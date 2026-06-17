@@ -1,8 +1,73 @@
 @import "tailwindcss";
 
-:root {
+@keyframes fp-slide-in-r {
+  from { opacity: 0; transform: translateX(24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes fp-slide-in-l {
+  from { opacity: 0; transform: translateX(-24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes fp-fade-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fp-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes fp-draw-circle {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes fp-draw-check {
+  to { stroke-dashoffset: 50; }
+}
+@keyframes fp-success-pop {
+  0%   { opacity: 0; transform: scale(0.85) translateY(12px); }
+  60%  { transform: scale(1.03) translateY(-2px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes fp-shake {
+  0%, 100% { transform: translateX(0); }
+  20%  { transform: translateX(-10px); }
+  40%  { transform: translateX(10px); }
+  60%  { transform: translateX(-6px); }
+  80%  { transform: translateX(6px); }
+}
+@keyframes fp-ring-draw {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes fp-ring-pulse {
+  0%, 100% { filter: drop-shadow(0 0 6px rgba(139,92,246,0.7)); }
+  50%       { filter: drop-shadow(0 0 18px rgba(139,92,246,1)); }
+}
+
+/* ── Auth theme tokens (data-theme on <html>) ── */
+:root,
+[data-theme="dark"] {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+
+  --auth-bg: #0a0a0a;
+  --auth-text: rgb(250, 250, 250);
+  --auth-text-sub: rgb(113, 113, 122);
+  --auth-input-bg: rgb(20, 20, 23);
+  --auth-input-border: rgb(39, 39, 42);
+  --auth-btn-bg: rgb(250, 250, 250);
+  --auth-btn-text: rgb(9, 9, 11);
+}
+
+[data-theme="light"] {
   --background: #ffffff;
   --foreground: #171717;
+
+  --auth-bg: #ffffff;
+  --auth-text: rgb(9, 9, 11);
+  --auth-text-sub: rgb(82, 82, 91);
+  --auth-input-bg: rgb(244, 244, 245);
+  --auth-input-border: rgb(228, 228, 231);
+  --auth-btn-bg: rgb(9, 9, 11);
+  --auth-btn-text: rgb(250, 250, 250);
 }
 
 @theme inline {
@@ -12,15 +77,39 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* ── Mobile auth gradient ── */
+/* Hidden on desktop (lg+). On mobile it shows by default (dark is the default).
+   Only disappears when [data-theme="light"] is explicitly set via JS toggle. */
+.auth-mobile-gradient {
+  display: none;
+  pointer-events: none;
+}
+
+@media (max-width: 1023px) {
+  .auth-mobile-gradient {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 58vh;
+    background: radial-gradient(
+      ellipse 130% 55% at 50% -5%,
+      rgb(88, 28, 218) 0%,
+      rgba(67, 10, 150, 0.85) 42%,
+      rgba(15, 5, 40, 0.45) 65%,
+      transparent 82%
+    );
+    z-index: 0;
+  }
+
+  [data-theme="light"] .auth-mobile-gradient {
+    display: none;
+  }
 }
