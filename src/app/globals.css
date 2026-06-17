@@ -20,7 +20,7 @@
   to { stroke-dashoffset: 0; }
 }
 @keyframes fp-draw-check {
-  to { stroke-dashoffset: 50; }
+  to { stroke-dashoffset: 0; }
 }
 @keyframes fp-success-pop {
   0%   { opacity: 0; transform: scale(0.85) translateY(12px); }

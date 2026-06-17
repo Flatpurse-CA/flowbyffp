@@ -6,19 +6,22 @@ export function StepProgress({
   step,
   total = 4,
   backHref,
+  onBack,
   title,
 }: {
   step: number;
   total?: number;
   backHref?: string;
+  onBack?: () => void;
   title?: string;
 }) {
   const router = useRouter();
   const easing = "cubic-bezier(0.16, 1, 0.3, 1)";
+  const handleBack = onBack ?? (backHref ? () => router.push(backHref) : undefined);
 
   return (
     <div>
-      {/* Pill + line indicator */}
+      {/* Pill + line indicator + back button — all on one row */}
       <div
         style={{
           display: "flex",
@@ -42,8 +45,7 @@ export function StepProgress({
                     width: isCompleted || isCurrent ? 22 : 8,
                     height: 8,
                     borderRadius: 100,
-                    background:
-                      isCompleted || isCurrent ? "rgb(107,99,232)" : "rgba(255,255,255,0.1)",
+                    background: isCompleted || isCurrent ? "rgb(107,99,232)" : "rgba(255,255,255,0.1)",
                     transition: "all 0.3s",
                     boxShadow: isCurrent ? "0 0 10px rgb(107,99,232)" : "none",
                   }}
@@ -55,18 +57,42 @@ export function StepProgress({
             </div>
           );
         })}
-        <span style={{ color: "rgb(113,113,122)", fontSize: 12, marginLeft: 4 }}>
+
+        <span style={{ color: "rgb(113,113,122)", fontSize: 12, marginLeft: 4, flex: 1 }}>
           Step {step} of {total}
         </span>
+
+        {handleBack && (
+          <button
+            type="button"
+            onClick={handleBack}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 5,
+              background: "none",
+              border: "1px solid rgb(39,39,42)",
+              borderRadius: 8,
+              padding: "5px 12px",
+              color: "rgb(113,113,122)",
+              fontSize: 12,
+              fontWeight: 500,
+              cursor: "pointer",
+              flexShrink: 0,
+            }}
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+              <path d="M19 12H5M12 5l-7 7 7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            Back
+          </button>
+        )}
       </div>
 
-      {/* Title + Back on same row */}
+      {/* Title row (only if title provided) */}
       {title && (
         <div
           style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
             marginBottom: 8,
             animation: `0.5s ${easing} 30ms 1 normal both running fp-fade-up`,
           }}
@@ -82,37 +108,6 @@ export function StepProgress({
           >
             {title}
           </h1>
-          {backHref && (
-            <button
-              type="button"
-              onClick={() => router.push(backHref)}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-                background: "none",
-                border: "1px solid rgb(39,39,42)",
-                borderRadius: 8,
-                padding: "7px 14px",
-                color: "rgb(113,113,122)",
-                fontSize: 13,
-                fontWeight: 500,
-                cursor: "pointer",
-                flexShrink: 0,
-              }}
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M19 12H5M12 5l-7 7 7 7"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              Back
-            </button>
-          )}
         </div>
       )}
     </div>

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { verifyCode, resendCode } from "./actions";
 
-function SuccessModal() {
+function SuccessModal({ onContinue }: { onContinue: () => void }) {
   const circumference = 2 * Math.PI * 36;
   return (
     <div
@@ -12,7 +12,7 @@ function SuccessModal() {
         position: "fixed",
         inset: 0,
         backdropFilter: "blur(20px)",
-        background: "rgba(0,0,0,0.75)",
+        background: "rgba(0,0,0,0.8)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -24,11 +24,12 @@ function SuccessModal() {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          gap: 28,
-          animation: "fp-success-pop 0.5s cubic-bezier(0.16,1,0.3,1) both",
+          gap: 32,
+          animation: "fp-success-pop 0.55s cubic-bezier(0.16,1,0.3,1) both",
         }}
       >
-        <svg width="96" height="96" viewBox="0 0 80 80" fill="none">
+        {/* Animated circle + checkmark */}
+        <svg width="110" height="110" viewBox="0 0 80 80" fill="none">
           <circle
             cx="40" cy="40" r="36"
             stroke="white"
@@ -37,43 +38,68 @@ function SuccessModal() {
             strokeDasharray={circumference}
             strokeDashoffset={circumference}
             strokeLinecap="round"
-            style={{ animation: "fp-draw-circle 0.7s ease forwards" }}
+            style={{ animation: "fp-draw-circle 0.8s ease forwards" }}
           />
           <path
-            d="M24 41l10 10 22-22"
+            d="M23 41l11 11 23-23"
             stroke="white"
-            strokeWidth="3"
+            strokeWidth="3.2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            strokeDasharray="50"
-            strokeDashoffset="50"
-            style={{ animation: "fp-draw-check 0.4s ease 0.65s forwards reverse" }}
+            strokeDasharray="52"
+            strokeDashoffset="52"
+            style={{ animation: "fp-draw-check 0.45s ease 0.75s forwards" }}
           />
         </svg>
+
         <div style={{ textAlign: "center" }}>
           <p
             style={{
               color: "white",
-              fontSize: 26,
-              fontWeight: 700,
-              margin: 0,
-              letterSpacing: "-0.02em",
-              animation: "fp-fade-in 0.4s ease 0.8s both",
+              fontSize: 28,
+              fontWeight: 800,
+              margin: "0 0 8px",
+              letterSpacing: "-0.03em",
+              animation: "fp-fade-up 0.4s ease 0.9s both",
             }}
           >
             Verification Successful
           </p>
           <p
             style={{
-              color: "rgba(255,255,255,0.45)",
+              color: "rgba(255,255,255,0.4)",
               fontSize: 14,
-              marginTop: 8,
-              animation: "fp-fade-in 0.4s ease 1s both",
+              margin: 0,
+              animation: "fp-fade-up 0.4s ease 1.05s both",
             }}
           >
-            Setting up your workspace…
+            Your account is ready to go.
           </p>
         </div>
+
+        <button
+          onClick={onContinue}
+          style={{
+            background: "white",
+            color: "rgb(9,9,11)",
+            border: "none",
+            borderRadius: 14,
+            padding: "13px 36px",
+            fontSize: 15,
+            fontWeight: 700,
+            cursor: "pointer",
+            letterSpacing: "-0.01em",
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            animation: "fp-fade-up 0.4s ease 1.25s both",
+          }}
+        >
+          Continue to Onboarding
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+            <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
       </div>
     </div>
   );
@@ -102,12 +128,16 @@ export function VerifyForm({ email, initialError }: { email: string; initialErro
     return () => clearInterval(intervalRef.current!);
   }, []);
 
+  const triggerSuccess = () => {
+    // Wait for all 6 ring animations to finish (5 × 100ms stagger + 900ms draw = 1400ms) then show modal
+    setTimeout(() => setShowSuccess(true), 1500);
+  };
+
   const submit = (code: string) => {
     setError(undefined);
     // Demo bypass — type 123456 to preview the full success flow
     if (code === "123456") {
-      setShowSuccess(true);
-      setTimeout(() => router.push("/onboarding"), 2600);
+      triggerSuccess();
       return;
     }
     startTransition(async () => {
@@ -119,8 +149,7 @@ export function VerifyForm({ email, initialError }: { email: string; initialErro
         setTimeout(() => setShake(false), 600);
         setTimeout(() => refs.current[0]?.focus(), 20);
       } else {
-        setShowSuccess(true);
-        setTimeout(() => router.push("/onboarding"), 2600);
+        triggerSuccess();
       }
     });
   };
@@ -200,7 +229,7 @@ export function VerifyForm({ email, initialError }: { email: string; initialErro
 
   return (
     <>
-      {showSuccess && <SuccessModal />}
+      {showSuccess && <SuccessModal onContinue={() => router.push("/onboarding")} />}
 
       {/* Full-page dark background */}
       <div
