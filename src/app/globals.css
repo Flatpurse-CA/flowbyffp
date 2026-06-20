@@ -83,6 +83,67 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+.cssbuttons-io {
+  position: relative;
+  font-family: inherit;
+  font-weight: 500;
+  font-size: 14px;
+  letter-spacing: 0.03em;
+  border-radius: 0.7em;
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.3);
+  background: transparent;
+  color: ghostwhite;
+  overflow: hidden;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+.cssbuttons-io svg {
+  width: 1em;
+  height: 1em;
+  margin-right: 0.4em;
+}
+
+.cssbuttons-io span {
+  position: relative;
+  z-index: 10;
+  transition: color 0.4s;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.6em 1.1em 0.6em 1em;
+}
+
+.cssbuttons-io::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -10%;
+  width: 120%;
+  height: 100%;
+  background: linear-gradient(to right, #9b3ff5, #5b10f0);
+  z-index: 0;
+  transform: skew(30deg) translate3d(-110%, 0, 0);
+  transition: transform 0.4s cubic-bezier(0.3, 1, 0.8, 1);
+}
+
+.cssbuttons-io:hover::before {
+  transform: skew(30deg) translate3d(0%, 0, 0);
+}
+
+.cssbuttons-io:active {
+  transform: scale(0.95);
+}
+
+.nav-link {
+  transition: background 0.15s ease;
+}
+.nav-link:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-radius: 8px;
+}
+
 /* ── Mobile auth gradient ── */
 /* Hidden on desktop (lg+). On mobile it shows by default (dark is the default).
    Only disappears when [data-theme="light"] is explicitly set via JS toggle. */
