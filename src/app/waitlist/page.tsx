@@ -98,33 +98,12 @@ export default function WaitlistPage() {
   return (
     <div style={{ background: "#060606", color: "#fff", minHeight: "100vh" }}>
 
-      {/* ── Minimal nav ── */}
-      <nav className="wl-nav" style={{
-        padding: "22px 48px",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        position: "relative",
-        zIndex: 10,
-      }}>
-        <Link href="/" style={{ textDecoration: "none", display: "flex", alignItems: "center" }}>
-          <Image src="/logo-white.svg" alt="FLOWBYFFP" width={105} height={35} priority />
-        </Link>
-        <Link href="/signup"
-          style={{ fontSize: 13, fontWeight: 500, color: "rgba(255,255,255,0.4)", textDecoration: "none", letterSpacing: "-0.01em" }}
-          onMouseEnter={e => (e.currentTarget.style.color = "#fff")}
-          onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.4)")}
-        >
-          Already have an account?
-        </Link>
-      </nav>
-
-      {/* ── Hero ── */}
+      {/* ── Hero (nav lives inside so it overlays the bg image) ── */}
       <section className="wl-hero" style={{
         position: "relative",
         overflow: "hidden",
         textAlign: "center",
-        padding: "30px 40px 80px",
+        padding: "0 40px 80px",
         minHeight: "100vh",
       }}>
         <Image
@@ -134,6 +113,27 @@ export default function WaitlistPage() {
           priority
           style={{ objectFit: "cover", objectPosition: "center bottom", zIndex: 0 }}
         />
+
+        {/* ── Minimal nav ── */}
+        <nav className="wl-nav" style={{
+          padding: "22px 48px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          position: "relative",
+          zIndex: 10,
+        }}>
+          <Link href="/" style={{ textDecoration: "none", display: "flex", alignItems: "center" }}>
+            <Image src="/logo-white.svg" alt="FLOWBYFFP" width={105} height={35} priority />
+          </Link>
+          <Link href="/signup"
+            style={{ fontSize: 13, fontWeight: 500, color: "rgba(255,255,255,0.4)", textDecoration: "none", letterSpacing: "-0.01em" }}
+            onMouseEnter={e => (e.currentTarget.style.color = "#fff")}
+            onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.4)")}
+          >
+            Already have an account?
+          </Link>
+        </nav>
 
         {/* AutoPilot pill */}
         <div style={{ position: "relative", zIndex: 1, marginBottom: 16, display: "inline-block" }}>
