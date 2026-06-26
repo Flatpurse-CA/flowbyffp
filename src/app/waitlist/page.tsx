@@ -194,7 +194,7 @@ export default function WaitlistPage() {
           maxWidth: 520,
           position: "relative", zIndex: 1,
         }}>
-          {"FlatPurse Flow fills empty slots, wins back lost clients, and runs your shop on AutoPilot.".split("").map((char, i) => (
+          {"First 40 shops get free beta access + automatic enrollment in Founders 100 — 40% off your subscription for 12 months, then 25% off as long as you stay.".split("").map((char, i) => (
             <span key={i} className="blur-drop" style={{
               display: "inline-block",
               animationDelay: `${0.72 + i * 0.018}s`,
