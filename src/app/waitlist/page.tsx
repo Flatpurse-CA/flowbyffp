@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
+import { joinWaitlist } from "./actions";
 import Link from "next/link";
 import { ArrowRight, ChevronDown, CheckCircle2, Sparkles, CalendarDays, Lock, Users, MessageSquare } from "lucide-react";
 import AutoPilotChip from "@/components/AutoPilotChip";
@@ -37,9 +38,11 @@ const SHOP_TYPES = ["I run a...", "Salon", "Barbershop", "Beauty Studio", "Nail 
 const AVATARS = ["/sd1.jpg", "/sd2.jpg", "/sd3.jpg", "/sd4.jpg"];
 
 export default function WaitlistPage() {
-  const [email, setEmail]       = useState("");
-  const [shopType, setShopType] = useState("I run a...");
+  const [email, setEmail]         = useState("");
+  const [shopType, setShopType]   = useState("I run a...");
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading]     = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
   const [open, setOpen]         = useState<number | null>(null);
   const [howVisible, setHowVisible] = useState(false);
   const howRef = useRef<HTMLHeadingElement>(null);
@@ -78,9 +81,18 @@ export default function WaitlistPage() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (email.trim()) setSubmitted(true);
+    if (!email.trim()) return;
+    setLoading(true);
+    setFormError(null);
+    const { error } = await joinWaitlist(email, shopType);
+    setLoading(false);
+    if (error) {
+      setFormError(error);
+    } else {
+      setSubmitted(true);
+    }
   }
 
   return (
@@ -234,7 +246,7 @@ export default function WaitlistPage() {
                 <option key={t} value={t} style={{ background: "#1a1a1a", color: "#fff" }}>{t}</option>
               ))}
             </select>
-            <button type="submit" style={{
+            <button type="submit" disabled={loading} style={{
               padding: "13px 24px",
               background: BRAND_PURPLE,
               color: "#fff",
@@ -242,7 +254,8 @@ export default function WaitlistPage() {
               fontWeight: 700,
               border: "none",
               borderRadius: 999,
-              cursor: "pointer",
+              cursor: loading ? "not-allowed" : "pointer",
+              opacity: loading ? 0.7 : 1,
               display: "flex",
               alignItems: "center",
               gap: 8,
@@ -251,9 +264,15 @@ export default function WaitlistPage() {
               fontFamily: "inherit",
               flexShrink: 0,
             }}>
-              Join Waitlist <ArrowRight size={14} />
+              {loading ? "Joining…" : <><span>Join Waitlist</span><ArrowRight size={14} /></>}
             </button>
           </form>
+        )}
+
+        {formError && !submitted && (
+          <p style={{ color: "rgb(248,113,113)", fontSize: 13, margin: "10px auto 0", maxWidth: 480, textAlign: "center" }}>
+            {formError}
+          </p>
         )}
 
         {/* Social proof */}
