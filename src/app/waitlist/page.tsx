@@ -229,69 +229,70 @@ export default function WaitlistPage() {
             </span>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} style={{
+          <form onSubmit={handleSubmit} className="wl-form" style={{
             position: "relative", zIndex: 1,
-            width: "100%", maxWidth: 520,
+            width: "100%", maxWidth: 680,
             margin: "0 auto 28px",
             display: "flex", flexDirection: "column", gap: 10,
           }}>
-            {/* Name */}
-            <input
-              type="text"
-              required
-              value={name}
-              onChange={e => setName(e.target.value)}
-              placeholder="Your name"
-              style={{
-                width: "100%", boxSizing: "border-box",
-                padding: "14px 18px",
-                background: "rgba(255,255,255,0.07)",
-                border: "1px solid rgba(255,255,255,0.12)",
-                borderRadius: 12, color: "#fff", fontSize: 14.5,
-                outline: "none", fontFamily: "inherit",
-              }}
-            />
-            {/* Email */}
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              placeholder="Your email"
-              style={{
-                width: "100%", boxSizing: "border-box",
-                padding: "14px 18px",
-                background: "rgba(255,255,255,0.07)",
-                border: "1px solid rgba(255,255,255,0.12)",
-                borderRadius: 12, color: "#fff", fontSize: 14.5,
-                outline: "none", fontFamily: "inherit",
-              }}
-            />
-            {/* Business type grid */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 }}>
-              {BUSINESS_TYPES.map((type) => {
-                const sel = bizType === type.label;
-                return (
-                  <button
-                    key={type.label}
-                    type="button"
-                    onClick={() => setBizType(type.label)}
-                    style={{
-                      padding: "12px 6px",
-                      background: sel ? "rgba(113,42,226,0.2)" : "rgba(255,255,255,0.06)",
-                      border: `1.5px solid ${sel ? BRAND_PURPLE : "rgba(255,255,255,0.1)"}`,
-                      borderRadius: 10, cursor: "pointer",
-                      display: "flex", flexDirection: "column", alignItems: "center", gap: 5,
-                      transition: "all 0.15s ease",
-                    }}
-                  >
-                    <span style={{ fontSize: 20 }}>{type.emoji}</span>
-                    <span style={{ fontSize: 11, fontWeight: 600, color: sel ? "#fff" : "rgba(255,255,255,0.5)", letterSpacing: "-0.01em" }}>
-                      {type.label}
-                    </span>
-                  </button>
-                );
-              })}
+            {/* Three fields in a row */}
+            <div style={{
+              display: "flex", gap: 0,
+              background: "rgba(255,255,255,0.06)",
+              border: "1px solid rgba(255,255,255,0.12)",
+              borderRadius: 14, overflow: "hidden",
+            }}>
+              <input
+                type="text"
+                required
+                value={name}
+                onChange={e => setName(e.target.value)}
+                placeholder="Your name"
+                style={{
+                  flex: 1, minWidth: 0,
+                  padding: "15px 18px",
+                  background: "transparent", border: "none",
+                  borderRight: "1px solid rgba(255,255,255,0.1)",
+                  color: "#fff", fontSize: 14.5,
+                  outline: "none", fontFamily: "inherit",
+                }}
+              />
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                placeholder="Your email"
+                style={{
+                  flex: 1, minWidth: 0,
+                  padding: "15px 18px",
+                  background: "transparent", border: "none",
+                  borderRight: "1px solid rgba(255,255,255,0.1)",
+                  color: "#fff", fontSize: 14.5,
+                  outline: "none", fontFamily: "inherit",
+                }}
+              />
+              <select
+                value={bizType ?? ""}
+                onChange={e => setBizType(e.target.value)}
+                style={{
+                  flex: 1, minWidth: 0,
+                  padding: "15px 18px",
+                  background: "transparent", border: "none",
+                  color: bizType ? "#fff" : "rgba(255,255,255,0.4)",
+                  fontSize: 14.5, outline: "none",
+                  fontFamily: "inherit", cursor: "pointer",
+                  appearance: "none",
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.4)' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
+                  backgroundRepeat: "no-repeat",
+                  backgroundPosition: "right 14px center",
+                }}
+              >
+                <option value="" style={{ background: "#1a1a1a" }}>Business type</option>
+                {BUSINESS_TYPES.map(t => (
+                  <option key={t.label} value={t.label} style={{ background: "#1a1a1a", color: "#fff" }}>{t.label}</option>
+                ))}
+              </select>
             </div>
             {/* CTA */}
             <button type="submit" disabled={loading} style={{
