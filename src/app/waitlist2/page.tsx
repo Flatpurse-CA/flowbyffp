@@ -1,349 +1,220 @@
-"use client";
-
-import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, CheckCircle2 } from "lucide-react";
+import { ArrowRight, User } from "lucide-react";
 
 const PURPLE = "#712AE2";
-const GOLD   = "#C9913A";
-const GOLD_B = "#D9A040";
-const BG     = "#0D0B1E";
 
-const BUSINESS_TYPES = [
-  { label: "Hair Salon",  emoji: "✂️" },
-  { label: "Barbershop",  emoji: "💈" },
-  { label: "Spa",         emoji: "🧖" },
-  { label: "Massage",     emoji: "💆" },
-  { label: "Nail Studio", emoji: "💅" },
-  { label: "Fitness",     emoji: "🏋️" },
-];
-
-const FEATURES = [
-  { icon: "📋", bold: "Recover up to 30%",    rest: " of lost revenue from no-shows" },
-  { icon: "🔔", bold: "Reduce no-shows by 40%", rest: " with automated SMS & email reminders" },
-  { icon: "📅", bold: "Fill empty slots in minutes", rest: " with AI-powered rebooking" },
-  { icon: "💳", bold: "Stripe pass-through processing", rest: " — no markup, no marketplace BS" },
-];
-
-const TOTAL = 40;
-const CLAIMED = 13;
+const NAV_LINKS = ["Features", "Pricing", "Resources", "Offers"];
 
 export default function Waitlist2Page() {
-  const [bizType,    setBizType]    = useState<string | null>(null);
-  const [email,      setEmail]      = useState("");
-  const [name,       setName]       = useState("");
-  const [submitted,  setSubmitted]  = useState(false);
-  const [hovering,   setHovering]   = useState(false);
-
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (email.trim() && name.trim()) setSubmitted(true);
-  }
-
   return (
-    <div style={{ background: BG, color: "#fff", minHeight: "100vh", fontFamily: "var(--font-geist-sans, system-ui, sans-serif)" }}>
+    <div style={{ background: PURPLE, color: "#fff", minHeight: "100vh", fontFamily: "var(--font-geist-sans, system-ui, sans-serif)", overflow: "hidden" }}>
 
       {/* ── Nav ── */}
-      <nav style={{ padding: "22px 48px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "relative", zIndex: 10 }}>
-        <Link href="/" style={{ textDecoration: "none" }}>
-          <Image src="/logo-white.svg" alt="FLOWBYFFP" width={105} height={35} priority />
+      <nav style={{
+        padding: "0 48px",
+        height: 68,
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        position: "relative", zIndex: 20,
+      }}>
+        {/* Logo */}
+        <Link href="/" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 10 }}>
+          <Image src="/logo-white.svg" alt="FlatPurse Flow" width={110} height={36} priority />
         </Link>
-        <Link
-          href="/login"
-          style={{ fontSize: 13, fontWeight: 500, color: "rgba(255,255,255,0.38)", textDecoration: "none", letterSpacing: "-0.01em", transition: "color 0.18s" }}
-          onMouseEnter={e => (e.currentTarget.style.color = "#fff")}
-          onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.38)")}
-        >
-          Already have an account?
-        </Link>
+
+        {/* Center links */}
+        <div className="wl2-nav-links" style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          {NAV_LINKS.map((l) => (
+            <Link key={l} href="#" style={{
+              fontSize: 14, fontWeight: 500, color: "rgba(255,255,255,0.75)",
+              textDecoration: "none", padding: "8px 14px", borderRadius: 8,
+              transition: "color 0.15s, background 0.15s",
+            }}
+              onMouseEnter={undefined}
+              className="wl2-nav-link"
+            >
+              {l}
+            </Link>
+          ))}
+        </div>
+
+        {/* Right actions */}
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <Link href="/signup" style={{
+            display: "flex", alignItems: "center", gap: 8,
+            fontSize: 14, fontWeight: 600, color: "#fff",
+            textDecoration: "none",
+            border: "1.5px solid rgba(255,255,255,0.35)",
+            borderRadius: 10, padding: "9px 18px",
+            transition: "background 0.15s, border-color 0.15s",
+          }}
+            className="wl2-cta-btn"
+          >
+            <ArrowRight size={14} /> Get started
+          </Link>
+          <Link href="/login" style={{
+            width: 38, height: 38, borderRadius: 10,
+            border: "1.5px solid rgba(255,255,255,0.25)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            color: "rgba(255,255,255,0.8)", textDecoration: "none",
+            transition: "background 0.15s",
+          }}
+            className="wl2-icon-btn"
+          >
+            <User size={16} />
+          </Link>
+        </div>
       </nav>
 
-      {/* ── Split ── */}
-      <div className="wl2-split" style={{
+      {/* ── Hero ── */}
+      <section style={{
         display: "grid",
-        gridTemplateColumns: "1.1fr 0.9fr",
-        gap: 0,
-        padding: "32px 48px 96px",
-        boxSizing: "border-box",
-        maxWidth: 1340,
-        margin: "0 auto",
-        alignItems: "start",
+        gridTemplateColumns: "1fr 1fr",
+        alignItems: "center",
+        minHeight: "calc(100vh - 68px)",
+        padding: "0 48px 0 72px",
+        gap: 40,
+        position: "relative",
       }}>
 
-        {/* ── LEFT ── */}
-        <div className="wl2-left" style={{ paddingRight: 72, paddingTop: 12 }}>
+        {/* LEFT */}
+        <div style={{ paddingBottom: 80 }}>
 
-          {/* Pill */}
+          {/* Chip */}
           <div style={{
-            display: "inline-flex", alignItems: "center", gap: 8,
-            background: "rgba(255,255,255,0.055)",
-            border: "1px solid rgba(255,255,255,0.11)",
-            borderRadius: 999, padding: "6px 16px", marginBottom: 36,
+            display: "inline-flex", alignItems: "center", gap: 9,
+            background: "rgba(255,255,255,0.12)",
+            border: "1px solid rgba(255,255,255,0.22)",
+            borderRadius: 999, padding: "8px 16px",
+            marginBottom: 36,
           }}>
-            <span style={{ color: GOLD, fontSize: 10 }}>✦</span>
-            <span style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.55)", letterSpacing: "0.1em", textTransform: "uppercase" }}>
-              FlatPurse Flow&nbsp;&nbsp;·&nbsp;&nbsp;Founder Beta
+            <span style={{ fontSize: 14 }}>⚡</span>
+            <span style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.85)", letterSpacing: "0.02em" }}>
+              Auto Pilot &nbsp;·&nbsp; Track More Bookings
             </span>
           </div>
 
           {/* Heading */}
           <h1 style={{
-            fontSize: "clamp(34px, 4.2vw, 60px)",
-            fontWeight: 900, letterSpacing: "-0.045em", lineHeight: 1.06,
+            fontSize: "clamp(42px, 5.5vw, 74px)",
+            fontWeight: 900, letterSpacing: "-0.045em", lineHeight: 1.04,
             margin: "0 0 28px", color: "#fff",
           }}>
-            Turn No-Shows into<br />
-            <em style={{ color: GOLD_B, fontStyle: "italic" }}>Revenue</em>{" "}—<br />
-            Automatically.
+            Book More.<br />
+            Lose Nothing.<br />
+            Keep Every Dollar.
           </h1>
 
-          {/* Body */}
-          <p style={{ fontSize: 16.5, color: "rgba(255,255,255,0.52)", lineHeight: 1.8, margin: "0 0 10px", maxWidth: 480 }}>
-            Every no-show costs you <strong style={{ color: "#fff" }}>C$80–C$200</strong>. Multiply that by a
-            slow week and you've lost more than your software bill. FlatPurse Flow fills empty chairs
-            automatically, recovers lost revenue, and keeps your clients{" "}
-            <em style={{ color: GOLD_B }}>yours</em> — no marketplace, no commission, no FX surprises.
-          </p>
-
-          {/* Tagline */}
-          <p style={{ fontSize: 13, color: "rgba(255,255,255,0.28)", fontStyle: "italic", lineHeight: 1.65, margin: "0 0 48px" }}>
-            Built for barbers, salons, spas, massage therapists, nail studios, and personal trainers.
-          </p>
-
-          {/* Feature list */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 14, marginBottom: 56 }}>
-            {FEATURES.map((f, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 14 }}>
-                <div style={{
-                  width: 38, height: 38, borderRadius: 9, flexShrink: 0,
-                  background: "rgba(255,255,255,0.045)",
-                  border: "1px solid rgba(255,255,255,0.07)",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: 17,
-                }}>
-                  {f.icon}
-                </div>
-                <p style={{ fontSize: 14.5, color: "rgba(255,255,255,0.6)", lineHeight: 1.65, margin: "auto 0" }}>
-                  <strong style={{ color: "#fff", fontWeight: 700 }}>{f.bold}</strong>{f.rest}
-                </p>
-              </div>
-            ))}
-          </div>
-
-          {/* Builder badge */}
-          <div style={{
-            display: "flex", alignItems: "flex-start", gap: 14,
-            background: "rgba(255,255,255,0.035)",
-            border: "1px solid rgba(255,255,255,0.07)",
-            borderRadius: 14, padding: "18px 20px",
-            maxWidth: 430,
+          {/* Sub */}
+          <p style={{
+            fontSize: 17, color: "rgba(255,255,255,0.7)", lineHeight: 1.75,
+            margin: "0 0 44px", maxWidth: 440,
           }}>
-            <div style={{
-              width: 44, height: 44, borderRadius: "50%", flexShrink: 0,
-              background: "rgba(255,255,255,0.05)",
-              border: "1px solid rgba(255,255,255,0.08)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 22,
-            }}>
-              🇨🇦
-            </div>
-            <p style={{ fontSize: 13.5, color: "rgba(255,255,255,0.55)", lineHeight: 1.75, margin: 0 }}>
-              Built by <strong style={{ color: "#fff" }}>George & Maxwell in Edmonton, AB.</strong>{" "}
-              Real founders. Real phone number. Real Canadian support.
-            </p>
+            FlatPurse Flow handles your bookings, fills your empty slots,
+            and wins back lost clients automatically, while you focus on the work.
+          </p>
+
+          {/* CTAs */}
+          <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+            <Link href="/signup" style={{
+              display: "inline-flex", alignItems: "center", gap: 9,
+              padding: "14px 26px",
+              background: "#fff", color: PURPLE,
+              fontSize: 15, fontWeight: 800, letterSpacing: "-0.025em",
+              textDecoration: "none", borderRadius: 12,
+              transition: "opacity 0.15s",
+            }}
+              className="wl2-primary-btn"
+            >
+              Get started free <ArrowRight size={16} />
+            </Link>
+            <Link href="#how" style={{
+              display: "inline-flex", alignItems: "center",
+              padding: "14px 26px",
+              background: "rgba(255,255,255,0.1)",
+              border: "1.5px solid rgba(255,255,255,0.2)",
+              color: "#fff",
+              fontSize: 15, fontWeight: 600, letterSpacing: "-0.02em",
+              textDecoration: "none", borderRadius: 12,
+              transition: "background 0.15s",
+            }}
+              className="wl2-ghost-btn"
+            >
+              See how it works
+            </Link>
           </div>
         </div>
 
-        {/* ── RIGHT (form card) ── */}
-        <div className="wl2-right">
+        {/* RIGHT — phone mockup */}
+        <div style={{
+          display: "flex", justifyContent: "center", alignItems: "flex-end",
+          height: "100%",
+          position: "relative",
+        }}>
           <div style={{
-            background: "rgba(255,255,255,0.038)",
-            border: "1px solid rgba(255,255,255,0.085)",
-            borderRadius: 22,
-            padding: "36px 36px 32px",
-            position: "sticky",
-            top: 28,
-            backdropFilter: "blur(12px)",
+            position: "relative",
+            width: "100%",
+            maxWidth: 520,
+            marginBottom: -2,
           }}>
-
-            {/* Card label */}
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 18 }}>
-              <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.13em", color: "rgba(255,255,255,0.32)", textTransform: "uppercase" }}>Founder Beta</span>
-              <span style={{ width: 3, height: 3, borderRadius: "50%", background: "rgba(255,255,255,0.18)", display: "inline-block" }} />
-              <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.13em", color: "rgba(255,255,255,0.32)", textTransform: "uppercase" }}>Free Access</span>
-            </div>
-
-            {/* Card heading */}
-            <h2 style={{ fontSize: 24, fontWeight: 800, letterSpacing: "-0.03em", margin: "0 0 2px", color: "#fff" }}>
-              Reserve your beta spot.
-            </h2>
-            <p style={{ fontSize: 20, fontWeight: 700, letterSpacing: "-0.025em", margin: "0 0 14px", color: GOLD_B, fontStyle: "italic" }}>
-              Get 40% off forever.
-            </p>
-            <p style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", lineHeight: 1.75, margin: "0 0 24px" }}>
-              First 40 shops get <strong style={{ color: "#fff" }}>free beta access</strong> + automatic
-              enrollment in <strong style={{ color: "#fff" }}>Founders 100</strong> — 40% off your
-              subscription for 12 months, then 25% off as long as you stay.
-            </p>
-
-            {/* Progress bar */}
-            <div style={{ marginBottom: 26 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 9 }}>
-                <span style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: "0.11em", color: "rgba(255,255,255,0.3)", textTransform: "uppercase" }}>
-                  Beta Spots Claimed
-                </span>
-                <span style={{ fontSize: 13.5, fontWeight: 800, color: "#fff", letterSpacing: "-0.025em" }}>
-                  <span style={{ color: GOLD_B }}>{CLAIMED}</span> / {TOTAL}
-                </span>
-              </div>
-              <div style={{ height: 4, borderRadius: 2, background: "rgba(255,255,255,0.07)" }}>
-                <div style={{
-                  height: "100%", width: `${(CLAIMED / TOTAL) * 100}%`,
-                  borderRadius: 2,
-                  background: `linear-gradient(to right, ${GOLD}, #E8C06A)`,
-                }} />
-              </div>
-            </div>
-
-            {submitted ? (
-              <div style={{
-                display: "flex", alignItems: "center", gap: 12,
-                background: "rgba(113,42,226,0.12)",
-                border: "1px solid rgba(113,42,226,0.3)",
-                borderRadius: 12, padding: "20px 22px",
-              }}>
-                <CheckCircle2 size={20} color={PURPLE} />
-                <span style={{ fontSize: 15, fontWeight: 600, color: "#fff", letterSpacing: "-0.02em" }}>
-                  You&apos;re on the list. We&apos;ll be in touch soon.
-                </span>
-              </div>
-            ) : (
-              <form onSubmit={handleSubmit}>
-
-                {/* Business type grid */}
-                <div style={{ marginBottom: 18 }}>
-                  <label style={{ display: "block", fontSize: 10, fontWeight: 700, letterSpacing: "0.09em", color: "rgba(255,255,255,0.38)", textTransform: "uppercase", marginBottom: 10 }}>
-                    Business Type <span style={{ color: "#E05555" }}>*</span>
-                  </label>
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 7 }}>
-                    {BUSINESS_TYPES.map((type) => {
-                      const sel = bizType === type.label;
-                      return (
-                        <button
-                          key={type.label}
-                          type="button"
-                          onClick={() => setBizType(type.label)}
-                          style={{
-                            padding: "13px 6px",
-                            background: sel ? "rgba(113,42,226,0.18)" : "rgba(255,255,255,0.04)",
-                            border: `1.5px solid ${sel ? PURPLE : "rgba(255,255,255,0.07)"}`,
-                            borderRadius: 10, cursor: "pointer",
-                            display: "flex", flexDirection: "column", alignItems: "center", gap: 5,
-                            transition: "all 0.15s ease",
-                          }}
-                        >
-                          <span style={{ fontSize: 21 }}>{type.emoji}</span>
-                          <span style={{ fontSize: 10.5, fontWeight: 600, color: sel ? "#fff" : "rgba(255,255,255,0.48)", letterSpacing: "-0.01em" }}>
-                            {type.label}
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Email */}
-                <div style={{ marginBottom: 12 }}>
-                  <label style={{ display: "block", fontSize: 10, fontWeight: 700, letterSpacing: "0.09em", color: "rgba(255,255,255,0.38)", textTransform: "uppercase", marginBottom: 8 }}>
-                    Email <span style={{ color: "#E05555" }}>*</span>
-                  </label>
-                  <input
-                    type="email"
-                    required
-                    value={email}
-                    onChange={e => setEmail(e.target.value)}
-                    placeholder="jane@mybusiness.com"
-                    style={{
-                      width: "100%", boxSizing: "border-box",
-                      padding: "13px 16px",
-                      background: "rgba(255,255,255,0.05)",
-                      border: "1.5px solid rgba(255,255,255,0.08)",
-                      borderRadius: 10, color: "#fff", fontSize: 14,
-                      outline: "none", fontFamily: "inherit",
-                      transition: "border-color 0.15s ease",
-                    }}
-                    onFocus={e => (e.currentTarget.style.borderColor = `${PURPLE}80`)}
-                    onBlur={e => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)")}
-                  />
-                </div>
-
-                {/* Name */}
-                <div style={{ marginBottom: 22 }}>
-                  <label style={{ display: "block", fontSize: 10, fontWeight: 700, letterSpacing: "0.09em", color: "rgba(255,255,255,0.38)", textTransform: "uppercase", marginBottom: 8 }}>
-                    Name <span style={{ color: "#E05555" }}>*</span>
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={name}
-                    onChange={e => setName(e.target.value)}
-                    placeholder="Jane Doe"
-                    style={{
-                      width: "100%", boxSizing: "border-box",
-                      padding: "13px 16px",
-                      background: "rgba(255,255,255,0.05)",
-                      border: "1.5px solid rgba(255,255,255,0.08)",
-                      borderRadius: 10, color: "#fff", fontSize: 14,
-                      outline: "none", fontFamily: "inherit",
-                      transition: "border-color 0.15s ease",
-                    }}
-                    onFocus={e => (e.currentTarget.style.borderColor = `${PURPLE}80`)}
-                    onBlur={e => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)")}
-                  />
-                </div>
-
-                {/* CTA */}
-                <button
-                  type="submit"
-                  onMouseEnter={() => setHovering(true)}
-                  onMouseLeave={() => setHovering(false)}
-                  style={{
-                    width: "100%", padding: "15px 24px",
-                    background: hovering ? "#C8891E" : GOLD_B,
-                    color: "#0A0704",
-                    fontSize: 15, fontWeight: 800, letterSpacing: "-0.025em",
-                    border: "none", borderRadius: 12,
-                    cursor: "pointer",
-                    display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-                    fontFamily: "inherit",
-                    transition: "background 0.18s ease",
-                  }}
-                >
-                  ⚡ Claim My Beta Spot <ArrowRight size={16} />
-                </button>
-
-                <p style={{ fontSize: 12, color: "rgba(255,255,255,0.28)", textAlign: "center", margin: "14px 0 0", lineHeight: 1.65 }}>
-                  Free during beta. No credit card. We&apos;ll never spam you, and you can leave anytime.
-                </p>
-              </form>
-            )}
+            <Image
+              src="/herorightimg.png"
+              alt="FlatPurse Flow app"
+              width={520}
+              height={640}
+              style={{
+                width: "100%",
+                height: "auto",
+                objectFit: "contain",
+                objectPosition: "bottom",
+                filter: "drop-shadow(0 32px 64px rgba(0,0,0,0.35))",
+              }}
+              priority
+            />
           </div>
         </div>
+      </section>
+
+      {/* ── Bottom peek cards ── */}
+      <div className="wl2-bottom-cards" style={{
+        position: "fixed",
+        bottom: 0, left: 0, right: 0,
+        display: "flex", gap: 12,
+        padding: "0 48px",
+        zIndex: 5,
+        pointerEvents: "none",
+      }}>
+        {["AutoPilot", "No-Show Recovery", "Smart Rebooking", "Stripe Payments", "Client Messaging"].map((label, i) => (
+          <div key={i} style={{
+            background: "#fff",
+            borderRadius: "14px 14px 0 0",
+            padding: "14px 22px 0",
+            fontSize: 12.5, fontWeight: 600, color: PURPLE,
+            whiteSpace: "nowrap",
+            letterSpacing: "-0.01em",
+            opacity: 0.92,
+          }}>
+            {label}
+          </div>
+        ))}
       </div>
 
       <style>{`
-        input::placeholder { color: rgba(255,255,255,0.22); }
+        .wl2-nav-link:hover { color: #fff !important; background: rgba(255,255,255,0.1) !important; }
+        .wl2-cta-btn:hover  { background: rgba(255,255,255,0.12) !important; border-color: rgba(255,255,255,0.6) !important; }
+        .wl2-icon-btn:hover { background: rgba(255,255,255,0.12) !important; }
+        .wl2-primary-btn:hover { opacity: 0.88 !important; }
+        .wl2-ghost-btn:hover   { background: rgba(255,255,255,0.18) !important; }
 
-        @media (max-width: 880px) {
-          .wl2-split {
+        @media (max-width: 860px) {
+          section {
             grid-template-columns: 1fr !important;
-            padding: 24px 20px 64px !important;
+            padding: 40px 24px 0 !important;
+            min-height: auto !important;
           }
-          .wl2-left {
-            padding-right: 0 !important;
-            margin-bottom: 40px;
-          }
+          .wl2-bottom-cards { display: none !important; }
+          .wl2-nav-links { display: none !important; }
+          nav { padding: 0 20px !important; }
         }
       `}</style>
     </div>
