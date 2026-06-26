@@ -169,7 +169,7 @@ export default function WaitlistPage() {
           letterSpacing: "-0.04em",
           lineHeight: 1.1,
           fontStyle: "italic",
-          color: "#D9A040",
+          color: "#D8C8FF",
           margin: "0 auto 32px",
           maxWidth: 800,
           position: "relative", zIndex: 1,
