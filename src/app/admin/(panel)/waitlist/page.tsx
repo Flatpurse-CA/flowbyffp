@@ -1,17 +1,13 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-import {
-  approveWaitlistEntry, rejectWaitlistEntry,
-  deleteWaitlistEntry, resetWaitlistEntry,
-} from "./actions";
-import {
-  CheckCircle, XCircle, Trash2, RotateCcw,
-  ClipboardList, Clock, CheckCheck, Ban,
-} from "lucide-react";
+import { inviteWaitlistEntry, deleteWaitlistEntry, resetWaitlistEntry } from "./actions";
+import { ClipboardList, Clock, Mail, Trash2, RotateCcw } from "lucide-react";
 
 const STATUS_STYLE: Record<string, { color: string; bg: string; label: string }> = {
-  pending:  { color: "rgb(251,191,36)",  bg: "rgba(245,158,11,0.12)",  label: "Pending"  },
-  approved: { color: "rgb(52,211,153)",  bg: "rgba(16,185,129,0.12)",  label: "Approved" },
-  rejected: { color: "rgb(248,113,113)", bg: "rgba(239,68,68,0.12)",   label: "Rejected" },
+  pending: { color: "rgb(251,191,36)",  bg: "rgba(245,158,11,0.12)", label: "Pending" },
+  invited: { color: "rgb(96,165,250)",  bg: "rgba(59,130,246,0.12)", label: "Invited" },
+  // legacy — keep rendering old values gracefully
+  approved: { color: "rgb(52,211,153)", bg: "rgba(16,185,129,0.12)", label: "Invited" },
+  rejected: { color: "rgb(248,113,113)", bg: "rgba(239,68,68,0.12)", label: "Removed" },
 };
 
 function StatCard({
@@ -57,17 +53,13 @@ export default async function AdminWaitlistPage() {
     email: string;
     shop_type: string | null;
     status: string;
-    notes: string | null;
     created_at: string;
     approved_at: string | null;
   }[];
 
-  const counts = {
-    total:    entries.length,
-    pending:  entries.filter(e => e.status === "pending").length,
-    approved: entries.filter(e => e.status === "approved").length,
-    rejected: entries.filter(e => e.status === "rejected").length,
-  };
+  const total   = entries.length;
+  const pending = entries.filter(e => e.status === "pending").length;
+  const invited = entries.filter(e => e.status === "invited" || e.status === "approved").length;
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
@@ -78,16 +70,15 @@ export default async function AdminWaitlistPage() {
           Waitlist
         </h1>
         <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 13, margin: 0 }}>
-          {counts.total} total &mdash; {counts.pending} pending review
+          {total} {total === 1 ? "person" : "people"} waiting &mdash; {pending} not yet invited
         </p>
       </div>
 
       {/* ── Stat cards ── */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
-        <StatCard label="Total"    count={counts.total}    Icon={ClipboardList} iconColor="rgb(167,139,250)" iconBg="rgba(109,40,217,0.15)" />
-        <StatCard label="Pending"  count={counts.pending}  Icon={Clock}         iconColor="rgb(251,191,36)"  iconBg="rgba(245,158,11,0.12)" />
-        <StatCard label="Approved" count={counts.approved} Icon={CheckCheck}    iconColor="rgb(52,211,153)"  iconBg="rgba(16,185,129,0.12)" />
-        <StatCard label="Rejected" count={counts.rejected} Icon={Ban}           iconColor="rgb(248,113,113)" iconBg="rgba(239,68,68,0.12)"  />
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
+        <StatCard label="Total on list" count={total}   Icon={ClipboardList} iconColor="rgb(167,139,250)" iconBg="rgba(109,40,217,0.15)" />
+        <StatCard label="Pending invite" count={pending} Icon={Clock}         iconColor="rgb(251,191,36)"  iconBg="rgba(245,158,11,0.12)" />
+        <StatCard label="Invited"        count={invited} Icon={Mail}          iconColor="rgb(96,165,250)"  iconBg="rgba(59,130,246,0.12)" />
       </div>
 
       {/* ── Error ── */}
@@ -97,7 +88,7 @@ export default async function AdminWaitlistPage() {
         </div>
       )}
 
-      {/* ── Table ── */}
+      {/* ── Table / empty ── */}
       {entries.length === 0 && !error ? (
         <div style={{
           background: "rgb(10,10,12)", border: "1px solid rgba(255,255,255,0.09)",
@@ -111,8 +102,8 @@ export default async function AdminWaitlistPage() {
           }}>
             <ClipboardList size={22} color="rgba(255,255,255,0.2)" strokeWidth={1.4} />
           </div>
-          <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 14, fontWeight: 600, margin: 0 }}>No waitlist entries yet</p>
-          <p style={{ color: "rgba(255,255,255,0.18)", fontSize: 12.5, margin: 0 }}>Entries will appear here once people join the waitlist</p>
+          <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 14, fontWeight: 600, margin: 0 }}>No one on the waitlist yet</p>
+          <p style={{ color: "rgba(255,255,255,0.18)", fontSize: 12.5, margin: 0 }}>Entries will appear here once people join at /waitlist</p>
         </div>
       ) : (
         <div style={{ background: "rgb(10,10,12)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 16, overflow: "hidden" }}>
@@ -135,17 +126,16 @@ export default async function AdminWaitlistPage() {
             <tbody>
               {entries.map((entry, i) => {
                 const displayName = entry.name ?? entry.email.split("@")[0];
-                const initials = displayName.slice(0, 2).toUpperCase();
-                const date = new Date(entry.created_at).toLocaleDateString("en-CA", {
+                const initials    = displayName.slice(0, 2).toUpperCase();
+                const date        = new Date(entry.created_at).toLocaleDateString("en-CA", {
                   month: "short", day: "numeric", year: "numeric",
                 });
-                const s = STATUS_STYLE[entry.status] ?? STATUS_STYLE.pending;
+                const s           = STATUS_STYLE[entry.status] ?? STATUS_STYLE.pending;
+                const isInvited   = entry.status === "invited" || entry.status === "approved";
 
                 return (
-                  <tr
-                    key={entry.id}
-                    style={{ borderBottom: i < entries.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none" }}
-                  >
+                  <tr key={entry.id} style={{ borderBottom: i < entries.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none" }}>
+
                     {/* Name */}
                     <td style={{ padding: "14px 20px" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -158,7 +148,9 @@ export default async function AdminWaitlistPage() {
                           {initials}
                         </div>
                         <span style={{ color: "rgb(240,240,248)", fontSize: 13.5, fontWeight: 600 }}>
-                          {entry.name ?? <span style={{ color: "rgba(255,255,255,0.25)", fontWeight: 400, fontStyle: "italic" }}>no name</span>}
+                          {entry.name ?? (
+                            <span style={{ color: "rgba(255,255,255,0.25)", fontWeight: 400, fontStyle: "italic" }}>no name</span>
+                          )}
                         </span>
                       </div>
                     </td>
@@ -203,36 +195,23 @@ export default async function AdminWaitlistPage() {
                     {/* Actions */}
                     <td style={{ padding: "14px 20px" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                        {entry.status === "pending" && (
-                          <>
-                            <form action={approveWaitlistEntry}>
-                              <input type="hidden" name="id" value={entry.id} />
-                              <button type="submit" style={{
-                                display: "flex", alignItems: "center", gap: 5,
-                                padding: "5px 11px", borderRadius: 8, cursor: "pointer",
-                                background: "rgba(16,185,129,0.1)", border: "1px solid rgba(52,211,153,0.22)",
-                                color: "rgb(52,211,153)", fontSize: 11.5, fontWeight: 600, fontFamily: "inherit",
-                              }}>
-                                <CheckCircle size={12} /> Approve
-                              </button>
-                            </form>
-                            <form action={rejectWaitlistEntry}>
-                              <input type="hidden" name="id" value={entry.id} />
-                              <button type="submit" style={{
-                                display: "flex", alignItems: "center", gap: 5,
-                                padding: "5px 11px", borderRadius: 8, cursor: "pointer",
-                                background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.18)",
-                                color: "rgb(248,113,113)", fontSize: 11.5, fontWeight: 600, fontFamily: "inherit",
-                              }}>
-                                <XCircle size={12} /> Reject
-                              </button>
-                            </form>
-                          </>
-                        )}
-                        {(entry.status === "approved" || entry.status === "rejected") && (
-                          <form action={resetWaitlistEntry}>
+                        {!isInvited && (
+                          <form action={inviteWaitlistEntry}>
                             <input type="hidden" name="id" value={entry.id} />
                             <button type="submit" style={{
+                              display: "flex", alignItems: "center", gap: 5,
+                              padding: "5px 11px", borderRadius: 8, cursor: "pointer",
+                              background: "rgba(59,130,246,0.1)", border: "1px solid rgba(96,165,250,0.22)",
+                              color: "rgb(96,165,250)", fontSize: 11.5, fontWeight: 600, fontFamily: "inherit",
+                            }}>
+                              <Mail size={12} /> Send Invite
+                            </button>
+                          </form>
+                        )}
+                        {isInvited && (
+                          <form action={resetWaitlistEntry}>
+                            <input type="hidden" name="id" value={entry.id} />
+                            <button type="submit" title="Reset to pending" style={{
                               display: "flex", alignItems: "center", gap: 5,
                               padding: "5px 11px", borderRadius: 8, cursor: "pointer",
                               background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)",
@@ -244,7 +223,7 @@ export default async function AdminWaitlistPage() {
                         )}
                         <form action={deleteWaitlistEntry}>
                           <input type="hidden" name="id" value={entry.id} />
-                          <button type="submit" title="Delete" style={{
+                          <button type="submit" title="Remove from list" style={{
                             display: "flex", alignItems: "center", justifyContent: "center",
                             width: 30, height: 30, borderRadius: 8, cursor: "pointer",
                             background: "transparent", border: "1px solid rgba(255,255,255,0.07)",
