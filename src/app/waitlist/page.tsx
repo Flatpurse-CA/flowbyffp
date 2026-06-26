@@ -126,13 +126,14 @@ export default function WaitlistPage() {
         textAlign: "center",
         padding: "30px 40px 80px",
         minHeight: "100vh",
-        backgroundImage: "url('/hero-p.jpeg')",
-        backgroundSize: "cover",
-        backgroundPosition: "center bottom",
-        backgroundRepeat: "no-repeat",
-        backgroundColor: "#060606",
       }}>
-
+        <Image
+          src="/hero-p.jpeg"
+          alt=""
+          fill
+          priority
+          style={{ objectFit: "cover", objectPosition: "center bottom", zIndex: 0 }}
+        />
 
         {/* AutoPilot pill */}
         <div style={{ position: "relative", zIndex: 1, marginBottom: 16, display: "inline-block" }}>
