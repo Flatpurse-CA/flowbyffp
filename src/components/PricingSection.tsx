@@ -100,7 +100,7 @@ export default function PricingSection() {
   }, []);
 
   return (
-    <section style={{ background: "#000", padding: "100px 155px 300px", position: "relative" }}>
+    <section className="pricing-section-outer" style={{ background: "#000", padding: "100px 155px 300px", position: "relative" }}>
       {/* Header */}
       <ScrollReveal delay={0} style={{ marginBottom: 56, display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
         <AutoPilotChip theme="dark" words={["Simple,", "transparent", "pricing."]} />
@@ -127,7 +127,7 @@ export default function PricingSection() {
       </ScrollReveal>
 
       {/* Cards */}
-      <div ref={gridRef} style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 12, alignItems: "stretch" }}>
+      <div ref={gridRef} className="pricing-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 12, alignItems: "stretch" }}>
         {PLANS.map((p, idx) => {
           const isSelected = selected === p.id;
           const isHovered = hovered === p.id;
@@ -284,6 +284,16 @@ export default function PricingSection() {
       <div style={{ position: "absolute", bottom: 0, left: 0, width: "100%", zIndex: 10, pointerEvents: "none" }}>
         <img src="/ffdoe.svg" alt="" style={{ width: "100%", display: "block", filter: "brightness(0) invert(1)" }} />
       </div>
+
+      <style>{`
+        @media (max-width: 900px) {
+          .pricing-section-outer { padding: 60px 20px 80px !important; }
+          .pricing-grid { grid-template-columns: 1fr 1fr !important; }
+        }
+        @media (max-width: 540px) {
+          .pricing-grid { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
     </section>
   );
 }

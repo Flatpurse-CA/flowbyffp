@@ -7,6 +7,7 @@ import Link from "next/link";
 import { ArrowRight, ChevronDown, CheckCircle2, Sparkles, CalendarDays, Lock, Users, MessageSquare } from "lucide-react";
 import AutoPilotChip from "@/components/AutoPilotChip";
 import ScrollZoom from "@/components/ScrollZoom";
+import PricingSection from "@/components/PricingSection";
 import Footer from "@/components/Footer";
 
 const BRAND_PURPLE = "#712AE2";
@@ -519,6 +520,8 @@ export default function WaitlistPage() {
           <div style={{ borderTop: "1px solid rgba(255,255,255,0.07)" }} />
         </div>
       </section>
+
+      <PricingSection />
 
       <Footer />
 
