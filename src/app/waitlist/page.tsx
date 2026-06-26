@@ -362,8 +362,10 @@ export default function WaitlistPage() {
       <section className="wl-how" style={{
         padding: "80px 120px 120px",
         width: "100%", boxSizing: "border-box",
+        position: "relative", overflow: "hidden",
       }}>
-        <div>
+        <Image src="/hero-p4.png" alt="" fill priority style={{ objectFit: "cover", objectPosition: "center top", zIndex: 0 }} />
+        <div style={{ position: "relative", zIndex: 1 }}>
           {/* Header row */}
           <div style={{ marginBottom: 72 }}>
             <div style={{
