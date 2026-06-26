@@ -4,158 +4,171 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
-  LayoutDashboard, Users, ClipboardList, Store, CreditCard, LogOut, Shield,
+  LayoutDashboard, Users, ClipboardList, Store, CreditCard,
+  LogOut, Search, Bell, Plus, ChevronRight,
 } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 import { logout } from "@/app/dashboard/actions";
 
 const NAV = [
-  { label: "Overview", icon: LayoutDashboard, href: "/admin"          },
-  { label: "Users",    icon: Users,           href: "/admin/users"    },
-  { label: "Waitlist", icon: ClipboardList,   href: "/admin/waitlist" },
-  { label: "Shops",    icon: Store,           href: "/admin/shops"    },
-  { label: "Plans",    icon: CreditCard,      href: "/admin/plans"    },
+  { icon: LayoutDashboard, href: "/admin",          label: "Overview"  },
+  { icon: Users,           href: "/admin/users",    label: "Users"     },
+  { icon: ClipboardList,   href: "/admin/waitlist", label: "Waitlist"  },
+  { icon: Store,           href: "/admin/shops",    label: "Shops"     },
+  { icon: CreditCard,      href: "/admin/plans",    label: "Plans"     },
 ];
 
-function Sidebar({ pathname, user }: { pathname: string; user: User }) {
-  const email = user.email ?? "";
-  const initials = email.slice(0, 2).toUpperCase();
+const PAGE_LABELS: Record<string, string> = {
+  "/admin":          "Overview",
+  "/admin/users":    "Users",
+  "/admin/waitlist": "Waitlist",
+  "/admin/shops":    "Shops",
+  "/admin/plans":    "Plans",
+};
 
+function IconSidebar({ pathname }: { pathname: string }) {
   return (
     <aside style={{
-      width: 220,
-      minHeight: "100vh",
-      background: "rgb(11,8,8)",
-      borderRight: "1px solid rgba(239,68,68,0.12)",
+      width: 54,
+      background: "rgb(10,12,19)",
+      borderRight: "1px solid rgba(255,255,255,0.05)",
       display: "flex",
       flexDirection: "column",
+      alignItems: "center",
+      paddingTop: 14,
+      paddingBottom: 14,
       flexShrink: 0,
     }}>
-      {/* Logo + admin badge */}
-      <div style={{
-        padding: "18px 16px",
-        borderBottom: "1px solid rgba(239,68,68,0.08)",
-        display: "flex",
-        alignItems: "center",
-        gap: 10,
-      }}>
-        <Image src="/main logo.png" alt="Flow" width={30} height={30} style={{ objectFit: "contain", flexShrink: 0 }} />
-        <div>
-          <p style={{ margin: "0 0 2px", color: "rgb(250,250,250)", fontSize: 13, fontWeight: 800, letterSpacing: "-0.02em" }}>Flow</p>
-          <span style={{
-            fontSize: 9, fontWeight: 800, color: "rgb(239,68,68)", letterSpacing: "0.12em",
-            textTransform: "uppercase", background: "rgba(239,68,68,0.1)",
-            padding: "1px 6px", borderRadius: 3,
-          }}>
-            ADMIN
-          </span>
-        </div>
+      {/* Logo */}
+      <div style={{ marginBottom: 22, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <Image src="/main logo.png" alt="Flow" width={26} height={26} style={{ objectFit: "contain" }} />
       </div>
 
-      {/* Nav */}
-      <nav style={{ flex: 1, padding: "14px 8px", display: "flex", flexDirection: "column", gap: 2 }}>
-        {NAV.map(({ label, icon: Icon, href }) => {
+      {/* Divider */}
+      <div style={{ width: 28, height: 1, background: "rgba(255,255,255,0.07)", marginBottom: 12 }} />
+
+      {/* Nav icons */}
+      <nav style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, flex: 1 }}>
+        {NAV.map(({ icon: Icon, href, label }) => {
           const active = href === "/admin" ? pathname === "/admin" : pathname.startsWith(href);
           return (
             <Link
               key={href}
               href={href}
+              title={label}
               style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
-                padding: "9px 12px",
-                borderRadius: 10,
-                background: active
-                  ? "linear-gradient(90deg, rgba(239,68,68,0.14) 0%, rgba(220,38,38,0.26) 100%)"
-                  : "transparent",
-                borderRight: active ? "2.5px solid rgb(239,68,68)" : "2.5px solid transparent",
-                color: active ? "rgb(252,165,165)" : "rgba(255,255,255,0.42)",
-                fontSize: 13.5,
-                fontWeight: active ? 600 : 400,
+                width: 36, height: 36,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                borderRadius: 9,
+                background: active ? "rgba(109,40,217,0.22)" : "transparent",
+                color: active ? "rgb(196,181,253)" : "rgba(255,255,255,0.28)",
                 textDecoration: "none",
-                transition: "all 0.15s",
-                whiteSpace: "nowrap",
+                transition: "background 0.15s, color 0.15s",
               }}
             >
-              <Icon size={16} strokeWidth={active ? 2.2 : 1.7} style={{ flexShrink: 0 }} />
-              {label}
+              <Icon size={16} strokeWidth={active ? 2.2 : 1.6} />
             </Link>
           );
         })}
       </nav>
 
-      {/* User */}
-      <div style={{ padding: "0 10px 14px", borderTop: "1px solid rgba(239,68,68,0.08)" }}>
-        <div style={{
-          display: "flex", alignItems: "center", gap: 10,
-          padding: "11px 12px", borderRadius: 12,
-          background: "rgba(255,255,255,0.03)",
-          border: "1px solid rgba(255,255,255,0.06)",
-          marginTop: 10,
-        }}>
-          <div style={{
-            width: 32, height: 32, borderRadius: 16,
-            background: "rgba(239,68,68,0.2)",
-            border: "1.5px solid rgba(239,68,68,0.35)",
+      {/* Sign out */}
+      <form action={logout}>
+        <button
+          type="submit"
+          title="Sign out"
+          style={{
+            width: 36, height: 36,
             display: "flex", alignItems: "center", justifyContent: "center",
-            color: "rgb(252,165,165)", fontSize: 11, fontWeight: 700, flexShrink: 0,
-          }}>
-            {initials}
-          </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <p style={{ color: "rgb(250,250,250)", fontSize: 11.5, fontWeight: 700, margin: "0 0 2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{email}</p>
-            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-              <Shield size={9} color="rgb(239,68,68)" />
-              <span style={{ color: "rgb(239,68,68)", fontSize: 10, fontWeight: 600 }}>Admin</span>
-            </div>
-          </div>
-        </div>
-      </div>
+            borderRadius: 9, background: "transparent", border: "none",
+            color: "rgba(255,255,255,0.22)", cursor: "pointer",
+          }}
+        >
+          <LogOut size={15} strokeWidth={1.6} />
+        </button>
+      </form>
     </aside>
   );
 }
 
 export function AdminShell({ children, user }: { children: React.ReactNode; user: User }) {
-  const pathname = usePathname();
+  const pathname  = usePathname();
+  const pageLabel = PAGE_LABELS[pathname] ?? "Admin";
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "rgb(9,9,11)" }}>
-      <Sidebar pathname={pathname} user={user} />
+    <div style={{ minHeight: "100vh", background: "rgb(8,10,16)", display: "flex", flexDirection: "column" }}>
 
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
-        {/* Top bar */}
-        <header style={{
-          height: 52,
-          borderBottom: "1px solid rgba(255,255,255,0.06)",
-          display: "flex",
-          alignItems: "center",
-          padding: "0 28px",
-          justifyContent: "space-between",
-          background: "rgb(9,9,11)",
-          position: "sticky",
-          top: 0,
-          zIndex: 30,
+      {/* ── Top bar ── */}
+      <header style={{
+        height: 50,
+        background: "rgb(10,12,19)",
+        borderBottom: "1px solid rgba(255,255,255,0.05)",
+        display: "flex",
+        alignItems: "center",
+        padding: "0 18px 0 0",
+        gap: 10,
+        flexShrink: 0,
+        position: "sticky",
+        top: 0,
+        zIndex: 40,
+      }}>
+        {/* Sidebar spacer */}
+        <div style={{ width: 54, flexShrink: 0 }} />
+
+        {/* Breadcrumb */}
+        <div style={{ display: "flex", alignItems: "center", gap: 5, flex: 1, minWidth: 0 }}>
+          <span style={{ color: "rgba(255,255,255,0.28)", fontSize: 13 }}>Admin</span>
+          <ChevronRight size={12} color="rgba(255,255,255,0.18)" />
+          <span style={{ color: "rgb(240,240,245)", fontSize: 13, fontWeight: 600 }}>{pageLabel}</span>
+        </div>
+
+        {/* Search */}
+        <div style={{
+          display: "flex", alignItems: "center", gap: 8,
+          background: "rgba(255,255,255,0.04)",
+          border: "1px solid rgba(255,255,255,0.07)",
+          borderRadius: 8, padding: "6px 12px", width: 200,
         }}>
-          <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 12, margin: 0 }}>
-            {new Date().toLocaleDateString("en-CA", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
-          </p>
-          <form action={logout}>
-            <button
-              type="submit"
-              style={{
-                display: "flex", alignItems: "center", gap: 6,
-                background: "none", border: "none",
-                color: "rgba(255,255,255,0.3)", cursor: "pointer",
-                fontSize: 12, padding: 4, fontFamily: "inherit",
-              }}
-            >
-              <LogOut size={13} /> Sign out
-            </button>
-          </form>
-        </header>
+          <Search size={12} color="rgba(255,255,255,0.25)" />
+          <span style={{ color: "rgba(255,255,255,0.22)", fontSize: 12.5 }}>Search...</span>
+        </div>
 
-        <main style={{ flex: 1, padding: "28px 32px" }}>
+        {/* Bell */}
+        <button style={{
+          width: 32, height: 32, borderRadius: 8, cursor: "pointer",
+          background: "rgba(255,255,255,0.04)",
+          border: "1px solid rgba(255,255,255,0.07)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          color: "rgba(255,255,255,0.38)", position: "relative",
+        }}>
+          <Bell size={14} strokeWidth={1.6} />
+          <span style={{
+            position: "absolute", top: 6, right: 6,
+            width: 6, height: 6, borderRadius: 3,
+            background: "rgb(139,92,246)",
+            border: "1.5px solid rgb(10,12,19)",
+          }} />
+        </button>
+
+        {/* Primary action */}
+        <Link
+          href="/admin/waitlist"
+          style={{
+            display: "flex", alignItems: "center", gap: 5,
+            padding: "7px 13px", borderRadius: 8,
+            background: "rgb(109,40,217)",
+            color: "#fff", fontSize: 12.5, fontWeight: 600,
+            textDecoration: "none", whiteSpace: "nowrap",
+          }}
+        >
+          <Plus size={13} /> New Entry
+        </Link>
+      </header>
+
+      {/* ── Body ── */}
+      <div style={{ display: "flex", flex: 1, minHeight: 0 }}>
+        <IconSidebar pathname={pathname} />
+        <main style={{ flex: 1, minWidth: 0, overflowY: "auto", padding: "24px 28px" }}>
           {children}
         </main>
       </div>
