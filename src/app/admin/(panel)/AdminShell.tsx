@@ -62,7 +62,7 @@ export function AdminShell({ children, user }: { children: React.ReactNode; user
         {open ? (
           <div style={{
             display: "flex", alignItems: "center", justifyContent: "space-between",
-            padding: "18px 14px 16px", flexShrink: 0,
+            padding: "17px 14px 17px", flexShrink: 0,
           }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0, flex: 1 }}>
               <div style={{
@@ -201,8 +201,9 @@ export function AdminShell({ children, user }: { children: React.ReactNode; user
         {/* Top header */}
         <header style={{
           flexShrink: 0,
+          height: 73,
           display: "flex", alignItems: "center", justifyContent: "space-between",
-          padding: "20px 32px",
+          padding: "0 32px",
           background: "rgb(10,10,12)",
           borderBottom: "1px solid rgba(255,255,255,0.05)",
         }}>
