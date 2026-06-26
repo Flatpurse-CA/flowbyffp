@@ -1,103 +1,51 @@
+import Link from "next/link";
 import { createAdminClient } from "@/lib/supabase/admin";
-import {
-  Users, Store, ClipboardList, CreditCard,
-  TrendingUp, TrendingDown, MoreHorizontal, Clock,
-} from "lucide-react";
+import { Users, Store, ClipboardList, CreditCard, TrendingUp } from "lucide-react";
 
-// ─── Vertical bar chart ────────────────────────────────────────────────────────
-
-function BarChart({ data, color }: { data: number[]; color: string }) {
-  const max = Math.max(...data, 1);
-  return (
-    <div style={{ display: "flex", alignItems: "flex-end", gap: 3, height: 40, width: 80 }}>
-      {data.map((v, i) => (
-        <div
-          key={i}
-          style={{
-            flex: 1,
-            height: `${Math.max(12, (v / max) * 100)}%`,
-            background: color,
-            borderRadius: "2px 2px 0 0",
-            opacity: i === data.length - 1 ? 1 : 0.25 + (i / (data.length - 1)) * 0.55,
-          }}
-        />
-      ))}
-    </div>
-  );
-}
-
-// ─── Stat card ─────────────────────────────────────────────────────────────────
+const PLAN_COLOR: Record<string, string> = {
+  founders:  "rgb(251,191,36)",
+  unlimited: "rgb(167,139,250)",
+  pro:       "rgb(96,165,250)",
+  starter:   "rgba(255,255,255,0.35)",
+};
 
 function StatCard({
-  label, value, unit, change, positive, chartData, chartColor, Icon,
+  label, value, Icon, iconColor, iconBg, subtitle,
 }: {
-  label: string; value: number | string; unit?: string; change: string;
-  positive: boolean; chartData: number[]; chartColor: string;
+  label: string;
+  value: number | string;
   Icon: React.ComponentType<{ size?: number; strokeWidth?: number; color?: string }>;
+  iconColor: string;
+  iconBg: string;
+  subtitle: string;
 }) {
-  const Trend = positive ? TrendingUp : TrendingDown;
   return (
     <div style={{
-      background: "rgb(11,13,21)",
-      border: "1px solid rgba(255,255,255,0.06)",
-      borderRadius: 14,
-      padding: "18px 20px",
-      display: "flex",
-      flexDirection: "column",
-      gap: 12,
+      background: "rgb(13,15,24)",
+      border: "1px solid rgba(255,255,255,0.07)",
+      borderRadius: 18,
+      padding: "22px 24px",
     }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
-          <Icon size={14} strokeWidth={1.7} color="rgba(255,255,255,0.35)" />
-          <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 12.5, fontWeight: 500 }}>{label}</span>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
+        <span style={{ color: "rgba(255,255,255,0.45)", fontSize: 13, fontWeight: 500 }}>{label}</span>
+        <div style={{
+          width: 38, height: 38, borderRadius: 11,
+          background: iconBg,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          flexShrink: 0,
+        }}>
+          <Icon size={18} color={iconColor} strokeWidth={1.8} />
         </div>
-        <button style={{ background: "none", border: "none", color: "rgba(255,255,255,0.2)", cursor: "pointer", padding: 2, display: "flex" }}>
-          <MoreHorizontal size={14} />
-        </button>
       </div>
-
-      <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
-        <div>
-          <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 7 }}>
-            <span style={{ color: "rgb(245,245,250)", fontSize: 30, fontWeight: 800, letterSpacing: "-0.04em", lineHeight: 1 }}>{value}</span>
-            {unit && <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 13, fontWeight: 600 }}>{unit}</span>}
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <span style={{
-              display: "flex", alignItems: "center", gap: 3,
-              fontSize: 10.5, fontWeight: 700,
-              color: positive ? "rgb(52,211,153)" : "rgb(248,113,113)",
-              background: positive ? "rgba(16,185,129,0.1)" : "rgba(239,68,68,0.1)",
-              padding: "2px 7px", borderRadius: 20,
-            }}>
-              <Trend size={9} strokeWidth={2.5} />
-              {change}
-            </span>
-            <span style={{ color: "rgba(255,255,255,0.2)", fontSize: 11 }}>vs last week</span>
-          </div>
-        </div>
-        <BarChart data={chartData} color={chartColor} />
+      <div style={{ color: "rgb(245,245,252)", fontSize: 36, fontWeight: 800, letterSpacing: "-0.04em", lineHeight: 1, marginBottom: 10 }}>
+        {value}
+      </div>
+      <div style={{ color: "rgba(255,255,255,0.25)", fontSize: 12.5 }}>
+        {subtitle}
       </div>
     </div>
   );
 }
-
-// ─── Styles ────────────────────────────────────────────────────────────────────
-
-const PLAN_STYLE: Record<string, { color: string; bg: string }> = {
-  founders:  { color: "rgb(251,191,36)",        bg: "rgba(245,158,11,0.1)"  },
-  unlimited: { color: "rgb(167,139,250)",       bg: "rgba(109,40,217,0.1)" },
-  pro:       { color: "rgb(96,165,250)",        bg: "rgba(59,130,246,0.1)" },
-  starter:   { color: "rgba(255,255,255,0.38)", bg: "rgba(255,255,255,0.05)" },
-};
-
-const STATUS_STYLE: Record<string, { color: string; bg: string }> = {
-  pending:  { color: "rgb(251,191,36)",  bg: "rgba(245,158,11,0.1)"  },
-  approved: { color: "rgb(52,211,153)",  bg: "rgba(16,185,129,0.1)"  },
-  rejected: { color: "rgb(248,113,113)", bg: "rgba(239,68,68,0.1)"   },
-};
-
-// ─── Page ──────────────────────────────────────────────────────────────────────
 
 export default async function AdminOverviewPage() {
   const admin = createAdminClient();
@@ -112,227 +60,347 @@ export default async function AdminOverviewPage() {
   const shops    = (shopsRes.data   ?? []) as { owner_id: string; name: string; plan: string; created_at: string }[];
   const waitlist = (waitlistRes.data ?? []) as { email: string; shop_type: string | null; status: string; created_at: string }[];
 
-  const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-  const newUsers    = users.filter(u => new Date(u.created_at) > weekAgo).length;
-  const newShops    = shops.filter(s => new Date(s.created_at) > weekAgo).length;
-  const newWaitlist = waitlist.filter(w => new Date(w.created_at) > weekAgo).length;
-  const paidShops   = shops.filter(s => s.plan !== "starter").length;
+  const weekAgo   = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+  const newUsers  = users.filter(u => new Date(u.created_at) > weekAgo).length;
+  const newShops  = shops.filter(s => new Date(s.created_at) > weekAgo).length;
+  const paidShops = shops.filter(s => s.plan !== "starter").length;
 
-  const userSpark = [2, 5, 4, 8, 6, 11, Math.max(1, newUsers)];
-  const waitSpark = [3, 7, 5, 12, 9, 15, Math.max(1, newWaitlist)];
-  const shopSpark = [1, 2, 1, 3, 2, 4,  Math.max(1, newShops)];
-  const paidSpark = [0, 1, 1, 2, 2, 3,  Math.max(1, paidShops)];
-
-  const planCounts: Record<string, number> = { starter: 0, pro: 0, unlimited: 0, founders: 0 };
-  shops.forEach(s => { planCounts[s.plan] = (planCounts[s.plan] ?? 0) + 1; });
+  // Monthly user growth (last 7 months)
+  const months = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date();
+    d.setDate(1);
+    d.setMonth(d.getMonth() - 6 + i);
+    return { label: d.toLocaleString("en", { month: "short" }), year: d.getFullYear(), month: d.getMonth(), count: 0 };
+  });
+  users.forEach(u => {
+    const d = new Date(u.created_at);
+    const m = months.find(x => x.year === d.getFullYear() && x.month === d.getMonth());
+    if (m) m.count++;
+  });
+  const hasData  = months.some(m => m.count > 0);
+  const chartMax = Math.max(...months.map(m => m.count), 1);
 
   const recentUsers = [...users]
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-    .slice(0, 6);
-
-  const recentWaitlist = [...waitlist]
-    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
     .slice(0, 8);
 
+  const recentShops = [...shops]
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    .slice(0, 6);
+
   const card: React.CSSProperties = {
-    background: "rgb(11,13,21)",
-    border: "1px solid rgba(255,255,255,0.06)",
-    borderRadius: 14,
+    background: "rgb(13,15,24)",
+    border: "1px solid rgba(255,255,255,0.07)",
+    borderRadius: 18,
     overflow: "hidden",
   };
 
   return (
     <div style={{ maxWidth: 1200, display: "flex", flexDirection: "column", gap: 20 }}>
 
-      {/* ── Tab row ── */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <div style={{ display: "flex", gap: 2 }}>
-          {(["Overview", "Analytics", "Logs"] as const).map((tab, i) => (
-            <button key={tab} style={{
-              padding: "7px 14px", borderRadius: 8, border: "none",
-              background: i === 0 ? "rgba(255,255,255,0.07)" : "transparent",
-              cursor: "pointer", fontFamily: "inherit",
-              color: i === 0 ? "rgb(240,240,245)" : "rgba(255,255,255,0.32)",
-              fontSize: 13, fontWeight: i === 0 ? 600 : 400,
-            }}>
-              {tab}
-            </button>
-          ))}
-        </div>
-        <div style={{
-          display: "flex", alignItems: "center", gap: 6,
-          padding: "6px 12px", borderRadius: 8,
-          background: "rgba(255,255,255,0.04)",
-          border: "1px solid rgba(255,255,255,0.07)",
-          color: "rgba(255,255,255,0.4)", fontSize: 12.5, cursor: "pointer",
-        }}>
-          Last 7 Days
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 9l6 6 6-6" /></svg>
-        </div>
-      </div>
-
       {/* ── Stat cards ── */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
-        <StatCard label="Total Users"  value={users.length}  unit="users"  change={`+${newUsers}`}    positive chartData={userSpark} chartColor="rgb(139,92,246)" Icon={Users}       />
-        <StatCard label="Waitlist"     value={waitlist.length} unit="joined" change={`+${newWaitlist}`} positive chartData={waitSpark} chartColor="rgb(96,165,250)"  Icon={ClipboardList} />
-        <StatCard label="Active Shops" value={shops.length}  unit="shops"  change={`+${newShops}`}    positive chartData={shopSpark} chartColor="rgb(52,211,153)" Icon={Store}       />
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14 }}>
         <StatCard
-          label="Paid Plans" value={paidShops} unit="active"
-          change={`${shops.length ? Math.round((paidShops / shops.length) * 100) : 0}%`}
-          positive chartData={paidSpark} chartColor="rgb(251,191,36)" Icon={CreditCard}
+          label="Total Members"
+          value={users.length}
+          Icon={Users}
+          iconColor="rgb(167,139,250)"
+          iconBg="rgba(109,40,217,0.15)"
+          subtitle={newUsers > 0 ? `+${newUsers} this week` : "No change yet"}
+        />
+        <StatCard
+          label="Active Shops"
+          value={shops.length}
+          Icon={Store}
+          iconColor="rgb(52,211,153)"
+          iconBg="rgba(16,185,129,0.12)"
+          subtitle={newShops > 0 ? `+${newShops} this week` : "No change yet"}
+        />
+        <StatCard
+          label="Revenue"
+          value="₦0"
+          Icon={CreditCard}
+          iconColor="rgb(251,191,36)"
+          iconBg="rgba(245,158,11,0.12)"
+          subtitle="No change yet"
+        />
+        <StatCard
+          label="Growth"
+          value={shops.length ? `${Math.round((paidShops / shops.length) * 100)}%` : "0%"}
+          Icon={TrendingUp}
+          iconColor="rgb(96,165,250)"
+          iconBg="rgba(59,130,246,0.12)"
+          subtitle={paidShops > 0 ? `${paidShops} paid plans` : "No change yet"}
         />
       </div>
 
-      {/* ── Row 2 ── */}
-      <div style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr", gap: 12 }}>
+      {/* ── Growth chart + Recent members ── */}
+      <div style={{ display: "grid", gridTemplateColumns: "1.6fr 1fr", gap: 14 }}>
 
-        {/* Plan breakdown */}
-        <div style={{ ...card, padding: "18px 20px" }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
-            <p style={{ color: "rgb(240,240,245)", fontSize: 13.5, fontWeight: 700, margin: 0 }}>Plan Distribution</p>
-            <button style={{ background: "none", border: "none", color: "rgba(255,255,255,0.2)", cursor: "pointer", display: "flex" }}><MoreHorizontal size={15} /></button>
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-            {(["founders", "unlimited", "pro", "starter"] as const).map(plan => {
-              const count = planCounts[plan] ?? 0;
-              const pct   = shops.length ? Math.round((count / shops.length) * 100) : 0;
-              const s     = PLAN_STYLE[plan];
-              return (
-                <div key={plan}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 7 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <div style={{ width: 7, height: 7, borderRadius: 2, background: s.color }} />
-                      <span style={{ color: "rgba(255,255,255,0.5)", fontSize: 12.5, textTransform: "capitalize" }}>{plan}</span>
-                    </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                      <span style={{ color: "rgba(255,255,255,0.25)", fontSize: 11 }}>{pct}%</span>
-                      <span style={{ color: "rgba(255,255,255,0.55)", fontSize: 12.5, fontWeight: 600, width: 20, textAlign: "right" }}>{count}</span>
-                    </div>
-                  </div>
-                  <div style={{ height: 4, borderRadius: 2, background: "rgba(255,255,255,0.05)" }}>
-                    <div style={{ height: "100%", width: `${pct}%`, borderRadius: 2, background: s.color }} />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+        {/* Member growth */}
+        <div style={{ ...card, padding: "22px 24px" }}>
+          <p style={{ color: "rgb(240,240,248)", fontSize: 14, fontWeight: 700, margin: "0 0 3px" }}>Member growth</p>
+          <p style={{ color: "rgba(255,255,255,0.28)", fontSize: 12, margin: 0 }}>Members joined over time</p>
 
-        {/* Recent signups */}
-        <div style={{ ...card, padding: "18px 20px" }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
-            <p style={{ color: "rgb(240,240,245)", fontSize: 13.5, fontWeight: 700, margin: 0 }}>Recent Signups</p>
-            <span style={{ color: "rgba(255,255,255,0.22)", fontSize: 11 }}>{recentUsers.length} shown</span>
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {recentUsers.length === 0 ? (
-              <p style={{ color: "rgba(255,255,255,0.2)", fontSize: 13, margin: 0 }}>No users yet.</p>
-            ) : recentUsers.map((u, i) => {
-              const email    = u.email ?? "Unknown";
-              const initials = email.slice(0, 2).toUpperCase();
-              const date     = new Date(u.created_at).toLocaleDateString("en-CA", { month: "short", day: "numeric" });
-              return (
-                <div key={u.id} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <div style={{
-                    width: 28, height: 28, borderRadius: "50%", flexShrink: 0,
-                    background: `hsl(${(i * 55 + 200) % 360}, 35%, 20%)`,
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.65)",
-                  }}>
-                    {initials}
-                  </div>
-                  <span style={{ flex: 1, color: "rgba(255,255,255,0.55)", fontSize: 12.5, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                    {email}
-                  </span>
-                  <div style={{ display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
-                    <Clock size={10} color="rgba(255,255,255,0.18)" />
-                    <span style={{ color: "rgba(255,255,255,0.22)", fontSize: 11 }}>{date}</span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-
-      {/* ── Waitlist table ── */}
-      <div style={card}>
-        <div style={{
-          padding: "14px 20px", borderBottom: "1px solid rgba(255,255,255,0.05)",
-          display: "flex", alignItems: "center", justifyContent: "space-between",
-        }}>
-          <p style={{ color: "rgb(240,240,245)", fontSize: 13.5, fontWeight: 700, margin: 0 }}>Waitlist Entries</p>
-          <span style={{
-            fontSize: 10.5, fontWeight: 700, color: "rgb(251,191,36)",
-            background: "rgba(245,158,11,0.1)", padding: "3px 9px", borderRadius: 20,
-          }}>
-            {waitlist.filter(w => w.status === "pending").length} pending
-          </span>
-        </div>
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead>
-            <tr style={{ background: "rgba(255,255,255,0.015)" }}>
-              {["Time", "Email", "Shop Type", "Status", "Action"].map(h => (
-                <th key={h} style={{
-                  padding: "9px 18px", textAlign: "left",
-                  color: "rgba(255,255,255,0.22)", fontSize: 11,
-                  fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase",
-                  borderBottom: "1px solid rgba(255,255,255,0.04)",
-                }}>
-                  {h}
-                </th>
+          <div style={{ display: "flex", gap: 0, marginTop: 20 }}>
+            {/* Y axis */}
+            <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", paddingRight: 10, paddingBottom: 22, width: 30, flexShrink: 0 }}>
+              {[chartMax, Math.round(chartMax * 0.75), Math.round(chartMax * 0.5), Math.round(chartMax * 0.25), 0].map((v, i) => (
+                <span key={i} style={{ color: "rgba(255,255,255,0.18)", fontSize: 10, lineHeight: 1 }}>{v}</span>
               ))}
-            </tr>
-          </thead>
-          <tbody>
-            {recentWaitlist.length === 0 ? (
-              <tr>
-                <td colSpan={5} style={{ padding: "32px 18px", textAlign: "center", color: "rgba(255,255,255,0.2)", fontSize: 13 }}>
-                  No waitlist entries yet.
-                </td>
-              </tr>
-            ) : recentWaitlist.map((entry, i) => {
-              const date = new Date(entry.created_at).toLocaleTimeString("en-CA", { hour: "2-digit", minute: "2-digit" });
-              const s    = STATUS_STYLE[entry.status] ?? STATUS_STYLE.pending;
-              return (
-                <tr key={i} style={{ borderBottom: i < recentWaitlist.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none" }}>
-                  <td style={{ padding: "11px 18px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 5, color: "rgba(255,255,255,0.28)", fontSize: 12, whiteSpace: "nowrap" }}>
-                      <Clock size={11} strokeWidth={1.6} />
-                      {date}
+            </div>
+
+            {/* Chart + X axis */}
+            <div style={{ flex: 1 }}>
+              <div style={{ height: 200, position: "relative", borderLeft: "1px solid rgba(255,255,255,0.06)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                {[25, 50, 75].map(pct => (
+                  <div key={pct} style={{ position: "absolute", top: `${pct}%`, left: 0, right: 0, borderTop: "1px solid rgba(255,255,255,0.04)" }} />
+                ))}
+
+                {hasData ? (
+                  <svg
+                    viewBox="0 0 100 100"
+                    preserveAspectRatio="none"
+                    style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
+                  >
+                    <defs>
+                      <linearGradient id="lg" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="rgba(139,92,246,0.25)" />
+                        <stop offset="100%" stopColor="rgba(139,92,246,0)" />
+                      </linearGradient>
+                    </defs>
+                    <path
+                      d={[
+                        ...months.map((m, i) => `${i === 0 ? "M" : "L"}${(i / 6) * 100},${100 - (m.count / chartMax) * 100}`),
+                        "L100,100 L0,100 Z",
+                      ].join(" ")}
+                      fill="url(#lg)"
+                    />
+                    <path
+                      d={months.map((m, i) => `${i === 0 ? "M" : "L"}${(i / 6) * 100},${100 - (m.count / chartMax) * 100}`).join(" ")}
+                      fill="none"
+                      stroke="rgb(139,92,246)"
+                      strokeWidth={2}
+                      vectorEffect="non-scaling-stroke"
+                    />
+                    {months.map((m, i) => (
+                      <circle
+                        key={i}
+                        cx={(i / 6) * 100}
+                        cy={100 - (m.count / chartMax) * 100}
+                        r={3}
+                        fill="rgb(139,92,246)"
+                        vectorEffect="non-scaling-stroke"
+                      />
+                    ))}
+                  </svg>
+                ) : (
+                  <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8 }}>
+                    <div style={{ width: 44, height: 44, borderRadius: "50%", background: "rgba(255,255,255,0.04)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <TrendingUp size={18} color="rgba(255,255,255,0.2)" strokeWidth={1.5} />
                     </div>
-                  </td>
-                  <td style={{ padding: "11px 18px", color: "rgba(255,255,255,0.6)", fontSize: 12.5, maxWidth: 220, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                    {entry.email}
-                  </td>
-                  <td style={{ padding: "11px 18px", color: "rgba(255,255,255,0.38)", fontSize: 12.5 }}>
-                    {entry.shop_type ?? "—"}
-                  </td>
-                  <td style={{ padding: "11px 18px" }}>
+                    <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 13, fontWeight: 600, margin: 0 }}>No data yet</p>
+                    <p style={{ color: "rgba(255,255,255,0.18)", fontSize: 12, margin: 0 }}>Chart will populate as members join</p>
+                  </div>
+                )}
+              </div>
+
+              {/* X axis labels */}
+              <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
+                {months.map((m, i) => (
+                  <span key={i} style={{ color: "rgba(255,255,255,0.2)", fontSize: 10 }}>{m.label}</span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Recent members */}
+        <div style={{ ...card, padding: "22px 24px", display: "flex", flexDirection: "column" }}>
+          <p style={{ color: "rgb(240,240,248)", fontSize: 14, fontWeight: 700, margin: "0 0 20px" }}>Recent members</p>
+
+          {recentUsers.length === 0 ? (
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, minHeight: 220 }}>
+              <div style={{ width: 50, height: 50, borderRadius: "50%", background: "rgba(255,255,255,0.04)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <Users size={22} color="rgba(255,255,255,0.2)" strokeWidth={1.4} />
+              </div>
+              <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 13, fontWeight: 600, margin: 0 }}>No members yet</p>
+              <p style={{ color: "rgba(255,255,255,0.18)", fontSize: 12, margin: 0, textAlign: "center", lineHeight: 1.5 }}>
+                Members will appear here once they join
+              </p>
+            </div>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 13 }}>
+              {recentUsers.map((u, i) => {
+                const emailStr = u.email ?? "Unknown";
+                const initials = emailStr.slice(0, 2).toUpperCase();
+                const date     = new Date(u.created_at).toLocaleDateString("en-CA", { month: "short", day: "numeric" });
+                return (
+                  <div key={u.id} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <div style={{
+                      width: 32, height: 32, borderRadius: "50%", flexShrink: 0,
+                      background: `hsl(${(i * 55 + 200) % 360}, 35%, 20%)`,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.65)",
+                    }}>
+                      {initials}
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 12.5, margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                        {emailStr}
+                      </p>
+                      <p style={{ color: "rgba(255,255,255,0.25)", fontSize: 11, margin: 0 }}>{date}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* ── Shops ── */}
+      <div>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+          <p style={{ color: "rgb(240,240,248)", fontSize: 15, fontWeight: 700, margin: 0 }}>Shops</p>
+          <Link
+            href="/admin/shops"
+            style={{
+              display: "inline-flex", alignItems: "center", gap: 6,
+              padding: "8px 16px", borderRadius: 10,
+              background: "rgba(234,88,12,0.12)",
+              border: "1px solid rgba(234,88,12,0.22)",
+              color: "rgb(251,146,60)", fontSize: 13, fontWeight: 600,
+              textDecoration: "none",
+            }}
+          >
+            + View all shops
+          </Link>
+        </div>
+
+        {recentShops.length === 0 ? (
+          <div style={{
+            ...card,
+            minHeight: 170,
+            display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10,
+          }}>
+            <div style={{ width: 50, height: 50, borderRadius: "50%", background: "rgba(255,255,255,0.04)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <Store size={22} color="rgba(255,255,255,0.2)" strokeWidth={1.4} />
+            </div>
+            <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 13, fontWeight: 600, margin: 0 }}>No shops yet</p>
+            <p style={{ color: "rgba(255,255,255,0.18)", fontSize: 12, margin: 0 }}>Shops will appear here once owners register</p>
+          </div>
+        ) : (
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
+            {recentShops.map((shop, i) => {
+              const color = PLAN_COLOR[shop.plan] ?? PLAN_COLOR.starter;
+              const date  = new Date(shop.created_at).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" });
+              return (
+                <div key={i} style={{
+                  background: "rgb(13,15,24)",
+                  border: "1px solid rgba(255,255,255,0.07)",
+                  borderRadius: 14, padding: "16px 18px",
+                }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+                    <div style={{
+                      width: 36, height: 36, borderRadius: 10,
+                      background: "rgba(255,255,255,0.05)",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                    }}>
+                      <Store size={16} color="rgba(255,255,255,0.4)" strokeWidth={1.6} />
+                    </div>
                     <span style={{
-                      fontSize: 10.5, fontWeight: 700, padding: "3px 10px", borderRadius: 20,
-                      textTransform: "capitalize", color: s.color, background: s.bg,
+                      fontSize: 10.5, fontWeight: 700, padding: "2px 9px", borderRadius: 20,
+                      textTransform: "capitalize", color,
+                      background: `${color}1A`,
                     }}>
-                      {entry.status}
+                      {shop.plan}
                     </span>
-                  </td>
-                  <td style={{ padding: "11px 18px" }}>
-                    <button style={{
-                      padding: "4px 11px", borderRadius: 7,
-                      background: "rgba(109,40,217,0.1)",
-                      border: "1px solid rgba(139,92,246,0.2)",
-                      color: "rgb(196,181,253)", fontSize: 11, fontWeight: 600,
-                      cursor: "pointer", fontFamily: "inherit",
-                    }}>
-                      Review
-                    </button>
-                  </td>
-                </tr>
+                  </div>
+                  <p style={{ color: "rgb(240,240,248)", fontSize: 13, fontWeight: 700, margin: "0 0 4px" }}>{shop.name}</p>
+                  <p style={{ color: "rgba(255,255,255,0.25)", fontSize: 11.5, margin: 0 }}>{date}</p>
+                </div>
               );
             })}
-          </tbody>
-        </table>
+          </div>
+        )}
       </div>
+
+      {/* ── Waitlist (pending) ── */}
+      <div>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <p style={{ color: "rgb(240,240,248)", fontSize: 15, fontWeight: 700, margin: 0 }}>Waitlist</p>
+            {waitlist.filter(w => w.status === "pending").length > 0 && (
+              <span style={{ fontSize: 10.5, fontWeight: 700, color: "rgb(251,191,36)", background: "rgba(245,158,11,0.1)", padding: "3px 9px", borderRadius: 20 }}>
+                {waitlist.filter(w => w.status === "pending").length} pending
+              </span>
+            )}
+          </div>
+          <Link
+            href="/admin/waitlist"
+            style={{
+              padding: "7px 14px", borderRadius: 10,
+              background: "rgba(255,255,255,0.04)",
+              border: "1px solid rgba(255,255,255,0.08)",
+              color: "rgba(255,255,255,0.45)", fontSize: 13, fontWeight: 600,
+              textDecoration: "none",
+            }}
+          >
+            Manage waitlist
+          </Link>
+        </div>
+
+        {waitlist.length === 0 ? (
+          <div style={{
+            ...card,
+            minHeight: 120,
+            display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8,
+          }}>
+            <ClipboardList size={22} color="rgba(255,255,255,0.15)" strokeWidth={1.4} />
+            <p style={{ color: "rgba(255,255,255,0.25)", fontSize: 13, margin: 0 }}>No waitlist entries yet</p>
+          </div>
+        ) : (
+          <div style={card}>
+            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+              <thead>
+                <tr style={{ background: "rgba(255,255,255,0.02)" }}>
+                  {["Email", "Shop Type", "Status", "Date"].map(h => (
+                    <th key={h} style={{
+                      padding: "10px 20px", textAlign: "left",
+                      color: "rgba(255,255,255,0.22)", fontSize: 11,
+                      fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase",
+                      borderBottom: "1px solid rgba(255,255,255,0.05)",
+                    }}>
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {waitlist.slice(0, 6).map((entry, i) => {
+                  const date = new Date(entry.created_at).toLocaleDateString("en-CA", { month: "short", day: "numeric" });
+                  const statusColor = entry.status === "approved" ? "rgb(52,211,153)" : entry.status === "rejected" ? "rgb(248,113,113)" : "rgb(251,191,36)";
+                  const statusBg   = entry.status === "approved" ? "rgba(16,185,129,0.1)" : entry.status === "rejected" ? "rgba(239,68,68,0.1)" : "rgba(245,158,11,0.1)";
+                  return (
+                    <tr key={i} style={{ borderBottom: i < Math.min(waitlist.length, 6) - 1 ? "1px solid rgba(255,255,255,0.04)" : "none" }}>
+                      <td style={{ padding: "11px 20px", color: "rgba(255,255,255,0.6)", fontSize: 13 }}>{entry.email}</td>
+                      <td style={{ padding: "11px 20px", color: "rgba(255,255,255,0.38)", fontSize: 13 }}>{entry.shop_type ?? "—"}</td>
+                      <td style={{ padding: "11px 20px" }}>
+                        <span style={{ fontSize: 10.5, fontWeight: 700, padding: "3px 10px", borderRadius: 20, textTransform: "capitalize", color: statusColor, background: statusBg }}>
+                          {entry.status}
+                        </span>
+                      </td>
+                      <td style={{ padding: "11px 20px", color: "rgba(255,255,255,0.28)", fontSize: 12 }}>{date}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
     </div>
   );
 }
