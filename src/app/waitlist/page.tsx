@@ -544,36 +544,14 @@ export default function WaitlistPage() {
 
           .wl-hero { padding: 24px 20px 60px !important; min-height: auto !important; }
 
-          .wl-form {
-            display: grid !important;
-            grid-template-columns: 1fr 1fr !important;
-            grid-template-rows: auto auto !important;
-            border-radius: 16px !important;
-            gap: 0 !important;
-            padding: 10px !important;
+          .wl-form > div {
+            flex-direction: column !important;
           }
-          .wl-form input {
-            grid-column: 1;
-            grid-row: 1;
-            padding: 13px 14px !important;
-            font-size: 15px !important;
-            border-right: 1px solid rgba(255,255,255,0.08) !important;
-          }
+          .wl-form input,
           .wl-form select {
-            grid-column: 2;
-            grid-row: 1;
-            padding: 13px 14px !important;
-            font-size: 15px !important;
-          }
-          .wl-form button {
-            grid-column: 1 / -1 !important;
-            grid-row: 2 !important;
             width: 100% !important;
-            justify-content: center !important;
-            border-radius: 10px !important;
-            margin-top: 8px !important;
+            box-sizing: border-box !important;
           }
-          .wl-form > div { display: none !important; }
 
           .wl-photo-grid {
             grid-template-columns: 1fr !important;
