@@ -338,29 +338,29 @@ export default function WaitlistPage() {
           </span>
         </div>
 
-        {/* Video — full bleed with side padding */}
-        <div style={{
-          position: "relative", zIndex: 1,
-          width: "100vw",
-          marginLeft: "calc(-50vw + 50%)",
-          padding: "0 40px",
-          boxSizing: "border-box",
-        }}>
-          <div style={{ aspectRatio: "16/9", borderRadius: 16, overflow: "hidden" }}>
-            <iframe
-              src="https://drive.google.com/file/d/16kEw9y92fjrpefWpY39HA_DjDehmx9oU/preview"
-              style={{ width: "100%", height: "100%", border: "none", display: "block" }}
-              allow="autoplay"
-              allowFullScreen
-            />
-          </div>
-        </div>
-
       </section>
+
+      {/* ── Video — bridges hero and section 2 ── */}
+      <div style={{
+        position: "relative",
+        zIndex: 10,
+        marginTop: "-160px",
+        padding: "0 40px",
+        boxSizing: "border-box",
+      }}>
+        <div style={{ aspectRatio: "16/9", borderRadius: 16, overflow: "hidden", boxShadow: "0 24px 80px rgba(0,0,0,0.5)" }}>
+          <iframe
+            src="https://drive.google.com/file/d/16kEw9y92fjrpefWpY39HA_DjDehmx9oU/preview"
+            style={{ width: "100%", height: "100%", border: "none", display: "block" }}
+            allow="autoplay"
+            allowFullScreen
+          />
+        </div>
+      </div>
 
       {/* ── 2. How it works ── */}
       <section className="wl-how" style={{
-        padding: "100px 120px 120px",
+        padding: "80px 120px 120px",
         width: "100%", boxSizing: "border-box",
       }}>
         <div>
