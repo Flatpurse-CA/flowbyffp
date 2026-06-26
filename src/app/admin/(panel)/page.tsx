@@ -21,8 +21,8 @@ function StatCard({
 }) {
   return (
     <div style={{
-      background: "rgb(16,17,22)",
-      border: "1px solid rgba(255,255,255,0.07)",
+      background: "rgb(10,10,12)",
+      border: "1px solid rgba(255,255,255,0.09)",
       borderRadius: 18,
       padding: "22px 24px",
     }}>
@@ -89,14 +89,14 @@ export default async function AdminOverviewPage() {
     .slice(0, 6);
 
   const card: React.CSSProperties = {
-    background: "rgb(16,17,22)",
-    border: "1px solid rgba(255,255,255,0.07)",
+    background: "rgb(10,10,12)",
+    border: "1px solid rgba(255,255,255,0.09)",
     borderRadius: 18,
     overflow: "hidden",
   };
 
   return (
-    <div style={{ maxWidth: 1200, display: "flex", flexDirection: "column", gap: 20 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
 
       {/* ── Stat cards ── */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14 }}>
