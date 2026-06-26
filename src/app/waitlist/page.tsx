@@ -19,12 +19,6 @@ const PERKS = [
   { icon: <MessageSquare size={22} strokeWidth={1.5} />, iconColor: "#f59e0b", iconBg: "rgba(245,158,11,0.08)", title: "Direct founder access",             desc: "A private channel with George and the team. Shape the product before it goes public." },
 ];
 
-const STEPS = [
-  { n: "Step 1", title: "Join the waitlist",              desc: "Enter your name, email, and shop type. It takes less than 60 seconds and your spot is reserved instantly." },
-  { n: "Step 2", title: "Get your early access invite",   desc: "When we open doors, you get a personal invite before anyone else. Early members get an extended free trial and locked-in pricing." },
-  { n: "Step 3", title: "Set up your shop",               desc: "Add your services, set your hours, and share your booking link. AutoPilot switches on automatically and starts working from day one." },
-];
-
 
 const FAQS = [
   { n: "01", q: "When does FlatPurse Flow launch?",            a: "We're rolling out access to waitlist members in waves starting soon. The earlier you join, the sooner you get in. We don't have a fixed public launch date — early access members come first." },
@@ -360,21 +354,26 @@ export default function WaitlistPage() {
             </div>
             <h2 ref={howRef} style={{
               fontSize: "clamp(32px, 4vw, 56px)",
-              fontWeight: 800, letterSpacing: "-0.04em", lineHeight: 1.08,
+              fontWeight: 800, letterSpacing: "-0.04em", lineHeight: 1.12,
               color: "#fff", margin: "0 auto 20px", maxWidth: 900,
             }}>
-              {"See exactly how a salon recovers C$2,000+/month in lost no-show revenue.".split("").map((char, i) =>
-                (
-                  <span key={i} style={{
-                    display: "inline-block",
-                    opacity: howVisible ? undefined : 0,
-                    animation: howVisible ? `blurDrop 0.45s cubic-bezier(0.16,1,0.3,1) ${i * 0.03}s forwards` : "none",
-                    whiteSpace: char === " " ? "pre" : "normal",
-                  }}>
-                    {char}
-                  </span>
-                )
-              )}
+              {"See exactly how a salon recovers".split("").map((char, i) => (
+                <span key={`l1-${i}`} style={{
+                  display: "inline-block",
+                  opacity: howVisible ? undefined : 0,
+                  animation: howVisible ? `blurDrop 0.45s cubic-bezier(0.16,1,0.3,1) ${i * 0.03}s forwards` : "none",
+                  whiteSpace: char === " " ? "pre" : "normal",
+                }}>{char}</span>
+              ))}
+              <br />
+              {"$2,000+/month in lost no-show revenue.".split("").map((char, i) => (
+                <span key={`l2-${i}`} style={{
+                  display: "inline-block",
+                  opacity: howVisible ? undefined : 0,
+                  animation: howVisible ? `blurDrop 0.45s cubic-bezier(0.16,1,0.3,1) ${(32 + i) * 0.03}s forwards` : "none",
+                  whiteSpace: char === " " ? "pre" : "normal",
+                }}>{char}</span>
+              ))}
             </h2>
             <p style={{ fontSize: 17, color: "rgba(255,255,255,0.45)", lineHeight: 1.75, margin: "0 auto", maxWidth: 680 }}>
               We break down the real math behind no-shows, marketplace commissions, and the hidden fees in Vagaro and Fresha — and show you the FlatPurse Flow dashboard in action.
