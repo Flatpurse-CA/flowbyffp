@@ -235,13 +235,8 @@ export default function WaitlistPage() {
             margin: "0 auto 28px",
             display: "flex", flexDirection: "column", gap: 10,
           }}>
-            {/* Three fields in a row */}
-            <div style={{
-              display: "flex", gap: 0,
-              background: "rgba(255,255,255,0.06)",
-              border: "1px solid rgba(255,255,255,0.12)",
-              borderRadius: 14, overflow: "hidden",
-            }}>
+            {/* Three fields in a row — separate with gaps */}
+            <div style={{ display: "flex", gap: 10 }}>
               <input
                 type="text"
                 required
@@ -251,9 +246,9 @@ export default function WaitlistPage() {
                 style={{
                   flex: 1, minWidth: 0,
                   padding: "15px 18px",
-                  background: "transparent", border: "none",
-                  borderRight: "1px solid rgba(255,255,255,0.1)",
-                  color: "#fff", fontSize: 14.5,
+                  background: "rgba(255,255,255,0.06)",
+                  border: "1px solid rgba(255,255,255,0.12)",
+                  borderRadius: 12, color: "#fff", fontSize: 14.5,
                   outline: "none", fontFamily: "inherit",
                 }}
               />
@@ -266,9 +261,9 @@ export default function WaitlistPage() {
                 style={{
                   flex: 1, minWidth: 0,
                   padding: "15px 18px",
-                  background: "transparent", border: "none",
-                  borderRight: "1px solid rgba(255,255,255,0.1)",
-                  color: "#fff", fontSize: 14.5,
+                  background: "rgba(255,255,255,0.06)",
+                  border: "1px solid rgba(255,255,255,0.12)",
+                  borderRadius: 12, color: "#fff", fontSize: 14.5,
                   outline: "none", fontFamily: "inherit",
                 }}
               />
@@ -278,7 +273,9 @@ export default function WaitlistPage() {
                 style={{
                   flex: 1, minWidth: 0,
                   padding: "15px 18px",
-                  background: "transparent", border: "none",
+                  background: "rgba(255,255,255,0.06)",
+                  border: "1px solid rgba(255,255,255,0.12)",
+                  borderRadius: 12,
                   color: bizType ? "#fff" : "rgba(255,255,255,0.4)",
                   fontSize: 14.5, outline: "none",
                   fontFamily: "inherit", cursor: "pointer",
