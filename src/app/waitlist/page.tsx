@@ -34,12 +34,20 @@ const FAQS = [
   { n: "05", q: "Can I use FlatPurse Flow right now?",         a: "We're in a closed beta with a small group of shops. Joining the waitlist is the fastest way to get access — we're not accepting public signups outside the waitlist at this stage." },
 ];
 
-const SHOP_TYPES = ["I run a...", "Salon", "Barbershop", "Beauty Studio", "Nail Studio", "Other"];
+const BUSINESS_TYPES = [
+  { label: "Hair Salon",  emoji: "✂️" },
+  { label: "Barbershop",  emoji: "💈" },
+  { label: "Spa",         emoji: "🧖" },
+  { label: "Massage",     emoji: "💆" },
+  { label: "Nail Studio", emoji: "💅" },
+  { label: "Other",       emoji: "🏢" },
+];
 const AVATARS = ["/sd1.jpg", "/sd2.jpg", "/sd3.jpg", "/sd4.jpg"];
 
 export default function WaitlistPage() {
+  const [name, setName]           = useState("");
   const [email, setEmail]         = useState("");
-  const [shopType, setShopType]   = useState("I run a...");
+  const [bizType, setBizType]     = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading]     = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
@@ -83,7 +91,7 @@ export default function WaitlistPage() {
 
   async function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (!email.trim()) return;
+    if (!email.trim() || !name.trim()) return;
     setLoading(true);
     setFormError(null);
     const { error } = await joinWaitlist(email, shopType);
@@ -221,79 +229,82 @@ export default function WaitlistPage() {
             </span>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="wl-form" style={{
-            display: "flex",
-            gap: 8,
-            background: "rgba(255,255,255,0.05)",
-            border: "1px solid rgba(255,255,255,0.1)",
-            borderRadius: 999,
-            padding: 8,
+          <form onSubmit={handleSubmit} style={{
             position: "relative", zIndex: 1,
-            marginBottom: 0,
-            width: "100%",
-            maxWidth: 680,
+            width: "100%", maxWidth: 520,
             margin: "0 auto 28px",
+            display: "flex", flexDirection: "column", gap: 10,
           }}>
+            {/* Name */}
+            <input
+              type="text"
+              required
+              value={name}
+              onChange={e => setName(e.target.value)}
+              placeholder="Your name"
+              style={{
+                width: "100%", boxSizing: "border-box",
+                padding: "14px 18px",
+                background: "rgba(255,255,255,0.07)",
+                border: "1px solid rgba(255,255,255,0.12)",
+                borderRadius: 12, color: "#fff", fontSize: 14.5,
+                outline: "none", fontFamily: "inherit",
+              }}
+            />
+            {/* Email */}
             <input
               type="email"
               required
               value={email}
               onChange={e => setEmail(e.target.value)}
-              placeholder="Enter Email"
+              placeholder="Your email"
               style={{
-                flex: 1,
-                minWidth: 0,
-                padding: "13px 18px",
-                background: "transparent",
-                border: "none",
-                color: "#fff",
-                fontSize: 14.5,
-                outline: "none",
-                fontFamily: "inherit",
+                width: "100%", boxSizing: "border-box",
+                padding: "14px 18px",
+                background: "rgba(255,255,255,0.07)",
+                border: "1px solid rgba(255,255,255,0.12)",
+                borderRadius: 12, color: "#fff", fontSize: 14.5,
+                outline: "none", fontFamily: "inherit",
               }}
             />
-            <div style={{ width: 1, background: "rgba(255,255,255,0.08)", alignSelf: "stretch", margin: "6px 0" }} />
-            <select
-              value={shopType}
-              onChange={e => setShopType(e.target.value)}
-              style={{
-                padding: "13px 36px 13px 16px",
-                background: "transparent",
-                border: "none",
-                color: shopType === "I run a..." ? "rgba(255,255,255,0.4)" : "#fff",
-                fontSize: 14.5,
-                outline: "none",
-                fontFamily: "inherit",
-                cursor: "pointer",
-                appearance: "none",
-                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.4)' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
-                backgroundRepeat: "no-repeat",
-                backgroundPosition: "right 12px center",
-              }}
-            >
-              {SHOP_TYPES.map(t => (
-                <option key={t} value={t} style={{ background: "#1a1a1a", color: "#fff" }}>{t}</option>
-              ))}
-            </select>
+            {/* Business type grid */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 }}>
+              {BUSINESS_TYPES.map((type) => {
+                const sel = bizType === type.label;
+                return (
+                  <button
+                    key={type.label}
+                    type="button"
+                    onClick={() => setBizType(type.label)}
+                    style={{
+                      padding: "12px 6px",
+                      background: sel ? "rgba(113,42,226,0.2)" : "rgba(255,255,255,0.06)",
+                      border: `1.5px solid ${sel ? BRAND_PURPLE : "rgba(255,255,255,0.1)"}`,
+                      borderRadius: 10, cursor: "pointer",
+                      display: "flex", flexDirection: "column", alignItems: "center", gap: 5,
+                      transition: "all 0.15s ease",
+                    }}
+                  >
+                    <span style={{ fontSize: 20 }}>{type.emoji}</span>
+                    <span style={{ fontSize: 11, fontWeight: 600, color: sel ? "#fff" : "rgba(255,255,255,0.5)", letterSpacing: "-0.01em" }}>
+                      {type.label}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+            {/* CTA */}
             <button type="submit" disabled={loading} style={{
-              padding: "13px 24px",
-              background: BRAND_PURPLE,
-              color: "#fff",
-              fontSize: 14,
-              fontWeight: 700,
-              border: "none",
-              borderRadius: 999,
+              width: "100%", padding: "15px 24px",
+              background: BRAND_PURPLE, color: "#fff",
+              fontSize: 15, fontWeight: 800, letterSpacing: "-0.02em",
+              border: "none", borderRadius: 12,
               cursor: loading ? "not-allowed" : "pointer",
               opacity: loading ? 0.7 : 1,
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-              whiteSpace: "nowrap",
-              letterSpacing: "-0.01em",
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
               fontFamily: "inherit",
-              flexShrink: 0,
             }}>
-              {loading ? "Joining…" : <><span>Join Waitlist</span><ArrowRight size={14} /></>}
+              {loading ? "Claiming…" : <><span>Claim My Spot</span><ArrowRight size={15} /></>}
             </button>
           </form>
         )}
