@@ -126,7 +126,7 @@ export default function WaitlistPage() {
         textAlign: "center",
         padding: "30px 40px 80px",
         minHeight: "100vh",
-        backgroundImage: "url('/hero-p.png')",
+        backgroundImage: "url('/hero-p.jpeg')",
         backgroundSize: "cover",
         backgroundPosition: "center bottom",
         backgroundRepeat: "no-repeat",
