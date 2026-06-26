@@ -202,7 +202,7 @@ export function AdminShell({ children, user }: { children: React.ReactNode; user
         <header style={{
           flexShrink: 0,
           display: "flex", alignItems: "center", justifyContent: "space-between",
-          padding: "18px 32px",
+          padding: "20px 32px",
           background: "rgb(10,10,12)",
           borderBottom: "1px solid rgba(255,255,255,0.05)",
         }}>
