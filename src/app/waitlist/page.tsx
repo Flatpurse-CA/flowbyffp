@@ -96,7 +96,19 @@ export default function WaitlistPage() {
   }
 
   return (
-    <div style={{ background: "#060606", color: "#fff", minHeight: "100vh" }}>
+    <div style={{
+      background: `
+        radial-gradient(ellipse 85% 60% at 50% 108%,
+          rgba(230,210,255,0.92)  0%,
+          rgba(148,60,255,0.88)  18%,
+          rgba(100,20,220,0.82)  38%,
+          rgba(50,5,110,0.65)    58%,
+          transparent            76%
+        ),
+        #000
+      `,
+      color: "#fff", minHeight: "100vh",
+    }}>
 
       {/* ── Minimal nav ── */}
       <nav className="wl-nav" style={{
