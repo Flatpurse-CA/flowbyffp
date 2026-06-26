@@ -2,135 +2,137 @@
 
 import { useSearchParams } from "next/navigation";
 import { useState, Suspense } from "react";
-import Image from "next/image";
 import { Eye, EyeOff, Shield } from "lucide-react";
+import { AuthImagePanel } from "@/components/AuthImagePanel";
 import { adminLogin } from "./actions";
 
+const easing = "cubic-bezier(0.16, 1, 0.3, 1)";
+const fadeUp = (delay: number) =>
+  `0.5s ${easing} ${delay}ms 1 normal both running fp-fade-up`;
+
 function Form() {
-  const searchParams  = useSearchParams();
-  const error         = searchParams.get("error");
+  const searchParams   = useSearchParams();
+  const error          = searchParams.get("error");
   const [show, setShow] = useState(false);
 
   return (
-    <div style={{
-      minHeight: "100vh",
-      background: "rgb(9,9,11)",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      padding: "0 20px",
-    }}>
-      <div style={{ width: "100%", maxWidth: 380 }}>
+    <div style={{ display: "flex", height: "100vh", overflow: "hidden", background: "var(--auth-bg)", position: "relative" }}>
+      <div className="auth-mobile-gradient" />
 
-        {/* Logo + badge */}
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: 36 }}>
-          <Image src="/main logo.png" alt="Flow" width={38} height={38} style={{ objectFit: "contain", marginBottom: 12 }} />
-          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+      <AuthImagePanel />
+
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "0 32px",
+          position: "relative",
+          zIndex: 1,
+        }}
+        className="w-full lg:w-1/2"
+      >
+        <div
+          style={{
+            width: "100%",
+            maxWidth: 400,
+            animation: `0.42s ${easing} 0s 1 normal both running fp-slide-in-r`,
+          }}
+        >
+          {/* Admin badge */}
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              marginBottom: 20,
+              padding: "5px 11px",
+              borderRadius: 20,
+              background: "rgba(239,68,68,0.1)",
+              border: "1px solid rgba(239,68,68,0.22)",
+              animation: fadeUp(0),
+            }}
+          >
             <Shield size={11} color="rgb(239,68,68)" />
-            <span style={{
-              fontSize: 10, fontWeight: 800, color: "rgb(239,68,68)",
-              letterSpacing: "0.14em", textTransform: "uppercase",
-            }}>
+            <span style={{ fontSize: 11, fontWeight: 700, color: "rgb(239,68,68)", letterSpacing: "0.1em", textTransform: "uppercase" }}>
               Admin Access
             </span>
           </div>
-        </div>
 
-        {/* Card */}
-        <div style={{
-          background: "rgba(255,255,255,0.025)",
-          border: "1px solid rgba(239,68,68,0.15)",
-          borderRadius: 18,
-          padding: "32px 28px",
-        }}>
-          <h1 style={{
-            color: "rgb(250,250,250)", fontSize: 20, fontWeight: 800,
-            letterSpacing: "-0.03em", margin: "0 0 6px",
-          }}>
+          <h1
+            style={{
+              color: "var(--auth-text)",
+              fontSize: 26,
+              fontWeight: 700,
+              letterSpacing: "-0.025em",
+              margin: 0,
+              animation: fadeUp(30),
+            }}
+          >
             Sign in
           </h1>
-          <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 13, margin: "0 0 28px" }}>
+          <p
+            style={{
+              color: "var(--auth-text-sub)",
+              fontSize: 14,
+              marginBottom: 32,
+              marginTop: 6,
+              lineHeight: 1.6,
+              animation: fadeUp(60),
+            }}
+          >
             Restricted to authorized team members.
           </p>
 
           {error && (
-            <div style={{
-              background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)",
-              borderRadius: 10, padding: "10px 14px",
-              color: "rgb(252,165,165)", fontSize: 13, marginBottom: 20,
-            }}>
+            <p style={{ background: "rgb(70,10,10)", color: "rgb(252,165,165)", borderRadius: 8, padding: "10px 14px", fontSize: 13, marginBottom: 20, animation: fadeUp(80) }}>
               {decodeURIComponent(error)}
-            </div>
+            </p>
           )}
 
-          <form action={adminLogin} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <div>
-              <label style={{ display: "block", color: "rgba(255,255,255,0.4)", fontSize: 12, fontWeight: 600, marginBottom: 7, letterSpacing: "0.03em" }}>
-                EMAIL
-              </label>
+          <form
+            action={adminLogin}
+            style={{ display: "flex", flexDirection: "column", animation: fadeUp(100) }}
+          >
+            <div style={{ marginBottom: 18 }}>
+              <label style={labelStyle}>Email</label>
               <input
                 name="email"
                 type="email"
                 required
+                placeholder="you@example.com"
                 autoComplete="email"
-                placeholder="admin@example.com"
-                style={{
-                  width: "100%", boxSizing: "border-box",
-                  background: "rgba(255,255,255,0.04)",
-                  border: "1px solid rgba(255,255,255,0.1)",
-                  borderRadius: 10, padding: "12px 14px",
-                  color: "rgb(250,250,250)", fontSize: 14,
-                  outline: "none", fontFamily: "inherit",
-                }}
+                style={inputStyle}
               />
             </div>
 
-            <div>
-              <label style={{ display: "block", color: "rgba(255,255,255,0.4)", fontSize: 12, fontWeight: 600, marginBottom: 7, letterSpacing: "0.03em" }}>
-                PASSWORD
-              </label>
+            <div style={{ marginBottom: 24 }}>
+              <label style={labelStyle}>Password</label>
               <div style={{ position: "relative" }}>
                 <input
                   name="password"
                   type={show ? "text" : "password"}
                   required
+                  placeholder="Enter your password"
                   autoComplete="current-password"
-                  placeholder="••••••••"
-                  style={{
-                    width: "100%", boxSizing: "border-box",
-                    background: "rgba(255,255,255,0.04)",
-                    border: "1px solid rgba(255,255,255,0.1)",
-                    borderRadius: 10, padding: "12px 44px 12px 14px",
-                    color: "rgb(250,250,250)", fontSize: 14,
-                    outline: "none", fontFamily: "inherit",
-                  }}
+                  style={{ ...inputStyle, paddingRight: 44 }}
                 />
                 <button
                   type="button"
                   tabIndex={-1}
                   onClick={() => setShow(v => !v)}
                   style={{
-                    position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)",
+                    position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)",
                     background: "none", border: "none", cursor: "pointer",
-                    color: "rgba(255,255,255,0.3)", display: "flex", padding: 4,
+                    color: "var(--auth-text-sub)", display: "flex", alignItems: "center", padding: 4,
                   }}
                 >
-                  {show ? <EyeOff size={15} /> : <Eye size={15} />}
+                  {show ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
             </div>
 
-            <button
-              type="submit"
-              style={{
-                width: "100%", marginTop: 4,
-                background: "rgb(239,68,68)",
-                color: "#fff", border: "none", borderRadius: 11,
-                padding: "13px 0", fontSize: 14, fontWeight: 700,
-                cursor: "pointer", fontFamily: "inherit",
-                letterSpacing: "-0.01em",
-              }}
-            >
+            <button type="submit" style={primaryBtnStyle}>
               Sign in to Admin
             </button>
           </form>
@@ -139,6 +141,44 @@ function Form() {
     </div>
   );
 }
+
+const labelStyle: React.CSSProperties = {
+  display: "block",
+  color: "var(--auth-text-sub)",
+  fontSize: 13,
+  fontWeight: 500,
+  marginBottom: 8,
+};
+
+const inputStyle: React.CSSProperties = {
+  width: "100%",
+  background: "var(--auth-input-bg)",
+  border: "1px solid var(--auth-input-border)",
+  borderRadius: 10,
+  padding: "13px 14px",
+  color: "var(--auth-text)",
+  fontSize: 15,
+  outline: "none",
+  transition: "border-color 0.15s",
+  boxSizing: "border-box",
+};
+
+const primaryBtnStyle: React.CSSProperties = {
+  width: "100%",
+  background: "var(--auth-btn-bg)",
+  color: "var(--auth-btn-text)",
+  border: "none",
+  borderRadius: 12,
+  padding: 14,
+  fontSize: 15,
+  fontWeight: 600,
+  cursor: "pointer",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: 8,
+  fontFamily: "inherit",
+};
 
 export function AdminLoginForm() {
   return (
