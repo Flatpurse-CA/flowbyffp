@@ -97,7 +97,7 @@ export default function WaitlistPage() {
 
   return (
     <div style={{
-      backgroundImage: "url('/purple bg.jpg')",
+      backgroundImage: "url('/hero-p.png')",
       backgroundSize: "cover",
       backgroundPosition: "center bottom",
       backgroundRepeat: "no-repeat",
