@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowRight, User } from "lucide-react";
 
 const PURPLE = "#712AE2";
+const GOLD_B = "#D9A040";
 
 const NAV_LINKS = ["Features", "Pricing", "Resources", "Offers"];
 
@@ -88,9 +89,8 @@ export default function Waitlist2Page() {
             borderRadius: 999, padding: "8px 16px",
             marginBottom: 36,
           }}>
-            <span style={{ fontSize: 14 }}>⚡</span>
-            <span style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.85)", letterSpacing: "0.02em" }}>
-              Auto Pilot &nbsp;·&nbsp; Track More Bookings
+            <span style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.75)", letterSpacing: "0.1em", textTransform: "uppercase" }}>
+              Founder Beta &nbsp;·&nbsp; Free Access
             </span>
           </div>
 
@@ -98,12 +98,19 @@ export default function Waitlist2Page() {
           <h1 style={{
             fontSize: "clamp(42px, 5.5vw, 74px)",
             fontWeight: 900, letterSpacing: "-0.045em", lineHeight: 1.04,
-            margin: "0 0 28px", color: "#fff",
+            margin: "0 0 16px", color: "#fff",
           }}>
-            Book More.<br />
-            Lose Nothing.<br />
-            Keep Every Dollar.
+            Reserve your beta spot.
           </h1>
+
+          {/* Gold italic subheading */}
+          <p style={{
+            fontSize: "clamp(28px, 3.5vw, 52px)",
+            fontWeight: 700, letterSpacing: "-0.035em", lineHeight: 1.1,
+            margin: "0 0 28px", color: GOLD_B, fontStyle: "italic",
+          }}>
+            Get 40% off forever.
+          </p>
 
           {/* Sub */}
           <p style={{
