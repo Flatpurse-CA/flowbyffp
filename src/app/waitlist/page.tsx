@@ -338,13 +338,15 @@ export default function WaitlistPage() {
           </span>
         </div>
 
-        {/* Video — full bleed */}
+        {/* Video — full bleed with side padding */}
         <div style={{
           position: "relative", zIndex: 1,
           width: "100vw",
           marginLeft: "calc(-50vw + 50%)",
+          padding: "0 40px",
+          boxSizing: "border-box",
         }}>
-          <div style={{ aspectRatio: "16/9" }}>
+          <div style={{ aspectRatio: "16/9", borderRadius: 16, overflow: "hidden" }}>
             <iframe
               src="https://drive.google.com/file/d/16kEw9y92fjrpefWpY39HA_DjDehmx9oU/preview"
               style={{ width: "100%", height: "100%", border: "none", display: "block" }}
