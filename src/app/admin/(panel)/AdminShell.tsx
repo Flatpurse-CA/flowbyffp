@@ -38,7 +38,7 @@ export function AdminShell({ children, user }: { children: React.ReactNode; user
   })();
 
   return (
-    <div style={{ minHeight: "100vh", background: "rgb(9,11,17)", display: "flex" }}>
+    <div style={{ minHeight: "100vh", background: "rgb(10,10,12)", display: "flex" }}>
 
       {/* ═══════════════════════════════════════════════
           SIDEBAR — single collapsible panel
@@ -203,7 +203,7 @@ export function AdminShell({ children, user }: { children: React.ReactNode; user
           flexShrink: 0, height: 66,
           display: "flex", alignItems: "center", justifyContent: "space-between",
           padding: "0 32px",
-          background: "rgb(9,11,17)",
+          background: "rgb(10,10,12)",
           borderBottom: "1px solid rgba(255,255,255,0.05)",
         }}>
           {/* Greeting */}

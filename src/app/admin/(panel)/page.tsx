@@ -21,7 +21,7 @@ function StatCard({
 }) {
   return (
     <div style={{
-      background: "rgb(13,15,24)",
+      background: "rgb(16,17,22)",
       border: "1px solid rgba(255,255,255,0.07)",
       borderRadius: 18,
       padding: "22px 24px",
@@ -89,7 +89,7 @@ export default async function AdminOverviewPage() {
     .slice(0, 6);
 
   const card: React.CSSProperties = {
-    background: "rgb(13,15,24)",
+    background: "rgb(16,17,22)",
     border: "1px solid rgba(255,255,255,0.07)",
     borderRadius: 18,
     overflow: "hidden",
@@ -297,7 +297,7 @@ export default async function AdminOverviewPage() {
               const date  = new Date(shop.created_at).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" });
               return (
                 <div key={i} style={{
-                  background: "rgb(13,15,24)",
+                  background: "rgb(16,17,22)",
                   border: "1px solid rgba(255,255,255,0.07)",
                   borderRadius: 14, padding: "16px 18px",
                 }}>
