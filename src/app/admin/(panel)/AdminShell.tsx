@@ -1,15 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Users, ClipboardList, Store, CreditCard,
   LogOut, Search, Bell, ChevronLeft, ChevronRight,
-  Sun, MessageSquare,
+  Sun, Moon, MessageSquare, User as UserIcon, Settings,
 } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 import { logout } from "@/app/dashboard/actions";
+
+const PURPLE = "rgb(139,92,246)";
+const PURPLE_BG = "rgba(109,40,217,0.18)";
 
 const NAV = [
   { icon: LayoutDashboard, href: "/admin",          label: "Overview"  },
@@ -23,31 +26,132 @@ function isActive(href: string, pathname: string) {
   return href === "/admin" ? pathname === "/admin" : pathname.startsWith(href);
 }
 
+const DARK = {
+  bg:             "rgb(10,10,12)",
+  border:         "rgba(255,255,255,0.06)",
+  border2:        "rgba(255,255,255,0.09)",
+  text:           "rgb(240,240,248)",
+  textMuted:      "rgba(255,255,255,0.3)",
+  textDim:        "rgba(255,255,255,0.42)",
+  iconBtn:        "rgba(255,255,255,0.04)",
+  iconBtnBorder:  "rgba(255,255,255,0.07)",
+  iconColor:      "rgba(255,255,255,0.35)",
+  menuLabel:      "rgba(255,255,255,0.2)",
+  activePill:     "rgba(139,92,246,0.12)",
+  activeText:     "rgb(200,180,255)",
+  inactiveText:   "rgba(255,255,255,0.42)",
+  searchBg:       "rgba(255,255,255,0.04)",
+  searchBorder:   "rgba(255,255,255,0.07)",
+  searchPlaceholder: "rgba(255,255,255,0.2)",
+  searchKbd:      "rgba(255,255,255,0.15)",
+  searchKbdBg:    "rgba(255,255,255,0.06)",
+  dropBg:         "rgb(18,18,24)",
+  dropBorder:     "rgba(255,255,255,0.1)",
+  dropItem:       "rgba(255,255,255,0.65)",
+  dropHover:      "rgba(255,255,255,0.06)",
+  divider:        "rgba(255,255,255,0.06)",
+};
+
+const LIGHT = {
+  bg:             "rgb(246,246,250)",
+  border:         "rgba(0,0,0,0.08)",
+  border2:        "rgba(0,0,0,0.1)",
+  text:           "rgb(12,12,20)",
+  textMuted:      "rgba(0,0,0,0.38)",
+  textDim:        "rgba(0,0,0,0.48)",
+  iconBtn:        "rgba(0,0,0,0.04)",
+  iconBtnBorder:  "rgba(0,0,0,0.09)",
+  iconColor:      "rgba(0,0,0,0.4)",
+  menuLabel:      "rgba(0,0,0,0.25)",
+  activePill:     "rgba(139,92,246,0.1)",
+  activeText:     "rgb(109,40,217)",
+  inactiveText:   "rgba(0,0,0,0.48)",
+  searchBg:       "rgba(0,0,0,0.04)",
+  searchBorder:   "rgba(0,0,0,0.09)",
+  searchPlaceholder: "rgba(0,0,0,0.3)",
+  searchKbd:      "rgba(0,0,0,0.2)",
+  searchKbdBg:    "rgba(0,0,0,0.06)",
+  dropBg:         "rgb(255,255,255)",
+  dropBorder:     "rgba(0,0,0,0.1)",
+  dropItem:       "rgba(0,0,0,0.65)",
+  dropHover:      "rgba(0,0,0,0.05)",
+  divider:        "rgba(0,0,0,0.08)",
+};
+
 export function AdminShell({ children, user }: { children: React.ReactNode; user: User }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(true);
+  const [dark, setDark] = useState(true);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const email   = user.email ?? "";
+  const email    = user.email ?? "";
   const username = email.split("@")[0];
-  const name    = username.charAt(0).toUpperCase() + username.slice(1);
-  const initial = name.charAt(0);
+  const name     = username.charAt(0).toUpperCase() + username.slice(1);
+  const initial  = name.charAt(0);
 
   const greeting = (() => {
     const h = new Date().getHours();
     return h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening";
   })();
 
+  useEffect(() => {
+    const stored = localStorage.getItem("admin-theme");
+    if (stored === "light") {
+      setDark(false);
+      document.documentElement.setAttribute("data-theme", "light");
+    }
+  }, []);
+
+  const toggleDark = () => {
+    const next = !dark;
+    setDark(next);
+    localStorage.setItem("admin-theme", next ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", next ? "dark" : "light");
+  };
+
+  useEffect(() => {
+    if (!dropdownOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [dropdownOpen]);
+
+  const T = dark ? DARK : LIGHT;
+
+  const headerIconBtn: React.CSSProperties = {
+    width: 36, height: 36,
+    display: "flex", alignItems: "center", justifyContent: "center",
+    borderRadius: 10, background: T.iconBtn,
+    border: `1px solid ${T.iconBtnBorder}`,
+    color: T.iconColor, cursor: "pointer",
+  };
+
+  const hdBadge: React.CSSProperties = {
+    position: "absolute", top: 4, right: 4,
+    minWidth: 14, height: 14, borderRadius: 7,
+    background: PURPLE,
+    display: "flex", alignItems: "center", justifyContent: "center",
+    fontSize: 9, fontWeight: 800, color: "white",
+    padding: "0 3px",
+    border: `1.5px solid ${T.bg}`,
+  };
+
   return (
-    <div style={{ minHeight: "100vh", background: "rgb(10,10,12)", display: "flex" }}>
+    <div style={{ minHeight: "100vh", background: T.bg, display: "flex" }}>
 
       {/* ═══════════════════════════════════════════════
-          SIDEBAR — single collapsible panel
+          SIDEBAR
           ═══════════════════════════════════════════════ */}
       <aside style={{
         width: open ? 260 : 62,
         minHeight: "100vh",
-        background: "rgb(10,10,12)",
-        borderRight: "1px solid rgba(255,255,255,0.06)",
+        background: T.bg,
+        borderRight: `1px solid ${T.border}`,
         display: "flex",
         flexDirection: "column",
         transition: "width 0.22s cubic-bezier(0.4,0,0.2,1)",
@@ -58,23 +162,24 @@ export function AdminShell({ children, user }: { children: React.ReactNode; user
         height: "100vh",
       }}>
 
-        {/* ── User profile header ── */}
+        {/* User profile header */}
         {open ? (
           <div style={{
             display: "flex", alignItems: "center", justifyContent: "space-between",
-            padding: "17px 14px 17px", flexShrink: 0,
+            padding: "17px 14px", flexShrink: 0,
           }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0, flex: 1 }}>
               <div style={{
                 width: 38, height: 38, borderRadius: 10,
-                background: "rgb(234,88,12)",
+                background: PURPLE_BG,
+                border: `1px solid rgba(139,92,246,0.3)`,
                 display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: 17, fontWeight: 800, color: "white", flexShrink: 0,
+                fontSize: 17, fontWeight: 800, color: PURPLE, flexShrink: 0,
               }}>
                 {initial}
               </div>
               <span style={{
-                color: "rgb(240,240,248)", fontSize: 15, fontWeight: 700,
+                color: T.text, fontSize: 15, fontWeight: 700,
                 whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
                 letterSpacing: "-0.01em",
               }}>
@@ -85,7 +190,7 @@ export function AdminShell({ children, user }: { children: React.ReactNode; user
               onClick={() => setOpen(false)}
               style={{
                 background: "none", border: "none",
-                color: "rgba(255,255,255,0.28)", cursor: "pointer",
+                color: T.textMuted, cursor: "pointer",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 width: 28, height: 28, borderRadius: 7, flexShrink: 0, padding: 0,
               }}
@@ -95,25 +200,24 @@ export function AdminShell({ children, user }: { children: React.ReactNode; user
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "18px 0 14px", gap: 10, flexShrink: 0 }}>
-            {/* Avatar */}
             <div style={{
               width: 38, height: 38, borderRadius: 10,
-              background: "rgb(234,88,12)",
+              background: PURPLE_BG,
+              border: `1px solid rgba(139,92,246,0.3)`,
               display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 17, fontWeight: 800, color: "white",
+              fontSize: 17, fontWeight: 800, color: PURPLE,
             }}>
               {initial}
             </div>
-            {/* Expand button */}
             <button
               onClick={() => setOpen(true)}
               title="Expand sidebar"
               style={{
-                background: "rgba(255,255,255,0.06)",
-                border: "1px solid rgba(255,255,255,0.09)",
+                background: T.iconBtn,
+                border: `1px solid ${T.border2}`,
                 borderRadius: 8, width: 34, height: 26,
                 display: "flex", alignItems: "center", justifyContent: "center",
-                color: "rgba(255,255,255,0.4)", cursor: "pointer", padding: 0,
+                color: T.textDim, cursor: "pointer", padding: 0,
               }}
             >
               <ChevronRight size={13} />
@@ -122,12 +226,12 @@ export function AdminShell({ children, user }: { children: React.ReactNode; user
         )}
 
         {/* Divider */}
-        <div style={{ height: 1, background: "rgba(255,255,255,0.06)", margin: "0 0 14px", flexShrink: 0 }} />
+        <div style={{ height: 1, background: T.divider, margin: "0 0 14px", flexShrink: 0 }} />
 
-        {/* ── MENU label ── */}
+        {/* MENU label */}
         {open && (
           <p style={{
-            color: "rgba(255,255,255,0.2)", fontSize: 10, fontWeight: 700,
+            color: T.menuLabel, fontSize: 10, fontWeight: 700,
             letterSpacing: "0.1em", textTransform: "uppercase",
             margin: "0 16px 8px", flexShrink: 0,
           }}>
@@ -135,7 +239,7 @@ export function AdminShell({ children, user }: { children: React.ReactNode; user
           </p>
         )}
 
-        {/* ── Nav items ── */}
+        {/* Nav items */}
         <nav style={{ display: "flex", flexDirection: "column", gap: 1, padding: "0 8px", flex: 1 }}>
           {NAV.map(({ icon: Icon, href, label }) => {
             const active = isActive(href, pathname);
@@ -150,8 +254,8 @@ export function AdminShell({ children, user }: { children: React.ReactNode; user
                   gap: 12,
                   padding: open ? "10px 12px" : "11px",
                   borderRadius: 10,
-                  background: active ? "rgba(255,255,255,0.07)" : "transparent",
-                  color: active ? "rgb(245,245,250)" : "rgba(255,255,255,0.42)",
+                  background: active ? T.activePill : "transparent",
+                  color: active ? T.activeText : T.inactiveText,
                   fontSize: 14,
                   fontWeight: active ? 600 : 500,
                   textDecoration: "none",
@@ -171,9 +275,9 @@ export function AdminShell({ children, user }: { children: React.ReactNode; user
           })}
         </nav>
 
-        {/* ── Sign out ── */}
+        {/* Sign out */}
         <div style={{ padding: "0 8px 20px", flexShrink: 0 }}>
-          <div style={{ height: 1, background: "rgba(255,255,255,0.06)", margin: "0 4px 8px" }} />
+          <div style={{ height: 1, background: T.divider, margin: "0 4px 8px" }} />
           <form action={logout} style={{ width: "100%" }}>
             <button type="submit" style={{
               display: "flex", alignItems: "center",
@@ -181,7 +285,7 @@ export function AdminShell({ children, user }: { children: React.ReactNode; user
               padding: open ? "10px 12px" : "11px",
               borderRadius: 10,
               background: "transparent", border: "none",
-              color: "rgba(255,255,255,0.35)", fontSize: 14, fontWeight: 500,
+              color: T.textDim, fontSize: 14, fontWeight: 500,
               cursor: "pointer", fontFamily: "inherit",
               width: "100%",
               justifyContent: open ? "flex-start" : "center",
@@ -194,7 +298,7 @@ export function AdminShell({ children, user }: { children: React.ReactNode; user
       </aside>
 
       {/* ═══════════════════════════════════════════════
-          RIGHT SIDE — top header + scrollable content
+          RIGHT SIDE
           ═══════════════════════════════════════════════ */}
       <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", height: "100vh", overflow: "hidden" }}>
 
@@ -204,15 +308,15 @@ export function AdminShell({ children, user }: { children: React.ReactNode; user
           height: 73,
           display: "flex", alignItems: "center", justifyContent: "space-between",
           padding: "0 32px",
-          background: "rgb(10,10,12)",
-          borderBottom: "1px solid rgba(255,255,255,0.05)",
+          background: T.bg,
+          borderBottom: `1px solid ${T.border}`,
         }}>
           {/* Greeting */}
           <div style={{ flexShrink: 0 }}>
-            <p style={{ color: "rgb(240,240,248)", fontSize: 15, fontWeight: 700, margin: 0, letterSpacing: "-0.01em" }}>
+            <p style={{ color: T.text, fontSize: 15, fontWeight: 700, margin: 0, letterSpacing: "-0.01em" }}>
               {greeting}, {name}
             </p>
-            <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 12, margin: 0 }}>
+            <p style={{ color: T.textMuted, fontSize: 12, margin: 0 }}>
               Here&apos;s what&apos;s happening today.
             </p>
           </div>
@@ -221,13 +325,16 @@ export function AdminShell({ children, user }: { children: React.ReactNode; user
           <div style={{ flex: 1, maxWidth: 300, margin: "0 32px" }}>
             <div style={{
               display: "flex", alignItems: "center", gap: 9,
-              background: "rgba(255,255,255,0.04)",
-              border: "1px solid rgba(255,255,255,0.07)",
+              background: T.searchBg,
+              border: `1px solid ${T.searchBorder}`,
               borderRadius: 10, padding: "9px 14px",
             }}>
-              <Search size={13} color="rgba(255,255,255,0.22)" />
-              <span style={{ color: "rgba(255,255,255,0.2)", fontSize: 13, flex: 1 }}>Search anything...</span>
-              <span style={{ color: "rgba(255,255,255,0.15)", fontSize: 11, fontWeight: 600, background: "rgba(255,255,255,0.06)", padding: "2px 6px", borderRadius: 5 }}>⌘K</span>
+              <Search size={13} color={T.searchPlaceholder} />
+              <span style={{ color: T.searchPlaceholder, fontSize: 13, flex: 1 }}>Search anything...</span>
+              <span style={{
+                color: T.searchKbd, fontSize: 11, fontWeight: 600,
+                background: T.searchKbdBg, padding: "2px 6px", borderRadius: 5,
+              }}>⌘K</span>
             </div>
           </div>
 
@@ -241,20 +348,136 @@ export function AdminShell({ children, user }: { children: React.ReactNode; user
               <button style={headerIconBtn}><Bell size={16} strokeWidth={1.6} /></button>
               <span style={hdBadge}>3</span>
             </div>
-            <button style={headerIconBtn}><Sun size={16} strokeWidth={1.6} /></button>
+
+            {/* Theme + Avatar grouped */}
             <div style={{
-              width: 34, height: 34, borderRadius: "50%",
-              background: "rgb(234,88,12)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 13, fontWeight: 800, color: "white", cursor: "pointer",
+              display: "flex", alignItems: "center",
+              background: T.iconBtn,
+              border: `1px solid ${T.iconBtnBorder}`,
+              borderRadius: 12, overflow: "visible",
+              height: 38,
             }}>
-              {initial}
+              {/* Dark mode toggle */}
+              <button
+                onClick={toggleDark}
+                title={dark ? "Switch to light" : "Switch to dark"}
+                style={{
+                  width: 38, height: 38,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  background: "transparent", border: "none",
+                  borderRight: `1px solid ${T.iconBtnBorder}`,
+                  color: T.iconColor, cursor: "pointer",
+                  borderRadius: "12px 0 0 12px",
+                }}
+              >
+                {dark ? <Sun size={15} strokeWidth={1.6} /> : <Moon size={15} strokeWidth={1.6} />}
+              </button>
+
+              {/* Avatar with dropdown */}
+              <div ref={dropdownRef} style={{ position: "relative" }}>
+                <button
+                  onClick={() => setDropdownOpen(v => !v)}
+                  style={{
+                    width: 44, height: 38,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    background: "transparent", border: "none",
+                    cursor: "pointer", padding: 0,
+                    borderRadius: "0 12px 12px 0",
+                  }}
+                >
+                  <div style={{
+                    width: 28, height: 28, borderRadius: "50%",
+                    background: PURPLE,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: 12, fontWeight: 800, color: "white",
+                    flexShrink: 0,
+                  }}>
+                    {initial}
+                  </div>
+                </button>
+
+                {/* Dropdown menu */}
+                {dropdownOpen && (
+                  <div style={{
+                    position: "absolute", top: "calc(100% + 10px)", right: 0,
+                    width: 200,
+                    background: T.dropBg,
+                    border: `1px solid ${T.dropBorder}`,
+                    borderRadius: 14,
+                    boxShadow: dark
+                      ? "0 12px 40px rgba(0,0,0,0.55)"
+                      : "0 8px 32px rgba(0,0,0,0.12)",
+                    overflow: "hidden",
+                    zIndex: 200,
+                  }}>
+                    {/* User info */}
+                    <div style={{
+                      padding: "13px 15px 11px",
+                      borderBottom: `1px solid ${T.dropBorder}`,
+                    }}>
+                      <p style={{ color: T.text, fontSize: 13, fontWeight: 700, margin: "0 0 2px" }}>{name}</p>
+                      <p style={{
+                        color: T.textMuted, fontSize: 11.5, margin: 0,
+                        overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                      }}>
+                        {email}
+                      </p>
+                    </div>
+
+                    {/* Nav items */}
+                    {[
+                      { icon: UserIcon, label: "Profile",  href: "/admin/profile" },
+                      { icon: Settings, label: "Settings", href: "/admin/settings" },
+                    ].map(({ icon: Icon, label, href }) => (
+                      <Link
+                        key={href}
+                        href={href}
+                        onClick={() => setDropdownOpen(false)}
+                        style={{
+                          display: "flex", alignItems: "center", gap: 10,
+                          padding: "10px 15px",
+                          color: T.dropItem,
+                          fontSize: 13, fontWeight: 500,
+                          textDecoration: "none",
+                        }}
+                        onMouseEnter={e => (e.currentTarget.style.background = T.dropHover)}
+                        onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+                      >
+                        <Icon size={14} strokeWidth={1.7} />
+                        {label}
+                      </Link>
+                    ))}
+
+                    <div style={{ height: 1, background: T.dropBorder, margin: "2px 0" }} />
+
+                    <form action={logout}>
+                      <button
+                        type="submit"
+                        style={{
+                          display: "flex", alignItems: "center", gap: 10,
+                          padding: "10px 15px", width: "100%",
+                          background: "transparent", border: "none",
+                          color: "rgb(248,113,113)",
+                          fontSize: 13, fontWeight: 500,
+                          cursor: "pointer", fontFamily: "inherit",
+                          textAlign: "left",
+                        }}
+                        onMouseEnter={e => (e.currentTarget.style.background = "rgba(239,68,68,0.08)")}
+                        onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+                      >
+                        <LogOut size={14} strokeWidth={1.7} />
+                        Sign out
+                      </button>
+                    </form>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </header>
 
         {/* Scrollable content */}
-        <main style={{ flex: 1, overflowY: "auto", padding: "28px 32px" }}>
+        <main style={{ flex: 1, overflowY: "auto", padding: "28px 32px", background: T.bg }}>
           {children}
         </main>
       </div>
@@ -262,23 +485,3 @@ export function AdminShell({ children, user }: { children: React.ReactNode; user
     </div>
   );
 }
-
-// ─── Shared header styles ─────────────────────────────────────────────────────
-
-const headerIconBtn: React.CSSProperties = {
-  width: 36, height: 36,
-  display: "flex", alignItems: "center", justifyContent: "center",
-  borderRadius: 10, background: "rgba(255,255,255,0.04)",
-  border: "1px solid rgba(255,255,255,0.07)",
-  color: "rgba(255,255,255,0.35)", cursor: "pointer",
-};
-
-const hdBadge: React.CSSProperties = {
-  position: "absolute", top: 4, right: 4,
-  minWidth: 14, height: 14, borderRadius: 7,
-  background: "rgb(234,88,12)",
-  display: "flex", alignItems: "center", justifyContent: "center",
-  fontSize: 9, fontWeight: 800, color: "white",
-  padding: "0 3px",
-  border: "1.5px solid rgb(9,11,17)",
-};

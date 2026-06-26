@@ -53,17 +53,17 @@ export default async function AdminOverviewPage() {
   const [usersRes, shopsRes, waitlistRes] = await Promise.all([
     admin.auth.admin.listUsers({ perPage: 1000 }),
     admin.from("shops").select("owner_id, name, plan, created_at"),
-    admin.from("waitlist").select("email, shop_type, status, created_at"),
+    admin.from("waitlist").select("email, shop_type, created_at"),
   ]);
 
   const users    = usersRes.data?.users ?? [];
   const shops    = (shopsRes.data   ?? []) as { owner_id: string; name: string; plan: string; created_at: string }[];
-  const waitlist = (waitlistRes.data ?? []) as { email: string; shop_type: string | null; status: string; created_at: string }[];
+  const waitlist = (waitlistRes.data ?? []) as { email: string; shop_type: string | null; created_at: string }[];
 
-  const weekAgo   = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-  const newUsers  = users.filter(u => new Date(u.created_at) > weekAgo).length;
-  const newShops  = shops.filter(s => new Date(s.created_at) > weekAgo).length;
-  const paidShops = shops.filter(s => s.plan !== "starter").length;
+  const weekAgo  = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+  const newUsers = users.filter(u => new Date(u.created_at) > weekAgo).length;
+  const newShops = shops.filter(s => new Date(s.created_at) > weekAgo).length;
+  const newWait  = waitlist.filter(w => new Date(w.created_at) > weekAgo).length;
 
   // Monthly user growth (last 7 months)
   const months = Array.from({ length: 7 }, (_, i) => {
@@ -106,7 +106,7 @@ export default async function AdminOverviewPage() {
           Icon={Users}
           iconColor="rgb(167,139,250)"
           iconBg="rgba(109,40,217,0.15)"
-          subtitle={newUsers > 0 ? `+${newUsers} this week` : "No change yet"}
+          subtitle={newUsers > 0 ? `+${newUsers} this week` : "No new members yet"}
         />
         <StatCard
           label="Active Shops"
@@ -114,23 +114,23 @@ export default async function AdminOverviewPage() {
           Icon={Store}
           iconColor="rgb(52,211,153)"
           iconBg="rgba(16,185,129,0.12)"
-          subtitle={newShops > 0 ? `+${newShops} this week` : "No change yet"}
+          subtitle={newShops > 0 ? `+${newShops} this week` : "No new shops yet"}
+        />
+        <StatCard
+          label="Waitlist"
+          value={waitlist.length}
+          Icon={ClipboardList}
+          iconColor="rgb(251,191,36)"
+          iconBg="rgba(245,158,11,0.12)"
+          subtitle={newWait > 0 ? `+${newWait} this week` : "No new signups yet"}
         />
         <StatCard
           label="Revenue"
           value="₦0"
           Icon={CreditCard}
-          iconColor="rgb(251,191,36)"
-          iconBg="rgba(245,158,11,0.12)"
-          subtitle="No change yet"
-        />
-        <StatCard
-          label="Growth"
-          value={shops.length ? `${Math.round((paidShops / shops.length) * 100)}%` : "0%"}
-          Icon={TrendingUp}
           iconColor="rgb(96,165,250)"
           iconBg="rgba(59,130,246,0.12)"
-          subtitle={paidShops > 0 ? `${paidShops} paid plans` : "No change yet"}
+          subtitle="Billing not active yet"
         />
       </div>
 
@@ -140,7 +140,7 @@ export default async function AdminOverviewPage() {
         {/* Member growth */}
         <div style={{ ...card, padding: "22px 24px" }}>
           <p style={{ color: "rgb(240,240,248)", fontSize: 14, fontWeight: 700, margin: "0 0 3px" }}>Member growth</p>
-          <p style={{ color: "rgba(255,255,255,0.28)", fontSize: 12, margin: 0 }}>Members joined over time</p>
+          <p style={{ color: "rgba(255,255,255,0.28)", fontSize: 12, margin: 0 }}>Members joined over the last 7 months</p>
 
           <div style={{ display: "flex", gap: 0, marginTop: 20 }}>
             {/* Y axis */}
@@ -217,7 +217,17 @@ export default async function AdminOverviewPage() {
 
         {/* Recent members */}
         <div style={{ ...card, padding: "22px 24px", display: "flex", flexDirection: "column" }}>
-          <p style={{ color: "rgb(240,240,248)", fontSize: 14, fontWeight: 700, margin: "0 0 20px" }}>Recent members</p>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
+            <p style={{ color: "rgb(240,240,248)", fontSize: 14, fontWeight: 700, margin: 0 }}>Recent members</p>
+            {users.length > 0 && (
+              <Link
+                href="/admin/users"
+                style={{ color: "rgba(255,255,255,0.35)", fontSize: 12, textDecoration: "none" }}
+              >
+                View all
+              </Link>
+            )}
+          </div>
 
           {recentUsers.length === 0 ? (
             <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, minHeight: 220 }}>
@@ -268,9 +278,9 @@ export default async function AdminOverviewPage() {
             style={{
               display: "inline-flex", alignItems: "center", gap: 6,
               padding: "8px 16px", borderRadius: 10,
-              background: "rgba(234,88,12,0.12)",
-              border: "1px solid rgba(234,88,12,0.22)",
-              color: "rgb(251,146,60)", fontSize: 13, fontWeight: 600,
+              background: "rgba(139,92,246,0.1)",
+              border: "1px solid rgba(139,92,246,0.2)",
+              color: "rgb(167,139,250)", fontSize: 13, fontWeight: 600,
               textDecoration: "none",
             }}
           >
@@ -297,8 +307,8 @@ export default async function AdminOverviewPage() {
               const date  = new Date(shop.created_at).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" });
               return (
                 <div key={i} style={{
-                  background: "rgb(16,17,22)",
-                  border: "1px solid rgba(255,255,255,0.07)",
+                  background: "rgb(10,10,12)",
+                  border: "1px solid rgba(255,255,255,0.09)",
                   borderRadius: 14, padding: "16px 18px",
                 }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
@@ -326,14 +336,14 @@ export default async function AdminOverviewPage() {
         )}
       </div>
 
-      {/* ── Waitlist (pending) ── */}
+      {/* ── Waitlist ── */}
       <div>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <p style={{ color: "rgb(240,240,248)", fontSize: 15, fontWeight: 700, margin: 0 }}>Waitlist</p>
-            {waitlist.filter(w => w.status === "pending").length > 0 && (
-              <span style={{ fontSize: 10.5, fontWeight: 700, color: "rgb(251,191,36)", background: "rgba(245,158,11,0.1)", padding: "3px 9px", borderRadius: 20 }}>
-                {waitlist.filter(w => w.status === "pending").length} pending
+            {waitlist.length > 0 && (
+              <span style={{ fontSize: 10.5, fontWeight: 700, color: "rgb(167,139,250)", background: "rgba(109,40,217,0.1)", padding: "3px 9px", borderRadius: 20 }}>
+                {waitlist.length} total
               </span>
             )}
           </div>
@@ -365,7 +375,7 @@ export default async function AdminOverviewPage() {
             <table style={{ width: "100%", borderCollapse: "collapse" }}>
               <thead>
                 <tr style={{ background: "rgba(255,255,255,0.02)" }}>
-                  {["Email", "Shop Type", "Status", "Date"].map(h => (
+                  {["Email", "Shop Type", "Joined"].map(h => (
                     <th key={h} style={{
                       padding: "10px 20px", textAlign: "left",
                       color: "rgba(255,255,255,0.22)", fontSize: 11,
@@ -379,17 +389,20 @@ export default async function AdminOverviewPage() {
               </thead>
               <tbody>
                 {waitlist.slice(0, 6).map((entry, i) => {
-                  const date = new Date(entry.created_at).toLocaleDateString("en-CA", { month: "short", day: "numeric" });
-                  const statusColor = entry.status === "approved" ? "rgb(52,211,153)" : entry.status === "rejected" ? "rgb(248,113,113)" : "rgb(251,191,36)";
-                  const statusBg   = entry.status === "approved" ? "rgba(16,185,129,0.1)" : entry.status === "rejected" ? "rgba(239,68,68,0.1)" : "rgba(245,158,11,0.1)";
+                  const date = new Date(entry.created_at).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" });
                   return (
                     <tr key={i} style={{ borderBottom: i < Math.min(waitlist.length, 6) - 1 ? "1px solid rgba(255,255,255,0.04)" : "none" }}>
                       <td style={{ padding: "11px 20px", color: "rgba(255,255,255,0.6)", fontSize: 13 }}>{entry.email}</td>
-                      <td style={{ padding: "11px 20px", color: "rgba(255,255,255,0.38)", fontSize: 13 }}>{entry.shop_type ?? "—"}</td>
-                      <td style={{ padding: "11px 20px" }}>
-                        <span style={{ fontSize: 10.5, fontWeight: 700, padding: "3px 10px", borderRadius: 20, textTransform: "capitalize", color: statusColor, background: statusBg }}>
-                          {entry.status}
-                        </span>
+                      <td style={{ padding: "11px 20px", color: "rgba(255,255,255,0.38)", fontSize: 13 }}>
+                        {entry.shop_type ? (
+                          <span style={{
+                            fontSize: 11, fontWeight: 600, padding: "2px 9px", borderRadius: 20,
+                            background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.5)",
+                            border: "1px solid rgba(255,255,255,0.08)",
+                          }}>
+                            {entry.shop_type}
+                          </span>
+                        ) : "—"}
                       </td>
                       <td style={{ padding: "11px 20px", color: "rgba(255,255,255,0.28)", fontSize: 12 }}>{date}</td>
                     </tr>
