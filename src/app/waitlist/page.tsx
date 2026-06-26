@@ -381,18 +381,6 @@ export default function WaitlistPage() {
             </p>
           </div>
 
-          {/* 3-column steps */}
-          <div className="wl-steps-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 0 }}>
-            {STEPS.map((step, i) => (
-              <div key={i} style={{ paddingRight: i < 2 ? 48 : 0, paddingLeft: i > 0 ? 48 : 0, borderLeft: i > 0 ? "1px solid rgba(255,255,255,0.07)" : "none" }}>
-                <div style={{ height: 2, background: i === 0 ? BRAND_PURPLE : "rgba(255,255,255,0.1)", marginBottom: 24, borderRadius: 1 }} />
-                <span style={{ display: "block", fontSize: 11, fontWeight: 700, color: BRAND_PURPLE, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 12 }}>{step.n}</span>
-                <h3 style={{ fontSize: 18, fontWeight: 700, color: "#fff", letterSpacing: "-0.03em", margin: "0 0 12px" }}>{step.title}</h3>
-                <p style={{ fontSize: 14, color: "rgba(255,255,255,0.4)", lineHeight: 1.75, margin: 0 }}>{step.desc}</p>
-              </div>
-            ))}
-          </div>
-
           {/* Video */}
           <div style={{ marginTop: 72 }}>
             <ScrollZoom minScale={0.88}>
