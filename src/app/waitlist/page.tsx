@@ -377,23 +377,24 @@ export default function WaitlistPage() {
             <h2 ref={howRef} style={{
               fontSize: "clamp(32px, 4vw, 56px)",
               fontWeight: 800, letterSpacing: "-0.04em", lineHeight: 1.08,
-              color: "#fff", margin: 0, maxWidth: 900,
+              color: "#fff", margin: "0 0 20px", maxWidth: 900,
             }}>
-              {"From waitlist to fully\nrunning shop in minutes.".split("").map((char, i) =>
-                char === "\n"
-                  ? <br key={i} />
-                  : (
-                    <span key={i} style={{
-                      display: "inline-block",
-                      opacity: howVisible ? undefined : 0,
-                      animation: howVisible ? `blurDrop 0.45s cubic-bezier(0.16,1,0.3,1) ${i * 0.03}s forwards` : "none",
-                      whiteSpace: char === " " ? "pre" : "normal",
-                    }}>
-                      {char}
-                    </span>
-                  )
+              {"Get in early. Pay less, forever.".split("").map((char, i) =>
+                (
+                  <span key={i} style={{
+                    display: "inline-block",
+                    opacity: howVisible ? undefined : 0,
+                    animation: howVisible ? `blurDrop 0.45s cubic-bezier(0.16,1,0.3,1) ${i * 0.03}s forwards` : "none",
+                    whiteSpace: char === " " ? "pre" : "normal",
+                  }}>
+                    {char}
+                  </span>
+                )
               )}
             </h2>
+            <p style={{ fontSize: 17, color: "rgba(255,255,255,0.45)", lineHeight: 1.75, margin: 0, maxWidth: 620 }}>
+              The first 40 shops shape the product, get it free through launch, and lock in lifetime founder pricing. After 40, this door closes.
+            </p>
           </div>
 
           {/* 3-column steps */}
