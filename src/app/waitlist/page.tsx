@@ -115,7 +115,7 @@ export default function WaitlistPage() {
         minHeight: "100vh",
       }}>
         <Image
-          src="/hero-p.jpeg"
+          src="/hero-p2.png"
           alt=""
           fill
           priority
