@@ -344,7 +344,7 @@ export default function WaitlistPage() {
       <div style={{
         position: "relative",
         zIndex: 10,
-        marginTop: "-160px",
+        marginTop: "-240px",
         padding: "0 40px",
         boxSizing: "border-box",
       }}>
