@@ -94,7 +94,7 @@ export default function WaitlistPage() {
     if (!email.trim() || !name.trim()) return;
     setLoading(true);
     setFormError(null);
-    const { error } = await joinWaitlist(email, bizType ?? "");
+    const { error } = await joinWaitlist(email, bizType ?? "", name);
     setLoading(false);
     if (error) {
       setFormError(error);
@@ -338,23 +338,20 @@ export default function WaitlistPage() {
           </span>
         </div>
 
-        {/* Video */}
+        {/* Video — full bleed */}
         <div style={{
           position: "relative", zIndex: 1,
-          width: "100%", maxWidth: 860,
-          margin: "0 auto",
-          paddingBottom: 60,
+          width: "100vw",
+          marginLeft: "calc(-50vw + 50%)",
         }}>
-          <ScrollZoom minScale={0.92}>
-            <div style={{ aspectRatio: "16/9", borderRadius: 16, overflow: "hidden" }}>
-              <iframe
-                src="https://drive.google.com/file/d/16kEw9y92fjrpefWpY39HA_DjDehmx9oU/preview"
-                style={{ width: "100%", height: "100%", border: "none", display: "block" }}
-                allow="autoplay"
-                allowFullScreen
-              />
-            </div>
-          </ScrollZoom>
+          <div style={{ aspectRatio: "16/9" }}>
+            <iframe
+              src="https://drive.google.com/file/d/16kEw9y92fjrpefWpY39HA_DjDehmx9oU/preview"
+              style={{ width: "100%", height: "100%", border: "none", display: "block" }}
+              allow="autoplay"
+              allowFullScreen
+            />
+          </div>
         </div>
 
       </section>
