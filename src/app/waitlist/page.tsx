@@ -94,7 +94,7 @@ export default function WaitlistPage() {
     if (!email.trim() || !name.trim()) return;
     setLoading(true);
     setFormError(null);
-    const { error } = await joinWaitlist(email, shopType);
+    const { error } = await joinWaitlist(email, bizType ?? "");
     setLoading(false);
     if (error) {
       setFormError(error);
