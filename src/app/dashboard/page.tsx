@@ -1,390 +1,376 @@
-import { createClient } from "@/lib/supabase/server";
+"use client";
+
+import { useState } from "react";
 import {
-  CalendarDays, DollarSign, Users, Zap,
-  TrendingUp, TrendingDown, ArrowUpRight, MoreHorizontal,
-  Clock, RefreshCw, Smartphone, MessageCircle, Gift,
+  DollarSign, CalendarDays, AlertTriangle, Users2,
+  TrendingUp, Clock, Zap, Shield,
 } from "lucide-react";
 
-// ─── Tiny SVG sparkline ───────────────────────────────────────────────────────
-
-function Sparkline({ data, color }: { data: number[]; color: string }) {
-  const W = 80; const H = 32;
-  const min = Math.min(...data); const max = Math.max(...data);
-  const range = max - min || 1;
-  const pts = data
-    .map((v, i) => `${(i / (data.length - 1)) * W},${H - ((v - min) / range) * H}`)
-    .join(" ");
-  return (
-    <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} fill="none" style={{ flexShrink: 0 }}>
-      <polyline points={pts} stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-// ─── Stat card ────────────────────────────────────────────────────────────────
-
-function StatCard({
-  label, value, sub, change, positive, sparkData, sparkColor, Icon, iconBg, iconColor,
-}: {
-  label: string; value: string; sub: string; change: string;
-  positive: boolean; sparkData: number[]; sparkColor: string;
-  Icon: React.ComponentType<{ size?: number; strokeWidth?: number; color?: string }>;
-  iconBg: string; iconColor: string;
-}) {
-  const Trend = positive ? TrendingUp : TrendingDown;
-  return (
-    <div style={{
-      background: "rgba(255,255,255,0.025)",
-      border: "1px solid rgba(255,255,255,0.07)",
-      borderRadius: 16,
-      padding: "20px 22px",
-    }}>
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 14 }}>
-        <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-          <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, fontWeight: 500, margin: 0, letterSpacing: "0.02em" }}>{label}</p>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <span style={{
-              fontSize: 10, fontWeight: 700, padding: "2px 7px", borderRadius: 20,
-              background: positive ? "rgba(34,197,94,0.12)" : "rgba(239,68,68,0.12)",
-              color: positive ? "rgb(34,197,94)" : "rgb(248,113,113)",
-              display: "flex", alignItems: "center", gap: 3,
-            }}>
-              <Trend size={9} strokeWidth={2.5} />
-              {change}
-            </span>
-          </div>
-        </div>
-        <div style={{ width: 36, height: 36, borderRadius: 10, background: iconBg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-          <Icon size={16} strokeWidth={1.8} color={iconColor} />
-        </div>
-      </div>
-
-      <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
-        <div>
-          <p style={{ color: "rgb(250,250,250)", fontSize: 30, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.04em", lineHeight: 1 }}>{value}</p>
-          <p style={{ color: "rgba(255,255,255,0.28)", fontSize: 11, margin: 0 }}>{sub}</p>
-        </div>
-        <Sparkline data={sparkData} color={sparkColor} />
-      </div>
-    </div>
-  );
-}
-
-// ─── Section header ───────────────────────────────────────────────────────────
-
-function SectionHeader({ title, action }: { title: string; action?: string }) {
-  return (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-      <p style={{ color: "rgb(250,250,250)", fontSize: 14, fontWeight: 700, margin: 0 }}>{title}</p>
-      {action && (
-        <button style={{ background: "none", border: "none", color: "rgba(139,92,246,0.8)", fontSize: 12, fontWeight: 600, cursor: "pointer", padding: 0, display: "flex", alignItems: "center", gap: 3 }}>
-          {action} <ArrowUpRight size={12} />
-        </button>
-      )}
-    </div>
-  );
-}
-
-// ─── Data ─────────────────────────────────────────────────────────────────────
+// ─── Stat cards ───────────────────────────────────────────────────────────────
 
 const STATS = [
   {
-    label: "Today's Bookings",
-    value: "8",
-    sub: "vs yesterday (6 bookings)",
-    change: "+33%",
-    positive: true,
-    sparkData: [3, 5, 4, 7, 6, 8, 8],
-    sparkColor: "rgb(139,92,246)",
-    Icon: CalendarDays,
-    iconBg: "rgba(109,40,217,0.18)",
-    iconColor: "rgb(167,139,250)",
-  },
-  {
-    label: "Monthly Revenue",
-    value: "C$2,340",
-    sub: "Jun 01 – Jun 17, 2026",
-    change: "+12.5%",
-    positive: true,
-    sparkData: [1200, 1450, 1800, 1600, 2100, 1950, 2340],
-    sparkColor: "rgb(52,211,153)",
+    label: "TODAY'S REVENUE",
+    value: "C$2,847",
+    sub: "+18% vs. last Tue",
+    subColor: "rgb(52,211,153)",
     Icon: DollarSign,
-    iconBg: "rgba(16,185,129,0.15)",
+    iconBg: "rgba(16,185,129,0.12)",
     iconColor: "rgb(52,211,153)",
+    positive: true,
   },
   {
-    label: "New Clients",
-    value: "14",
-    sub: "this week",
-    change: "+8.2%",
+    label: "BOOKINGS",
+    value: "23",
+    sub: "+4 vs. forecast",
+    subColor: "rgb(52,211,153)",
+    Icon: CalendarDays,
+    iconBg: "rgba(139,92,246,0.14)",
+    iconColor: "rgb(167,139,250)",
     positive: true,
-    sparkData: [5, 8, 6, 11, 9, 12, 14],
-    sparkColor: "rgb(96,165,250)",
-    Icon: Users,
-    iconBg: "rgba(59,130,246,0.15)",
-    iconColor: "rgb(96,165,250)",
   },
   {
-    label: "AutoPilot Saves",
-    value: "3",
-    sub: "no-shows recovered today",
-    change: "+21%",
-    positive: true,
-    sparkData: [0, 1, 2, 1, 3, 2, 3],
-    sparkColor: "rgb(251,191,36)",
-    Icon: Zap,
-    iconBg: "rgba(245,158,11,0.15)",
+    label: "NO-SHOW RISK",
+    value: "2",
+    sub: "Deposits required",
+    subColor: "rgb(251,191,36)",
+    Icon: AlertTriangle,
+    iconBg: "rgba(245,158,11,0.12)",
     iconColor: "rgb(251,191,36)",
+    positive: false,
+  },
+  {
+    label: "WIN-BACK WINS",
+    value: "7",
+    sub: "+C$840 recovered",
+    subColor: "rgb(52,211,153)",
+    Icon: Users2,
+    iconBg: "rgba(96,165,250,0.12)",
+    iconColor: "rgb(96,165,250)",
+    positive: true,
   },
 ];
 
-const APPOINTMENTS = [
-  { name: "Amara Obi",    service: "Full highlights + trim",  time: "9:00 AM",  stylist: "Fatima",  status: "confirmed" },
-  { name: "Lola Adeyemi", service: "Knotless braids",         time: "11:30 AM", stylist: "Grace",   status: "confirmed" },
-  { name: "Temi Bello",   service: "Silk press",              time: "1:00 PM",  stylist: "Fatima",  status: "pending"   },
-  { name: "Zara Johnson", service: "Colour + gloss",          time: "3:00 PM",  stylist: "Grace",   status: "confirmed" },
-  { name: "Chisom Eze",   service: "Trim + blowout",          time: "5:00 PM",  stylist: "Fatima",  status: "confirmed" },
+// ─── Schedule ─────────────────────────────────────────────────────────────────
+
+const SCHEDULE = [
+  { time: "9:00",  initials: "SJ", color: "rgb(52,211,153)",   name: "Sarah Johnson",  service: "Color + Cut",      stylist: "Emma",  status: "done",      price: "C$185" },
+  { time: "10:30", initials: "MC", color: "rgb(248,113,113)",   name: "Michael Chen",   service: "Beard Trim",       stylist: "James", status: "done",      price: "C$35"  },
+  { time: "11:15", initials: "JL", color: "rgb(139,92,246)",    name: "Jamie Lee",      service: "Balayage",         stylist: "Emma",  status: "upnext",    price: "C$220" },
+  { time: "12:30", initials: "DK", color: "rgb(251,146,60)",    name: "Daniel King",    service: "Skin Fade",        stylist: "James", status: "deposit",   price: "C$50"  },
+  { time: "14:00", initials: "EM", color: "rgb(167,139,250)",   name: "Emma Mitchell",  service: "Highlight",        stylist: "James", status: "confirmed", price: "C$240" },
 ];
 
-const AUTOPILOT_FLOWS = [
-  { Icon: RefreshCw,     label: "No-show recovery",        value: "1 rebooked",       active: true  },
-  { Icon: Smartphone,    label: "30-day reactivation",     value: "3 msgs sent",      active: true  },
-  { Icon: Zap,           label: "Last-minute slot filler", value: "0 gaps remaining", active: true  },
-  { Icon: MessageCircle, label: "AI Front Desk",           value: "Off",              active: false },
-  { Icon: Gift,          label: "Birthday campaign",       value: "2 sent this week", active: true  },
+// ─── Team ─────────────────────────────────────────────────────────────────────
+
+const TEAM = [
+  { initials: "EW", color: "rgb(30,30,40)",    name: "Emma Watson",  role: "Senior Stylist", mtgs: 6,  max: 8 },
+  { initials: "JM", color: "rgb(180,30,50)",   name: "James Miller", role: "Barber",         mtgs: 7,  max: 8 },
+  { initials: "ZA", color: "rgb(30,130,80)",   name: "Zara Ahmed",   role: "Colorist",       mtgs: 4,  max: 8 },
 ];
 
-const TOP_SERVICES = [
-  { name: "Full Highlights",   bookings: 24, revenue: "$720",  change: "+18%",  up: true  },
-  { name: "Knotless Braids",   bookings: 18, revenue: "$1,080", change: "+32%", up: true  },
-  { name: "Silk Press",        bookings: 14, revenue: "$490",  change: "+7%",   up: true  },
-  { name: "Colour + Gloss",    bookings: 9,  revenue: "$675",  change: "-4%",   up: false },
-];
+// ─── Status pill ──────────────────────────────────────────────────────────────
 
-// Booking heatmap data: [hour][day] = 0–4 intensity
-const HEATMAP_HOURS = ["9 AM", "10 AM", "11 AM", "12 PM", "1 PM", "2 PM", "3 PM", "4 PM"];
-const HEATMAP_DAYS  = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-const HEATMAP_DATA  = [
-  [1, 1, 2, 2, 1, 0, 0],
-  [2, 3, 3, 4, 3, 1, 0],
-  [2, 4, 4, 4, 3, 2, 0],
-  [3, 4, 4, 3, 4, 3, 1],
-  [3, 3, 4, 4, 4, 4, 2],
-  [2, 2, 3, 3, 3, 4, 3],
-  [1, 2, 2, 2, 2, 3, 2],
-  [1, 1, 1, 1, 1, 2, 1],
-];
-
-const heatColor = (v: number) => {
-  if (v === 0) return "rgba(255,255,255,0.04)";
-  if (v === 1) return "rgba(109,40,217,0.15)";
-  if (v === 2) return "rgba(109,40,217,0.32)";
-  if (v === 3) return "rgba(109,40,217,0.55)";
-  return "rgba(109,40,217,0.85)";
-};
+function StatusPill({ status }: { status: string }) {
+  const map: Record<string, { label: string; color: string; bg: string }> = {
+    done:      { label: "Done",      color: "rgba(255,255,255,0.4)",  bg: "rgba(255,255,255,0.06)"  },
+    upnext:    { label: "Up next",   color: "rgb(139,92,246)",        bg: "rgba(109,40,217,0.14)"   },
+    deposit:   { label: "⚠ Deposit", color: "rgb(251,191,36)",        bg: "rgba(245,158,11,0.1)"    },
+    confirmed: { label: "Confirmed", color: "rgb(52,211,153)",        bg: "rgba(16,185,129,0.1)"    },
+  };
+  const s = map[status] ?? map.confirmed;
+  return (
+    <span style={{
+      fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 20,
+      color: s.color, background: s.bg,
+      whiteSpace: "nowrap",
+    }}>
+      {s.label}
+    </span>
+  );
+}
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export default async function DashboardPage() {
-  const supabase = await createClient();
-  const { data } = await supabase.auth.getUser();
-  const email = data.user?.email ?? "";
-  const name  = email.split("@")[0];
-  const displayName = name.charAt(0).toUpperCase() + name.slice(1);
+const SCHEDULE_TABS = ["Day", "Week", "List"];
 
-  const now     = new Date();
-  const hour    = now.getHours();
-  const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
-  const dateStr  = now.toLocaleDateString("en-CA", { weekday: "short", month: "short", day: "numeric", year: "numeric" });
+export default function DashboardPage() {
+  const [tab, setTab] = useState("Day");
 
   const card: React.CSSProperties = {
-    background: "rgba(255,255,255,0.025)",
-    border: "1px solid rgba(255,255,255,0.07)",
-    borderRadius: 16,
+    background: "rgb(10,10,12)",
+    border: "1px solid rgba(255,255,255,0.09)",
+    borderRadius: 18,
     overflow: "hidden",
   };
 
-  return (
-    <div style={{ maxWidth: 1280, margin: "0 auto", display: "flex", flexDirection: "column", gap: 24 }}>
+  const dateStr = new Date().toLocaleDateString("en-CA", {
+    weekday: "long", month: "long", day: "numeric",
+  });
 
-      {/* Page heading */}
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+
+      {/* ── Page header ── */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div>
-          <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 12, margin: "0 0 4px" }}>{dateStr}</p>
-          <h1 style={{ color: "rgb(250,250,250)", fontSize: 22, fontWeight: 800, margin: 0, letterSpacing: "-0.03em" }}>
-            {greeting}, {displayName} 👋
+          <h1 style={{ color: "rgb(245,245,252)", fontSize: 22, fontWeight: 800, margin: "0 0 3px", letterSpacing: "-0.03em" }}>
+            Dashboard
           </h1>
+          <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 13, margin: 0 }}>{dateStr}</p>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 14px", background: "rgba(109,40,217,0.12)", border: "1px solid rgba(139,92,246,0.25)", borderRadius: 10 }}>
-          <div style={{ width: 6, height: 6, borderRadius: 3, background: "rgb(52,211,153)", boxShadow: "0 0 6px rgb(52,211,153)" }} />
-          <span style={{ color: "rgba(255,255,255,0.7)", fontSize: 12, fontWeight: 600 }}>AutoPilot active</span>
-        </div>
-      </div>
-
-      {/* Stat cards */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14 }}>
-        {STATS.map((s) => <StatCard key={s.label} {...s} />)}
-      </div>
-
-      {/* Row 2: Appointments + AutoPilot */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: 14, alignItems: "start" }}>
-
-        {/* Appointments table */}
-        <div style={card}>
-          <div style={{ padding: "16px 20px 12px", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-            <SectionHeader title="Today's Appointments" action="View all" />
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{
+            display: "flex", alignItems: "center", gap: 7,
+            padding: "8px 14px",
+            background: "rgba(16,185,129,0.08)",
+            border: "1px solid rgba(52,211,153,0.2)",
+            borderRadius: 10,
+          }}>
+            <div style={{ width: 7, height: 7, borderRadius: "50%", background: "rgb(52,211,153)", boxShadow: "0 0 6px rgb(52,211,153)" }} />
+            <span style={{ color: "rgb(52,211,153)", fontSize: 12.5, fontWeight: 700 }}>AutoPilot ON</span>
           </div>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead>
-              <tr>
-                {["Client", "Service", "Time", "Stylist", "Status"].map((h) => (
-                  <th key={h} style={{ padding: "10px 20px", textAlign: "left", color: "rgba(255,255,255,0.28)", fontSize: 11, fontWeight: 600, letterSpacing: "0.04em", textTransform: "uppercase", background: "rgba(255,255,255,0.015)", borderBottom: "1px solid rgba(255,255,255,0.05)", whiteSpace: "nowrap" }}>
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {APPOINTMENTS.map((a, i) => (
-                <tr key={i} style={{ borderBottom: i < APPOINTMENTS.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none" }}>
-                  <td style={{ padding: "13px 20px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                      <div style={{
-                        width: 32, height: 32, borderRadius: "50%",
-                        background: `hsl(${(i * 53 + 240) % 360}, 40%, 26%)`,
-                        display: "flex", alignItems: "center", justifyContent: "center",
-                        fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.85)", flexShrink: 0,
-                      }}>
-                        {a.name.split(" ").map((n) => n[0]).join("")}
-                      </div>
-                      <span style={{ color: "rgb(250,250,250)", fontSize: 13, fontWeight: 600 }}>{a.name}</span>
-                    </div>
-                  </td>
-                  <td style={{ padding: "13px 20px", color: "rgba(255,255,255,0.5)", fontSize: 12.5, whiteSpace: "nowrap", maxWidth: 160, overflow: "hidden", textOverflow: "ellipsis" }}>{a.service}</td>
-                  <td style={{ padding: "13px 20px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 5, color: "rgba(255,255,255,0.5)", fontSize: 12.5, whiteSpace: "nowrap" }}>
-                      <Clock size={11} strokeWidth={1.8} />
-                      {a.time}
-                    </div>
-                  </td>
-                  <td style={{ padding: "13px 20px", color: "rgba(255,255,255,0.5)", fontSize: 12.5 }}>{a.stylist}</td>
-                  <td style={{ padding: "13px 20px" }}>
-                    <span style={{
-                      fontSize: 10, fontWeight: 700, padding: "3px 9px", borderRadius: 20,
-                      letterSpacing: "0.04em", textTransform: "uppercase",
-                      color: a.status === "confirmed" ? "rgb(52,211,153)" : "rgb(251,191,36)",
-                      background: a.status === "confirmed" ? "rgba(16,185,129,0.1)" : "rgba(245,158,11,0.1)",
-                    }}>
-                      {a.status}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <button style={{
+            display: "flex", alignItems: "center", gap: 7,
+            padding: "9px 18px", borderRadius: 11,
+            background: "rgb(109,40,217)", border: "none",
+            color: "white", fontSize: 13, fontWeight: 700,
+            cursor: "pointer", letterSpacing: "-0.01em",
+          }}>
+            + New booking
+          </button>
         </div>
+      </div>
 
-        {/* AutoPilot */}
-        <div style={{ ...card, padding: "16px 18px" }}>
-          <SectionHeader title="AutoPilot" />
-          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            {AUTOPILOT_FLOWS.map(({ Icon, label, value, active }) => (
-              <div key={label} style={{
-                display: "flex", alignItems: "center", gap: 11, padding: "11px 13px", borderRadius: 11,
-                background: active ? "rgba(109,40,217,0.08)" : "rgba(255,255,255,0.02)",
-                border: active ? "1px solid rgba(139,92,246,0.18)" : "1px solid rgba(255,255,255,0.05)",
+      {/* ── Stat cards ── */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14 }}>
+        {STATS.map(({ label, value, sub, subColor, Icon, iconBg, iconColor }) => (
+          <div key={label} style={{ ...card, padding: "20px 22px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+              <div style={{
+                width: 36, height: 36, borderRadius: 10,
+                background: iconBg,
+                display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
               }}>
+                <Icon size={17} color={iconColor} strokeWidth={1.8} />
+              </div>
+              <span style={{ color: "rgba(255,255,255,0.35)", fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" }}>
+                {label}
+              </span>
+            </div>
+            <p style={{ color: "rgb(245,245,252)", fontSize: 34, fontWeight: 800, letterSpacing: "-0.04em", margin: "0 0 8px", lineHeight: 1 }}>
+              {value}
+            </p>
+            <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+              <TrendingUp size={12} color={subColor} strokeWidth={2} />
+              <span style={{ color: subColor, fontSize: 12.5, fontWeight: 600 }}>{sub}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* ── Row: Schedule + AutoPilot / Team ── */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 320px", gap: 14, alignItems: "start" }}>
+
+        {/* Today's Schedule */}
+        <div style={card}>
+          {/* Card header */}
+          <div style={{ padding: "18px 20px 14px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <p style={{ color: "rgb(240,240,248)", fontSize: 15, fontWeight: 700, margin: 0 }}>Today&apos;s Schedule</p>
+              <span style={{
+                fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 20,
+                background: "rgba(139,92,246,0.14)", color: "rgb(167,139,250)",
+              }}>
+                {SCHEDULE.length * 4 + 3} BOOKED
+              </span>
+            </div>
+            {/* Tabs */}
+            <div style={{ display: "flex", gap: 2, marginTop: 12, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 9, padding: 3, width: "fit-content" }}>
+              {SCHEDULE_TABS.map(t => (
+                <button
+                  key={t}
+                  onClick={() => setTab(t)}
+                  style={{
+                    padding: "5px 14px", borderRadius: 7, border: "none",
+                    cursor: "pointer", fontSize: 12.5, fontWeight: tab === t ? 700 : 400,
+                    background: tab === t ? "rgba(109,40,217,0.4)" : "transparent",
+                    color: tab === t ? "rgb(210,196,254)" : "rgba(255,255,255,0.4)",
+                    transition: "all 0.15s",
+                  }}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Risk alert */}
+          <div style={{
+            margin: "14px 16px 0",
+            padding: "11px 14px",
+            background: "rgba(245,158,11,0.07)",
+            border: "1px solid rgba(245,158,11,0.2)",
+            borderRadius: 12,
+            display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12,
+          }}>
+            <div style={{ display: "flex", alignItems: "flex-start", gap: 9 }}>
+              <AlertTriangle size={15} color="rgb(251,191,36)" strokeWidth={2} style={{ flexShrink: 0, marginTop: 1 }} />
+              <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 12.5, margin: 0, lineHeight: 1.5 }}>
+                2 high-risk bookings today — <strong style={{ color: "rgb(240,240,248)" }}>Marcus T.</strong> (2 no-shows) and <strong style={{ color: "rgb(240,240,248)" }}>Daniel K.</strong> (new client). Deposits required.
+              </p>
+            </div>
+            <button style={{
+              padding: "7px 13px", borderRadius: 9, flexShrink: 0,
+              background: "rgb(245,158,11)", border: "none",
+              color: "rgb(12,10,0)", fontSize: 12, fontWeight: 700,
+              cursor: "pointer", whiteSpace: "nowrap",
+            }}>
+              Require deposits
+            </button>
+          </div>
+
+          {/* Schedule rows */}
+          <div style={{ padding: "8px 0 8px" }}>
+            {SCHEDULE.map((row, i) => (
+              <div
+                key={i}
+                style={{
+                  display: "flex", alignItems: "center", gap: 14,
+                  padding: "12px 20px",
+                  borderBottom: i < SCHEDULE.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none",
+                }}
+              >
+                {/* Time */}
+                <div style={{ display: "flex", alignItems: "center", gap: 4, width: 42, flexShrink: 0 }}>
+                  <Clock size={11} color="rgba(255,255,255,0.22)" strokeWidth={1.8} />
+                  <span style={{ color: "rgba(255,255,255,0.32)", fontSize: 12, fontWeight: 600 }}>{row.time}</span>
+                </div>
+
+                {/* Avatar */}
                 <div style={{
-                  width: 32, height: 32, borderRadius: 8, flexShrink: 0,
-                  background: active ? "rgba(109,40,217,0.2)" : "rgba(255,255,255,0.05)",
+                  width: 36, height: 36, borderRadius: "50%", flexShrink: 0,
+                  background: row.color + "33",
+                  border: `1.5px solid ${row.color}55`,
                   display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 12, fontWeight: 800, color: row.color,
                 }}>
-                  <Icon size={14} strokeWidth={1.8} color={active ? "rgb(167,139,250)" : "rgba(255,255,255,0.25)"} />
+                  {row.initials}
                 </div>
+
+                {/* Name + service */}
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ color: active ? "rgb(250,250,250)" : "rgba(255,255,255,0.3)", fontSize: 12, fontWeight: 600, margin: "0 0 1px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{label}</p>
-                  <p style={{ color: active ? "rgba(255,255,255,0.4)" : "rgba(255,255,255,0.2)", fontSize: 11, margin: 0 }}>{value}</p>
+                  <p style={{ color: "rgb(240,240,248)", fontSize: 13.5, fontWeight: 700, margin: "0 0 2px" }}>{row.name}</p>
+                  <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 12, margin: 0 }}>
+                    {row.service} <span style={{ color: "rgba(255,255,255,0.2)" }}>•</span> {row.stylist}
+                  </p>
                 </div>
-                <div style={{ width: 7, height: 7, borderRadius: "50%", background: active ? "rgb(52,211,153)" : "rgba(255,255,255,0.12)", boxShadow: active ? "0 0 6px rgb(52,211,153)" : "none", flexShrink: 0 }} />
+
+                {/* Status */}
+                <StatusPill status={row.status} />
+
+                {/* Price */}
+                <span style={{ color: "rgb(52,211,153)", fontSize: 13, fontWeight: 700, flexShrink: 0, minWidth: 48, textAlign: "right" }}>
+                  {row.price}
+                </span>
+
+                {/* Action */}
+                {(row.status === "upnext" || row.status === "deposit" || row.status === "confirmed") && (
+                  <button style={{
+                    padding: "7px 13px", borderRadius: 9, flexShrink: 0,
+                    background: "rgb(240,240,248)", border: "none",
+                    color: "rgb(10,10,12)", fontSize: 12, fontWeight: 700,
+                    cursor: "pointer",
+                  }}>
+                    Check out
+                  </button>
+                )}
               </div>
             ))}
           </div>
         </div>
-      </div>
 
-      {/* Row 3: Heatmap + Top Services */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: 14, alignItems: "start" }}>
+        {/* Right column: AutoPilot + Team Today */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
 
-        {/* Bookings heatmap */}
-        <div style={{ ...card, padding: "16px 20px 20px" }}>
-          <div style={{ marginBottom: 16 }}>
-            <SectionHeader title="Bookings by time" />
-            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              {[["Light", "rgba(109,40,217,0.15)"], ["Busy", "rgba(109,40,217,0.55)"], ["Peak", "rgba(109,40,217,0.85)"]].map(([l, c]) => (
-                <div key={l} style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                  <div style={{ width: 8, height: 8, borderRadius: 2, background: c }} />
-                  <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 10 }}>{l}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ display: "flex", gap: 8 }}>
-            {/* Hour labels */}
-            <div style={{ display: "flex", flexDirection: "column", gap: 5, paddingTop: 22 }}>
-              {HEATMAP_HOURS.map((h) => (
-                <div key={h} style={{ height: 24, display: "flex", alignItems: "center", color: "rgba(255,255,255,0.25)", fontSize: 10, whiteSpace: "nowrap", width: 36 }}>{h}</div>
-              ))}
-            </div>
-
-            {/* Grid */}
-            <div style={{ flex: 1 }}>
-              {/* Day labels */}
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 5, marginBottom: 5 }}>
-                {HEATMAP_DAYS.map((d) => (
-                  <div key={d} style={{ textAlign: "center", color: "rgba(255,255,255,0.3)", fontSize: 10, fontWeight: 600 }}>{d}</div>
-                ))}
+          {/* AutoPilot panel */}
+          <div style={{ ...card, padding: "18px 20px" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <Zap size={15} color="rgb(167,139,250)" strokeWidth={1.8} />
+                <p style={{ color: "rgb(240,240,248)", fontSize: 14, fontWeight: 700, margin: 0 }}>AutoPilot</p>
               </div>
-              {HEATMAP_DATA.map((row, ri) => (
-                <div key={ri} style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 5, marginBottom: 5 }}>
-                  {row.map((val, ci) => (
-                    <div key={ci} style={{ height: 24, borderRadius: 5, background: heatColor(val), transition: "background 0.2s" }} />
-                  ))}
+              <span style={{
+                fontSize: 10, fontWeight: 800, padding: "3px 9px", borderRadius: 20, letterSpacing: "0.05em",
+                background: "rgba(52,211,153,0.1)", color: "rgb(52,211,153)",
+                border: "1px solid rgba(52,211,153,0.2)",
+              }}>
+                6 FLOWS RUNNING
+              </span>
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+              {[
+                { icon: DollarSign, label: "RECOVERED",      value: "C$8,240", sub: "this month",      iconColor: "rgb(52,211,153)",  iconBg: "rgba(16,185,129,0.12)"  },
+                { icon: CalendarDays, label: "SLOTS FILLED", value: "34",      sub: "this month",      iconColor: "rgb(96,165,250)",  iconBg: "rgba(59,130,246,0.12)"  },
+                { icon: Shield, label: "NO-SHOWS SAVED",     value: "12",      sub: "deposits taken",  iconColor: "rgb(167,139,250)", iconBg: "rgba(109,40,217,0.12)"  },
+                { icon: Users2, label: "WIN-BACKS",           value: "47",      sub: "7 converted",     iconColor: "rgb(251,191,36)",  iconBg: "rgba(245,158,11,0.12)"  },
+              ].map(({ icon: Icon, label, value, sub, iconColor, iconBg }) => (
+                <div key={label} style={{
+                  padding: "12px 14px",
+                  background: "rgba(255,255,255,0.03)",
+                  border: "1px solid rgba(255,255,255,0.06)",
+                  borderRadius: 12,
+                }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
+                    <div style={{ width: 26, height: 26, borderRadius: 7, background: iconBg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      <Icon size={13} color={iconColor} strokeWidth={1.8} />
+                    </div>
+                    <span style={{ color: "rgba(255,255,255,0.28)", fontSize: 9.5, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" }}>{label}</span>
+                  </div>
+                  <p style={{ color: "rgb(240,240,248)", fontSize: 20, fontWeight: 800, letterSpacing: "-0.03em", margin: "0 0 2px", lineHeight: 1 }}>{value}</p>
+                  <p style={{ color: "rgba(255,255,255,0.28)", fontSize: 11, margin: 0 }}>{sub}</p>
                 </div>
               ))}
             </div>
           </div>
-        </div>
 
-        {/* Top services */}
-        <div style={{ ...card, padding: "16px 18px" }}>
-          <SectionHeader title="Top services" action="View all" />
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead>
-              <tr>
-                {["Service", "Bookings", "Revenue", ""].map((h, i) => (
-                  <th key={i} style={{ padding: "6px 8px", textAlign: i === 0 ? "left" : "right", color: "rgba(255,255,255,0.25)", fontSize: 10, fontWeight: 600, letterSpacing: "0.04em", textTransform: "uppercase", paddingBottom: 10, borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {TOP_SERVICES.map((s, i) => (
-                <tr key={i} style={{ borderBottom: i < TOP_SERVICES.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none" }}>
-                  <td style={{ padding: "11px 8px", color: "rgb(250,250,250)", fontSize: 12.5, fontWeight: 600 }}>{s.name}</td>
-                  <td style={{ padding: "11px 8px", textAlign: "right", color: "rgba(255,255,255,0.5)", fontSize: 12.5 }}>{s.bookings}</td>
-                  <td style={{ padding: "11px 8px", textAlign: "right", color: "rgba(255,255,255,0.5)", fontSize: 12.5 }}>{s.revenue}</td>
-                  <td style={{ padding: "11px 8px", textAlign: "right" }}>
-                    <span style={{ fontSize: 10, fontWeight: 700, color: s.up ? "rgb(52,211,153)" : "rgb(248,113,113)", display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 2 }}>
-                      {s.up ? <TrendingUp size={10} /> : <TrendingDown size={10} />}
-                      {s.change}
-                    </span>
-                  </td>
-                </tr>
+          {/* Team Today */}
+          <div style={{ ...card, padding: "18px 20px" }}>
+            <p style={{ color: "rgb(240,240,248)", fontSize: 14, fontWeight: 700, margin: "0 0 16px" }}>Team Today</p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              {TEAM.map((member, i) => (
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: 11 }}>
+                  <div style={{
+                    width: 36, height: 36, borderRadius: "50%", flexShrink: 0,
+                    background: `hsl(${(i * 73 + 200) % 360}, 45%, 25%)`,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: 12, fontWeight: 800, color: "rgba(255,255,255,0.85)",
+                  }}>
+                    {member.initials}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
+                      <div>
+                        <p style={{ color: "rgb(240,240,248)", fontSize: 12.5, fontWeight: 700, margin: 0 }}>{member.name}</p>
+                        <p style={{ color: "rgba(255,255,255,0.28)", fontSize: 11, margin: 0 }}>{member.role}</p>
+                      </div>
+                      <span style={{ color: "rgba(255,255,255,0.38)", fontSize: 11.5, fontWeight: 600, flexShrink: 0 }}>{member.mtgs} mtgs</span>
+                    </div>
+                    <div style={{ height: 3, borderRadius: 2, background: "rgba(255,255,255,0.07)" }}>
+                      <div style={{
+                        height: "100%", borderRadius: 2,
+                        width: `${(member.mtgs / member.max) * 100}%`,
+                        background: "rgb(139,92,246)",
+                        transition: "width 0.4s ease",
+                      }} />
+                    </div>
+                  </div>
+                </div>
               ))}
-            </tbody>
-          </table>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>

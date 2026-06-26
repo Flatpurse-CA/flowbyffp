@@ -1,403 +1,502 @@
 "use client";
 
-import { useState } from "react";
-import Image from "next/image";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import {
-  LayoutDashboard,
-  CalendarDays,
-  Users,
-  Scissors,
-  BarChart2,
-  Settings,
-  LogOut,
-  Bell,
-  Search,
-  Menu,
-  X,
-  HelpCircle,
-  Sparkles,
-  ChevronUp,
-  ChevronDown,
-  PanelLeftClose,
-  PanelLeftOpen,
+  LayoutDashboard, CalendarDays, Users, Zap, Calendar,
+  Megaphone, ShoppingBag, BarChart2, Users2, Settings,
+  LogOut, Search, Bell, ChevronLeft, ChevronRight,
+  Sun, Moon, MessageSquare, User as UserIcon,
 } from "lucide-react";
 import { logout } from "./actions";
 
+const PURPLE    = "rgb(139,92,246)";
+const PURPLE_BG = "rgba(109,40,217,0.18)";
+
 const NAV_MAIN = [
-  { label: "Overview",     icon: LayoutDashboard, href: "/dashboard"              },
-  { label: "Appointments", icon: CalendarDays,    href: "/dashboard/appointments" },
-  { label: "Clients",      icon: Users,           href: "/dashboard/clients"      },
-  { label: "Services",     icon: Scissors,        href: "/dashboard/services"     },
-  { label: "Reports",      icon: BarChart2,       href: "/dashboard/reports"      },
+  { icon: LayoutDashboard, href: "/dashboard",              label: "Dashboard",  badge: 0  },
+  { icon: CalendarDays,    href: "/dashboard/appointments", label: "Bookings",   badge: 23 },
+  { icon: Users,           href: "/dashboard/clients",      label: "Clients",    badge: 0  },
+  { icon: Zap,             href: "/dashboard/autopilot",    label: "AutoPilot",  badge: 3  },
+  { icon: Calendar,        href: "/dashboard/calendar",     label: "Calendar",   badge: 0  },
+  { icon: Megaphone,       href: "/dashboard/marketing",    label: "Marketing",  badge: 0  },
+  { icon: ShoppingBag,     href: "/dashboard/pos",          label: "POS",        badge: 0  },
 ];
 
-const NAV_OTHER = [
-  { label: "Settings",    icon: Settings,    href: "/dashboard/settings" },
-  { label: "Help Center", icon: HelpCircle,  href: "/dashboard/help"     },
+const NAV_ANALYTICS = [
+  { icon: BarChart2, href: "/dashboard/reports", label: "Reports", badge: 0 },
+  { icon: Users2,    href: "/dashboard/staff",   label: "Staff",   badge: 0 },
 ];
 
-function Sidebar({
-  pathname,
-  user,
-  collapsed,
-  onClose,
-  onCollapseToggle,
+const NAV_MANAGE = [
+  { icon: Settings, href: "/dashboard/settings", label: "Settings", badge: 0 },
+];
+
+function isActive(href: string, pathname: string) {
+  return href === "/dashboard" ? pathname === "/dashboard" : pathname.startsWith(href);
+}
+
+const DARK = {
+  bg:                "rgb(10,10,12)",
+  border:            "rgba(255,255,255,0.06)",
+  border2:           "rgba(255,255,255,0.09)",
+  text:              "rgb(240,240,248)",
+  textMuted:         "rgba(255,255,255,0.3)",
+  textDim:           "rgba(255,255,255,0.42)",
+  iconBtn:           "rgba(255,255,255,0.04)",
+  iconBtnBorder:     "rgba(255,255,255,0.07)",
+  iconColor:         "rgba(255,255,255,0.35)",
+  sectionLabel:      "rgba(255,255,255,0.2)",
+  activePill:        "rgba(139,92,246,0.14)",
+  activeText:        "rgb(200,180,255)",
+  inactiveText:      "rgba(255,255,255,0.42)",
+  searchBg:          "rgba(255,255,255,0.04)",
+  searchBorder:      "rgba(255,255,255,0.07)",
+  searchPlaceholder: "rgba(255,255,255,0.2)",
+  searchKbd:         "rgba(255,255,255,0.15)",
+  searchKbdBg:       "rgba(255,255,255,0.06)",
+  dropBg:            "rgb(18,18,24)",
+  dropBorder:        "rgba(255,255,255,0.1)",
+  dropItem:          "rgba(255,255,255,0.65)",
+  dropHover:         "rgba(255,255,255,0.06)",
+};
+
+const LIGHT = {
+  bg:                "rgb(246,246,250)",
+  border:            "rgba(0,0,0,0.08)",
+  border2:           "rgba(0,0,0,0.1)",
+  text:              "rgb(12,12,20)",
+  textMuted:         "rgba(0,0,0,0.38)",
+  textDim:           "rgba(0,0,0,0.48)",
+  iconBtn:           "rgba(0,0,0,0.04)",
+  iconBtnBorder:     "rgba(0,0,0,0.09)",
+  iconColor:         "rgba(0,0,0,0.4)",
+  sectionLabel:      "rgba(0,0,0,0.25)",
+  activePill:        "rgba(139,92,246,0.1)",
+  activeText:        "rgb(109,40,217)",
+  inactiveText:      "rgba(0,0,0,0.48)",
+  searchBg:          "rgba(0,0,0,0.04)",
+  searchBorder:      "rgba(0,0,0,0.09)",
+  searchPlaceholder: "rgba(0,0,0,0.3)",
+  searchKbd:         "rgba(0,0,0,0.2)",
+  searchKbdBg:       "rgba(0,0,0,0.06)",
+  dropBg:            "rgb(255,255,255)",
+  dropBorder:        "rgba(0,0,0,0.1)",
+  dropItem:          "rgba(0,0,0,0.65)",
+  dropHover:         "rgba(0,0,0,0.05)",
+};
+
+function NavGroup({
+  items, open, pathname, T,
 }: {
+  items: typeof NAV_MAIN;
+  open: boolean;
   pathname: string;
-  user: User;
-  collapsed: boolean;
-  onClose?: () => void;
-  onCollapseToggle?: () => void;
+  T: typeof DARK;
 }) {
-  const email = user.email ?? "";
-  const raw   = email.split("@")[0];
-  const name  = raw.charAt(0).toUpperCase() + raw.slice(1);
-  const initials = raw.slice(0, 2).toUpperCase();
-
-  const w = collapsed ? 72 : 248;
-
   return (
-    <aside
-      style={{
-        width: w,
-        minHeight: "100vh",
-        background: "rgb(12,12,15)",
-        borderRight: "1px solid rgba(255,255,255,0.06)",
-        display: "flex",
-        flexDirection: "column",
-        flexShrink: 0,
-        overflow: "hidden",
-        transition: "width 0.3s cubic-bezier(0.16,1,0.3,1)",
-        position: "relative",
-      }}
-    >
-      {/* Logo + collapse */}
-      <div
-        style={{
-          padding: collapsed ? "18px 0" : "18px 16px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: collapsed ? "center" : "space-between",
-          borderBottom: "1px solid rgba(255,255,255,0.05)",
-          flexShrink: 0,
-        }}
-      >
-        <Image src="/main logo.png" alt="Flow" width={34} height={34} style={{ objectFit: "contain", flexShrink: 0 }} />
-        {!collapsed && (
-          <button
-            onClick={onClose ?? onCollapseToggle}
-            style={{ background: "none", border: "none", color: "rgba(255,255,255,0.3)", cursor: "pointer", padding: 4, display: "flex" }}
-          >
-            {onClose ? <X size={17} /> : <PanelLeftClose size={17} />}
-          </button>
-        )}
-      </div>
-
-      {/* Search */}
-      {!collapsed && (
-        <div style={{ padding: "14px 12px 0" }}>
-          <div
+    <nav style={{ display: "flex", flexDirection: "column", gap: 1, padding: "0 8px", flexShrink: 0 }}>
+      {items.map(({ icon: Icon, href, label, badge }) => {
+        const active = isActive(href, pathname);
+        return (
+          <Link
+            key={href}
+            href={href}
+            title={!open ? label : undefined}
             style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-              background: "rgba(255,255,255,0.04)",
-              border: "1px solid rgba(255,255,255,0.07)",
-              borderRadius: 9,
-              padding: "8px 10px",
+              display: "flex", alignItems: "center",
+              gap: 12,
+              padding: open ? "9px 12px" : "11px",
+              borderRadius: 10,
+              background: active ? T.activePill : "transparent",
+              color: active ? T.activeText : T.inactiveText,
+              fontSize: 13.5, fontWeight: active ? 600 : 400,
+              textDecoration: "none",
+              transition: "background 0.15s, color 0.15s",
+              justifyContent: open ? "flex-start" : "center",
             }}
           >
-            <Search size={13} color="rgba(255,255,255,0.28)" style={{ flexShrink: 0 }} />
-            <span style={{ flex: 1, fontSize: 12.5, color: "rgba(255,255,255,0.28)" }}>Search…</span>
-            <div style={{ display: "flex", gap: 3 }}>
-              {["⌘", "K"].map((k) => (
-                <kbd
-                  key={k}
-                  style={{
-                    fontSize: 10,
-                    padding: "1px 5px",
-                    borderRadius: 4,
-                    background: "rgba(255,255,255,0.06)",
-                    border: "1px solid rgba(255,255,255,0.1)",
-                    color: "rgba(255,255,255,0.3)",
-                    fontFamily: "inherit",
-                    lineHeight: 1.6,
-                  }}
-                >
-                  {k}
-                </kbd>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Nav */}
-      <nav style={{ flex: 1, padding: collapsed ? "14px 0" : "14px 8px", display: "flex", flexDirection: "column", gap: 2, overflowY: "auto" }}>
-        {/* Main section */}
-        {NAV_MAIN.map(({ label, icon: Icon, href }) => {
-          const active = pathname === href;
-          return (
-            <Link
-              key={href}
-              href={href}
-              title={collapsed ? label : undefined}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
-                padding: collapsed ? "10px 0" : "9px 12px",
-                justifyContent: collapsed ? "center" : "flex-start",
-                borderRadius: collapsed ? 0 : 10,
-                background: active
-                  ? collapsed
-                    ? "rgba(109,40,217,0.25)"
-                    : "linear-gradient(90deg, rgba(109,40,217,0.22) 0%, rgba(89,28,180,0.42) 100%)"
-                  : "transparent",
-                borderRight: active && !collapsed ? "2.5px solid rgb(139,92,246)" : "2.5px solid transparent",
-                color: active ? "rgb(210,196,254)" : "rgba(255,255,255,0.42)",
-                fontSize: 13.5,
-                fontWeight: active ? 600 : 400,
-                textDecoration: "none",
-                transition: "all 0.15s",
-                whiteSpace: "nowrap",
-                flexShrink: 0,
-              }}
-            >
-              <Icon size={16} strokeWidth={active ? 2.2 : 1.7} style={{ flexShrink: 0 }} />
-              {!collapsed && label}
-            </Link>
-          );
-        })}
-
-        {/* Divider + OTHER section */}
-        {!collapsed && (
-          <div style={{ margin: "10px 4px", borderTop: "1px solid rgba(255,255,255,0.06)" }} />
-        )}
-        {!collapsed && (
-          <p style={{ color: "rgba(255,255,255,0.22)", fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", padding: "2px 12px 6px", margin: 0 }}>
-            Other
-          </p>
-        )}
-        {NAV_OTHER.map(({ label, icon: Icon, href }) => {
-          const active = pathname === href;
-          return (
-            <Link
-              key={href}
-              href={href}
-              title={collapsed ? label : undefined}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
-                padding: collapsed ? "10px 0" : "9px 12px",
-                justifyContent: collapsed ? "center" : "flex-start",
-                borderRadius: collapsed ? 0 : 10,
-                background: active ? "rgba(109,40,217,0.18)" : "transparent",
-                borderRight: active && !collapsed ? "2.5px solid rgb(139,92,246)" : "2.5px solid transparent",
-                color: active ? "rgb(210,196,254)" : "rgba(255,255,255,0.38)",
-                fontSize: 13.5,
-                fontWeight: active ? 600 : 400,
-                textDecoration: "none",
-                transition: "all 0.15s",
-                whiteSpace: "nowrap",
-                flexShrink: 0,
-              }}
-            >
-              <Icon size={16} strokeWidth={active ? 2.2 : 1.7} style={{ flexShrink: 0 }} />
-              {!collapsed && label}
-            </Link>
-          );
-        })}
-      </nav>
-
-      {/* AutoPilot boost card */}
-      {!collapsed && (
-        <div style={{ padding: "0 10px 10px" }}>
-          <div
-            style={{
-              padding: "15px 14px",
-              background: "linear-gradient(135deg, rgb(18,14,50) 0%, rgb(32,18,80) 100%)",
-              border: "1px solid rgba(139,92,246,0.25)",
-              borderRadius: 13,
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 7 }}>
-              <Sparkles size={14} color="rgb(167,139,250)" strokeWidth={1.8} />
-              <p style={{ color: "white", fontSize: 13, fontWeight: 700, margin: 0 }}>
-                Boost with <span style={{ color: "rgb(167,139,250)" }}>AutoPilot</span>
-              </p>
-            </div>
-            <p style={{ color: "rgba(255,255,255,0.42)", fontSize: 11.5, margin: "0 0 12px", lineHeight: 1.6 }}>
-              AI-powered reminders, rebooking, and tools that save hours.
-            </p>
-            <button
-              style={{
-                width: "100%",
-                padding: "9px 0",
-                borderRadius: 9,
-                background: "linear-gradient(90deg, rgb(109,40,217) 0%, rgb(99,102,241) 100%)",
-                border: "none",
-                color: "white",
-                fontSize: 12.5,
-                fontWeight: 700,
-                cursor: "pointer",
-                letterSpacing: "-0.01em",
-              }}
-            >
-              Activate AutoPilot
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* User profile */}
-      <div style={{ padding: collapsed ? "10px 0" : "0 10px 14px", borderTop: "1px solid rgba(255,255,255,0.05)", flexShrink: 0 }}>
-        {collapsed ? (
-          <div style={{ display: "flex", justifyContent: "center", paddingTop: 12 }}>
-            <div style={{ width: 34, height: 34, borderRadius: 17, background: "rgba(109,40,217,0.35)", border: "1.5px solid rgba(139,92,246,0.5)", display: "flex", alignItems: "center", justifyContent: "center", color: "rgb(196,181,253)", fontSize: 12, fontWeight: 700 }}>
-              {initials}
-            </div>
-          </div>
-        ) : (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-              padding: "11px 12px",
-              borderRadius: 12,
-              background: "rgba(255,255,255,0.04)",
-              border: "1px solid rgba(255,255,255,0.07)",
-              cursor: "pointer",
-              marginTop: 10,
-            }}
-          >
-            <div style={{ width: 34, height: 34, borderRadius: 17, background: "rgba(109,40,217,0.35)", border: "1.5px solid rgba(139,92,246,0.5)", display: "flex", alignItems: "center", justifyContent: "center", color: "rgb(196,181,253)", fontSize: 12, fontWeight: 700, flexShrink: 0 }}>
-              {initials}
-            </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ color: "rgb(250,250,250)", fontSize: 13, fontWeight: 700, margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{name}</p>
-              <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{email}</p>
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 0, flexShrink: 0 }}>
-              <ChevronUp size={12} color="rgba(255,255,255,0.3)" />
-              <ChevronDown size={12} color="rgba(255,255,255,0.3)" />
-            </div>
-          </div>
-        )}
-      </div>
-    </aside>
+            <Icon size={16} strokeWidth={active ? 2.1 : 1.7} style={{ flexShrink: 0 }} />
+            {open && (
+              <>
+                <span style={{ flex: 1, whiteSpace: "nowrap" }}>{label}</span>
+                {badge > 0 && (
+                  <span style={{
+                    minWidth: 18, height: 18, borderRadius: 9,
+                    background: PURPLE, color: "white",
+                    fontSize: 10, fontWeight: 800,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    padding: "0 4px", flexShrink: 0,
+                  }}>
+                    {badge}
+                  </span>
+                )}
+              </>
+            )}
+          </Link>
+        );
+      })}
+    </nav>
   );
 }
 
-// ─── Shell ────────────────────────────────────────────────────────────────────
-
 export function DashboardShell({ children, user }: { children: React.ReactNode; user: User }) {
-  const pathname   = usePathname();
-  const [mobileOpen,   setMobileOpen]   = useState(false);
-  const [sideCollapsed, setSideCollapsed] = useState(false);
+  const pathname = usePathname();
+  const [open, setOpen]             = useState(true);
+  const [dark, setDark]             = useState(true);
+  const [dropdownOpen, setDropdown] = useState(false);
+  const dropdownRef                 = useRef<HTMLDivElement>(null);
+
+  const email    = user.email ?? "";
+  const username = email.split("@")[0];
+  const name     = username.charAt(0).toUpperCase() + username.slice(1);
+  const initial  = name.charAt(0);
+
+  const greeting = (() => {
+    const h = new Date().getHours();
+    return h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening";
+  })();
+
+  useEffect(() => {
+    const stored = localStorage.getItem("portal-theme");
+    if (stored === "light") {
+      setDark(false);
+      document.documentElement.setAttribute("data-portal-theme", "light");
+    }
+  }, []);
+
+  const toggleDark = () => {
+    const next = !dark;
+    setDark(next);
+    localStorage.setItem("portal-theme", next ? "dark" : "light");
+    document.documentElement.setAttribute("data-portal-theme", next ? "dark" : "light");
+  };
+
+  useEffect(() => {
+    if (!dropdownOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [dropdownOpen]);
+
+  const T = dark ? DARK : LIGHT;
+
+  const headerIconBtn: React.CSSProperties = {
+    width: 36, height: 36,
+    display: "flex", alignItems: "center", justifyContent: "center",
+    borderRadius: 10, background: T.iconBtn,
+    border: `1px solid ${T.iconBtnBorder}`,
+    color: T.iconColor, cursor: "pointer",
+  };
+
+  const hdBadge: React.CSSProperties = {
+    position: "absolute", top: 4, right: 4,
+    minWidth: 14, height: 14, borderRadius: 7,
+    background: PURPLE,
+    display: "flex", alignItems: "center", justifyContent: "center",
+    fontSize: 9, fontWeight: 800, color: "white",
+    padding: "0 3px",
+    border: `1.5px solid ${T.bg}`,
+  };
+
+  const sectionLabel = (text: string) => open ? (
+    <p style={{
+      color: T.sectionLabel, fontSize: 10, fontWeight: 700,
+      letterSpacing: "0.1em", textTransform: "uppercase",
+      margin: "10px 16px 6px", flexShrink: 0,
+    }}>
+      {text}
+    </p>
+  ) : (
+    <div style={{ height: 1, background: T.border, margin: "8px 0" }} />
+  );
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "rgb(9,9,11)" }}>
-      {/* Desktop sidebar */}
-      <div style={{ display: "none" }} className="dash-sidebar-desktop">
-        <Sidebar
-          pathname={pathname}
-          user={user}
-          collapsed={sideCollapsed}
-          onCollapseToggle={() => setSideCollapsed((v) => !v)}
-        />
-      </div>
+    <div style={{ minHeight: "100vh", background: T.bg, display: "flex" }}>
 
-      {/* Mobile sidebar overlay */}
-      {mobileOpen && (
-        <div style={{ position: "fixed", inset: 0, zIndex: 50, display: "flex" }}>
-          <div onClick={() => setMobileOpen(false)} style={{ flex: 1, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }} />
-          <div style={{ position: "absolute", left: 0, top: 0, bottom: 0 }}>
-            <Sidebar pathname={pathname} user={user} collapsed={false} onClose={() => setMobileOpen(false)} />
-          </div>
-        </div>
-      )}
+      {/* ══════════════════════════════════════
+          SIDEBAR
+          ══════════════════════════════════════ */}
+      <aside style={{
+        width: open ? 240 : 62,
+        minHeight: "100vh",
+        background: T.bg,
+        borderRight: `1px solid ${T.border}`,
+        display: "flex",
+        flexDirection: "column",
+        transition: "width 0.22s cubic-bezier(0.4,0,0.2,1)",
+        overflow: "hidden",
+        flexShrink: 0,
+        position: "sticky",
+        top: 0,
+        height: "100vh",
+      }}>
 
-      {/* Main */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
-        {/* Top bar */}
-        <header
-          style={{
-            height: 58,
-            borderBottom: "1px solid rgba(255,255,255,0.06)",
-            display: "flex",
-            alignItems: "center",
-            padding: "0 20px",
-            gap: 12,
-            background: "rgb(9,9,11)",
-            position: "sticky",
-            top: 0,
-            zIndex: 30,
-          }}
-        >
-          {/* Mobile menu */}
-          <button onClick={() => setMobileOpen(true)} className="dash-mobile-menu" style={{ background: "none", border: "none", color: "rgba(255,255,255,0.5)", cursor: "pointer", padding: 4, display: "none" }}>
-            <Menu size={20} />
-          </button>
-
-          {/* Desktop collapse toggle */}
-          {sideCollapsed && (
-            <button onClick={() => setSideCollapsed(false)} className="dash-sidebar-desktop" style={{ display: "none", background: "none", border: "none", color: "rgba(255,255,255,0.4)", cursor: "pointer", padding: 4 }}>
-              <PanelLeftOpen size={18} />
+        {/* Profile header */}
+        {open ? (
+          <div style={{
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+            padding: "17px 14px", flexShrink: 0,
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0, flex: 1 }}>
+              <div style={{
+                width: 38, height: 38, borderRadius: 10,
+                background: PURPLE_BG,
+                border: "1px solid rgba(139,92,246,0.3)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: 17, fontWeight: 800, color: PURPLE, flexShrink: 0,
+              }}>
+                {initial}
+              </div>
+              <div style={{ minWidth: 0 }}>
+                <p style={{
+                  color: T.text, fontSize: 14, fontWeight: 700,
+                  whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
+                  margin: 0, letterSpacing: "-0.01em",
+                }}>
+                  {name}
+                </p>
+                <p style={{ color: T.textMuted, fontSize: 11, margin: 0, whiteSpace: "nowrap" }}>
+                  Salon
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => setOpen(false)}
+              style={{
+                background: "none", border: "none",
+                color: T.textMuted, cursor: "pointer",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                width: 28, height: 28, borderRadius: 7, flexShrink: 0, padding: 0,
+              }}
+            >
+              <ChevronLeft size={15} />
             </button>
-          )}
-
-          {/* Search */}
-          <div style={{ flex: 1, maxWidth: 380, display: "flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "7px 12px" }}>
-            <Search size={13} color="rgba(255,255,255,0.3)" />
-            <span style={{ flex: 1, fontSize: 13, color: "rgba(255,255,255,0.28)" }}>Search…</span>
-            <kbd style={{ fontSize: 10, padding: "1px 6px", borderRadius: 4, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.28)", fontFamily: "inherit", lineHeight: 1.6 }}>⌘K</kbd>
           </div>
-
-          <div style={{ flex: 1 }} />
-
-          {/* Date */}
-          <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 11px", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 9 }}>
-            <CalendarDays size={13} color="rgba(255,255,255,0.32)" />
-            <span style={{ color: "rgba(255,255,255,0.42)", fontSize: 12, fontWeight: 500, whiteSpace: "nowrap" }}>
-              {new Date().toLocaleDateString("en-CA", { weekday: "short", month: "short", day: "numeric" })}
-            </span>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "18px 0 14px", gap: 10, flexShrink: 0 }}>
+            <div style={{
+              width: 38, height: 38, borderRadius: 10,
+              background: PURPLE_BG,
+              border: "1px solid rgba(139,92,246,0.3)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: 17, fontWeight: 800, color: PURPLE,
+            }}>
+              {initial}
+            </div>
+            <button
+              onClick={() => setOpen(true)}
+              title="Expand sidebar"
+              style={{
+                background: T.iconBtn,
+                border: `1px solid ${T.border2}`,
+                borderRadius: 8, width: 34, height: 26,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                color: T.textDim, cursor: "pointer", padding: 0,
+              }}
+            >
+              <ChevronRight size={13} />
+            </button>
           </div>
+        )}
 
-          {/* Bell */}
-          <button style={{ background: "none", border: "none", color: "rgba(255,255,255,0.45)", cursor: "pointer", position: "relative", padding: 4 }}>
-            <Bell size={18} />
-            <span style={{ position: "absolute", top: 2, right: 2, width: 7, height: 7, background: "rgb(139,92,246)", borderRadius: "50%", border: "1.5px solid rgb(9,9,11)" }} />
-          </button>
+        {/* Divider */}
+        <div style={{ height: 1, background: T.border, flexShrink: 0 }} />
 
-          {/* Sign out */}
-          <form action={logout}>
-            <button type="submit" style={{ background: "none", border: "none", color: "rgba(255,255,255,0.28)", cursor: "pointer", padding: 4, display: "flex" }}>
-              <LogOut size={16} />
+        {/* Scrollable nav */}
+        <div style={{ flex: 1, overflowY: "auto", paddingBottom: 8 }}>
+          {sectionLabel("Main")}
+          <NavGroup items={NAV_MAIN} open={open} pathname={pathname} T={T} />
+
+          {sectionLabel("Analytics")}
+          <NavGroup items={NAV_ANALYTICS} open={open} pathname={pathname} T={T} />
+
+          {sectionLabel("Manage")}
+          <NavGroup items={NAV_MANAGE} open={open} pathname={pathname} T={T} />
+        </div>
+
+        {/* Sign out */}
+        <div style={{ padding: "0 8px 20px", flexShrink: 0 }}>
+          <div style={{ height: 1, background: T.border, margin: "0 4px 8px" }} />
+          <form action={logout} style={{ width: "100%" }}>
+            <button type="submit" style={{
+              display: "flex", alignItems: "center",
+              gap: 12,
+              padding: open ? "10px 12px" : "11px",
+              borderRadius: 10,
+              background: "transparent", border: "none",
+              color: T.textDim, fontSize: 13.5, fontWeight: 400,
+              cursor: "pointer", fontFamily: "inherit",
+              width: "100%",
+              justifyContent: open ? "flex-start" : "center",
+            }}>
+              <LogOut size={16} strokeWidth={1.7} style={{ flexShrink: 0 }} />
+              {open && <span>Sign out</span>}
             </button>
           </form>
+        </div>
+      </aside>
+
+      {/* ══════════════════════════════════════
+          RIGHT SIDE
+          ══════════════════════════════════════ */}
+      <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", height: "100vh", overflow: "hidden" }}>
+
+        {/* Top header */}
+        <header style={{
+          flexShrink: 0,
+          height: 73,
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          padding: "0 32px",
+          background: T.bg,
+          borderBottom: `1px solid ${T.border}`,
+        }}>
+          {/* Greeting */}
+          <div style={{ flexShrink: 0 }}>
+            <p style={{ color: T.text, fontSize: 15, fontWeight: 700, margin: 0, letterSpacing: "-0.01em" }}>
+              {greeting}, {name}
+            </p>
+            <p style={{ color: T.textMuted, fontSize: 12, margin: 0 }}>
+              Here&apos;s what&apos;s happening today.
+            </p>
+          </div>
+
+          {/* Search */}
+          <div style={{ flex: 1, maxWidth: 300, margin: "0 32px" }}>
+            <div style={{
+              display: "flex", alignItems: "center", gap: 9,
+              background: T.searchBg,
+              border: `1px solid ${T.searchBorder}`,
+              borderRadius: 10, padding: "9px 14px",
+            }}>
+              <Search size={13} color={T.searchPlaceholder} />
+              <span style={{ color: T.searchPlaceholder, fontSize: 13, flex: 1 }}>Search anything...</span>
+              <span style={{
+                color: T.searchKbd, fontSize: 11, fontWeight: 600,
+                background: T.searchKbdBg, padding: "2px 6px", borderRadius: 5,
+              }}>⌘K</span>
+            </div>
+          </div>
+
+          {/* Right icons */}
+          <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
+            <div style={{ position: "relative" }}>
+              <button style={headerIconBtn}><MessageSquare size={16} strokeWidth={1.6} /></button>
+              <span style={hdBadge}>2</span>
+            </div>
+            <div style={{ position: "relative" }}>
+              <button style={headerIconBtn}><Bell size={16} strokeWidth={1.6} /></button>
+              <span style={hdBadge}>5</span>
+            </div>
+
+            {/* Theme + Avatar pill */}
+            <div style={{
+              display: "flex", alignItems: "center",
+              background: T.iconBtn,
+              border: `1px solid ${T.iconBtnBorder}`,
+              borderRadius: 12,
+              height: 38,
+            }}>
+              <button
+                onClick={toggleDark}
+                title={dark ? "Switch to light" : "Switch to dark"}
+                style={{
+                  width: 38, height: 38,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  background: "transparent", border: "none",
+                  borderRight: `1px solid ${T.iconBtnBorder}`,
+                  color: T.iconColor, cursor: "pointer",
+                  borderRadius: "12px 0 0 12px",
+                }}
+              >
+                {dark ? <Sun size={15} strokeWidth={1.6} /> : <Moon size={15} strokeWidth={1.6} />}
+              </button>
+
+              <div ref={dropdownRef} style={{ position: "relative" }}>
+                <button
+                  onClick={() => setDropdown(v => !v)}
+                  style={{
+                    width: 44, height: 38,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    background: "transparent", border: "none",
+                    cursor: "pointer", padding: 0,
+                    borderRadius: "0 12px 12px 0",
+                  }}
+                >
+                  <div style={{
+                    width: 28, height: 28, borderRadius: "50%",
+                    background: PURPLE,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: 12, fontWeight: 800, color: "white", flexShrink: 0,
+                  }}>
+                    {initial}
+                  </div>
+                </button>
+
+                {dropdownOpen && (
+                  <div style={{
+                    position: "absolute", top: "calc(100% + 10px)", right: 0,
+                    width: 200,
+                    background: T.dropBg,
+                    border: `1px solid ${T.dropBorder}`,
+                    borderRadius: 14,
+                    boxShadow: dark ? "0 12px 40px rgba(0,0,0,0.55)" : "0 8px 32px rgba(0,0,0,0.12)",
+                    overflow: "hidden",
+                    zIndex: 200,
+                  }}>
+                    <div style={{ padding: "13px 15px 11px", borderBottom: `1px solid ${T.dropBorder}` }}>
+                      <p style={{ color: T.text, fontSize: 13, fontWeight: 700, margin: "0 0 2px" }}>{name}</p>
+                      <p style={{ color: T.textMuted, fontSize: 11.5, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{email}</p>
+                    </div>
+
+                    {[
+                      { icon: UserIcon, label: "Profile",  href: "/dashboard/profile"  },
+                      { icon: Settings, label: "Settings", href: "/dashboard/settings" },
+                    ].map(({ icon: Icon, label, href }) => (
+                      <Link
+                        key={href}
+                        href={href}
+                        onClick={() => setDropdown(false)}
+                        style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 15px", color: T.dropItem, fontSize: 13, fontWeight: 500, textDecoration: "none" }}
+                        onMouseEnter={e => (e.currentTarget.style.background = T.dropHover)}
+                        onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+                      >
+                        <Icon size={14} strokeWidth={1.7} />
+                        {label}
+                      </Link>
+                    ))}
+
+                    <div style={{ height: 1, background: T.dropBorder, margin: "2px 0" }} />
+
+                    <form action={logout}>
+                      <button
+                        type="submit"
+                        style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 15px", width: "100%", background: "transparent", border: "none", color: "rgb(248,113,113)", fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: "inherit", textAlign: "left" }}
+                        onMouseEnter={e => (e.currentTarget.style.background = "rgba(239,68,68,0.08)")}
+                        onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+                      >
+                        <LogOut size={14} strokeWidth={1.7} />
+                        Sign out
+                      </button>
+                    </form>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         </header>
 
-        {/* Page content */}
-        <main style={{ flex: 1, padding: "28px 28px" }}>
+        {/* Scrollable content */}
+        <main style={{ flex: 1, overflowY: "auto", padding: "28px 32px", background: T.bg }}>
           {children}
         </main>
       </div>
-
-      <style>{`
-        @media (min-width: 768px) {
-          .dash-sidebar-desktop { display: flex !important; }
-          .dash-mobile-menu { display: none !important; }
-        }
-        @media (max-width: 767px) {
-          .dash-mobile-menu { display: flex !important; }
-        }
-      `}</style>
     </div>
   );
 }
