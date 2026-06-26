@@ -18,6 +18,7 @@ export default async function AdminWaitlistPage() {
 
   const entries = (data ?? []) as {
     id: string;
+    name: string | null;
     email: string;
     shop_type: string | null;
     status: string;
@@ -34,7 +35,7 @@ export default async function AdminWaitlistPage() {
   };
 
   return (
-    <div style={{ maxWidth: 1100 }}>
+    <div>
       {/* Heading */}
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ color: "rgb(250,250,250)", fontSize: 22, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.03em" }}>Waitlist</h1>
@@ -71,11 +72,11 @@ export default async function AdminWaitlistPage() {
           No waitlist entries yet.
         </div>
       ) : (
-        <div style={{ background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 16, overflow: "hidden" }}>
+        <div style={{ background: "rgb(10,10,12)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 16, overflow: "hidden" }}>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
-              <tr style={{ background: "rgba(255,255,255,0.015)" }}>
-                {["Email", "Shop Type", "Joined", "Status", "Actions"].map(h => (
+              <tr style={{ background: "rgba(255,255,255,0.02)" }}>
+                {["Name", "Email", "Shop Type", "Joined", "Status", "Actions"].map(h => (
                   <th key={h} style={{
                     padding: "11px 18px", textAlign: "left",
                     color: "rgba(255,255,255,0.28)", fontSize: 11,
@@ -90,25 +91,34 @@ export default async function AdminWaitlistPage() {
             </thead>
             <tbody>
               {entries.map((entry, i) => {
-                const initials = entry.email.slice(0, 2).toUpperCase();
+                const displayName = entry.name ?? entry.email.split("@")[0];
+                const initials = displayName.slice(0, 2).toUpperCase();
                 const date = new Date(entry.created_at).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" });
                 const s = STATUS_STYLE[entry.status] ?? STATUS_STYLE.pending;
 
                 return (
                   <tr key={entry.id} style={{ borderBottom: i < entries.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none" }}>
-                    {/* Email */}
+
+                    {/* Name */}
                     <td style={{ padding: "13px 18px" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                         <div style={{
-                          width: 30, height: 30, borderRadius: 15, flexShrink: 0,
+                          width: 30, height: 30, borderRadius: "50%", flexShrink: 0,
                           background: `hsl(${(i * 61 + 180) % 360}, 30%, 20%)`,
                           display: "flex", alignItems: "center", justifyContent: "center",
                           fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.7)",
                         }}>
                           {initials}
                         </div>
-                        <span style={{ color: "rgba(255,255,255,0.75)", fontSize: 13, fontWeight: 500 }}>{entry.email}</span>
+                        <span style={{ color: "rgb(240,240,248)", fontSize: 13, fontWeight: 600 }}>
+                          {entry.name ?? <span style={{ color: "rgba(255,255,255,0.25)", fontWeight: 400 }}>—</span>}
+                        </span>
                       </div>
+                    </td>
+
+                    {/* Email */}
+                    <td style={{ padding: "13px 18px", color: "rgba(255,255,255,0.55)", fontSize: 12.5 }}>
+                      {entry.email}
                     </td>
 
                     {/* Shop type */}
@@ -139,29 +149,23 @@ export default async function AdminWaitlistPage() {
                           <>
                             <form action={approveWaitlistEntry}>
                               <input type="hidden" name="id" value={entry.id} />
-                              <button
-                                type="submit"
-                                style={{
-                                  display: "flex", alignItems: "center", gap: 5,
-                                  padding: "5px 10px", borderRadius: 8, cursor: "pointer",
-                                  background: "rgba(16,185,129,0.1)", border: "1px solid rgba(52,211,153,0.22)",
-                                  color: "rgb(52,211,153)", fontSize: 11, fontWeight: 600, fontFamily: "inherit",
-                                }}
-                              >
+                              <button type="submit" style={{
+                                display: "flex", alignItems: "center", gap: 5,
+                                padding: "5px 10px", borderRadius: 8, cursor: "pointer",
+                                background: "rgba(16,185,129,0.1)", border: "1px solid rgba(52,211,153,0.22)",
+                                color: "rgb(52,211,153)", fontSize: 11, fontWeight: 600, fontFamily: "inherit",
+                              }}>
                                 <CheckCircle size={11} /> Approve
                               </button>
                             </form>
                             <form action={rejectWaitlistEntry}>
                               <input type="hidden" name="id" value={entry.id} />
-                              <button
-                                type="submit"
-                                style={{
-                                  display: "flex", alignItems: "center", gap: 5,
-                                  padding: "5px 10px", borderRadius: 8, cursor: "pointer",
-                                  background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.18)",
-                                  color: "rgb(248,113,113)", fontSize: 11, fontWeight: 600, fontFamily: "inherit",
-                                }}
-                              >
+                              <button type="submit" style={{
+                                display: "flex", alignItems: "center", gap: 5,
+                                padding: "5px 10px", borderRadius: 8, cursor: "pointer",
+                                background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.18)",
+                                color: "rgb(248,113,113)", fontSize: 11, fontWeight: 600, fontFamily: "inherit",
+                              }}>
                                 <XCircle size={11} /> Reject
                               </button>
                             </form>
@@ -170,32 +174,24 @@ export default async function AdminWaitlistPage() {
                         {(entry.status === "approved" || entry.status === "rejected") && (
                           <form action={resetWaitlistEntry}>
                             <input type="hidden" name="id" value={entry.id} />
-                            <button
-                              type="submit"
-                              title="Reset to pending"
-                              style={{
-                                display: "flex", alignItems: "center", gap: 5,
-                                padding: "5px 10px", borderRadius: 8, cursor: "pointer",
-                                background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)",
-                                color: "rgba(255,255,255,0.4)", fontSize: 11, fontWeight: 600, fontFamily: "inherit",
-                              }}
-                            >
+                            <button type="submit" style={{
+                              display: "flex", alignItems: "center", gap: 5,
+                              padding: "5px 10px", borderRadius: 8, cursor: "pointer",
+                              background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)",
+                              color: "rgba(255,255,255,0.4)", fontSize: 11, fontWeight: 600, fontFamily: "inherit",
+                            }}>
                               <RotateCcw size={11} /> Reset
                             </button>
                           </form>
                         )}
                         <form action={deleteWaitlistEntry}>
                           <input type="hidden" name="id" value={entry.id} />
-                          <button
-                            type="submit"
-                            title="Delete"
-                            style={{
-                              display: "flex", alignItems: "center", justifyContent: "center",
-                              width: 28, height: 28, borderRadius: 8, cursor: "pointer",
-                              background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)",
-                              color: "rgba(255,255,255,0.28)", fontFamily: "inherit",
-                            }}
-                          >
+                          <button type="submit" title="Delete" style={{
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            width: 28, height: 28, borderRadius: 8, cursor: "pointer",
+                            background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)",
+                            color: "rgba(255,255,255,0.28)", fontFamily: "inherit",
+                          }}>
                             <Trash2 size={12} />
                           </button>
                         </form>
