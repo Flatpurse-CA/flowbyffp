@@ -59,26 +59,20 @@ export function AdminShell({ children, user }: { children: React.ReactNode; user
       }}>
 
         {/* ── User profile header ── */}
-        <div style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "18px 14px 16px",
-          flexShrink: 0,
-          minWidth: 0,
-        }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0, flex: 1 }}>
-            {/* Orange avatar */}
-            <div style={{
-              width: 38, height: 38, borderRadius: 10,
-              background: "rgb(234,88,12)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 17, fontWeight: 800, color: "white",
-              flexShrink: 0,
-            }}>
-              {initial}
-            </div>
-            {open && (
+        {open ? (
+          <div style={{
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+            padding: "18px 14px 16px", flexShrink: 0,
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0, flex: 1 }}>
+              <div style={{
+                width: 38, height: 38, borderRadius: 10,
+                background: "rgb(234,88,12)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: 17, fontWeight: 800, color: "white", flexShrink: 0,
+              }}>
+                {initial}
+              </div>
               <span style={{
                 color: "rgb(240,240,248)", fontSize: 15, fontWeight: 700,
                 whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
@@ -86,24 +80,46 @@ export function AdminShell({ children, user }: { children: React.ReactNode; user
               }}>
                 {name}
               </span>
-            )}
+            </div>
+            <button
+              onClick={() => setOpen(false)}
+              style={{
+                background: "none", border: "none",
+                color: "rgba(255,255,255,0.28)", cursor: "pointer",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                width: 28, height: 28, borderRadius: 7, flexShrink: 0, padding: 0,
+              }}
+            >
+              <ChevronLeft size={15} />
+            </button>
           </div>
-
-          {/* Collapse / expand toggle */}
-          <button
-            onClick={() => setOpen(v => !v)}
-            style={{
-              background: "none", border: "none",
-              color: "rgba(255,255,255,0.28)", cursor: "pointer",
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "18px 0 14px", gap: 10, flexShrink: 0 }}>
+            {/* Avatar */}
+            <div style={{
+              width: 38, height: 38, borderRadius: 10,
+              background: "rgb(234,88,12)",
               display: "flex", alignItems: "center", justifyContent: "center",
-              width: 28, height: 28, borderRadius: 7,
-              flexShrink: 0,
-              padding: 0,
-            }}
-          >
-            {open ? <ChevronLeft size={15} /> : <ChevronRight size={15} />}
-          </button>
-        </div>
+              fontSize: 17, fontWeight: 800, color: "white",
+            }}>
+              {initial}
+            </div>
+            {/* Expand button */}
+            <button
+              onClick={() => setOpen(true)}
+              title="Expand sidebar"
+              style={{
+                background: "rgba(255,255,255,0.06)",
+                border: "1px solid rgba(255,255,255,0.09)",
+                borderRadius: 8, width: 34, height: 26,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                color: "rgba(255,255,255,0.4)", cursor: "pointer", padding: 0,
+              }}
+            >
+              <ChevronRight size={13} />
+            </button>
+          </div>
+        )}
 
         {/* Divider */}
         <div style={{ height: 1, background: "rgba(255,255,255,0.06)", margin: "0 0 14px", flexShrink: 0 }} />
