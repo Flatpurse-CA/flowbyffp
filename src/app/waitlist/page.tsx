@@ -338,23 +338,55 @@ export default function WaitlistPage() {
           </span>
         </div>
 
-        {/* Photo cards — unequal widths */}
+        {/* Features + Image grid */}
         <div className="wl-photo-grid" style={{
           position: "relative", zIndex: 1,
-          display: "grid", gridTemplateColumns: "1.45fr 1fr",
-          gap: 10,
+          display: "grid", gridTemplateColumns: "1fr 1.3fr",
+          gap: 16,
           marginTop: 48,
-          paddingLeft: 120,
-          paddingRight: 120,
+          paddingLeft: 80,
+          paddingRight: 80,
           boxSizing: "border-box",
           width: "100vw",
           marginLeft: "calc(-50vw + 50%)",
-          height: 540,
+          height: 520,
         }}>
-          {/* Left card — wider */}
-          <div style={{ position: "relative", borderRadius: 16, overflow: "hidden", height: "100%" }}>
-            <Image src="/her1.png" alt="" fill sizes="60vw" style={{ objectFit: "cover", objectPosition: "center top" }} />
-            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 55%)" }} />
+          {/* Left — feature bullets box */}
+          <div style={{
+            borderRadius: 20,
+            border: "1px solid rgba(255,255,255,0.1)",
+            background: "rgba(255,255,255,0.04)",
+            backdropFilter: "blur(12px)",
+            padding: "44px 40px",
+            display: "flex", flexDirection: "column", justifyContent: "center", gap: 28,
+          }}>
+            {[
+              { icon: "📋", bold: "Recover up to 30%", rest: " of lost revenue from no-shows" },
+              { icon: "🔔", bold: "Reduce no-shows by 40%", rest: " with automated SMS & email reminders" },
+              { icon: "📅", bold: "Fill empty slots in minutes", rest: " with AI-powered rebooking" },
+              { icon: "💳", bold: "Stripe pass-through processing", rest: " — no markup, no marketplace BS" },
+            ].map((f, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 14 }}>
+                <div style={{
+                  width: 40, height: 40, borderRadius: 10, flexShrink: 0,
+                  background: "rgba(113,42,226,0.12)",
+                  border: "1px solid rgba(113,42,226,0.2)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 18,
+                }}>
+                  {f.icon}
+                </div>
+                <p style={{ fontSize: 15, color: "rgba(255,255,255,0.65)", lineHeight: 1.6, margin: "auto 0" }}>
+                  <strong style={{ color: "#fff", fontWeight: 700 }}>{f.bold}</strong>{f.rest}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          {/* Right — photo card */}
+          <div style={{ position: "relative", borderRadius: 20, overflow: "hidden", height: "100%" }}>
+            <Image src="/her1.png" alt="" fill sizes="55vw" style={{ objectFit: "cover", objectPosition: "center top" }} />
+            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 50%)" }} />
             <div style={{
               position: "absolute", bottom: 20, left: 20,
               background: "#fff", borderRadius: 12, padding: "14px 18px",
@@ -367,36 +399,6 @@ export default function WaitlistPage() {
               <div style={{ fontSize: 30, fontWeight: 800, color: "#0a0a0a", letterSpacing: "-0.04em", marginBottom: 12 }}>47</div>
               <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                 {[["Confirmed", "31", "#16a34a"], ["Pending", "10", "#f59e0b"], ["No-shows filled", "6", "#712AE2"]].map(([label, val, color]) => (
-                  <div key={label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ fontSize: 11, color: "#999", display: "flex", alignItems: "center", gap: 5 }}>
-                      <span style={{ width: 6, height: 6, borderRadius: "50%", background: color, display: "inline-block" }} />{label}
-                    </span>
-                    <span style={{ fontSize: 11, fontWeight: 700, color: "#0a0a0a" }}>{val}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Right card — narrower */}
-          <div style={{ position: "relative", borderRadius: 16, overflow: "hidden", height: "100%" }}>
-            <Image src="/her2.png" alt="" fill sizes="40vw" style={{ objectFit: "cover", objectPosition: "center top" }} />
-            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 55%)" }} />
-            <div style={{
-              position: "absolute", bottom: 20, left: 20,
-              background: "#fff", borderRadius: 12, padding: "14px 18px",
-              minWidth: 210, boxShadow: "0 8px 32px rgba(0,0,0,0.25)",
-            }}>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
-                <span style={{ fontSize: 12, fontWeight: 600, color: "#666" }}>Revenue This Week</span>
-                <span style={{ fontSize: 11, fontWeight: 700, color: "#16a34a", background: "rgba(22,163,74,0.1)", borderRadius: 999, padding: "2px 7px" }}>↑ 18%</span>
-              </div>
-              <div style={{ fontSize: 26, fontWeight: 800, color: "#0a0a0a", letterSpacing: "-0.04em", marginBottom: 12 }}>£3,840</div>
-              <div style={{ height: 6, borderRadius: 3, background: "#f0f0f0", overflow: "hidden", marginBottom: 10 }}>
-                <div style={{ height: "100%", width: "78%", borderRadius: 3, background: `linear-gradient(to right, ${BRAND_PURPLE}, #a06ee8)` }} />
-              </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                {[["Bookings", "£2,400", "#712AE2"], ["Recovered", "£1,240", "#16a34a"], ["Tips", "£200", "#f59e0b"]].map(([label, val, color]) => (
                   <div key={label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <span style={{ fontSize: 11, color: "#999", display: "flex", alignItems: "center", gap: 5 }}>
                       <span style={{ width: 6, height: 6, borderRadius: "50%", background: color, display: "inline-block" }} />{label}
