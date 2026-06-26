@@ -350,7 +350,7 @@ export default function WaitlistPage() {
         <Image src="/hero-p4.png" alt="" fill priority style={{ objectFit: "cover", objectPosition: "center top", zIndex: 0 }} />
         <div style={{ position: "relative", zIndex: 1 }}>
           {/* Header row */}
-          <div style={{ marginBottom: 72 }}>
+          <div style={{ marginBottom: 72, textAlign: "center" }}>
             <div style={{
               display: "inline-flex", alignItems: "center", gap: 7,
               background: "rgba(113,42,226,0.12)", border: "1px solid rgba(113,42,226,0.3)",
@@ -362,9 +362,9 @@ export default function WaitlistPage() {
             <h2 ref={howRef} style={{
               fontSize: "clamp(32px, 4vw, 56px)",
               fontWeight: 800, letterSpacing: "-0.04em", lineHeight: 1.08,
-              color: "#fff", margin: "0 0 20px", maxWidth: 900,
+              color: "#fff", margin: "0 auto 20px", maxWidth: 900,
             }}>
-              {"Get in early. Pay less, forever.".split("").map((char, i) =>
+              {"See exactly how a salon recovers C$2,000+/month in lost no-show revenue.".split("").map((char, i) =>
                 (
                   <span key={i} style={{
                     display: "inline-block",
@@ -377,8 +377,8 @@ export default function WaitlistPage() {
                 )
               )}
             </h2>
-            <p style={{ fontSize: 17, color: "rgba(255,255,255,0.45)", lineHeight: 1.75, margin: 0, maxWidth: 620 }}>
-              The first 40 shops shape the product, get it free through launch, and lock in lifetime founder pricing. After 40, this door closes.
+            <p style={{ fontSize: 17, color: "rgba(255,255,255,0.45)", lineHeight: 1.75, margin: "0 auto", maxWidth: 680 }}>
+              We break down the real math behind no-shows, marketplace commissions, and the hidden fees in Vagaro and Fresha — and show you the FlatPurse Flow dashboard in action.
             </p>
           </div>
 
