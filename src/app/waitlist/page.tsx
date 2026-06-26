@@ -111,8 +111,7 @@ export default function WaitlistPage() {
         position: "relative",
         overflow: "hidden",
         textAlign: "center",
-        padding: "0 40px 80px",
-        minHeight: "100vh",
+        padding: "0 40px 72px",
       }}>
         <Image
           src="/hero-p2.png"
@@ -343,7 +342,7 @@ export default function WaitlistPage() {
 
       {/* ── 2. How it works ── */}
       <section className="wl-how" style={{
-        padding: "80px 120px 120px",
+        padding: "60px 120px 100px",
         width: "100%", boxSizing: "border-box",
         position: "relative", overflow: "hidden",
       }}>
