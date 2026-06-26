@@ -97,7 +97,11 @@ export default function WaitlistPage() {
 
   return (
     <div style={{
-      background: "radial-gradient(ellipse 85% 60% at 50% 108%, rgba(230,210,255,0.92) 0%, rgba(148,60,255,0.88) 18%, rgba(100,20,220,0.82) 38%, rgba(50,5,110,0.65) 58%, #000 76%) #000",
+      backgroundImage: "url('/purple bg.jpg')",
+      backgroundSize: "cover",
+      backgroundPosition: "center bottom",
+      backgroundRepeat: "no-repeat",
+      backgroundColor: "#000",
       color: "#fff", minHeight: "100vh",
     }}>
 
