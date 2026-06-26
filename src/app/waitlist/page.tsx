@@ -340,23 +340,6 @@ export default function WaitlistPage() {
 
       </section>
 
-      {/* ── Video — bridges hero and section 2 ── */}
-      <div style={{
-        position: "relative",
-        zIndex: 10,
-        marginTop: "-240px",
-        padding: "0 40px",
-        boxSizing: "border-box",
-      }}>
-        <div style={{ aspectRatio: "16/9", borderRadius: 16, overflow: "hidden", boxShadow: "0 24px 80px rgba(0,0,0,0.5)" }}>
-          <iframe
-            src="https://drive.google.com/file/d/16kEw9y92fjrpefWpY39HA_DjDehmx9oU/preview"
-            style={{ width: "100%", height: "100%", border: "none", display: "block" }}
-            allow="autoplay"
-            allowFullScreen
-          />
-        </div>
-      </div>
 
       {/* ── 2. How it works ── */}
       <section className="wl-how" style={{
