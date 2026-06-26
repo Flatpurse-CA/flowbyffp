@@ -145,13 +145,13 @@ export default function WaitlistPage() {
           fontSize: "clamp(38px, 5vw, 66px)",
           fontWeight: 900,
           letterSpacing: "-0.05em",
-          lineHeight: 1.0,
+          lineHeight: 1.08,
           color: "#fff",
-          margin: "0 auto 24px",
+          margin: "0 auto 8px",
           maxWidth: 800,
           position: "relative", zIndex: 1,
         }}>
-          {"Get early access.".split("").map((char, i) => (
+          {"Reserve your beta spot.".split("").map((char, i) => (
             <span key={i} className="blur-drop" style={{
               display: "inline-block",
               animationDelay: `${i * 0.04}s`,
@@ -162,13 +162,36 @@ export default function WaitlistPage() {
           ))}
         </h1>
 
+        {/* Gold italic subheading */}
+        <p style={{
+          fontSize: "clamp(28px, 3.8vw, 52px)",
+          fontWeight: 700,
+          letterSpacing: "-0.04em",
+          lineHeight: 1.1,
+          fontStyle: "italic",
+          color: "#D9A040",
+          margin: "0 auto 32px",
+          maxWidth: 800,
+          position: "relative", zIndex: 1,
+        }}>
+          {"Get 40% off forever.".split("").map((char, i) => (
+            <span key={i} className="blur-drop" style={{
+              display: "inline-block",
+              animationDelay: `${0.92 + i * 0.035}s`,
+              whiteSpace: char === " " ? "pre" : "normal",
+            }}>
+              {char}
+            </span>
+          ))}
+        </p>
+
         {/* Subtext */}
         <p style={{
           fontSize: 17,
           color: "rgba(255,255,255,0.45)",
           lineHeight: 1.7,
           margin: "0 auto 48px",
-          maxWidth: 480,
+          maxWidth: 520,
           position: "relative", zIndex: 1,
         }}>
           {"FlatPurse Flow fills empty slots, wins back lost clients, and runs your shop on AutoPilot.".split("").map((char, i) => (
