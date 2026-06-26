@@ -96,14 +96,7 @@ export default function WaitlistPage() {
   }
 
   return (
-    <div style={{
-      backgroundImage: "url('/hero-p.png')",
-      backgroundSize: "cover",
-      backgroundPosition: "center bottom",
-      backgroundRepeat: "no-repeat",
-      backgroundColor: "#000",
-      color: "#fff", minHeight: "100vh",
-    }}>
+    <div style={{ background: "#060606", color: "#fff", minHeight: "100vh" }}>
 
       {/* ── Minimal nav ── */}
       <nav className="wl-nav" style={{
@@ -133,6 +126,11 @@ export default function WaitlistPage() {
         textAlign: "center",
         padding: "30px 40px 80px",
         minHeight: "100vh",
+        backgroundImage: "url('/hero-p.png')",
+        backgroundSize: "cover",
+        backgroundPosition: "center bottom",
+        backgroundRepeat: "no-repeat",
+        backgroundColor: "#060606",
       }}>
 
 
