@@ -525,9 +525,13 @@ export default function WaitlistPage() {
             );
           })}
         </div>
+      </section>
 
-        {/* FAQ */}
-        <div style={{ padding: "80px 0 100px", maxWidth: 860, margin: "0 auto" }}>
+      <PricingSection />
+
+      {/* FAQ */}
+      <section className="wl-faq" style={{ background: "#060606", padding: "100px 120px", boxSizing: "border-box", width: "100%" }}>
+        <div style={{ maxWidth: 860, margin: "0 auto" }}>
           <h3 style={{ fontSize: "clamp(24px, 2.5vw, 36px)", fontWeight: 800, letterSpacing: "-0.03em", color: "#fff", margin: "0 0 48px", textAlign: "center" }}>
             Frequently Asked Questions
           </h3>
@@ -552,8 +556,6 @@ export default function WaitlistPage() {
           <div style={{ borderTop: "1px solid rgba(255,255,255,0.07)" }} />
         </div>
       </section>
-
-      <PricingSection />
 
       <Footer />
 
@@ -614,6 +616,7 @@ export default function WaitlistPage() {
           .wl-steps-grid > div:last-child { border-bottom: none !important; padding-bottom: 0 !important; }
 
           .wl-founder { padding: 60px 20px !important; }
+          .wl-faq { padding: 60px 20px !important; }
 
           .wl-perks-section { padding: 60px 0 0 !important; }
           .wl-perks-heading { font-size: 20px !important; }
