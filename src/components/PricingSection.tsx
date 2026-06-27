@@ -269,20 +269,8 @@ export default function PricingSection() {
                   height: 1,
                   background: isSelected ? "rgba(139,92,246,0.25)" : "rgb(39,39,42)",
                   marginBottom: 13, transition: "background 0.25s",
+                  flex: 1,
                 }} />
-
-                {/* Features */}
-                <ul style={{ listStyle: "none", padding: 0, margin: "0 0 18px", display: "flex", flexDirection: "column", gap: 8, flex: 1 }}>
-                  {p.features.map((f) => (
-                    <li key={f} style={{
-                      fontSize: 11.5,
-                      color: isSelected ? "rgba(224,213,255,0.82)" : "rgb(113,113,122)",
-                      lineHeight: 1.3, transition: "color 0.25s",
-                    }}>
-                      {f}
-                    </li>
-                  ))}
-                </ul>
 
                 {/* CTA */}
                 {isSelected && (
