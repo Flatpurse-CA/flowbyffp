@@ -22,11 +22,13 @@ const PERKS = [
 
 
 const FAQS = [
-  { n: "01", q: "When does FlatPurse Flow launch?",            a: "We're rolling out access to waitlist members in waves starting soon. The earlier you join, the sooner you get in. We don't have a fixed public launch date — early access members come first." },
-  { n: "02", q: "What do early access members actually get?",  a: "A 30-day free trial (3× the standard), founder pricing locked for life, priority onboarding with our team, and a direct line to the founders to shape the product." },
-  { n: "03", q: "How much does it cost?",                      a: "Early access members get a special founder rate that's locked forever — lower than our public pricing. We'll share exact numbers when we send your invite. Zero commission on revenue, always." },
-  { n: "04", q: "Do waitlist spots expire?",                   a: "Your spot is reserved as long as your email is on the list. We'll send a reminder before your invite goes out. If we don't hear back within 7 days, your spot moves to the next person." },
-  { n: "05", q: "Can I use FlatPurse Flow right now?",         a: "We're in a closed beta with a small group of shops. Joining the waitlist is the fastest way to get access — we're not accepting public signups outside the waitlist at this stage." },
+  { n: "01", q: "What's actually included in beta access?",                        a: "Full Pro+ access while beta runs — booking, POS, CRM, AI marketing, AI upsell, commission tracking, retail inventory, recurring memberships, and analytics. The whole stack. No feature gates. Beta runs roughly 6 weeks from the day we open the first cohort." },
+  { n: "02", q: "Do I pay anything during beta?",                                  a: "Nothing. No credit card. No surprise charges. When beta ends, we'll email you to enter a card and lock in your Founders 100 pricing. If you don't, your slot returns to the public pool — no penalty." },
+  { n: "03", q: "How does the 40% off forever offer actually work?",               a: "When beta ends and you enter a card, your subscription kicks off at 40% off for 12 months. Then at month 13, it automatically becomes 25% off forever, as long as your account stays open. Cancel later and come back? You'd pay standard price. That's why staying enrolled is the deal." },
+  { n: "04", q: "What if I'm currently locked into Booksy / Vagaro / Fresha?",    a: "We'll migrate everything for you — clients, appointment history, service menu, notes (where supported), and product inventory. Most shops are live on FlatPurse Flow within 48 hours. No second register. No data abandoned." },
+  { n: "05", q: "Why only 40 beta spots?",                                         a: "Because we're two people and we want to talk to every beta member directly. 40 is the number where we can run real onboarding calls, get real feedback, and ship real fixes in the same week. Past 40, we lose that." },
+  { n: "06", q: "What happens after the 40 beta spots fill?",                      a: "The Founders 100 offer opens to the public on launch day. The remaining 60 slots are first-come, first-served — and the offer closes when we hit 100 total paid customers or 90 days after launch, whichever comes first. Beta members are pre-qualified, so you skip the rush." },
+  { n: "07", q: "Are you really based in Edmonton?",                               a: "Yes. Edmonton, Alberta. CAD pricing, no FX, real Canadian phone support, Interac e-Transfer for booking deposits. GlossGenius, Mangomint, and Boulevard all price in USD and quietly charge Canadian operators ~1.37×. That's not a feature gap — that's our wedge." },
 ];
 
 const BUSINESS_TYPES = [
