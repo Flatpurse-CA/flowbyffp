@@ -48,8 +48,8 @@ export default function Footer() {
   return (
     <footer style={{ background: "#060606" }}>
       {/* CTA Banner */}
-      <div style={{ padding: "100px 155px 80px" }}>
-        <div style={{
+      <div className="footer-cta-wrap" style={{ padding: "100px 155px 80px" }}>
+        <div className="footer-cta-card" style={{
           background: BRAND_PURPLE,
           borderRadius: 10,
           padding: "64px 72px",
@@ -91,7 +91,7 @@ export default function Footer() {
       </div>
 
       {/* Footer body */}
-      <div style={{ padding: "0 155px 0", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
+      <div className="footer-body" style={{ padding: "0 155px 0", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr", gap: 40, padding: "60px 0 48px" }}>
           {/* Logo col */}
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -126,7 +126,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div style={{
+        <div className="footer-bottom" style={{
           borderTop: "1px solid rgba(255,255,255,0.07)",
           padding: "20px 0 32px",
           display: "flex",
@@ -150,6 +150,28 @@ export default function Footer() {
       </div>
 
       <div style={{ height: 3, background: "#712AE2" }} />
+
+      <style>{`
+        @media (max-width: 768px) {
+          .footer-cta-wrap { padding: 60px 20px 48px !important; }
+          .footer-cta-card {
+            padding: 40px 28px !important;
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 32px !important;
+          }
+          .footer-body { padding: 0 20px !important; }
+          .footer-body > div:first-child {
+            grid-template-columns: 1fr 1fr !important;
+            gap: 32px !important;
+          }
+          .footer-bottom {
+            flex-direction: column !important;
+            gap: 16px !important;
+            align-items: flex-start !important;
+          }
+        }
+      `}</style>
     </footer>
   );
 }
