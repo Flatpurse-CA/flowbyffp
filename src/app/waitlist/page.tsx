@@ -132,7 +132,7 @@ export default function WaitlistPage() {
         </nav>
 
         {/* AutoPilot pill */}
-        <div style={{ position: "relative", zIndex: 1, marginBottom: 16, display: "inline-block" }}>
+        <div style={{ position: "relative", zIndex: 1, marginBottom: 16, display: "inline-block", marginTop: 72 }}>
           <AutoPilotChip words={["AutoPilot", "·", "Early", "Access"]} />
         </div>
 
