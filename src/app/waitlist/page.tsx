@@ -124,19 +124,11 @@ export default function WaitlistPage() {
           padding: "22px 48px",
           display: "flex",
           alignItems: "center",
-          justifyContent: "space-between",
           position: "relative",
           zIndex: 10,
         }}>
           <Link href="/" style={{ textDecoration: "none", display: "flex", alignItems: "center" }}>
-            <Image src="/logo-white.svg" alt="FLOWBYFFP" width={105} height={35} priority />
-          </Link>
-          <Link href="/signup"
-            style={{ fontSize: 13, fontWeight: 500, color: "rgba(255,255,255,0.4)", textDecoration: "none", letterSpacing: "-0.01em" }}
-            onMouseEnter={e => (e.currentTarget.style.color = "#fff")}
-            onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.4)")}
-          >
-            Already have an account?
+            <Image src="/group-starter.svg" alt="FlatPurse Flow" width={160} height={45} priority />
           </Link>
         </nav>
 
