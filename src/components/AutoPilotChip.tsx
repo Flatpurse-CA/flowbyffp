@@ -58,13 +58,13 @@ export default function AutoPilotChip({ theme = "dark", words = DEFAULT_WORDS }:
         marginBottom: 32,
       }}
     >
-      <Sparkles size={14} color={isLight ? "#712AE2" : "rgb(250,219,229)"} style={{ flexShrink: 0 }} />
+      <Sparkles size={14} color={isLight ? "#712AE2" : "rgb(216,200,255)"} style={{ flexShrink: 0 }} />
 
       <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
         <span style={{
           fontSize: 12.5,
           fontWeight: 500,
-          color: isLight ? "#712AE2" : "rgb(250,219,229)",
+          color: isLight ? "#712AE2" : "rgb(216,200,255)",
           letterSpacing: "0.01em",
           whiteSpace: "nowrap",
         }}>

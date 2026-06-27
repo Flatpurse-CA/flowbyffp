@@ -442,8 +442,8 @@ export default function WaitlistPage() {
               background: "rgba(250,219,229,0.07)", border: "0.5px solid rgba(250,219,229,0.22)",
               borderRadius: 7, padding: "10px 15px",
             }}>
-              <Sparkles size={14} color="rgb(250,219,229)" style={{ flexShrink: 0 }} />
-              <span style={{ fontSize: 12.5, fontWeight: 500, color: "rgb(250,219,229)", letterSpacing: "0.01em", whiteSpace: "nowrap" }}>
+              <Sparkles size={14} color="rgb(216,200,255)" style={{ flexShrink: 0 }} />
+              <span style={{ fontSize: 12.5, fontWeight: 500, color: "rgb(216,200,255)", letterSpacing: "0.01em", whiteSpace: "nowrap" }}>
                 A note from our founder
               </span>
             </div>
