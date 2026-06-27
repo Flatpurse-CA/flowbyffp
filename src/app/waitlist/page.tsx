@@ -309,27 +309,35 @@ export default function WaitlistPage() {
 
         {/* Social proof */}
         <div style={{
-          display: "flex", alignItems: "center", justifyContent: "center",
-          gap: 12, marginTop: 24, marginBottom: 28,
+          display: "flex", flexDirection: "column", alignItems: "center",
+          gap: 14, marginTop: 32, marginBottom: 28,
           position: "relative", zIndex: 1,
         }}>
-          <div style={{ display: "flex" }}>
+          {/* Avatars row */}
+          <div style={{ display: "flex", alignItems: "center" }}>
             {AVATARS.map((src, i) => (
               <div key={i} style={{
-                width: 32, height: 32, borderRadius: "50%",
-                border: "2px solid #060606",
+                width: 44, height: 44, borderRadius: "50%",
+                border: "2.5px solid rgba(113,42,226,0.5)",
                 overflow: "hidden",
-                marginLeft: i === 0 ? 0 : -10,
+                marginLeft: i === 0 ? 0 : -14,
                 position: "relative",
                 zIndex: AVATARS.length - i,
+                boxShadow: "0 2px 12px rgba(0,0,0,0.5)",
               }}>
-                <Image src={src} alt="" width={32} height={32} style={{ objectFit: "cover", width: "100%", height: "100%" }} />
+                <Image src={src} alt="" width={44} height={44} style={{ objectFit: "cover", width: "100%", height: "100%" }} />
               </div>
             ))}
           </div>
-          <span style={{ fontSize: 13.5, color: "rgba(255,255,255,0.45)", letterSpacing: "-0.01em" }}>
-            Join <strong style={{ color: "#fff" }}>1,280+</strong> shop owners already on the waitlist
-          </span>
+          {/* Text */}
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+            <span style={{ fontSize: 15, fontWeight: 700, color: "#fff", letterSpacing: "-0.02em" }}>
+              1,280+ shop owners
+            </span>
+            <span style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", letterSpacing: "-0.01em" }}>
+              already on the waitlist
+            </span>
+          </div>
         </div>
 
       </section>
