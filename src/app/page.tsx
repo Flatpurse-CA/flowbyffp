@@ -10,6 +10,7 @@ import ScrollZoom from "@/components/ScrollZoom";
 import FoundationsGrid from "@/components/FoundationsSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import ChangelogSection from "@/components/ChangelogSection";
+import TestimonialsGrid from "@/components/TestimonialsGrid";
 import PricingSection from "@/components/PricingSection";
 import IntegrationsGrid from "@/components/IntegrationsGrid";
 import Footer from "@/components/Footer";
@@ -213,6 +214,8 @@ export default function Home() {
       <TestimonialsSection />
 
       <ChangelogSection />
+
+      <TestimonialsGrid />
 
       <PricingSection />
 
