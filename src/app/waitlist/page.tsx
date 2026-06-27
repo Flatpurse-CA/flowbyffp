@@ -489,7 +489,7 @@ export default function WaitlistPage() {
         </div>
       </section>
 
-      <PricingSection />
+      {/* PricingSection hidden */}
 
       {/* FAQ */}
       <section className="wl-faq" style={{ background: "#060606", padding: "100px 120px", boxSizing: "border-box", width: "100%" }}>

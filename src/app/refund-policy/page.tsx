@@ -85,7 +85,7 @@ export default function RefundPolicyPage() {
         justifyContent: "space-between",
         borderBottom: "1px solid rgba(255,255,255,0.06)",
       }}>
-        <Link href="/" style={{ textDecoration: "none", display: "flex", alignItems: "center" }}>
+        <Link href="/waitlist" style={{ textDecoration: "none", display: "flex", alignItems: "center" }}>
           <Image src="/group-starter.svg" alt="FlatPurse Flow" width={130} height={37} priority />
         </Link>
         <Link href="/waitlist" style={{
@@ -99,6 +99,14 @@ export default function RefundPolicyPage() {
 
       {/* Hero */}
       <div style={{ padding: "80px 48px 60px", maxWidth: 860, margin: "0 auto" }}>
+        <Link href="/waitlist" style={{
+          display: "inline-flex", alignItems: "center", gap: 6,
+          fontSize: 13, color: "rgba(255,255,255,0.4)", textDecoration: "none",
+          marginBottom: 32, letterSpacing: "-0.01em",
+        }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          Back to waitlist
+        </Link>
         <div style={{
           display: "inline-flex", alignItems: "center", gap: 7,
           background: "rgba(113,42,226,0.12)", border: "1px solid rgba(113,42,226,0.3)",
