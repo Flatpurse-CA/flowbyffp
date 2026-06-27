@@ -39,7 +39,6 @@ const BUSINESS_TYPES = [
   { label: "Nail Studio", emoji: "💅" },
   { label: "Other",       emoji: "🏢" },
 ];
-const AVATARS = ["/sd1.jpg", "/sd2.jpg", "/sd3.jpg", "/sd4.jpg"];
 
 export default function WaitlistPage() {
   const [name, setName]           = useState("");
@@ -302,38 +301,6 @@ export default function WaitlistPage() {
           </p>
         )}
 
-        {/* Social proof */}
-        <div style={{
-          display: "flex", flexDirection: "column", alignItems: "center",
-          gap: 14, marginTop: 32, marginBottom: 28,
-          position: "relative", zIndex: 1,
-        }}>
-          {/* Avatars row */}
-          <div style={{ display: "flex", alignItems: "center" }}>
-            {AVATARS.map((src, i) => (
-              <div key={i} style={{
-                width: 44, height: 44, borderRadius: "50%",
-                border: "2.5px solid rgba(113,42,226,0.5)",
-                overflow: "hidden",
-                marginLeft: i === 0 ? 0 : -14,
-                position: "relative",
-                zIndex: AVATARS.length - i,
-                boxShadow: "0 2px 12px rgba(0,0,0,0.5)",
-              }}>
-                <Image src={src} alt="" width={44} height={44} style={{ objectFit: "cover", width: "100%", height: "100%" }} />
-              </div>
-            ))}
-          </div>
-          {/* Text */}
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
-            <span style={{ fontSize: 15, fontWeight: 700, color: "#fff", letterSpacing: "-0.02em" }}>
-              1,280+ shop owners
-            </span>
-            <span style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", letterSpacing: "-0.01em" }}>
-              already on the waitlist
-            </span>
-          </div>
-        </div>
 
       </section>
 
