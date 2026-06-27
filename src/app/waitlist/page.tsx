@@ -502,12 +502,11 @@ export default function WaitlistPage() {
             return (
               <div key={i} className="perk-cell" style={{
                 padding: "48px 48px",
-                aspectRatio: "1",
                 borderTop: isTop ? BORDER : "none",
                 borderBottom: BORDER,
                 borderLeft: isLeft ? BORDER : "none",
                 borderRight: BORDER,
-                display: "flex", flexDirection: "column", justifyContent: "space-between",
+                display: "flex", flexDirection: "column", gap: 28,
                 transition: "background 0.25s ease",
               }}>
                 <div style={{
