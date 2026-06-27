@@ -510,7 +510,7 @@ export default function WaitlistPage() {
                 transition: "background 0.25s ease",
               }}>
                 <div style={{
-                  width: 44, height: 44, borderRadius: 0,
+                  width: 44, height: 44, borderRadius: 10,
                   background: perk.iconBg,
                   display: "flex", alignItems: "center", justifyContent: "center",
                   color: perk.iconColor,
