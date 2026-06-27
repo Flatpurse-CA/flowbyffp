@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight } from "lucide-react";
 
 const BRAND_PURPLE = "#712AE2";
 
@@ -48,44 +47,51 @@ export default function Footer() {
   return (
     <footer style={{ background: "#060606" }}>
       {/* CTA Banner */}
-      <div className="footer-cta-wrap" style={{ padding: "100px 155px 80px" }}>
-        <div className="footer-cta-card" style={{
-          background: BRAND_PURPLE,
-          borderRadius: 10,
-          padding: "64px 72px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          position: "relative",
-          overflow: "hidden",
-        }}>
-          {/* Subtle radial glow */}
-          <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at 20% 50%, rgba(255,255,255,0.08) 0%, transparent 60%)", pointerEvents: "none" }} />
+      <div className="footer-cta-wrap" style={{
+        position: "relative",
+        background: BRAND_PURPLE,
+        padding: "120px 40px",
+        textAlign: "center",
+        overflow: "hidden",
+      }}>
+        {/* Background image — swap src when ready */}
+        {/* <img src="/footer-bg.png" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", zIndex: 0 }} /> */}
+        <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at 50% 120%, rgba(255,255,255,0.10) 0%, transparent 65%)", pointerEvents: "none", zIndex: 1 }} />
 
-          <h2 style={{
-            fontSize: "clamp(28px, 3vw, 44px)",
-            fontWeight: 800,
+        <div style={{ position: "relative", zIndex: 2, maxWidth: 680, margin: "0 auto" }}>
+          <h2 className="footer-cta-heading" style={{
+            fontSize: "clamp(32px, 4.5vw, 60px)",
+            fontWeight: 900,
             letterSpacing: "-0.04em",
-            lineHeight: 1.1,
+            lineHeight: 1.06,
             color: "#fff",
-            margin: 0,
-            position: "relative",
-            zIndex: 1,
-            maxWidth: 560,
+            margin: "0 0 20px",
           }}>
-            Your shop on AutoPilot.<br />Start free today.
+            Stop Letting Your Client<br />Book Your Competitors
           </h2>
-
-          <Link href="/signup" style={{
-            width: 80, height: 80, borderRadius: 10,
-            background: "#fff",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            flexShrink: 0, position: "relative", zIndex: 1,
-            textDecoration: "none",
-            transition: "transform 0.2s cubic-bezier(0.16,1,0.3,1), box-shadow 0.2s",
-            boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
+          <p style={{
+            fontSize: 16,
+            color: "rgba(255,255,255,0.7)",
+            lineHeight: 1.7,
+            margin: "0 auto 40px",
+            maxWidth: 480,
           }}>
-            <ArrowRight size={28} color={BRAND_PURPLE} strokeWidth={2.5} />
+            Free during beta. No credit card. Auto-enrolled in 40% off forever. Edmonton-built and the door&apos;s closing.
+          </p>
+          <Link href="/waitlist" style={{
+            display: "inline-flex", alignItems: "center", justifyContent: "center",
+            padding: "16px 36px",
+            background: "transparent",
+            border: "2px solid rgba(255,255,255,0.7)",
+            color: "#fff",
+            fontSize: 15, fontWeight: 700, letterSpacing: "-0.01em",
+            borderRadius: 12,
+            textDecoration: "none",
+            transition: "background 0.2s, border-color 0.2s",
+          }}
+            className="footer-cta-btn"
+          >
+            Claim Your Beta Spot
           </Link>
         </div>
       </div>
@@ -152,14 +158,10 @@ export default function Footer() {
       <div style={{ height: 3, background: "#712AE2" }} />
 
       <style>{`
+        .footer-cta-btn:hover { background: rgba(255,255,255,0.12) !important; border-color: #fff !important; }
         @media (max-width: 768px) {
-          .footer-cta-wrap { padding: 60px 20px 48px !important; }
-          .footer-cta-card {
-            padding: 40px 28px !important;
-            flex-direction: column !important;
-            align-items: flex-start !important;
-            gap: 32px !important;
-          }
+          .footer-cta-wrap { padding: 80px 24px !important; }
+          .footer-cta-heading { font-size: 30px !important; }
           .footer-body { padding: 0 20px !important; }
           .footer-body > div:first-child {
             grid-template-columns: 1fr 1fr !important;
