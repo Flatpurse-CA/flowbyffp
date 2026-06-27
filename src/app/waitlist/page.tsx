@@ -573,7 +573,9 @@ export default function WaitlistPage() {
           .wl-photo-grid > div { height: 300px !important; }
           .wl-photo-grid > div:last-child { display: none !important; }
 
-          .wl-how { padding: 60px 20px 60px !important; }
+          .wl-how { padding: 32px 20px 60px !important; }
+          .wl-how h2 { font-size: 26px !important; }
+          .wl-how h2 br { display: none !important; }
           .wl-steps-grid {
             grid-template-columns: 1fr !important;
             gap: 40px !important;
