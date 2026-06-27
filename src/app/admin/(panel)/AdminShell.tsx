@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Users, ClipboardList, Store, CreditCard,
   LogOut, Search, Bell, ChevronLeft, ChevronRight,
-  Sun, Moon, MessageSquare, User as UserIcon, Settings,
+  Sun, Moon, MessageSquare, User as UserIcon, Settings, Mail,
 } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 import { logout } from "@/app/dashboard/actions";
@@ -18,6 +18,7 @@ const NAV = [
   { icon: LayoutDashboard, href: "/admin",          label: "Overview"  },
   { icon: Users,           href: "/admin/users",    label: "Users"     },
   { icon: ClipboardList,   href: "/admin/waitlist", label: "Waitlist"  },
+  { icon: Mail,            href: "/admin/emails",   label: "Emails"    },
   { icon: Store,           href: "/admin/shops",    label: "Shops"     },
   { icon: CreditCard,      href: "/admin/plans",    label: "Plans"     },
 ];

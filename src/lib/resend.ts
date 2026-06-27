@@ -1,6 +1,6 @@
 import { Resend } from "resend";
 
-const FROM = process.env.RESEND_FROM_EMAIL ?? "FLOWBYFFP <onboarding@resend.dev>";
+const FROM = process.env.RESEND_FROM_EMAIL ?? "FlatPurse Flow <onboarding@resend.dev>";
 
 function client() {
   const key = process.env.RESEND_API_KEY;
@@ -10,6 +10,18 @@ function client() {
     );
   }
   return new Resend(key);
+}
+
+export async function sendEmail({
+  to,
+  subject,
+  html,
+}: {
+  to: string;
+  subject: string;
+  html: string;
+}) {
+  return client().emails.send({ from: FROM, to, subject, html });
 }
 
 export async function sendOtpEmail(email: string, code: string, firstName: string) {
