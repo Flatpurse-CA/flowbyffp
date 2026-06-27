@@ -196,7 +196,7 @@ export default function WaitlistPage() {
           maxWidth: 680,
           position: "relative", zIndex: 1,
         }}>
-          {"First 40 shops get free beta access + automatic enrollment in Founders 100. 40% off your subscription for 12 months, then 25% off as long as you stay.".split(" ").map((word, i) => (
+          {"Join the FlatPurse Flow Founder Beta and receive 40% off any plan for your first 12 months, plus 25% off for as long as you remain an active customer. Limited to the first 40 businesses.".split(" ").map((word, i) => (
             <span key={i} className="blur-drop" style={{
               display: "inline-block",
               animationDelay: `${0.72 + i * 0.06}s`,
