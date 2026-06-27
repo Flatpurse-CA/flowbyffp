@@ -41,7 +41,7 @@ export default async function SubscribersPage({
     `)
     .order("scheduled_at", { ascending: true });
 
-  const allSends = (sends ?? []) as {
+  const allSends = (sends ?? []) as unknown as {
     id: string;
     status: string;
     scheduled_at: string;
