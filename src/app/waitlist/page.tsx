@@ -165,7 +165,7 @@ export default function WaitlistPage() {
         </h1>
 
         {/* Gold italic subheading */}
-        <p style={{
+        <p className="wl-subheading" style={{
           fontSize: "clamp(28px, 3.8vw, 52px)",
           fontWeight: 700,
           letterSpacing: "-0.04em",
@@ -188,7 +188,7 @@ export default function WaitlistPage() {
         </p>
 
         {/* Subtext */}
-        <p style={{
+        <p className="wl-subtext" style={{
           fontSize: 19,
           color: "rgba(255,255,255,0.45)",
           lineHeight: 1.6,
@@ -542,7 +542,10 @@ export default function WaitlistPage() {
         @media (max-width: 768px) {
           .wl-nav { padding: 16px 20px !important; }
 
-          .wl-hero { padding: 24px 20px 60px !important; min-height: auto !important; }
+          .wl-hero { padding: 0 20px 60px !important; min-height: auto !important; }
+          .wl-hero h1 { font-size: 30px !important; letter-spacing: -0.03em !important; line-height: 1.12 !important; }
+          .wl-subheading { font-size: 22px !important; }
+          .wl-subtext { font-size: 15px !important; }
 
           .wl-form > div {
             flex-direction: column !important;
