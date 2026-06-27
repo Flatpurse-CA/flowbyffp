@@ -99,7 +99,8 @@ export default function Footer() {
           .footer-bottom {
             flex-direction: column !important;
             gap: 16px !important;
-            align-items: flex-start !important;
+            align-items: center !important;
+            text-align: center !important;
           }
         }
       `}</style>
