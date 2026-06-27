@@ -48,6 +48,7 @@ export default function WaitlistPage() {
   const [formError, setFormError] = useState<string | null>(null);
   const [open, setOpen]         = useState<number | null>(null);
   const [howVisible, setHowVisible] = useState(false);
+  const [videoPlaying, setVideoPlaying] = useState(false);
   const howRef = useRef<HTMLHeadingElement>(null);
   const founderParaRef = useRef<HTMLParagraphElement>(null);
   const wordRefs = useRef<(HTMLSpanElement | null)[]>([]);
@@ -386,13 +387,43 @@ export default function WaitlistPage() {
           {/* Video */}
           <div style={{ marginTop: 72 }}>
             <ScrollZoom minScale={0.88}>
-              <div style={{ aspectRatio: "16/9", borderRadius: 10, overflow: "hidden" }}>
-                <iframe
-                  src="https://drive.google.com/file/d/16kEw9y92fjrpefWpY39HA_DjDehmx9oU/preview"
-                  style={{ width: "100%", height: "100%", border: "none", display: "block" }}
-                  allow="autoplay"
-                  allowFullScreen
-                />
+              <div style={{ aspectRatio: "16/9", borderRadius: 10, overflow: "hidden", position: "relative", background: "#0a0a0a" }}>
+                {videoPlaying ? (
+                  <iframe
+                    src="https://drive.google.com/file/d/16kEw9y92fjrpefWpY39HA_DjDehmx9oU/preview?autoplay=1"
+                    style={{ width: "100%", height: "100%", border: "none", display: "block" }}
+                    allow="autoplay"
+                    allowFullScreen
+                  />
+                ) : (
+                  <>
+                    <img
+                      src={`https://drive.google.com/thumbnail?id=16kEw9y92fjrpefWpY39HA_DjDehmx9oU&sz=w1280`}
+                      alt="Video preview"
+                      style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                    />
+                    <button
+                      onClick={() => setVideoPlaying(true)}
+                      style={{
+                        position: "absolute", inset: 0,
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        background: "rgba(0,0,0,0.25)",
+                        border: "none", cursor: "pointer",
+                      }}
+                    >
+                      <div style={{
+                        width: 72, height: 72, borderRadius: "50%",
+                        background: BRAND_PURPLE,
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        boxShadow: "0 0 0 12px rgba(113,42,226,0.2)",
+                      }}>
+                        <svg width="26" height="26" viewBox="0 0 24 24" fill="white">
+                          <path d="M8 5.14v14l11-7-11-7z" />
+                        </svg>
+                      </div>
+                    </button>
+                  </>
+                )}
               </div>
             </ScrollZoom>
           </div>
