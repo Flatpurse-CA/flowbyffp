@@ -355,11 +355,11 @@ export default function WaitlistPage() {
           <div style={{ marginBottom: 72, textAlign: "center" }}>
             <div style={{
               display: "inline-flex", alignItems: "center", gap: 7,
-              background: "rgba(113,42,226,0.12)", border: "1px solid rgba(113,42,226,0.3)",
+              background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.25)",
               borderRadius: 999, padding: "6px 14px", marginBottom: 28,
             }}>
-              <span style={{ fontSize: 11, color: BRAND_PURPLE }}>✦</span>
-              <span style={{ fontSize: 12, fontWeight: 600, color: BRAND_PURPLE, letterSpacing: "0.08em", textTransform: "uppercase" }}>How It Works</span>
+              <span style={{ fontSize: 11, color: "#fff" }}>✦</span>
+              <span style={{ fontSize: 12, fontWeight: 600, color: "#fff", letterSpacing: "0.08em", textTransform: "uppercase" }}>How It Works</span>
             </div>
             <h2 ref={howRef} style={{
               fontSize: "clamp(32px, 4vw, 56px)",
