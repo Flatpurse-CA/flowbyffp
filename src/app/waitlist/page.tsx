@@ -453,7 +453,7 @@ export default function WaitlistPage() {
               ref={founderParaRef}
               style={{ fontSize: "clamp(20px, 2.4vw, 36px)", lineHeight: 1.6, letterSpacing: "-0.02em", fontWeight: 600, margin: "0 0 48px", textAlign: "center" }}
             >
-              {`“I built FlatPurse Flow because I watched my cousin lose thousands every month to no-shows and cancellations. No existing tool actually fixed it. AutoPilot isn’t a feature, it’s the whole point. The shops joining us early aren’t just customers. They’re the reason we keep building. I want to speak to every one of them personally.”`.split(" ").map((word, i) => (
+              {`“I built FlatPurse Flow because I watched my cousin lose thousands every month to no-shows and cancellations and no existing tools actually fixed it. AutoPilot isn’t a feature, it’s the whole point. The shops joining us early aren’t just customers. They’re the reason we keep building. I want to speak to every one of them personally.”`.split(" ").map((word, i) => (
                 <span
                   key={i}
                   ref={(el) => { wordRefs.current[i] = el; }}
