@@ -379,7 +379,7 @@ export default function WaitlistPage() {
               ))}
             </h2>
             <p style={{ fontSize: 17, color: "rgba(255,255,255,0.45)", lineHeight: 1.75, margin: "0 auto", maxWidth: 680 }}>
-              We break down the real math behind no-shows, marketplace commissions, and the hidden fees in Vagaro and Fresha — and show you the FlatPurse Flow dashboard in action.
+              We break down the real math behind no-shows, marketplace commissions, and the hidden fees in Vagaro and Fresha. See the FlatPurse Flow dashboard in action.
             </p>
           </div>
 
