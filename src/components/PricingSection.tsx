@@ -293,11 +293,7 @@ export default function PricingSection() {
           );
         })}
       </div>
-      <div style={{ position: "absolute", bottom: 0, left: 0, width: "100%", zIndex: 10, pointerEvents: "none" }}>
-        <img src="/ffdoe.svg" alt="" style={{ width: "100%", display: "block", filter: "brightness(0) invert(1)" }} />
-      </div>
-
-      <style>{`
+<style>{`
         @media (max-width: 900px) {
           .pricing-section-outer { padding: 60px 20px 80px !important; }
           .pricing-grid { grid-template-columns: 1fr 1fr !important; }
