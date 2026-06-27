@@ -49,12 +49,14 @@ export default function Footer() {
       {/* CTA Banner */}
       <div className="footer-cta-wrap" style={{
         position: "relative",
-        background: BRAND_PURPLE,
+        backgroundImage: "url('/cta.jpg')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundColor: BRAND_PURPLE,
         padding: "120px 40px",
         textAlign: "center",
         overflow: "hidden",
       }}>
-        <img src="/cta.jpg" alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center", zIndex: 0 }} />
         <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.18)", pointerEvents: "none", zIndex: 1 }} />
 
         <div style={{ position: "relative", zIndex: 2, maxWidth: 680, margin: "0 auto" }}>
