@@ -487,10 +487,10 @@ export default function WaitlistPage() {
             <span style={{ fontSize: 11, color: BRAND_PURPLE }}>✦</span>
             <span style={{ fontSize: 12, fontWeight: 600, color: BRAND_PURPLE, letterSpacing: "0.06em", textTransform: "uppercase" }}>Early Access</span>
           </div>
-          <h2 style={{ fontSize: "clamp(26px, 3vw, 42px)", fontWeight: 800, letterSpacing: "-0.04em", lineHeight: 1.1, color: "#fff", margin: "0 0 14px" }}>
+          <h2 className="wl-perks-heading" style={{ fontSize: "clamp(26px, 3vw, 42px)", fontWeight: 800, letterSpacing: "-0.04em", lineHeight: 1.1, color: "#fff", margin: "0 0 14px" }}>
             What you get for joining early.
           </h2>
-          <p style={{ fontSize: 15, color: "rgba(255,255,255,0.4)", margin: 0, lineHeight: 1.7 }}>
+          <p style={{ fontSize: 15, color: "rgba(255,255,255,0.4)", margin: "0 auto", lineHeight: 1.7, maxWidth: 320 }}>
             Early members get more than access. They get an unfair advantage.
           </p>
         </div>
@@ -520,7 +520,7 @@ export default function WaitlistPage() {
                 </div>
                 <div>
                   <h3 style={{ fontSize: 16, fontWeight: 700, color: "#fff", letterSpacing: "-0.025em", margin: "0 0 8px" }}>{perk.title}</h3>
-                  <p style={{ fontSize: 13.5, color: "rgba(255,255,255,0.4)", lineHeight: 1.75, margin: 0, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{perk.desc}</p>
+                  <p style={{ fontSize: 13.5, color: "rgba(255,255,255,0.4)", lineHeight: 1.75, margin: 0 }}>{perk.desc}</p>
                 </div>
               </div>
             );
@@ -616,13 +616,14 @@ export default function WaitlistPage() {
           .wl-founder { padding: 60px 20px !important; }
 
           .wl-perks-section { padding: 60px 0 0 !important; }
+          .wl-perks-heading { font-size: 20px !important; }
           .wl-perks-grid {
-            grid-template-columns: repeat(2, 1fr) !important;
+            grid-template-columns: 1fr !important;
           }
           .perk-cell {
             padding: 28px 24px !important;
             aspect-ratio: unset !important;
-            min-height: 200px !important;
+            min-height: auto !important;
           }
         }
       `}</style>
