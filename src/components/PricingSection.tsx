@@ -124,7 +124,7 @@ export default function PricingSection() {
           color: "#fff",
           margin: "0 0 16px",
         }}>
-          Beta members are <span style={{ color: BRAND_PURPLE }}>auto-enrolled.</span>
+          Beta members are<br /><span style={{ color: BRAND_PURPLE }}>auto-enrolled.</span>
         </h2>
         <p style={{
           fontSize: 16,
