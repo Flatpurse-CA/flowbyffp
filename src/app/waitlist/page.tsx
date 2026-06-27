@@ -15,7 +15,7 @@ const BRAND_PURPLE = "#712AE2";
 
 const PERKS = [
   { icon: <CalendarDays size={22} strokeWidth={1.5} />, iconColor: "#2563eb", iconBg: "rgba(37,99,235,0.08)", title: "Free until launch",               desc: "Full Pro+ access during beta. No card on file. Cancel anytime. Use it like it's yours, because it is." },
-  { icon: <Lock size={22} strokeWidth={1.5} />,         iconColor: "#712AE2", iconBg: "rgba(113,42,226,0.08)", title: "40% off forever",                 desc: "Auto-enrollment in Founders 100. 40% off subscription for your first 12 months, then 25% off for as long as your account stays open." },
+  { icon: <Lock size={22} strokeWidth={1.5} />,         iconColor: "#712AE2", iconBg: "rgba(113,42,226,0.08)", title: "40% off",                 desc: "Auto-enrollment in Founders 100. 40% off subscription for your first 12 months, then 25% off for as long as your account stays open." },
   { icon: <Users size={22} strokeWidth={1.5} />,        iconColor: "#16a34a", iconBg: "rgba(22,163,74,0.08)",  title: "Free white-glove migration",      desc: "Coming from Booksy, Vagaro, Fresha, GlossGenius, or Square? We import your clients, history, and service menu. Live in 48 hours." },
   { icon: <MessageSquare size={22} strokeWidth={1.5} />, iconColor: "#f59e0b", iconBg: "rgba(245,158,11,0.08)", title: "Direct text line to founders",   desc: "Text George & Maxwell directly. Real Edmonton phone number. We answer because the product is ours and your feedback shapes it." },
 ];
