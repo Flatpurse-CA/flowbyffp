@@ -128,7 +128,7 @@ export default function WaitlistPage() {
           zIndex: 10,
         }}>
           <Link href="/" style={{ textDecoration: "none", display: "flex", alignItems: "center" }}>
-            <Image src="/group-starter.svg" alt="FlatPurse Flow" width={160} height={45} priority />
+            <Image src="/group-starter.svg" alt="FlatPurse Flow" width={130} height={37} priority />
           </Link>
         </nav>
 
