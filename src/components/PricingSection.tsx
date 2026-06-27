@@ -8,49 +8,61 @@ const BRAND_PURPLE = "#712AE2";
 
 const PLANS = [
   {
-    id: "starter",
-    label: "Starter",
-    badge: null,
-    price: "$0",
-    description: "Ideal for solo operators and small salons",
-    features: ["50 appts/mo", "1 staff", "Booking page", "AutoPilot basic", "Tap to Pay"],
-    cta: "Start for Free",
-    href: "/signup",
-    gradient: "radial-gradient(140% 60% at 50% 100%, rgb(109,40,217) 0%, rgb(76,29,149) 28%, rgb(30,10,60) 58%, rgba(9,9,11,0) 85%)",
-    isFounders: false,
-  },
-  {
     id: "pro",
     label: "Pro",
-    badge: "Popular",
-    price: "C$49",
-    description: "Best for growing salons and studios",
-    features: ["Unlimited appts", "Full AutoPilot", "Client Intelligence", "SMS + Email", "Daily Brief"],
+    badge: null,
+    originalPrice: "C$59/mo",
+    price: "C$35.40",
+    priceSuffix: "/mo",
+    subtitle: "Year 1 · then C$44.25/mo forever",
+    description: "Best for solo operators and growing salons",
+    features: ["Unlimited appts", "1 staff", "Booking page", "AutoPilot basic", "Tap to Pay"],
     cta: "Get started with Pro",
     href: "/signup",
     gradient: "radial-gradient(140% 60% at 50% 100%, rgb(109,40,217) 0%, rgb(76,29,149) 28%, rgb(30,10,60) 58%, rgba(9,9,11,0) 85%)",
     isFounders: false,
   },
   {
-    id: "unlimited",
-    label: "Unlimited",
-    badge: null,
-    price: "C$274",
-    description: "For large studios and multi-location shops",
-    features: ["Everything in Pro+", "Multi-location", "Custom integrations", "White-glove onboard", "SLA guarantee"],
-    cta: "Get started with Unlimited",
+    id: "pro-plus",
+    label: "Pro+",
+    badge: "Most Popular",
+    originalPrice: "C$149/mo",
+    price: "C$89.40",
+    priceSuffix: "/mo",
+    subtitle: "Year 1 · then C$111.75/mo forever",
+    description: "Full power for multi-staff salons and studios",
+    features: ["Unlimited appts", "Full AutoPilot", "Client Intelligence", "SMS + Email", "Daily Brief"],
+    cta: "Get started with Pro+",
     href: "/signup",
     gradient: "radial-gradient(140% 60% at 50% 100%, rgb(109,40,217) 0%, rgb(76,29,149) 28%, rgb(30,10,60) 58%, rgba(9,9,11,0) 85%)",
     isFounders: false,
   },
   {
-    id: "founders",
-    label: "Founders",
-    badge: "Limited",
-    price: "C$29",
-    description: "Pro at half price — locked in forever. 50 spots only.",
-    features: ["Everything in Pro", "Price locked forever", "Founding member badge", "Early access features", "50 spots remaining"],
-    cta: "Claim Founders Rate",
+    id: "enterprise",
+    label: "Enterprise",
+    badge: null,
+    originalPrice: "C$274/mo",
+    price: "C$164.40",
+    priceSuffix: "/mo",
+    subtitle: "Year 1 · then C$205.50/mo forever",
+    description: "For large studios and multi-location shops",
+    features: ["Everything in Pro+", "Multi-location", "Custom integrations", "White-glove onboard", "SLA guarantee"],
+    cta: "Get started with Enterprise",
+    href: "/signup",
+    gradient: "radial-gradient(140% 60% at 50% 100%, rgb(109,40,217) 0%, rgb(76,29,149) 28%, rgb(30,10,60) 58%, rgba(9,9,11,0) 85%)",
+    isFounders: false,
+  },
+  {
+    id: "annual-founders",
+    label: "Annual Founders",
+    badge: "Best Deal",
+    originalPrice: "C$1,490/yr",
+    price: "C$894",
+    priceSuffix: "/yr",
+    subtitle: "Pro+ annual · C$74.50 effective monthly",
+    description: "Pro+ at half price — locked in forever. 50 spots only.",
+    features: ["Everything in Pro+", "Price locked forever", "Founding member badge", "Early access features", "50 spots remaining"],
+    cta: "Claim Annual Founders Rate",
     href: "/signup",
     gradient: "radial-gradient(140% 60% at 50% 100%, rgba(161,98,7,0.6) 0%, rgba(120,53,15,0.35) 40%, rgba(9,9,11,0) 75%)",
     isFounders: true,
@@ -67,7 +79,7 @@ function CheckIcon({ active, founders }: { active: boolean; founders: boolean })
 }
 
 export default function PricingSection() {
-  const [selected, setSelected] = useState("pro");
+  const [selected, setSelected] = useState("pro-plus");
   const [hovered, setHovered] = useState<string | null>(null);
   const gridRef = useRef<HTMLDivElement>(null);
 
@@ -212,19 +224,33 @@ export default function PricingSection() {
                 </p>
 
                 {/* Price */}
-                <div style={{ marginBottom: 8 }}>
+                <div style={{ marginBottom: 4 }}>
                   <span style={{
-                    fontSize: 32, fontWeight: 800, letterSpacing: "-0.04em", lineHeight: 1,
-                    color: isSelected ? "rgb(237,233,254)" : "rgb(250,250,250)",
-                    transition: "color 0.25s",
+                    fontSize: 11, color: "rgb(113,113,122)",
+                    textDecoration: "line-through", display: "block", marginBottom: 2,
                   }}>
-                    {p.price}
+                    {p.originalPrice}
                   </span>
+                  <div style={{ display: "flex", alignItems: "baseline", gap: 2 }}>
+                    <span style={{
+                      fontSize: 32, fontWeight: 800, letterSpacing: "-0.04em", lineHeight: 1,
+                      color: isSelected ? "rgb(237,233,254)" : "rgb(250,250,250)",
+                      transition: "color 0.25s",
+                    }}>
+                      {p.price}
+                    </span>
+                    <span style={{
+                      fontSize: 11, color: isSelected ? "rgba(196,181,253,0.55)" : "rgb(113,113,122)",
+                      transition: "color 0.25s",
+                    }}>
+                      {p.priceSuffix}
+                    </span>
+                  </div>
                   <span style={{
-                    fontSize: 11, color: isSelected ? "rgba(196,181,253,0.55)" : "rgb(113,113,122)",
-                    marginLeft: 3, transition: "color 0.25s",
+                    fontSize: 10.5, color: isSelected ? "rgba(196,181,253,0.55)" : "rgb(113,113,122)",
+                    display: "block", marginTop: 4, transition: "color 0.25s",
                   }}>
-                    /month
+                    {p.subtitle}
                   </span>
                 </div>
 
