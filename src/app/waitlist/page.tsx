@@ -133,7 +133,7 @@ export default function WaitlistPage() {
         </nav>
 
         {/* Mobile-only logo */}
-        <div className="wl-mobile-logo" style={{ display: "none", position: "relative", zIndex: 1, marginTop: 48, marginBottom: 32 }}>
+        <div className="wl-mobile-logo" style={{ display: "flex", justifyContent: "center", position: "relative", zIndex: 1, marginTop: 48, marginBottom: 32 }}>
           <Image src="/group-starter.svg" alt="FlatPurse Flow" width={130} height={37} priority />
         </div>
 
