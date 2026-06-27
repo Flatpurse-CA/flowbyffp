@@ -370,12 +370,12 @@ export default function WaitlistPage() {
                 <span key={`l1-${i}`} style={{ display: "inline-block", marginRight: "0.22em", opacity: howVisible ? undefined : 0, animation: howVisible ? `blurDrop 0.45s cubic-bezier(0.16,1,0.3,1) ${i * 0.06}s forwards` : "none" }}>{word}</span>
               ))}
               <br />
-              {["recovers", "$2,000+/month", "in", "lost"].map((word, i) => (
+              {["recovers", "$2,000+/month", "in"].map((word, i) => (
                 <span key={`l2-${i}`} style={{ display: "inline-block", marginRight: "0.22em", opacity: howVisible ? undefined : 0, animation: howVisible ? `blurDrop 0.45s cubic-bezier(0.16,1,0.3,1) ${(5 + i) * 0.06}s forwards` : "none" }}>{word}</span>
               ))}
               <br />
-              {["no-show", "revenue."].map((word, i) => (
-                <span key={`l3-${i}`} style={{ display: "inline-block", marginRight: "0.22em", opacity: howVisible ? undefined : 0, animation: howVisible ? `blurDrop 0.45s cubic-bezier(0.16,1,0.3,1) ${(9 + i) * 0.06}s forwards` : "none" }}>{word}</span>
+              {["lost", "revenue."].map((word, i) => (
+                <span key={`l3-${i}`} style={{ display: "inline-block", marginRight: "0.22em", opacity: howVisible ? undefined : 0, animation: howVisible ? `blurDrop 0.45s cubic-bezier(0.16,1,0.3,1) ${(8 + i) * 0.06}s forwards` : "none" }}>{word}</span>
               ))}
             </h2>
             <p style={{ fontSize: 17, color: "rgba(255,255,255,0.45)", lineHeight: 1.75, margin: "0 auto", maxWidth: 680 }}>
