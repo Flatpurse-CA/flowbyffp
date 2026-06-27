@@ -293,7 +293,36 @@ export default function PricingSection() {
           );
         })}
       </div>
-<style>{`
+
+      {/* Bottom CTA */}
+      <div style={{ textAlign: "center", marginTop: 48 }}>
+        <p style={{
+          fontSize: 15,
+          color: "rgba(255,255,255,0.5)",
+          lineHeight: 1.7,
+          margin: "0 auto 28px",
+          maxWidth: 480,
+        }}>
+          Beta members are pre-qualified. The remaining 60 Founders spots open to the public on launch day.
+        </p>
+        <a href="/waitlist" style={{
+          display: "inline-flex", alignItems: "center", gap: 8,
+          background: BRAND_PURPLE,
+          color: "#fff",
+          fontSize: 15, fontWeight: 800, letterSpacing: "-0.02em",
+          padding: "15px 32px",
+          borderRadius: 12,
+          textDecoration: "none",
+          transition: "opacity 0.15s",
+        }}
+          onMouseEnter={e => (e.currentTarget.style.opacity = "0.85")}
+          onMouseLeave={e => (e.currentTarget.style.opacity = "1")}
+        >
+          Claim your beta spot now
+        </a>
+      </div>
+
+      <style>{`
         @media (max-width: 900px) {
           .pricing-section-outer { padding: 60px 20px 80px !important; }
           .pricing-grid { grid-template-columns: 1fr 1fr !important; }
