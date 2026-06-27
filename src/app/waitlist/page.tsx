@@ -540,7 +540,7 @@ export default function WaitlistPage() {
         }
 
         @media (max-width: 768px) {
-          .wl-nav { padding: 16px 20px !important; }
+          .wl-nav { display: none !important; }
 
           .wl-hero { padding: 0 20px 60px !important; min-height: auto !important; }
           .wl-hero h1 { font-size: 30px !important; letter-spacing: -0.03em !important; line-height: 1.12 !important; }
