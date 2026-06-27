@@ -619,11 +619,15 @@ export default function WaitlistPage() {
           .wl-perks-heading { font-size: 20px !important; }
           .wl-perks-grid {
             grid-template-columns: 1fr !important;
+            gap: 12px !important;
+            padding: 0 20px !important;
           }
           .perk-cell {
             padding: 28px 24px !important;
             aspect-ratio: unset !important;
             min-height: auto !important;
+            border: 1px solid rgba(255,255,255,0.1) !important;
+            border-radius: 14px !important;
           }
         }
       `}</style>
