@@ -275,12 +275,11 @@ export default function PricingSection() {
                 <ul style={{ listStyle: "none", padding: 0, margin: "0 0 18px", display: "flex", flexDirection: "column", gap: 8, flex: 1 }}>
                   {p.features.map((f) => (
                     <li key={f} style={{
-                      display: "flex", alignItems: "center", gap: 7,
                       fontSize: 11.5,
                       color: isSelected ? "rgba(224,213,255,0.82)" : "rgb(113,113,122)",
                       lineHeight: 1.3, transition: "color 0.25s",
                     }}>
-                      <CheckIcon active={isSelected} founders={p.isFounders} /> {f}
+                      {f}
                     </li>
                   ))}
                 </ul>
