@@ -54,9 +54,8 @@ export default function Footer() {
         textAlign: "center",
         overflow: "hidden",
       }}>
-        {/* Background image — swap src when ready */}
-        {/* <img src="/footer-bg.png" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", zIndex: 0 }} /> */}
-        <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at 50% 120%, rgba(255,255,255,0.10) 0%, transparent 65%)", pointerEvents: "none", zIndex: 1 }} />
+        <img src="/cta.jpg" alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center", zIndex: 0 }} />
+        <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.18)", pointerEvents: "none", zIndex: 1 }} />
 
         <div style={{ position: "relative", zIndex: 2, maxWidth: 680, margin: "0 auto" }}>
           <h2 className="footer-cta-heading" style={{
