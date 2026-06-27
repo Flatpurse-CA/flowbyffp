@@ -100,7 +100,7 @@ export default function WaitlistPage() {
   }
 
   return (
-    <div style={{ background: "#060606", color: "#fff", minHeight: "100vh" }}>
+    <div style={{ background: "#060606", color: "#fff", minHeight: "100vh", overflowX: "hidden", maxWidth: "100vw" }}>
 
       {/* ── Hero (nav lives inside so it overlays the bg image) ── */}
       <section className="wl-hero" style={{
@@ -572,6 +572,7 @@ export default function WaitlistPage() {
         }
 
         @media (max-width: 768px) {
+          body, html { overflow-x: hidden !important; max-width: 100vw !important; }
           .wl-nav { display: none !important; }
 
           .wl-hero { padding: 48px 20px 60px !important; min-height: auto !important; }
