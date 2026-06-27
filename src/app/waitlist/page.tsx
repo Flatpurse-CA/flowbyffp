@@ -132,11 +132,6 @@ export default function WaitlistPage() {
           </Link>
         </nav>
 
-        {/* Mobile-only logo */}
-        <div className="wl-mobile-logo" style={{ display: "flex", justifyContent: "center", position: "relative", zIndex: 1, marginTop: 48, marginBottom: 32 }}>
-          <Image src="/group-starter.svg" alt="FlatPurse Flow" width={130} height={37} priority />
-        </div>
-
         {/* AutoPilot pill */}
         <div style={{ position: "relative", zIndex: 1, marginBottom: 16, display: "inline-block", marginTop: 120 }}>
           <AutoPilotChip words={["AutoPilot", "·", "Early", "Access"]} />
@@ -153,7 +148,7 @@ export default function WaitlistPage() {
           maxWidth: 800,
           position: "relative", zIndex: 1,
         }}>
-          {"Reserve your beta spot.".split("").map((char, i) => (
+          {"40% off.".split("").map((char, i) => (
             <span key={i} className="blur-drop" style={{
               display: "inline-block",
               animationDelay: `${i * 0.04}s`,
@@ -176,7 +171,7 @@ export default function WaitlistPage() {
           maxWidth: 800,
           position: "relative", zIndex: 1,
         }}>
-          {"Get 40% off forever.".split("").map((char, i) => (
+          {"Get 40% off.".split("").map((char, i) => (
             <span key={i} className="blur-drop" style={{
               display: "inline-block",
               animationDelay: `${0.92 + i * 0.035}s`,
