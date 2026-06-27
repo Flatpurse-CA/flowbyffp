@@ -148,7 +148,7 @@ export default function WaitlistPage() {
           maxWidth: 800,
           position: "relative", zIndex: 1,
         }}>
-          {"40% off.".split("").map((char, i) => (
+          {"Reserve your beta spot.".split("").map((char, i) => (
             <span key={i} className="blur-drop" style={{
               display: "inline-block",
               animationDelay: `${i * 0.04}s`,
@@ -171,7 +171,7 @@ export default function WaitlistPage() {
           maxWidth: 800,
           position: "relative", zIndex: 1,
         }}>
-          {"Get 40% off.".split("").map((char, i) => (
+          {"Get 40% off forever.".split("").map((char, i) => (
             <span key={i} className="blur-drop" style={{
               display: "inline-block",
               animationDelay: `${0.92 + i * 0.035}s`,
