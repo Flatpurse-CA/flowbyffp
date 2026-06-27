@@ -40,7 +40,7 @@ export default function Footer() {
           }}>
             Free during beta. No credit card. Auto-enrolled in 40% off forever. Edmonton-built and the door&apos;s closing.
           </p>
-          <Link href="/waitlist" style={{
+          <Link href="/waitlist#waitlist-form" style={{
             display: "inline-flex", alignItems: "center", justifyContent: "center",
             padding: "16px 36px",
             background: "transparent",

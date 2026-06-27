@@ -223,7 +223,7 @@ export default function WaitlistPage() {
             </span>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="wl-form" style={{
+          <form id="waitlist-form" onSubmit={handleSubmit} className="wl-form" style={{
             position: "relative", zIndex: 1,
             width: "100%", maxWidth: 680,
             margin: "0 auto 28px",
