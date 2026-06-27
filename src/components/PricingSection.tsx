@@ -112,17 +112,16 @@ export default function PricingSection() {
           color: "#fff",
           margin: "0 0 16px",
         }}>
-          Start free.<br />
-          <span style={{ color: BRAND_PURPLE }}>Scale when you're ready.</span>
+          Beta members are <span style={{ color: BRAND_PURPLE }}>auto-enrolled.</span>
         </h2>
         <p style={{
           fontSize: 16,
           color: "rgba(255,255,255,0.45)",
           lineHeight: 1.7,
           margin: 0,
-          maxWidth: 480,
+          maxWidth: 520,
         }}>
-          No contracts, no commission, no surprises. Pick the plan that fits your shop and upgrade anytime.
+          When beta ends, every member who enters a card gets 40% off for 12 months, then 25% off forever. No code required. No fine print. Here&apos;s what that looks like:
         </p>
       </ScrollReveal>
 
