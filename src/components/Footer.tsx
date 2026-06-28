@@ -72,8 +72,13 @@ export default function Footer() {
             © 2026 FlatPurse Flow. All rights reserved.
           </p>
           <div style={{ display: "flex", gap: 24 }}>
-            {["Terms of Service", "Privacy Policy", "Cookie Policy"].map((label) => (
-              <Link key={label} href="#" style={{ fontSize: 12, color: "rgba(255,255,255,0.25)", textDecoration: "none", transition: "color 0.15s" }}
+            {[
+              { label: "Terms of Service", href: "/terms" },
+              { label: "Privacy Policy", href: "/privacy" },
+              { label: "Cookie Policy", href: "/cookie-policy" },
+              { label: "Refund Policy", href: "/refund-policy" },
+            ].map(({ label, href }) => (
+              <Link key={label} href={href} style={{ fontSize: 12, color: "rgba(255,255,255,0.25)", textDecoration: "none", transition: "color 0.15s" }}
                 onMouseEnter={e => (e.currentTarget.style.color = "rgba(255,255,255,0.6)")}
                 onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.25)")}
               >
