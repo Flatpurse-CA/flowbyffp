@@ -15,7 +15,7 @@ const BRAND_PURPLE = "#712AE2";
 
 const PERKS = [
   { icon: <CalendarDays size={22} strokeWidth={1.5} />, iconColor: "#2563eb", iconBg: "rgba(37,99,235,0.08)", title: "Free until launch",               desc: "Full Pro+ access during beta. No card on file. Cancel anytime. Use it like it's yours, because it is." },
-  { icon: <Lock size={22} strokeWidth={1.5} />,         iconColor: "#712AE2", iconBg: "rgba(113,42,226,0.08)", title: "40% off",                 desc: "Auto-enrollment in Founders 100. 40% off subscription for your first 12 months, then 25% off for as long as your account stays open." },
+  { icon: <Lock size={22} strokeWidth={1.5} />,         iconColor: "#712AE2", iconBg: "rgba(113,42,226,0.08)", title: "40% off",                 desc: "Auto-enrollment in Founders 40. 40% off subscription for your first 12 months, then 25% off for as long as your account stays open." },
   { icon: <Users size={22} strokeWidth={1.5} />,        iconColor: "#16a34a", iconBg: "rgba(22,163,74,0.08)",  title: "Free white-glove migration",      desc: "Coming from Booksy, Vagaro, Fresha, GlossGenius, or Square? We import your clients, history, and service menu. Live in 48 hours." },
   { icon: <MessageSquare size={22} strokeWidth={1.5} />, iconColor: "#f59e0b", iconBg: "rgba(245,158,11,0.08)", title: "Direct text line to founders",   desc: "Text George & Maxwell directly. Real Edmonton phone number. We answer because the product is ours and your feedback shapes it." },
 ];
@@ -23,7 +23,7 @@ const PERKS = [
 
 const FAQS = [
   { n: "01", q: "What's actually included in beta access?",                        a: "Full Pro+ access while beta runs — booking, POS, CRM, AI marketing, AI upsell, commission tracking, retail inventory, recurring memberships, and analytics. The whole stack. No feature gates. Beta runs roughly 6 weeks from the day we open the first cohort." },
-  { n: "02", q: "Do I pay anything during beta?",                                  a: "Nothing. No credit card. No surprise charges. When beta ends, we'll email you to enter a card and lock in your Founders 100 pricing. If you don't, your slot returns to the public pool — no penalty." },
+  { n: "02", q: "Do I pay anything during beta?",                                  a: "Nothing. No credit card. No surprise charges. When beta ends, we'll email you to enter a card and lock in your Founders 40 pricing. If you don't, your slot returns to the public pool — no penalty." },
   { n: "03", q: "How does the 40% off forever offer actually work?",               a: "When beta ends and you enter a card, your subscription kicks off at 40% off for 12 months. Then at month 13, it automatically becomes 25% off forever, as long as your account stays open. Cancel later and come back? You'd pay standard price. That's why staying enrolled is the deal." },
   { n: "04", q: "What if I'm currently locked into Booksy / Vagaro / Fresha?",    a: "We'll migrate everything for you — clients, appointment history, service menu, notes (where supported), and product inventory. Most shops are live on FlatPurse Flow within 48 hours. No second register. No data abandoned." },
   { n: "05", q: "Why only 40 beta spots?",                                         a: "Because we're two people and we want to talk to every beta member directly. 40 is the number where we can run real onboarding calls, get real feedback, and ship real fixes in the same week. Past 40, we lose that." },
