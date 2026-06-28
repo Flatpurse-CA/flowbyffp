@@ -52,7 +52,7 @@ export default function Home() {
           }}>
             {/* Logo */}
             <Link href="/" style={{ display: "flex", alignItems: "center", textDecoration: "none", flexShrink: 0 }}>
-              <Image src="/logo-white.svg" alt="FLOWBYFFP" width={110} height={37} priority />
+              <Image src="/group-starter.svg" alt="FlatPurse Flow" width={130} height={37} priority />
             </Link>
 
             {/* Center nav links */}
