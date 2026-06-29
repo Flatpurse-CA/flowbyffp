@@ -5,33 +5,23 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import {
-  LayoutDashboard, CalendarDays, Users, Zap, Calendar,
-  Megaphone, ShoppingBag, BarChart2, Users2, Settings,
-  LogOut, Search, Bell, ChevronLeft, ChevronRight,
-  Sun, Moon, MessageSquare, User as UserIcon,
+  LayoutDashboard, CalendarDays, Users, Zap,
+  LayoutGrid, Users2, Settings,
+  LogOut, Bell, ChevronLeft, ChevronRight,
+  Sun, Moon, User as UserIcon, Search, MessageSquare,
 } from "lucide-react";
 import { logout } from "./actions";
 
 const PURPLE    = "rgb(139,92,246)";
 const PURPLE_BG = "rgba(109,40,217,0.18)";
 
-const NAV_MAIN = [
-  { icon: LayoutDashboard, href: "/dashboard",              label: "Dashboard",  badge: 0  },
-  { icon: CalendarDays,    href: "/dashboard/appointments", label: "Bookings",   badge: 23 },
-  { icon: Users,           href: "/dashboard/clients",      label: "Clients",    badge: 0  },
-  { icon: Zap,             href: "/dashboard/autopilot",    label: "AutoPilot",  badge: 3  },
-  { icon: Calendar,        href: "/dashboard/calendar",     label: "Calendar",   badge: 0  },
-  { icon: Megaphone,       href: "/dashboard/marketing",    label: "Marketing",  badge: 0  },
-  { icon: ShoppingBag,     href: "/dashboard/pos",          label: "POS",        badge: 0  },
-];
-
-const NAV_ANALYTICS = [
-  { icon: BarChart2, href: "/dashboard/reports", label: "Reports", badge: 0 },
-  { icon: Users2,    href: "/dashboard/staff",   label: "Staff",   badge: 0 },
-];
-
-const NAV_MANAGE = [
-  { icon: Settings, href: "/dashboard/settings", label: "Settings", badge: 0 },
+const NAV_TABS = [
+  { icon: LayoutDashboard, href: "/dashboard",              label: "Home",       badge: 0 },
+  { icon: CalendarDays,    href: "/dashboard/appointments", label: "Bookings",   badge: 4 },
+  { icon: Users,           href: "/dashboard/clients",      label: "Clients",    badge: 0 },
+  { icon: Users2,          href: "/dashboard/team",         label: "Team",       badge: 0 },
+  { icon: Zap,             href: "/dashboard/autopilot",    label: "AutoPilot",  badge: 3 },
+  { icon: LayoutGrid,      href: "/dashboard/operations",   label: "Operations", badge: 0 },
 ];
 
 function isActive(href: string, pathname: string) {
@@ -88,17 +78,10 @@ const LIGHT = {
   dropHover:         "rgba(0,0,0,0.05)",
 };
 
-function NavGroup({
-  items, open, pathname, T,
-}: {
-  items: typeof NAV_MAIN;
-  open: boolean;
-  pathname: string;
-  T: typeof DARK;
-}) {
+function SidebarNav({ open, pathname, T }: { open: boolean; pathname: string; T: typeof DARK }) {
   return (
     <nav style={{ display: "flex", flexDirection: "column", gap: 1, padding: "0 8px", flexShrink: 0 }}>
-      {items.map(({ icon: Icon, href, label, badge }) => {
+      {NAV_TABS.map(({ icon: Icon, href, label, badge }) => {
         const active = isActive(href, pathname);
         return (
           <Link
@@ -309,31 +292,36 @@ export function DashboardShell({ children, user }: { children: React.ReactNode; 
         {/* Divider */}
         <div style={{ height: 1, background: T.border, flexShrink: 0 }} />
 
-        {/* Scrollable nav */}
-        <div style={{ flex: 1, overflowY: "auto", paddingBottom: 8 }}>
-          {sectionLabel("Main")}
-          <NavGroup items={NAV_MAIN} open={open} pathname={pathname} T={T} />
-
-          {sectionLabel("Analytics")}
-          <NavGroup items={NAV_ANALYTICS} open={open} pathname={pathname} T={T} />
-
-          {sectionLabel("Manage")}
-          <NavGroup items={NAV_MANAGE} open={open} pathname={pathname} T={T} />
+        {/* Nav */}
+        <div style={{ flex: 1, overflowY: "auto", paddingBottom: 8, paddingTop: 8 }}>
+          <SidebarNav open={open} pathname={pathname} T={T} />
         </div>
 
-        {/* Sign out */}
+        {/* Bottom: Settings + Sign out */}
         <div style={{ padding: "0 8px 20px", flexShrink: 0 }}>
           <div style={{ height: 1, background: T.border, margin: "0 4px 8px" }} />
+          <Link
+            href="/dashboard/settings"
+            title={!open ? "Settings" : undefined}
+            style={{
+              display: "flex", alignItems: "center", gap: 12,
+              padding: open ? "9px 12px" : "11px", borderRadius: 10,
+              background: isActive("/dashboard/settings", pathname) ? T.activePill : "transparent",
+              color: isActive("/dashboard/settings", pathname) ? T.activeText : T.inactiveText,
+              fontSize: 13.5, fontWeight: 400, textDecoration: "none",
+              justifyContent: open ? "flex-start" : "center", marginBottom: 2,
+            }}
+          >
+            <Settings size={16} strokeWidth={1.7} style={{ flexShrink: 0 }} />
+            {open && <span>Settings</span>}
+          </Link>
           <form action={logout} style={{ width: "100%" }}>
             <button type="submit" style={{
-              display: "flex", alignItems: "center",
-              gap: 12,
-              padding: open ? "10px 12px" : "11px",
-              borderRadius: 10,
+              display: "flex", alignItems: "center", gap: 12,
+              padding: open ? "10px 12px" : "11px", borderRadius: 10,
               background: "transparent", border: "none",
               color: T.textDim, fontSize: 13.5, fontWeight: 400,
-              cursor: "pointer", fontFamily: "inherit",
-              width: "100%",
+              cursor: "pointer", fontFamily: "inherit", width: "100%",
               justifyContent: open ? "flex-start" : "center",
             }}>
               <LogOut size={16} strokeWidth={1.7} style={{ flexShrink: 0 }} />
@@ -493,10 +481,53 @@ export function DashboardShell({ children, user }: { children: React.ReactNode; 
         </header>
 
         {/* Scrollable content */}
-        <main style={{ flex: 1, overflowY: "auto", padding: "28px 32px", background: T.bg }}>
+        <main style={{ flex: 1, overflowY: "auto", padding: "28px 32px", background: T.bg, paddingBottom: 90 }}>
           {children}
         </main>
       </div>
+
+      {/* ══════════════════════════════════════
+          MOBILE BOTTOM NAV
+          ══════════════════════════════════════ */}
+      <nav style={{
+        display: "none",
+        position: "fixed", bottom: 0, left: 0, right: 0,
+        height: 72,
+        background: dark ? "rgb(12,12,16)" : "rgb(255,255,255)",
+        borderTop: `1px solid ${T.border}`,
+        zIndex: 100,
+        alignItems: "flex-start",
+        justifyContent: "space-around",
+        paddingTop: 10,
+      }}
+        className="mobile-bottom-nav"
+      >
+        {NAV_TABS.map(({ icon: Icon, href, label, badge }) => {
+          const active = isActive(href, pathname);
+          return (
+            <Link key={href} href={href} style={{
+              display: "flex", flexDirection: "column", alignItems: "center", gap: 4,
+              textDecoration: "none", position: "relative", padding: "0 8px",
+              color: active ? PURPLE : T.textMuted,
+            }}>
+              <div style={{ position: "relative" }}>
+                <Icon size={22} strokeWidth={active ? 2.2 : 1.6} />
+                {badge > 0 && (
+                  <span style={{
+                    position: "absolute", top: -4, right: -6,
+                    minWidth: 14, height: 14, borderRadius: 7,
+                    background: PURPLE, color: "white",
+                    fontSize: 8, fontWeight: 800,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    padding: "0 3px",
+                  }}>{badge}</span>
+                )}
+              </div>
+              <span style={{ fontSize: 10, fontWeight: active ? 700 : 500 }}>{label}</span>
+            </Link>
+          );
+        })}
+      </nav>
     </div>
   );
 }
