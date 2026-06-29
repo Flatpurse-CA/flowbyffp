@@ -379,7 +379,9 @@ export function DashboardShell({ children, user }: { children: React.ReactNode; 
               <span style={hdBadge}>2</span>
             </div>
             <div style={{ position: "relative" }}>
-              <button style={headerIconBtn}><Bell size={16} strokeWidth={1.6} /></button>
+              <Link href="/dashboard/notifications" style={{ ...headerIconBtn, display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
+                <Bell size={16} strokeWidth={1.6} color={T.iconColor} />
+              </Link>
               <span style={hdBadge}>5</span>
             </div>
 
