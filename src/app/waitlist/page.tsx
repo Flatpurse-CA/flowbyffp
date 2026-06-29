@@ -132,8 +132,13 @@ export default function WaitlistPage() {
           </Link>
         </nav>
 
+        {/* Mobile-only logo — hidden on desktop, shown by .wl-mobile-logo media query */}
+        <div className="wl-mobile-logo" style={{ display: "none", position: "relative", zIndex: 1, marginBottom: 32, marginTop: 24 }}>
+          <Image src="/group-starter.svg" alt="FlatPurse Flow" width={130} height={37} priority />
+        </div>
+
         {/* AutoPilot pill */}
-        <div style={{ position: "relative", zIndex: 1, marginBottom: 16, display: "inline-block", marginTop: 120 }}>
+        <div className="wl-pill" style={{ position: "relative", zIndex: 1, marginBottom: 16, display: "inline-block", marginTop: 120 }}>
           <AutoPilotChip words={["AutoPilot", "·", "Early", "Access"]} />
         </div>
 
@@ -539,7 +544,7 @@ export default function WaitlistPage() {
           body, html { overflow-x: hidden !important; max-width: 100vw !important; }
           .wl-nav { display: none !important; }
           .wl-mobile-logo { display: flex !important; justify-content: center; }
-          .wl-mobile-logo + div { margin-top: 0 !important; }
+          .wl-mobile-logo + .wl-pill { margin-top: 0 !important; }
 
           .wl-hero { padding: 48px 20px 60px !important; min-height: auto !important; }
           .wl-hero h1 { font-size: 30px !important; letter-spacing: -0.03em !important; line-height: 1.12 !important; }
