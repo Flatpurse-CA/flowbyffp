@@ -280,7 +280,7 @@ function ServicesStep({
             width: 90,
           }}
         >
-          <span style={{ padding: "13px 4px 13px 12px", fontSize: 14, color: "rgba(255,255,255,0.35)" }}>$</span>
+          <span style={{ padding: "13px 4px 13px 12px", fontSize: 14, color: "rgba(255,255,255,0.35)" }}>C$</span>
           <input
             type="number"
             value={price}
@@ -354,7 +354,7 @@ function ServicesStep({
                   flexShrink: 0,
                 }}
               >
-                <span style={{ padding: "5px 3px 5px 8px", fontSize: 13, color: "rgba(255,255,255,0.4)" }}>$</span>
+                <span style={{ padding: "5px 3px 5px 8px", fontSize: 13, color: "rgba(255,255,255,0.4)" }}>C$</span>
                 <input
                   type="number"
                   value={svc.price}
@@ -381,7 +381,7 @@ function ServicesStep({
             }}
           >
             <p style={{ color: "rgb(52,211,153)", fontSize: 12.5, fontWeight: 700, margin: 0 }}>
-              {services.length} service{services.length > 1 ? "s" : ""} added · avg ${avg} per booking
+              {services.length} service{services.length > 1 ? "s" : ""} added · avg C${avg} per booking
             </p>
           </div>
         </div>
