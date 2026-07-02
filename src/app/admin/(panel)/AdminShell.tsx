@@ -5,11 +5,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Users, ClipboardList, Store, CreditCard,
-  LogOut, Search, Bell, ChevronLeft, ChevronRight,
+  LogOut, ChevronLeft, ChevronRight,
   Sun, Moon, MessageSquare, User as UserIcon, Settings, Mail,
 } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
-import { logout } from "@/app/dashboard/actions";
+import { adminLogout } from "@/app/admin/actions";
+import { NotificationsBell } from "./NotificationsBell";
+import { AdminSearch } from "./AdminSearch";
 
 const PURPLE = "rgb(139,92,246)";
 const PURPLE_BG = "rgba(109,40,217,0.18)";
@@ -279,7 +281,7 @@ export function AdminShell({ children, user }: { children: React.ReactNode; user
         {/* Sign out */}
         <div style={{ padding: "0 8px 20px", flexShrink: 0 }}>
           <div style={{ height: 1, background: T.divider, margin: "0 4px 8px" }} />
-          <form action={logout} style={{ width: "100%" }}>
+          <form action={adminLogout} style={{ width: "100%" }}>
             <button type="submit" style={{
               display: "flex", alignItems: "center",
               gap: 12,
@@ -323,20 +325,14 @@ export function AdminShell({ children, user }: { children: React.ReactNode; user
           </div>
 
           {/* Search */}
-          <div style={{ flex: 1, maxWidth: 300, margin: "0 32px" }}>
-            <div style={{
-              display: "flex", alignItems: "center", gap: 9,
-              background: T.searchBg,
-              border: `1px solid ${T.searchBorder}`,
-              borderRadius: 10, padding: "9px 14px",
-            }}>
-              <Search size={13} color={T.searchPlaceholder} />
-              <span style={{ color: T.searchPlaceholder, fontSize: 13, flex: 1 }}>Search anything...</span>
-              <span style={{
-                color: T.searchKbd, fontSize: 11, fontWeight: 600,
-                background: T.searchKbdBg, padding: "2px 6px", borderRadius: 5,
-              }}>⌘K</span>
-            </div>
+          <div style={{ margin: "0 32px", flex: 1, maxWidth: 300 }}>
+            <AdminSearch
+              T={{
+                searchBg: T.searchBg, searchBorder: T.searchBorder, searchPlaceholder: T.searchPlaceholder,
+                searchKbd: T.searchKbd, searchKbdBg: T.searchKbdBg,
+                dropBg: T.dropBg, dropBorder: T.dropBorder, dropItem: T.dropItem, textMuted: T.textMuted, dropHover: T.dropHover,
+              }}
+            />
           </div>
 
           {/* Action icons */}
@@ -345,10 +341,11 @@ export function AdminShell({ children, user }: { children: React.ReactNode; user
               <button style={headerIconBtn}><MessageSquare size={16} strokeWidth={1.6} /></button>
               <span style={hdBadge}>3</span>
             </div>
-            <div style={{ position: "relative" }}>
-              <button style={headerIconBtn}><Bell size={16} strokeWidth={1.6} /></button>
-              <span style={hdBadge}>3</span>
-            </div>
+            <NotificationsBell
+              headerIconBtn={headerIconBtn}
+              badgeStyle={hdBadge}
+              T={{ dropBg: T.dropBg, dropBorder: T.dropBorder, text: T.text, textMuted: T.textMuted, dropItem: T.dropItem, dropHover: T.dropHover }}
+            />
 
             {/* Theme + Avatar grouped */}
             <div style={{
@@ -451,7 +448,7 @@ export function AdminShell({ children, user }: { children: React.ReactNode; user
 
                     <div style={{ height: 1, background: T.dropBorder, margin: "2px 0" }} />
 
-                    <form action={logout}>
+                    <form action={adminLogout}>
                       <button
                         type="submit"
                         style={{

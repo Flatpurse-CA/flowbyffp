@@ -7,6 +7,6 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const supabase = await createClient();
   const { data, error } = await supabase.auth.getUser();
   if (error || !data.user) redirect("/admin/login");
-  if (!isAdmin(data.user.email)) redirect("/admin/login?error=Access+denied");
+  if (!(await isAdmin(data.user.email))) redirect("/admin/login?error=Access+denied");
   return <AdminShell user={data.user}>{children}</AdminShell>;
 }

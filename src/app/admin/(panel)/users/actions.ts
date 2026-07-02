@@ -9,7 +9,7 @@ import { redirect } from "next/navigation";
 async function requireAdmin() {
   const supabase = await createClient();
   const { data } = await supabase.auth.getUser();
-  if (!isAdmin(data.user?.email)) redirect("/dashboard");
+  if (!(await isAdmin(data.user?.email))) redirect("/admin/login");
 }
 
 export async function banUser(formData: FormData) {

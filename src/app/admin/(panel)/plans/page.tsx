@@ -1,11 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-
-const PLANS = [
-  { key: "founders",  label: "Founders",  price: "C$29/mo",  color: "rgb(251,191,36)",  bg: "rgba(245,158,11,0.1)",  border: "rgba(245,158,11,0.2)"  },
-  { key: "unlimited", label: "Unlimited", price: "C$274/mo", color: "rgb(167,139,250)", bg: "rgba(109,40,217,0.1)", border: "rgba(139,92,246,0.2)"  },
-  { key: "pro",       label: "Pro",       price: "C$49/mo",  color: "rgb(96,165,250)",  bg: "rgba(59,130,246,0.1)", border: "rgba(59,130,246,0.2)"  },
-  { key: "starter",   label: "Starter",   price: "Free",     color: "rgba(255,255,255,0.45)", bg: "rgba(255,255,255,0.06)", border: "rgba(255,255,255,0.1)" },
-];
+import { PLANS } from "@/lib/plans";
 
 export default async function AdminPlansPage() {
   const admin = createAdminClient();
@@ -36,7 +30,7 @@ export default async function AdminPlansPage() {
 
       {/* Plan cards */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, marginBottom: 28 }}>
-        {PLANS.map(({ key, label, price, color, bg, border }) => {
+        {PLANS.map(({ key, label, priceLabel, color, bg, border }) => {
           const count = planCounts[key] ?? 0;
           const pct   = totalShops ? Math.round((count / totalShops) * 100) : 0;
           return (
@@ -47,7 +41,7 @@ export default async function AdminPlansPage() {
             }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                 <span style={{ fontSize: 11, fontWeight: 700, color, letterSpacing: "0.06em", textTransform: "uppercase" }}>{label}</span>
-                <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)" }}>{price}</span>
+                <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)" }}>{priceLabel}</span>
               </div>
               <p style={{ color: "rgb(250,250,250)", fontSize: 30, fontWeight: 800, margin: 0, letterSpacing: "-0.04em", lineHeight: 1 }}>{count}</p>
               <div>

@@ -1,6 +1,8 @@
 "use server";
 
 import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
+import { isAdmin } from "@/lib/admin-guard";
 import { sendSequenceEmail } from "@/lib/email-sequence";
 import { sendEmail } from "@/lib/resend";
 import { revalidatePath } from "next/cache";
@@ -8,7 +10,14 @@ import { redirect } from "next/navigation";
 
 const EMAILS_PATH = "/admin/emails";
 
+async function requireAdmin() {
+  const supabase = await createClient();
+  const { data } = await supabase.auth.getUser();
+  if (!(await isAdmin(data.user?.email))) redirect("/admin/login");
+}
+
 export async function createSequenceEmail(formData: FormData) {
+  await requireAdmin();
   const admin = createAdminClient();
 
   const { data: last } = await admin
@@ -33,6 +42,7 @@ export async function createSequenceEmail(formData: FormData) {
 }
 
 export async function updateSequenceEmail(id: string, formData: FormData) {
+  await requireAdmin();
   const admin = createAdminClient();
 
   await admin.from("email_sequences").update({
@@ -49,6 +59,7 @@ export async function updateSequenceEmail(id: string, formData: FormData) {
 }
 
 export async function toggleSequenceEmail(id: string, isActive: boolean) {
+  await requireAdmin();
   const admin = createAdminClient();
   await admin.from("email_sequences").update({
     is_active: isActive,
@@ -58,12 +69,14 @@ export async function toggleSequenceEmail(id: string, isActive: boolean) {
 }
 
 export async function deleteSequenceEmail(id: string) {
+  await requireAdmin();
   const admin = createAdminClient();
   await admin.from("email_sequences").delete().eq("id", id);
   revalidatePath(EMAILS_PATH);
 }
 
 export async function triggerSendNow(sendId: string) {
+  await requireAdmin();
   const { error } = await sendSequenceEmail(sendId);
   revalidatePath("/admin/emails/subscribers");
   return { error };
@@ -80,6 +93,7 @@ export async function sendBlast({
   audience: "all" | "pending";
   sequenceId?: string;
 }) {
+  await requireAdmin();
   const admin = createAdminClient();
 
   let query = admin.from("waitlist").select("id, email, name").eq("status", "pending");

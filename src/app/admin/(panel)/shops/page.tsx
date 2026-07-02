@@ -1,19 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { MapPin } from "lucide-react";
-
-const PLAN_COLORS: Record<string, string> = {
-  starter:   "rgba(255,255,255,0.35)",
-  pro:       "rgb(96,165,250)",
-  unlimited: "rgb(167,139,250)",
-  founders:  "rgb(251,191,36)",
-};
-
-const PLAN_BG: Record<string, string> = {
-  starter:   "rgba(255,255,255,0.06)",
-  pro:       "rgba(59,130,246,0.1)",
-  unlimited: "rgba(109,40,217,0.1)",
-  founders:  "rgba(245,158,11,0.1)",
-};
+import { PLAN_COLORS, PLAN_BG } from "@/lib/plans";
 
 export default async function AdminShopsPage() {
   const admin = createAdminClient();

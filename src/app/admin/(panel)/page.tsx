@@ -1,13 +1,7 @@
 import Link from "next/link";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { Users, Store, ClipboardList, CreditCard, TrendingUp } from "lucide-react";
-
-const PLAN_COLOR: Record<string, string> = {
-  founders:  "rgb(251,191,36)",
-  unlimited: "rgb(167,139,250)",
-  pro:       "rgb(96,165,250)",
-  starter:   "rgba(255,255,255,0.35)",
-};
+import { PLAN_COLORS as PLAN_COLOR, planPrice, formatCAD } from "@/lib/plans";
 
 function StatCard({
   label, value, Icon, iconColor, iconBg, subtitle,
@@ -88,6 +82,9 @@ export default async function AdminOverviewPage() {
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
     .slice(0, 6);
 
+  const estimatedMRR = shops.reduce((sum, s) => sum + planPrice(s.plan), 0);
+  const payingShops  = shops.filter(s => planPrice(s.plan) > 0).length;
+
   const card: React.CSSProperties = {
     background: "rgb(10,10,12)",
     border: "1px solid rgba(255,255,255,0.09)",
@@ -125,12 +122,12 @@ export default async function AdminOverviewPage() {
           subtitle={newWait > 0 ? `+${newWait} this week` : "No new signups yet"}
         />
         <StatCard
-          label="Revenue"
-          value="₦0"
+          label="Estimated MRR"
+          value={formatCAD(estimatedMRR)}
           Icon={CreditCard}
           iconColor="rgb(96,165,250)"
           iconBg="rgba(59,130,246,0.12)"
-          subtitle="Billing not active yet"
+          subtitle={payingShops > 0 ? `From ${payingShops} paying shop${payingShops !== 1 ? "s" : ""} · billing not connected` : "Billing not connected yet"}
         />
       </div>
 

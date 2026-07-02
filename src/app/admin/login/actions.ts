@@ -16,7 +16,7 @@ export async function adminLogin(formData: FormData) {
   }
 
   const { data } = await supabase.auth.getUser();
-  if (!isAdmin(data.user?.email)) {
+  if (!(await isAdmin(data.user?.email))) {
     await supabase.auth.signOut();
     redirect("/admin/login?error=Access+denied");
   }
