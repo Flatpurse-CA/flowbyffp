@@ -151,7 +151,7 @@ function BookingLinkStep({
             <span style={{ padding: "13px 4px 13px 14px", fontSize: 13.5, color: "rgba(255,255,255,0.28)" }}>flow.app/</span>
             <input
               value={handle}
-              onChange={(e) => onHandleChange(e.target.value.toLowerCase().replace(/[^a-z0-9]/g, ""))}
+              onChange={(e) => onHandleChange(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))}
               placeholder="yourhandle"
               style={{ flex: 1, padding: "13px 14px 13px 2px", background: "none", border: "none", outline: "none", color: "white", fontSize: 15, fontWeight: 700 }}
             />
