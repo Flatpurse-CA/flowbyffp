@@ -777,6 +777,11 @@ export function OnboardingFlow({ displayName }: { displayName: string }) {
         }}
       />
 
+      {/* Logo — pinned to the top-left of the page */}
+      <div style={{ position: "absolute", top: 32, left: 32, zIndex: 2 }}>
+        <Image src="/group-starter.svg" alt="FlatPurse Flow" width={130} height={37} style={{ objectFit: "contain" }} priority />
+      </div>
+
       {/* Content */}
       <div
         style={{
@@ -787,10 +792,6 @@ export function OnboardingFlow({ displayName }: { displayName: string }) {
           animation: `fp-fade-up 0.5s ${easing} both`,
         }}
       >
-        {/* Logo */}
-        <div style={{ marginBottom: 32 }}>
-          <Image src="/group-starter.svg" alt="FlatPurse Flow" width={130} height={37} style={{ objectFit: "contain" }} priority />
-        </div>
 
         {/* Step indicator */}
         {step <= 4 && (
