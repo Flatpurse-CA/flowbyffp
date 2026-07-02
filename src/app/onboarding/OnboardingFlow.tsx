@@ -99,7 +99,7 @@ function BookingLinkStep({
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
       <div>
         <h2 style={{ color: "white", fontSize: 28, fontWeight: 800, margin: "0 0 8px", letterSpacing: "-0.03em", lineHeight: 1.1 }}>
-          Your booking link
+          Create your booking link
         </h2>
         <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 15, margin: 0, lineHeight: 1.6 }}>
           Clients tap this to book with you instantly.
