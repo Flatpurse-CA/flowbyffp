@@ -770,7 +770,7 @@ export function OnboardingFlow({ displayName }: { displayName: string }) {
       >
         {/* Logo */}
         <div style={{ marginBottom: 32 }}>
-          <Image src="/main logo.png" alt="Flow" width={40} height={40} style={{ objectFit: "contain" }} />
+          <Image src="/group-starter.svg" alt="FlatPurse Flow" width={130} height={37} style={{ objectFit: "contain" }} priority />
         </div>
 
         {/* Step indicator */}
