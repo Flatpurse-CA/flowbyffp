@@ -4,7 +4,8 @@ import { useState } from "react";
 import {
   Plus, Search, Copy, Check, MessageSquare,
   Mail, ExternalLink, Zap, Clock, ChevronRight,
-  X, Link2,
+  X, Link2, Phone, CreditCard, Banknote, Smartphone,
+  Send, Pencil, Ban, CheckCircle2, StickyNote,
 } from "lucide-react";
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
@@ -16,14 +17,15 @@ type Booking = {
   name: string; initials: string; color: string;
   service: string; stylist: string; price: string;
   status: "confirmed" | "pending" | "deposit";
+  phone: string; email: string; notes: string; depositAmount?: string;
 };
 
 const DAY_BOOKINGS: Booking[] = [
-  { id:1,  hour:9,  min:0,  duration:90, name:"Amara Obi",     initials:"AO", color:"rgb(52,211,153)",  service:"Full Highlights + Trim", stylist:"Emma",   price:"C$140", status:"confirmed" },
-  { id:2,  hour:11, min:0,  duration:60, name:"Lola Adeyemi",  initials:"LA", color:"rgb(167,139,250)", service:"Knotless Braids",         stylist:"Grace",  price:"C$180", status:"confirmed" },
-  { id:3,  hour:13, min:0,  duration:60, name:"Temi Bello",    initials:"TB", color:"rgb(251,191,36)",  service:"Silk Press",               stylist:"Emma",   price:"C$85",  status:"pending"   },
-  { id:4,  hour:15, min:0,  duration:90, name:"Zara Johnson",  initials:"ZJ", color:"rgb(96,165,250)",  service:"Colour + Gloss",           stylist:"Grace",  price:"C$160", status:"deposit"   },
-  { id:5,  hour:17, min:0,  duration:60, name:"Chisom Eze",    initials:"CE", color:"rgb(248,113,113)", service:"Trim + Blowout",           stylist:"Emma",   price:"C$65",  status:"confirmed" },
+  { id:1,  hour:9,  min:0,  duration:90, name:"Amara Obi",     initials:"AO", color:"rgb(52,211,153)",  service:"Full Highlights + Trim", stylist:"Emma",   price:"C$140", status:"confirmed", phone:"+1 647 201 3344", email:"amara@gmail.com",   notes:"Prefers no heat on ends. Allergic to sulfates — use the sulfate-free line." },
+  { id:2,  hour:11, min:0,  duration:60, name:"Lola Adeyemi",  initials:"LA", color:"rgb(167,139,250)", service:"Knotless Braids",         stylist:"Grace",  price:"C$180", status:"confirmed", phone:"+1 416 882 7701", email:"lola@icloud.com",   notes:"Likes braids medium length, box parting." },
+  { id:3,  hour:13, min:0,  duration:60, name:"Temi Bello",    initials:"TB", color:"rgb(251,191,36)",  service:"Silk Press",               stylist:"Emma",   price:"C$85",  status:"pending",   phone:"+1 905 334 2299", email:"temi@gmail.com",    notes:"First-time client — walked in from Instagram." },
+  { id:4,  hour:15, min:0,  duration:90, name:"Zara Johnson",  initials:"ZJ", color:"rgb(96,165,250)",  service:"Colour + Gloss",           stylist:"Grace",  price:"C$160", status:"deposit",   phone:"+1 647 553 8812", email:"zara@yahoo.com",    notes:"C$40 deposit paid at booking — balance due at close-out.", depositAmount:"C$40" },
+  { id:5,  hour:17, min:0,  duration:60, name:"Chisom Eze",    initials:"CE", color:"rgb(248,113,113)", service:"Trim + Blowout",           stylist:"Emma",   price:"C$65",  status:"confirmed", phone:"+1 416 772 0091", email:"chisom@gmail.com",  notes:"" },
 ];
 
 // Open slots (hour, revenue lost)
@@ -44,16 +46,16 @@ const WEEK_DAYS = [
 ];
 
 const LIST_BOOKINGS = [
-  { id:1,  date:"Today",          time:"9:00 AM",  name:"Amara Obi",    service:"Full Highlights",  stylist:"Emma",  price:"C$140", status:"confirmed" },
-  { id:2,  date:"Today",          time:"11:00 AM", name:"Lola Adeyemi", service:"Knotless Braids",  stylist:"Grace", price:"C$180", status:"confirmed" },
-  { id:3,  date:"Today",          time:"1:00 PM",  name:"Temi Bello",   service:"Silk Press",       stylist:"Emma",  price:"C$85",  status:"pending"   },
-  { id:4,  date:"Today",          time:"3:00 PM",  name:"Zara Johnson", service:"Colour + Gloss",   stylist:"Grace", price:"C$160", status:"deposit"   },
-  { id:5,  date:"Today",          time:"5:00 PM",  name:"Chisom Eze",   service:"Trim + Blowout",   stylist:"Emma",  price:"C$65",  status:"confirmed" },
-  { id:6,  date:"Tomorrow",       time:"10:00 AM", name:"Bisola Akin",  service:"Deep Condition",   stylist:"Grace", price:"C$90",  status:"confirmed" },
-  { id:7,  date:"Tomorrow",       time:"12:00 PM", name:"Ngozi Chukwu", service:"Full Colour",      stylist:"Emma",  price:"C$220", status:"confirmed" },
-  { id:8,  date:"Wed, Jun 25",    time:"9:00 AM",  name:"Funmi Alabi",  service:"Loc Retwist",      stylist:"Grace", price:"C$110", status:"pending"   },
-  { id:9,  date:"Wed, Jun 25",    time:"2:00 PM",  name:"Adaeze Nwosu", service:"Balayage",         stylist:"Emma",  price:"C$280", status:"confirmed" },
-  { id:10, date:"Fri, Jun 27",    time:"10:30 AM", name:"Sola Dada",    service:"Knotless Braids",  stylist:"Emma",  price:"C$180", status:"confirmed" },
+  { id:1,  date:"Today",          time:"9:00 AM",  name:"Amara Obi",    service:"Full Highlights",  stylist:"Emma",  price:"C$140", status:"confirmed", duration:90, phone:"+1 647 201 3344", email:"amara@gmail.com",   notes:"Prefers no heat on ends. Allergic to sulfates." },
+  { id:2,  date:"Today",          time:"11:00 AM", name:"Lola Adeyemi", service:"Knotless Braids",  stylist:"Grace", price:"C$180", status:"confirmed", duration:60, phone:"+1 416 882 7701", email:"lola@icloud.com",   notes:"Likes braids medium length, box parting." },
+  { id:3,  date:"Today",          time:"1:00 PM",  name:"Temi Bello",   service:"Silk Press",       stylist:"Emma",  price:"C$85",  status:"pending",   duration:60, phone:"+1 905 334 2299", email:"temi@gmail.com",    notes:"First-time client — walked in from Instagram." },
+  { id:4,  date:"Today",          time:"3:00 PM",  name:"Zara Johnson", service:"Colour + Gloss",   stylist:"Grace", price:"C$160", status:"deposit",   duration:90, phone:"+1 647 553 8812", email:"zara@yahoo.com",    notes:"C$40 deposit paid at booking — balance due at close-out.", depositAmount:"C$40" },
+  { id:5,  date:"Today",          time:"5:00 PM",  name:"Chisom Eze",   service:"Trim + Blowout",   stylist:"Emma",  price:"C$65",  status:"confirmed", duration:60, phone:"+1 416 772 0091", email:"chisom@gmail.com",  notes:"" },
+  { id:6,  date:"Tomorrow",       time:"10:00 AM", name:"Bisola Akin",  service:"Deep Condition",   stylist:"Grace", price:"C$90",  status:"confirmed", duration:60, phone:"+1 416 334 5567", email:"bisola@icloud.com", notes:"" },
+  { id:7,  date:"Tomorrow",       time:"12:00 PM", name:"Ngozi Chukwu", service:"Full Colour",      stylist:"Emma",  price:"C$220", status:"confirmed", duration:120,phone:"+1 647 881 2230", email:"ngozi@gmail.com",   notes:"Wants a deeper auburn tone than last time." },
+  { id:8,  date:"Wed, Jun 25",    time:"9:00 AM",  name:"Funmi Alabi",  service:"Loc Retwist",      stylist:"Grace", price:"C$110", status:"pending",   duration:90, phone:"+1 416 229 4410", email:"funmi@hotmail.com", notes:"" },
+  { id:9,  date:"Wed, Jun 25",    time:"2:00 PM",  name:"Adaeze Nwosu", service:"Balayage",         stylist:"Emma",  price:"C$280", status:"confirmed", duration:150,phone:"+1 647 990 3317", email:"adaeze@gmail.com",  notes:"Bring reference photo she texted last week." },
+  { id:10, date:"Fri, Jun 27",    time:"10:30 AM", name:"Sola Dada",    service:"Knotless Braids",  stylist:"Emma",  price:"C$180", status:"confirmed", duration:60, phone:"+1 416 773 2290", email:"sola@gmail.com",    notes:"" },
 ];
 
 const OPEN_SLOT_LIST = [
@@ -74,6 +76,8 @@ const STATUS_STYLE: Record<string, { label: string; color: string; bg: string; b
   confirmed: { label: "Confirmed", color: "rgb(52,211,153)",  bg: "rgba(16,185,129,0.1)", border: "rgba(16,185,129,0.2)"  },
   pending:   { label: "Pending",   color: "rgb(251,191,36)",  bg: "rgba(245,158,11,0.1)", border: "rgba(245,158,11,0.2)"  },
   deposit:   { label: "⚠ Deposit", color: "rgb(248,113,113)", bg: "rgba(239,68,68,0.1)",  border: "rgba(239,68,68,0.2)"   },
+  completed: { label: "Completed", color: "rgb(96,165,250)",  bg: "rgba(59,130,246,0.1)", border: "rgba(59,130,246,0.2)"  },
+  cancelled: { label: "Cancelled", color: "rgba(255,255,255,0.4)", bg: "rgba(255,255,255,0.06)", border: "rgba(255,255,255,0.1)" },
 };
 
 const card: React.CSSProperties = {
@@ -82,6 +86,37 @@ const card: React.CSSProperties = {
   borderRadius: 16,
   overflow: "hidden",
 };
+
+// ─── Appointment detail — unified record shared by Day + List views ───────────
+
+type ApptStatus = "confirmed" | "pending" | "deposit" | "completed" | "cancelled";
+
+type ApptRecord = {
+  id: number; name: string; initials: string; color: string;
+  service: string; stylist: string; price: string; duration: number;
+  dateLabel: string; time: string; status: ApptStatus;
+  phone: string; email: string; notes: string; depositAmount?: string;
+};
+
+function dayBookingToAppt(b: Booking): ApptRecord {
+  return {
+    id: b.id, name: b.name, initials: b.initials, color: b.color,
+    service: b.service, stylist: b.stylist, price: b.price, duration: b.duration,
+    dateLabel: "Today", time: fmt12(b.hour), status: b.status,
+    phone: b.phone, email: b.email, notes: b.notes, depositAmount: b.depositAmount,
+  };
+}
+
+function listBookingToAppt(b: typeof LIST_BOOKINGS[number]): ApptRecord {
+  return {
+    id: b.id, name: b.name,
+    initials: b.name.split(" ").map(n => n[0]).join(""),
+    color: `hsl(${b.id * 53 + 200}deg 35% 25%)`,
+    service: b.service, stylist: b.stylist, price: b.price, duration: b.duration,
+    dateLabel: b.date, time: b.time, status: b.status as ApptStatus,
+    phone: b.phone, email: b.email, notes: b.notes, depositAmount: b.depositAmount,
+  };
+}
 
 // ─── New Appointment Overlay ───────────────────────────────────────────────────
 
@@ -321,9 +356,432 @@ function NewBookingOverlay({ onClose }: { onClose: () => void }) {
   );
 }
 
+// ─── Close-out Modal (payment collection) ──────────────────────────────────
+
+const GRATUITY_PRESETS = [0, 15, 18, 20];
+
+function CloseOutModal({ appt, onClose, onCompleted }: { appt: ApptRecord; onClose: () => void; onCompleted: () => void }) {
+  const [gratuityPct, setGratuityPct] = useState<number | "custom">(18);
+  const [customTip, setCustomTip] = useState("");
+  const [method, setMethod] = useState<"tap" | "link" | "card" | "cash" | null>(null);
+  const [linkChannel, setLinkChannel] = useState<"sms" | "whatsapp" | "email">("sms");
+  const [receiptSms, setReceiptSms] = useState(true);
+  const [stage, setStage] = useState<"select" | "processing" | "success">("select");
+
+  const baseNum = parseFloat(appt.price.replace(/[^0-9.]/g, "")) || 0;
+  const depositNum = appt.depositAmount ? parseFloat(appt.depositAmount.replace(/[^0-9.]/g, "")) || 0 : 0;
+  const subtotal = Math.max(0, baseNum - depositNum);
+  const tipAmount = gratuityPct === "custom" ? (parseFloat(customTip) || 0) : (baseNum * gratuityPct / 100);
+  const total = subtotal + tipAmount;
+  const fmtMoney = (n: number) => `C$${n.toFixed(2)}`;
+
+  const runCharge = () => {
+    setStage("processing");
+    setTimeout(() => setStage("success"), method === "cash" ? 500 : 1400);
+  };
+
+  const inputStyle: React.CSSProperties = {
+    width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)",
+    borderRadius: 10, padding: "10px 13px", color: "rgb(250,250,250)", fontSize: 13.5,
+    outline: "none", boxSizing: "border-box",
+  };
+
+  return (
+    <div style={{
+      position: "fixed", inset: 0, zIndex: 320,
+      background: "rgba(0,0,0,0.75)", backdropFilter: "blur(6px)",
+      display: "flex", alignItems: "center", justifyContent: "center",
+    }} onClick={stage === "select" ? onClose : undefined}>
+      <div style={{
+        background: "rgb(14,14,18)", border: "1px solid rgba(255,255,255,0.1)",
+        borderRadius: 22, width: "100%", maxWidth: 440,
+        padding: "26px 26px 24px", margin: 20,
+        boxShadow: "0 24px 80px rgba(0,0,0,0.7)",
+      }} onClick={e => e.stopPropagation()}>
+
+        {stage === "success" ? (
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", padding: "12px 0 4px", animation: "fp-success-pop 0.5s cubic-bezier(0.2,0.8,0.2,1)" }}>
+            <div style={{ width: 64, height: 64, borderRadius: "50%", background: "rgba(52,211,153,0.12)", border: "2px solid rgba(52,211,153,0.35)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
+              <CheckCircle2 size={30} color="rgb(52,211,153)" strokeWidth={1.8} />
+            </div>
+            <h2 style={{ color: "rgb(250,250,250)", fontSize: 19, fontWeight: 800, margin: "0 0 6px", letterSpacing: "-0.02em" }}>{fmtMoney(total)} collected</h2>
+            <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 13, margin: "0 0 4px" }}>
+              {method === "link" ? `Payment link sent via ${linkChannel === "sms" ? "SMS" : linkChannel === "whatsapp" ? "WhatsApp" : "Email"}`
+                : method === "cash" ? "Marked as received in cash"
+                : "Charged card on file"}
+            </p>
+            {receiptSms ? (
+              <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 12, margin: "0 0 22px" }}>Receipt texted to {appt.phone}</p>
+            ) : (
+              <div style={{ marginBottom: 22 }} />
+            )}
+            <button onClick={onCompleted} style={{ width: "100%", padding: "13px", borderRadius: 13, border: "none", background: "rgb(52,211,153)", color: "rgb(5,40,20)", fontSize: 14, fontWeight: 800, cursor: "pointer" }}>
+              Done
+            </button>
+          </div>
+        ) : (
+          <>
+            {/* Header */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
+              <div>
+                <h2 style={{ color: "rgb(250,250,250)", fontSize: 17, fontWeight: 800, margin: "0 0 2px", letterSpacing: "-0.02em" }}>Close out</h2>
+                <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 12.5, margin: 0 }}>{appt.name} · {appt.service}</p>
+              </div>
+              <button onClick={onClose} disabled={stage === "processing"} style={{ background: "rgba(255,255,255,0.06)", border: "none", borderRadius: 8, width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", cursor: stage === "processing" ? "default" : "pointer", color: "rgba(255,255,255,0.5)" }}>
+                <X size={16} />
+              </button>
+            </div>
+
+            {stage === "processing" ? (
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "30px 0 20px" }}>
+                <div style={{ position: "relative", width: 64, height: 64, marginBottom: 18 }}>
+                  <div style={{ position: "absolute", inset: 0, borderRadius: "50%", background: "rgba(139,92,246,0.15)", border: "2px solid rgba(139,92,246,0.4)" }} />
+                  <div style={{ position: "absolute", inset: 0, borderRadius: "50%", background: "rgba(139,92,246,0.3)", animation: "ping 1.4s cubic-bezier(0,0,0.2,1) infinite" }} />
+                  <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    {method === "tap" ? <Smartphone size={22} color="rgb(167,139,250)" /> : method === "link" ? <Send size={20} color="rgb(167,139,250)" /> : method === "cash" ? <Banknote size={20} color="rgb(167,139,250)" /> : <CreditCard size={20} color="rgb(167,139,250)" />}
+                  </div>
+                </div>
+                <p style={{ color: "rgb(250,250,250)", fontSize: 13.5, fontWeight: 700, margin: "0 0 4px" }}>
+                  {method === "tap" ? "Hold card or phone near reader…" : method === "link" ? "Sending payment link…" : method === "cash" ? "Marking as received…" : "Charging card on file…"}
+                </p>
+                <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 12, margin: 0 }}>{fmtMoney(total)}</p>
+              </div>
+            ) : (
+              <>
+                {/* Gratuity selector */}
+                <div style={{ marginBottom: 18 }}>
+                  <label style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, fontWeight: 500, display: "block", marginBottom: 8 }}>Gratuity</label>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 6 }}>
+                    {GRATUITY_PRESETS.map(p => (
+                      <button key={p} onClick={() => setGratuityPct(p)} style={{
+                        padding: "9px 4px", borderRadius: 10,
+                        border: `1px solid ${gratuityPct === p ? "rgba(139,92,246,0.5)" : "rgba(255,255,255,0.07)"}`,
+                        background: gratuityPct === p ? "rgba(109,40,217,0.15)" : "rgba(255,255,255,0.02)",
+                        color: gratuityPct === p ? "rgb(210,196,254)" : "rgba(255,255,255,0.5)",
+                        fontSize: 12.5, fontWeight: gratuityPct === p ? 700 : 400, cursor: "pointer",
+                      }}>
+                        {p === 0 ? "No tip" : `${p}%`}
+                      </button>
+                    ))}
+                    <button onClick={() => setGratuityPct("custom")} style={{
+                      padding: "9px 4px", borderRadius: 10,
+                      border: `1px solid ${gratuityPct === "custom" ? "rgba(139,92,246,0.5)" : "rgba(255,255,255,0.07)"}`,
+                      background: gratuityPct === "custom" ? "rgba(109,40,217,0.15)" : "rgba(255,255,255,0.02)",
+                      color: gratuityPct === "custom" ? "rgb(210,196,254)" : "rgba(255,255,255,0.5)",
+                      fontSize: 12.5, fontWeight: gratuityPct === "custom" ? 700 : 400, cursor: "pointer",
+                    }}>
+                      Custom
+                    </button>
+                  </div>
+                  {gratuityPct === "custom" && (
+                    <input value={customTip} onChange={e => setCustomTip(e.target.value.replace(/[^0-9.]/g, ""))} placeholder="Custom tip amount" style={{ ...inputStyle, marginTop: 8 }} />
+                  )}
+                </div>
+
+                {/* Total breakdown */}
+                <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 14, padding: "14px 16px", marginBottom: 18, display: "flex", flexDirection: "column", gap: 7 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between" }}>
+                    <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 12.5 }}>Service</span>
+                    <span style={{ color: "rgba(255,255,255,0.7)", fontSize: 12.5 }}>{appt.price}</span>
+                  </div>
+                  {depositNum > 0 && (
+                    <div style={{ display: "flex", justifyContent: "space-between" }}>
+                      <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 12.5 }}>Deposit already paid</span>
+                      <span style={{ color: "rgb(52,211,153)", fontSize: 12.5 }}>-{appt.depositAmount}</span>
+                    </div>
+                  )}
+                  <div style={{ display: "flex", justifyContent: "space-between" }}>
+                    <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 12.5 }}>Gratuity</span>
+                    <span style={{ color: "rgba(255,255,255,0.7)", fontSize: 12.5 }}>{fmtMoney(tipAmount)}</span>
+                  </div>
+                  <div style={{ height: 1, background: "rgba(255,255,255,0.07)", margin: "3px 0" }} />
+                  <div style={{ display: "flex", justifyContent: "space-between" }}>
+                    <span style={{ color: "rgb(250,250,250)", fontSize: 14, fontWeight: 700 }}>Total due</span>
+                    <span style={{ color: "rgb(52,211,153)", fontSize: 16, fontWeight: 800 }}>{fmtMoney(total)}</span>
+                  </div>
+                </div>
+
+                {/* Payment method */}
+                <div style={{ marginBottom: 14 }}>
+                  <label style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, fontWeight: 500, display: "block", marginBottom: 8 }}>Payment method</label>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                    {[
+                      { id: "tap" as const, Icon: Smartphone, label: "Tap to Pay", sub: "NFC / contactless" },
+                      { id: "link" as const, Icon: Send, label: "Payment Link", sub: "SMS / WhatsApp / Email" },
+                      { id: "card" as const, Icon: CreditCard, label: "Card on File", sub: "Visa •••• 4242" },
+                      { id: "cash" as const, Icon: Banknote, label: "Cash", sub: "Collected in person" },
+                    ].map(m => (
+                      <button key={m.id} onClick={() => setMethod(m.id)} style={{
+                        display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 6,
+                        padding: "12px 13px", borderRadius: 12,
+                        border: `1px solid ${method === m.id ? "rgba(139,92,246,0.5)" : "rgba(255,255,255,0.07)"}`,
+                        background: method === m.id ? "rgba(109,40,217,0.15)" : "rgba(255,255,255,0.02)",
+                        cursor: "pointer", textAlign: "left",
+                      }}>
+                        <m.Icon size={17} color={method === m.id ? "rgb(167,139,250)" : "rgba(255,255,255,0.5)"} strokeWidth={1.7} />
+                        <div>
+                          <p style={{ color: method === m.id ? "rgb(210,196,254)" : "rgb(250,250,250)", fontSize: 12.5, fontWeight: 700, margin: "0 0 1px" }}>{m.label}</p>
+                          <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 10.5, margin: 0 }}>{m.sub}</p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Payment link channel picker */}
+                {method === "link" && (
+                  <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
+                    {[
+                      { id: "sms" as const, label: "SMS" },
+                      { id: "whatsapp" as const, label: "WhatsApp" },
+                      { id: "email" as const, label: "Email" },
+                    ].map(c => (
+                      <button key={c.id} onClick={() => setLinkChannel(c.id)} style={{
+                        flex: 1, padding: "8px 6px", borderRadius: 9,
+                        border: `1px solid ${linkChannel === c.id ? "rgba(139,92,246,0.5)" : "rgba(255,255,255,0.07)"}`,
+                        background: linkChannel === c.id ? "rgba(109,40,217,0.15)" : "rgba(255,255,255,0.02)",
+                        color: linkChannel === c.id ? "rgb(210,196,254)" : "rgba(255,255,255,0.5)",
+                        fontSize: 12, fontWeight: linkChannel === c.id ? 700 : 400, cursor: "pointer",
+                      }}>
+                        {c.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {/* Receipt SMS toggle */}
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 14px", background: "rgba(255,255,255,0.03)", borderRadius: 10, border: "1px solid rgba(255,255,255,0.07)", marginBottom: 20 }}>
+                  <div>
+                    <p style={{ color: "rgb(250,250,250)", fontSize: 13, fontWeight: 600, margin: "0 0 2px" }}>Text receipt to client</p>
+                    <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 11.5, margin: 0 }}>{appt.phone}</p>
+                  </div>
+                  <button onClick={() => setReceiptSms(v => !v)} style={{
+                    width: 40, height: 22, borderRadius: 11, border: "none", cursor: "pointer",
+                    background: receiptSms ? "rgb(109,40,217)" : "rgba(255,255,255,0.12)",
+                    position: "relative", transition: "background 0.2s",
+                  }}>
+                    <span style={{ position: "absolute", top: 3, left: receiptSms ? 21 : 3, width: 16, height: 16, borderRadius: "50%", background: "white", transition: "left 0.2s" }} />
+                  </button>
+                </div>
+
+                {/* CTA */}
+                <button
+                  disabled={!method}
+                  onClick={runCharge}
+                  style={{
+                    width: "100%", padding: "14px", borderRadius: 13, border: "none",
+                    background: method ? "rgb(52,211,153)" : "rgba(255,255,255,0.08)",
+                    color: method ? "rgb(5,40,20)" : "rgba(255,255,255,0.3)",
+                    fontSize: 14, fontWeight: 800, cursor: method ? "pointer" : "default",
+                  }}
+                >
+                  Complete · Collect {fmtMoney(total)}
+                </button>
+              </>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── Appointment Detail overlay ────────────────────────────────────────────
+
+function AppointmentDetail({ appt, onClose, onCloseOut }: { appt: ApptRecord; onClose: () => void; onCloseOut: () => void }) {
+  const [status, setStatus] = useState<ApptStatus>(appt.status);
+  const [confirmCancel, setConfirmCancel] = useState(false);
+  const [rescheduling, setRescheduling] = useState(false);
+  const [newDate, setNewDate] = useState("");
+  const [newTime, setNewTime] = useState("");
+
+  const s = STATUS_STYLE[status];
+  const TIMES = ["9:00 AM", "9:30 AM", "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM", "12:00 PM", "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM"];
+
+  const inputStyle: React.CSSProperties = {
+    width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)",
+    borderRadius: 10, padding: "10px 13px", color: "rgb(250,250,250)", fontSize: 13.5,
+    outline: "none", boxSizing: "border-box", colorScheme: "dark",
+  };
+
+  const avatarColor = appt.color.startsWith("hsl") ? "rgba(255,255,255,0.85)" : appt.color;
+  const isDone = status === "completed" || status === "cancelled";
+
+  return (
+    <div style={{
+      position: "fixed", inset: 0, zIndex: 310,
+      background: "rgba(0,0,0,0.75)", backdropFilter: "blur(6px)",
+      display: "flex", alignItems: "center", justifyContent: "center",
+    }} onClick={onClose}>
+      <div style={{
+        background: "rgb(12,12,16)", border: "1px solid rgba(255,255,255,0.1)",
+        borderRadius: 24, width: "100%", maxWidth: 480,
+        maxHeight: "90vh", display: "flex", flexDirection: "column",
+        margin: 20, overflow: "hidden",
+        boxShadow: "0 32px 100px rgba(0,0,0,0.8)",
+      }} onClick={e => e.stopPropagation()}>
+
+        {/* Header */}
+        <div style={{ padding: "22px 22px 0", flexShrink: 0 }}>
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 16 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <div style={{ width: 46, height: 46, borderRadius: "50%", background: `${appt.color}22`, border: `1.5px solid ${appt.color}44`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, fontWeight: 800, color: avatarColor, flexShrink: 0 }}>
+                {appt.initials}
+              </div>
+              <div>
+                <h2 style={{ color: "rgb(250,250,250)", fontSize: 17, fontWeight: 800, margin: "0 0 3px", letterSpacing: "-0.02em" }}>{appt.name}</h2>
+                <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 12.5, margin: 0 }}>{appt.dateLabel} · {appt.time}</p>
+              </div>
+            </div>
+            <button onClick={onClose} style={{ background: "rgba(255,255,255,0.06)", border: "none", borderRadius: 8, width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "rgba(255,255,255,0.45)", flexShrink: 0 }}>
+              <X size={16} />
+            </button>
+          </div>
+
+          {/* status + deposit badges */}
+          <div style={{ display: "flex", gap: 8, marginBottom: 18, flexWrap: "wrap" }}>
+            <span style={{ fontSize: 11, fontWeight: 700, padding: "4px 11px", borderRadius: 20, color: s.color, background: s.bg, border: `1px solid ${s.border}` }}>
+              {s.label}
+            </span>
+            {appt.depositAmount && status !== "completed" && (
+              <span style={{ fontSize: 11, fontWeight: 700, padding: "4px 11px", borderRadius: 20, color: "rgb(52,211,153)", background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.2)" }}>
+                {appt.depositAmount} deposit paid
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Body */}
+        <div style={{ flex: 1, overflowY: "auto", padding: "0 22px 22px", display: "flex", flexDirection: "column", gap: 16 }}>
+
+          {/* Client card */}
+          <div style={{ ...card, padding: "14px 16px" }}>
+            <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 10, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", margin: "0 0 10px" }}>Client</p>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{ color: "rgb(250,250,250)", fontSize: 13, fontWeight: 600, margin: "0 0 2px" }}>{appt.phone}</p>
+                <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 12, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{appt.email}</p>
+              </div>
+              <div style={{ display: "flex", gap: 6 }}>
+                <button style={{ width: 32, height: 32, borderRadius: 8, border: "1px solid rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.04)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "rgb(52,211,153)" }}>
+                  <MessageSquare size={14} strokeWidth={1.8} />
+                </button>
+                <button style={{ width: 32, height: 32, borderRadius: 8, border: "1px solid rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.04)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "rgb(96,165,250)" }}>
+                  <Phone size={14} strokeWidth={1.8} />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Service details */}
+          <div style={{ ...card, padding: "14px 16px" }}>
+            <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 10, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", margin: "0 0 10px" }}>Service</p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {[
+                { label: "Service", value: appt.service },
+                { label: "Stylist", value: appt.stylist },
+                { label: "Duration", value: `${appt.duration} min` },
+                { label: "Price", value: appt.price },
+              ].map(row => (
+                <div key={row.label} style={{ display: "flex", justifyContent: "space-between" }}>
+                  <span style={{ color: "rgba(255,255,255,0.35)", fontSize: 12.5 }}>{row.label}</span>
+                  <span style={{ color: "rgb(250,250,250)", fontSize: 12.5, fontWeight: 600 }}>{row.value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Client notes */}
+          <div style={{ ...card, padding: "14px 16px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
+              <StickyNote size={12} color="rgba(255,255,255,0.35)" />
+              <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 10, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", margin: 0 }}>Client notes</p>
+            </div>
+            <p style={{ color: appt.notes ? "rgba(255,255,255,0.65)" : "rgba(255,255,255,0.25)", fontSize: 12.5, margin: 0, lineHeight: 1.55 }}>
+              {appt.notes || "No notes on file for this client."}
+            </p>
+          </div>
+
+          {/* Reschedule panel */}
+          {rescheduling && (
+            <div style={{ ...card, padding: "14px 16px", display: "flex", flexDirection: "column", gap: 12 }}>
+              <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 10, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", margin: 0 }}>Reschedule to</p>
+              <input type="date" value={newDate} onChange={e => setNewDate(e.target.value)} style={inputStyle} />
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 6 }}>
+                {TIMES.map(t => (
+                  <button key={t} onClick={() => setNewTime(t)} style={{
+                    padding: "8px 4px", borderRadius: 9,
+                    border: `1px solid ${newTime === t ? "rgba(139,92,246,0.5)" : "rgba(255,255,255,0.07)"}`,
+                    background: newTime === t ? "rgba(109,40,217,0.15)" : "rgba(255,255,255,0.02)",
+                    color: newTime === t ? "rgb(210,196,254)" : "rgba(255,255,255,0.5)",
+                    fontSize: 11.5, fontWeight: newTime === t ? 700 : 400, cursor: "pointer",
+                  }}>
+                    {t}
+                  </button>
+                ))}
+              </div>
+              <div style={{ display: "flex", gap: 8 }}>
+                <button onClick={() => setRescheduling(false)} style={{ flex: 1, padding: "10px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.6)", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>
+                  Cancel
+                </button>
+                <button
+                  disabled={!newDate || !newTime}
+                  onClick={() => setRescheduling(false)}
+                  style={{ flex: 2, padding: "10px", borderRadius: 10, border: "none", background: newDate && newTime ? "rgb(109,40,217)" : "rgba(255,255,255,0.08)", color: newDate && newTime ? "white" : "rgba(255,255,255,0.3)", fontSize: 12.5, fontWeight: 700, cursor: newDate && newTime ? "pointer" : "default" }}
+                >
+                  Confirm new time
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Cancel confirm */}
+          {confirmCancel && (
+            <div style={{ background: "rgba(248,113,113,0.06)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 14, padding: "14px 16px", display: "flex", flexDirection: "column", gap: 10 }}>
+              <p style={{ color: "rgba(248,113,113,0.9)", fontSize: 12.5, fontWeight: 600, margin: 0 }}>
+                Cancel this appointment? The client will be notified automatically.
+              </p>
+              <div style={{ display: "flex", gap: 8 }}>
+                <button onClick={() => setConfirmCancel(false)} style={{ flex: 1, padding: "9px", borderRadius: 9, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.6)", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+                  Never mind
+                </button>
+                <button onClick={() => { setStatus("cancelled"); setConfirmCancel(false); }} style={{ flex: 1, padding: "9px", borderRadius: 9, border: "none", background: "rgb(239,68,68)", color: "white", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+                  Cancel appointment
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Footer actions */}
+        {!isDone && (
+          <div style={{ padding: "16px 22px 22px", flexShrink: 0, borderTop: "1px solid rgba(255,255,255,0.06)", display: "flex", flexDirection: "column", gap: 10 }}>
+            <div style={{ display: "flex", gap: 8 }}>
+              <button onClick={() => setRescheduling(v => !v)} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "11px", borderRadius: 11, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.65)", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>
+                <Pencil size={13} strokeWidth={2} /> Reschedule
+              </button>
+              <button onClick={() => setConfirmCancel(v => !v)} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "11px", borderRadius: 11, border: "1px solid rgba(239,68,68,0.2)", background: "rgba(239,68,68,0.06)", color: "rgb(248,113,113)", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>
+                <Ban size={13} strokeWidth={2} /> Cancel
+              </button>
+            </div>
+            <button onClick={onCloseOut} style={{ width: "100%", padding: "13px", borderRadius: 13, border: "none", background: "rgb(52,211,153)", color: "rgb(5,40,20)", fontSize: 13.5, fontWeight: 800, cursor: "pointer" }}>
+              Mark as completed →
+            </button>
+          </div>
+        )}
+        {status === "cancelled" && (
+          <div style={{ padding: "16px 22px 22px", flexShrink: 0, borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+            <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 12, textAlign: "center", margin: 0 }}>This appointment has been cancelled.</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ─── Day view ─────────────────────────────────────────────────────────────────
 
-function DayView({ onNewBooking }: { onNewBooking: () => void }) {
+function DayView({ onNewBooking, onSelect }: { onNewBooking: () => void; onSelect: (appt: ApptRecord) => void }) {
   const bookingAtHour = (h: number) => DAY_BOOKINGS.find(b => b.hour === h);
 
   return (
@@ -391,7 +849,7 @@ function DayView({ onNewBooking }: { onNewBooking: () => void }) {
               {/* Slot content */}
               <div style={{ flex: 1, padding: "8px 16px 8px 8px", display: "flex", alignItems: "center" }}>
                 {booking ? (
-                  <div style={{
+                  <div onClick={() => onSelect(dayBookingToAppt(booking))} style={{
                     flex: 1, padding: "10px 14px", borderRadius: 12,
                     background: `${booking.color}12`,
                     border: `1px solid ${booking.color}30`,
@@ -546,7 +1004,7 @@ function WeekView() {
 
 // ─── List view ────────────────────────────────────────────────────────────────
 
-function ListView() {
+function ListView({ onSelect }: { onSelect: (appt: ApptRecord) => void }) {
   const grouped = LIST_BOOKINGS.reduce<Record<string, typeof LIST_BOOKINGS>>((acc, b) => {
     (acc[b.date] ??= []).push(b);
     return acc;
@@ -563,9 +1021,9 @@ function ListView() {
             {bookings.map((b, i) => {
               const s = STATUS_STYLE[b.status];
               return (
-                <div key={b.id} style={{
+                <div key={b.id} onClick={() => onSelect(listBookingToAppt(b))} style={{
                   display: "flex", alignItems: "center", gap: 14,
-                  padding: "13px 18px",
+                  padding: "13px 18px", cursor: "pointer",
                   borderBottom: i < bookings.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none",
                 }}>
                   <div style={{ width: 34, height: 34, borderRadius: "50%", background: `hsl(${b.id * 53 + 200}deg 35% 25%)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 800, color: "rgba(255,255,255,0.8)", flexShrink: 0 }}>
@@ -687,6 +1145,8 @@ export default function BookingsPage() {
   const [view, setView]           = useState<View>("Day");
   const [query, setQuery]         = useState("");
   const [showNewBooking, setNew]  = useState(false);
+  const [selectedAppt, setSelectedAppt] = useState<ApptRecord | null>(null);
+  const [closingOut, setClosingOut]     = useState(false);
 
   const dateStr = new Date().toLocaleDateString("en-CA", {
     weekday: "short", month: "short", day: "numeric",
@@ -735,12 +1195,28 @@ export default function BookingsPage() {
       </div>
 
       {/* View content */}
-      {view === "Day"  && <DayView onNewBooking={() => setNew(true)} />}
+      {view === "Day"  && <DayView onNewBooking={() => setNew(true)} onSelect={setSelectedAppt} />}
       {view === "Week" && <WeekView />}
-      {view === "List" && <ListView />}
+      {view === "List" && <ListView onSelect={setSelectedAppt} />}
 
       {/* New booking overlay */}
       {showNewBooking && <NewBookingOverlay onClose={() => setNew(false)} />}
+
+      {/* Appointment detail → close-out */}
+      {selectedAppt && !closingOut && (
+        <AppointmentDetail
+          appt={selectedAppt}
+          onClose={() => setSelectedAppt(null)}
+          onCloseOut={() => setClosingOut(true)}
+        />
+      )}
+      {selectedAppt && closingOut && (
+        <CloseOutModal
+          appt={selectedAppt}
+          onClose={() => setClosingOut(false)}
+          onCompleted={() => { setClosingOut(false); setSelectedAppt(null); }}
+        />
+      )}
     </div>
   );
 }
