@@ -19,6 +19,7 @@ import {
   Check,
 } from "lucide-react";
 import { StepProgress } from "@/components/StepProgress";
+import { checkHandleAvailability } from "./actions";
 
 const easing = "cubic-bezier(0.16,1,0.3,1)";
 const ACCENT = "rgb(109,40,217)";
@@ -88,11 +89,15 @@ function BookingLinkStep({
   handle,
   onHandleChange,
   available,
+  reason,
+  checking,
   onCheck,
 }: {
   handle: string;
   onHandleChange: (v: string) => void;
   available: boolean | null;
+  reason: string | null;
+  checking: boolean;
   onCheck: () => void;
 }) {
   return (
@@ -158,9 +163,15 @@ function BookingLinkStep({
           </div>
           <button
             onClick={onCheck}
-            style={{ padding: "0 18px", borderRadius: 12, background: ACCENT, border: "none", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer", flexShrink: 0 }}
+            disabled={checking || handle.length < 3}
+            style={{
+              padding: "0 18px", borderRadius: 12, background: ACCENT, border: "none", color: "white",
+              fontSize: 13, fontWeight: 700, flexShrink: 0,
+              cursor: checking || handle.length < 3 ? "default" : "pointer",
+              opacity: checking || handle.length < 3 ? 0.6 : 1,
+            }}
           >
-            Check
+            {checking ? "Checking…" : "Check"}
           </button>
         </div>
 
@@ -171,7 +182,7 @@ function BookingLinkStep({
         )}
         {available === false && (
           <p style={{ color: "rgb(248,113,113)", fontSize: 12, fontWeight: 600, margin: "7px 0 0" }}>
-            That handle is taken. Try another.
+            {reason ?? "That handle is taken. Try another."}
           </p>
         )}
       </div>
@@ -704,11 +715,19 @@ export function OnboardingFlow({ displayName }: { displayName: string }) {
   const [step, setStep]                       = useState(1);
   const [handle, setHandle]                   = useState(displayName.toLowerCase().replace(/[^a-z0-9]/g, ""));
   const [handleAvailable, setHandleAvailable] = useState<boolean | null>(null);
+  const [handleReason, setHandleReason]       = useState<string | null>(null);
+  const [checkingHandle, setCheckingHandle]   = useState(false);
   const [services, setServices]               = useState<Service[]>([]);
   const [members, setMembers]                 = useState([{ name: displayName, role: "Owner", color: MEMBER_COLORS[0] }]);
   const [flows, setFlows]                     = useState(FLOWS);
 
-  const checkHandle      = () => setHandleAvailable(handle.length >= 3);
+  const checkHandle = async () => {
+    setCheckingHandle(true);
+    const result = await checkHandleAvailability(handle);
+    setHandleAvailable(result.available);
+    setHandleReason(result.reason ?? null);
+    setCheckingHandle(false);
+  };
   const addService       = (name: string, price: number) =>
     setServices((prev) => [...prev, { id: `${Date.now()}`, name, price }]);
   const removeService    = (id: string) =>
@@ -787,8 +806,10 @@ export function OnboardingFlow({ displayName }: { displayName: string }) {
           {step === 1 && (
             <BookingLinkStep
               handle={handle}
-              onHandleChange={(v) => { setHandle(v); setHandleAvailable(null); }}
+              onHandleChange={(v) => { setHandle(v); setHandleAvailable(null); setHandleReason(null); }}
               available={handleAvailable}
+              reason={handleReason}
+              checking={checkingHandle}
               onCheck={checkHandle}
             />
           )}
