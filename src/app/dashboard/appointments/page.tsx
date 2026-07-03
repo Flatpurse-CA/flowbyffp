@@ -2,6 +2,9 @@ import { createClient } from "@/lib/supabase/server";
 import { listAppointments } from "./actions";
 import { AppointmentsClient } from "./AppointmentsClient";
 
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
+
 export default async function BookingsPage() {
   const supabase = await createClient();
   const { data: userData } = await supabase.auth.getUser();
