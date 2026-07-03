@@ -1,0 +1,153 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { createClient } from "@/lib/supabase/server";
+
+export type AppointmentStatus = "confirmed" | "pending" | "deposit" | "completed" | "cancelled";
+
+export type AppointmentRow = {
+  id: string;
+  client_name: string;
+  client_phone: string | null;
+  client_email: string | null;
+  client_notes: string | null;
+  service_name: string;
+  stylist_name: string | null;
+  starts_at: string;
+  duration_minutes: number;
+  price: number;
+  deposit_amount: number | null;
+  status: AppointmentStatus;
+  tip_amount: number | null;
+  payment_method: string | null;
+  paid_amount: number | null;
+};
+
+async function requireShop() {
+  const supabase = await createClient();
+  const { data: userData } = await supabase.auth.getUser();
+  if (!userData.user) throw new Error("Not authenticated");
+
+  const { data: shop } = await supabase
+    .from("shops")
+    .select("id")
+    .eq("owner_id", userData.user.id)
+    .maybeSingle();
+
+  if (!shop) throw new Error("No shop set up for this account yet");
+  return { supabase, shopId: shop.id as string };
+}
+
+export async function getCurrentShopId(): Promise<string | null> {
+  const supabase = await createClient();
+  const { data: userData } = await supabase.auth.getUser();
+  if (!userData.user) return null;
+
+  const { data: shop } = await supabase
+    .from("shops")
+    .select("id")
+    .eq("owner_id", userData.user.id)
+    .maybeSingle();
+
+  return (shop?.id as string) ?? null;
+}
+
+export async function listAppointments(rangeStart: string, rangeEnd: string): Promise<AppointmentRow[]> {
+  const shopId = await getCurrentShopId();
+  if (!shopId) return [];
+
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("appointments")
+    .select("*")
+    .eq("shop_id", shopId)
+    .gte("starts_at", rangeStart)
+    .lte("starts_at", rangeEnd)
+    .order("starts_at", { ascending: true });
+
+  if (error) return [];
+  return (data ?? []) as AppointmentRow[];
+}
+
+export async function createAppointment(input: {
+  clientName: string;
+  clientPhone?: string;
+  clientEmail?: string;
+  serviceName: string;
+  stylistName?: string;
+  startsAt: string;
+  durationMinutes: number;
+  price: number;
+  requireDeposit?: boolean;
+  depositAmount?: number;
+  notes?: string;
+}) {
+  const { supabase, shopId } = await requireShop();
+
+  const { error } = await supabase.from("appointments").insert({
+    shop_id: shopId,
+    client_name: input.clientName,
+    client_phone: input.clientPhone || null,
+    client_email: input.clientEmail || null,
+    client_notes: input.notes || null,
+    service_name: input.serviceName,
+    stylist_name: input.stylistName || null,
+    starts_at: input.startsAt,
+    duration_minutes: input.durationMinutes,
+    price: input.price,
+    deposit_amount: input.requireDeposit ? (input.depositAmount ?? null) : null,
+    status: input.requireDeposit ? "deposit" : "confirmed",
+  });
+
+  if (error) throw new Error(error.message);
+  revalidatePath("/dashboard/appointments");
+}
+
+export async function rescheduleAppointment(id: string, startsAt: string) {
+  const { supabase, shopId } = await requireShop();
+
+  const { error } = await supabase
+    .from("appointments")
+    .update({ starts_at: startsAt, updated_at: new Date().toISOString() })
+    .eq("id", id)
+    .eq("shop_id", shopId);
+
+  if (error) throw new Error(error.message);
+  revalidatePath("/dashboard/appointments");
+}
+
+export async function cancelAppointment(id: string) {
+  const { supabase, shopId } = await requireShop();
+
+  const { error } = await supabase
+    .from("appointments")
+    .update({ status: "cancelled", updated_at: new Date().toISOString() })
+    .eq("id", id)
+    .eq("shop_id", shopId);
+
+  if (error) throw new Error(error.message);
+  revalidatePath("/dashboard/appointments");
+}
+
+export async function completeAppointment(
+  id: string,
+  input: { tipAmount: number; paymentMethod: string; paidAmount: number },
+) {
+  const { supabase, shopId } = await requireShop();
+
+  const { error } = await supabase
+    .from("appointments")
+    .update({
+      status: "completed",
+      tip_amount: input.tipAmount,
+      payment_method: input.paymentMethod,
+      paid_amount: input.paidAmount,
+      completed_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", id)
+    .eq("shop_id", shopId);
+
+  if (error) throw new Error(error.message);
+  revalidatePath("/dashboard/appointments");
+}
