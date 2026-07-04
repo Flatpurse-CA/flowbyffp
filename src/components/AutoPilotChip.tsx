@@ -74,7 +74,7 @@ export default function AutoPilotChip({ theme = "dark", words = DEFAULT_WORDS }:
         <div style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
           {words.map((word, i) => (
             <span
-              key={word}
+              key={i}
               ref={(el) => { wordRefs.current[i] = el; }}
               style={{
                 display: "inline-block",
