@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import type { AppointmentRow, AppointmentStatus } from "./actions";
 import { createAppointment, rescheduleAppointment, cancelAppointment, completeAppointment } from "./actions";
+import type { StaffRow } from "../team/actions";
 
 // ─── Timezone-aware formatting (shop is Edmonton-based) ───────────────────────
 
@@ -80,7 +81,6 @@ function rowToAppt(row: AppointmentRow, now: Date): ApptRecord {
 }
 
 const SERVICES = ["Signature Cut", "Cut + Beard", "Full Highlights", "Balayage", "Knotless Braids", "Silk Press", "Loc Retwist", "Trim + Blowout", "Deep Condition + Set", "Colour + Gloss"];
-const STYLISTS = ["Emma Watson", "Grace Olu", "James Miller"];
 const TIMES = ["9:00 AM", "9:30 AM", "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM", "12:00 PM", "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM"];
 const HOURS = Array.from({ length: 12 }, (_, i) => i + 8); // 8 AM – 7 PM
 const FAMILY_HOURS = [18, 19]; // 6–8 PM, decorative until Settings/Hours is wired
@@ -130,11 +130,12 @@ function combineDateTime(dateStr: string, timeStr: string) {
 
 // ─── New Appointment Overlay ───────────────────────────────────────────────────
 
-function NewBookingOverlay({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
+function NewBookingOverlay({ onClose, onCreated, staff }: { onClose: () => void; onCreated: () => void; staff: StaffRow[] }) {
   const [step, setStep] = useState<"client"|"service"|"datetime"|"confirm">("client");
   const [clientQ, setClientQ] = useState("");
   const [selectedService, setSelectedService] = useState("");
-  const [selectedStylist, setSelectedStylist] = useState("");
+  const [selectedStaffId, setSelectedStaffId] = useState("");
+  const selectedStylist = staff.find(s => s.id === selectedStaffId)?.full_name ?? "";
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
   const [price, setPrice] = useState("50");
@@ -162,6 +163,7 @@ function NewBookingOverlay({ onClose, onCreated }: { onClose: () => void; onCrea
         clientName: clientQ,
         serviceName: selectedService,
         stylistName: selectedStylist,
+        staffId: selectedStaffId || undefined,
         startsAt: combineDateTime(selectedDate, selectedTime),
         durationMinutes: parseInt(duration, 10) || 30,
         price: parseFloat(price) || 0,
@@ -249,22 +251,24 @@ function NewBookingOverlay({ onClose, onCreated }: { onClose: () => void; onCrea
                 <input type="number" value={duration} onChange={e => setDuration(e.target.value)} style={inputStyle} />
               </div>
             </div>
-            <div>
-              <label style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, fontWeight: 500, display: "block", marginBottom: 7 }}>Stylist</label>
-              <div style={{ display: "flex", gap: 8 }}>
-                {STYLISTS.map(s => (
-                  <button key={s} onClick={() => setSelectedStylist(s)} style={{
-                    flex: 1, padding: "9px 6px", borderRadius: 10,
-                    border: `1px solid ${selectedStylist === s ? "rgba(139,92,246,0.5)" : "rgba(255,255,255,0.07)"}`,
-                    background: selectedStylist === s ? "rgba(109,40,217,0.15)" : "rgba(255,255,255,0.02)",
-                    color: selectedStylist === s ? "rgb(210,196,254)" : "rgba(255,255,255,0.5)",
-                    fontSize: 12, fontWeight: selectedStylist === s ? 700 : 400, cursor: "pointer",
-                  }}>
-                    {s.split(" ")[0]}
-                  </button>
-                ))}
+            {staff.length > 0 && (
+              <div>
+                <label style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, fontWeight: 500, display: "block", marginBottom: 7 }}>Stylist</label>
+                <div style={{ display: "flex", gap: 8 }}>
+                  {staff.map(s => (
+                    <button key={s.id} onClick={() => setSelectedStaffId(s.id)} style={{
+                      flex: 1, padding: "9px 6px", borderRadius: 10,
+                      border: `1px solid ${selectedStaffId === s.id ? "rgba(139,92,246,0.5)" : "rgba(255,255,255,0.07)"}`,
+                      background: selectedStaffId === s.id ? "rgba(109,40,217,0.15)" : "rgba(255,255,255,0.02)",
+                      color: selectedStaffId === s.id ? "rgb(210,196,254)" : "rgba(255,255,255,0.5)",
+                      fontSize: 12, fontWeight: selectedStaffId === s.id ? 700 : 400, cursor: "pointer",
+                    }}>
+                      {s.full_name.split(" ")[0]}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         )}
 
@@ -1208,7 +1212,7 @@ function BookingLinkCard({ bookingLink }: { bookingLink: string }) {
 const VIEWS = ["Day", "Week", "List"] as const;
 type View = typeof VIEWS[number];
 
-export function AppointmentsClient({ initialAppointments, bookingLink }: { initialAppointments: AppointmentRow[]; bookingLink: string }) {
+export function AppointmentsClient({ initialAppointments, bookingLink, staff }: { initialAppointments: AppointmentRow[]; bookingLink: string; staff: StaffRow[] }) {
   const router = useRouter();
   const [, startTransition] = useTransition();
   const [view, setView]           = useState<View>("Day");
@@ -1275,7 +1279,7 @@ export function AppointmentsClient({ initialAppointments, bookingLink }: { initi
       {view === "List" && <ListView appts={appts} onSelect={a => setSelectedId(a.id)} />}
 
       {/* New booking overlay */}
-      {showNewBooking && <NewBookingOverlay onClose={() => setNew(false)} onCreated={refresh} />}
+      {showNewBooking && <NewBookingOverlay onClose={() => setNew(false)} onCreated={refresh} staff={staff} />}
 
       {/* Appointment detail → close-out */}
       {selectedAppt && !closingOut && (

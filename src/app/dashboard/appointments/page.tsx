@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { listAppointments } from "./actions";
+import { listStaff } from "../team/actions";
 import { AppointmentsClient } from "./AppointmentsClient";
 
 export const dynamic = "force-dynamic";
@@ -32,8 +33,11 @@ export default async function BookingsPage() {
   const rangeEnd = new Date(now);
   rangeEnd.setDate(rangeEnd.getDate() + 45);
 
-  const appointments = await listAppointments(rangeStart.toISOString(), rangeEnd.toISOString());
+  const [appointments, staff] = await Promise.all([
+    listAppointments(rangeStart.toISOString(), rangeEnd.toISOString()),
+    listStaff(),
+  ]);
   const bookingLink = shop.handle ? `flowbyffp.co/book/${shop.handle}` : "flowbyffp.co/book/your-shop";
 
-  return <AppointmentsClient initialAppointments={appointments} bookingLink={bookingLink} />;
+  return <AppointmentsClient initialAppointments={appointments} bookingLink={bookingLink} staff={staff} />;
 }

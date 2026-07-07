@@ -8,7 +8,7 @@ import {
   LayoutDashboard, CalendarDays, Users, Zap,
   LayoutGrid, Users2, Settings,
   LogOut, Bell, ChevronLeft, ChevronRight,
-  Sun, Moon, User as UserIcon, Search, MessageSquare,
+  Sun, Moon, User as UserIcon, Search, MessageSquare, Sparkles,
 } from "lucide-react";
 import { logout } from "./actions";
 
@@ -378,6 +378,9 @@ export function DashboardShell({ children, user }: { children: React.ReactNode; 
               <button style={headerIconBtn}><MessageSquare size={16} strokeWidth={1.6} /></button>
               <span style={hdBadge}>2</span>
             </div>
+            <Link href="/dashboard/daily-brief" title="Daily Brief" style={{ ...headerIconBtn, display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
+              <Sparkles size={16} strokeWidth={1.6} color={T.iconColor} />
+            </Link>
             <div style={{ position: "relative" }}>
               <Link href="/dashboard/notifications" style={{ ...headerIconBtn, display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
                 <Bell size={16} strokeWidth={1.6} color={T.iconColor} />

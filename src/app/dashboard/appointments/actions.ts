@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { requireShop, getCurrentShopId } from "@/lib/dashboard/shop";
 
 export type AppointmentStatus = "confirmed" | "pending" | "deposit" | "completed" | "cancelled";
 
@@ -13,6 +14,7 @@ export type AppointmentRow = {
   client_notes: string | null;
   service_name: string;
   stylist_name: string | null;
+  staff_id: string | null;
   starts_at: string;
   duration_minutes: number;
   price: number;
@@ -22,35 +24,6 @@ export type AppointmentRow = {
   payment_method: string | null;
   paid_amount: number | null;
 };
-
-async function requireShop() {
-  const supabase = await createClient();
-  const { data: userData } = await supabase.auth.getUser();
-  if (!userData.user) throw new Error("Not authenticated");
-
-  const { data: shop } = await supabase
-    .from("shops")
-    .select("id")
-    .eq("owner_id", userData.user.id)
-    .maybeSingle();
-
-  if (!shop) throw new Error("No shop set up for this account yet");
-  return { supabase, shopId: shop.id as string };
-}
-
-export async function getCurrentShopId(): Promise<string | null> {
-  const supabase = await createClient();
-  const { data: userData } = await supabase.auth.getUser();
-  if (!userData.user) return null;
-
-  const { data: shop } = await supabase
-    .from("shops")
-    .select("id")
-    .eq("owner_id", userData.user.id)
-    .maybeSingle();
-
-  return (shop?.id as string) ?? null;
-}
 
 export async function listAppointments(rangeStart: string, rangeEnd: string): Promise<AppointmentRow[]> {
   const shopId = await getCurrentShopId();
@@ -75,6 +48,7 @@ export async function createAppointment(input: {
   clientEmail?: string;
   serviceName: string;
   stylistName?: string;
+  staffId?: string;
   startsAt: string;
   durationMinutes: number;
   price: number;
@@ -92,6 +66,7 @@ export async function createAppointment(input: {
     client_notes: input.notes || null,
     service_name: input.serviceName,
     stylist_name: input.stylistName || null,
+    staff_id: input.staffId || null,
     starts_at: input.startsAt,
     duration_minutes: input.durationMinutes,
     price: input.price,

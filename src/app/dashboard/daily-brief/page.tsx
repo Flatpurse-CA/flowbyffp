@@ -1,11 +1,11 @@
 import { createClient } from "@/lib/supabase/server";
-import { listStaff, listAppointmentsForMetrics } from "./actions";
-import { TeamClient } from "./TeamClient";
+import { evaluateAndPersistFamilyHoursStreak, getDailyBriefData } from "./actions";
+import { DailyBriefClient } from "./DailyBriefClient";
 
 export const dynamic = "force-dynamic";
 export const fetchCache = "force-no-store";
 
-export default async function TeamPage() {
+export default async function DailyBriefPage() {
   const supabase = await createClient();
   const { data: userData } = await supabase.auth.getUser();
 
@@ -20,22 +20,14 @@ export default async function TeamPage() {
           Finish setting up your shop
         </h1>
         <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 13.5, lineHeight: 1.6, margin: 0 }}>
-          We couldn&apos;t find a shop linked to your account yet. Complete onboarding before managing your team.
+          We couldn&apos;t find a shop linked to your account yet. Complete onboarding to unlock your Daily Brief.
         </p>
       </div>
     );
   }
 
-  const now = new Date();
-  const rangeStart = new Date(now);
-  rangeStart.setDate(rangeStart.getDate() - 200);
-  const rangeEnd = new Date(now);
-  rangeEnd.setDate(rangeEnd.getDate() + 14);
+  await evaluateAndPersistFamilyHoursStreak();
+  const data = await getDailyBriefData();
 
-  const [staff, appointments] = await Promise.all([
-    listStaff(),
-    listAppointmentsForMetrics(rangeStart.toISOString(), rangeEnd.toISOString()),
-  ]);
-
-  return <TeamClient staff={staff} appointments={appointments} />;
+  return <DailyBriefClient data={data} />;
 }
