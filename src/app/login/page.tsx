@@ -5,9 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { AuthImagePanel } from "@/components/AuthImagePanel";
-import { GoogleIcon } from "@/components/GoogleIcon";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { signInWithGoogle } from "@/lib/auth/google";
 import { loginWithMagicLink, loginWithPassword } from "./actions";
 
 const easing = "cubic-bezier(0.16, 1, 0.3, 1)";
@@ -131,13 +129,13 @@ function LoginForm() {
                 </p>
               )}
 
-              {/* Magic Link + Google — side by side 50/50 */}
-              <div style={{ display: "flex", gap: 10, animation: fadeUp(80) }}>
+              {/* Magic Link */}
+              <div style={{ animation: fadeUp(80) }}>
                 <button
                   type="button"
                   onClick={() => setMode("magic-link")}
                   style={{
-                    flex: 1, display: "flex", alignItems: "center", justifyContent: "center",
+                    width: "100%", display: "flex", alignItems: "center", justifyContent: "center",
                     gap: 7, background: "transparent", border: "1px solid var(--auth-input-border)",
                     borderRadius: 10, padding: "12px 10px", color: "var(--auth-text)",
                     fontSize: 13, fontWeight: 500, cursor: "pointer",
@@ -145,21 +143,6 @@ function LoginForm() {
                 >
                   <MagicLinkIcon /> Magic Link
                 </button>
-
-                <form action={signInWithGoogle} style={{ flex: 1 }}>
-                  <input type="hidden" name="next" value="/dashboard" />
-                  <button
-                    type="submit"
-                    style={{
-                      width: "100%", display: "flex", alignItems: "center", justifyContent: "center",
-                      gap: 7, background: "transparent", border: "1px solid var(--auth-input-border)",
-                      borderRadius: 10, padding: "12px 10px", color: "var(--auth-text)",
-                      fontSize: 13, fontWeight: 500, cursor: "pointer",
-                    }}
-                  >
-                    <GoogleIcon /> Google
-                  </button>
-                </form>
               </div>
 
               {/* Or divider */}

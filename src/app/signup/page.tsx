@@ -5,9 +5,8 @@ import { useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { AuthImagePanel } from "@/components/AuthImagePanel";
-import { GoogleIcon } from "@/components/GoogleIcon";
+import { FlatPurseLogo } from "@/components/FlatPurseLogo";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { signInWithGoogle } from "@/lib/auth/google";
 import { createAccount } from "./actions";
 
 const easing = "cubic-bezier(0.16, 1, 0.3, 1)";
@@ -32,6 +31,11 @@ function SignupStep1() {
     <div className="flex h-screen overflow-hidden" style={{ background: "var(--auth-bg)", position: "relative" }}>
       {/* Mobile purple gradient */}
       <div className="auth-mobile-gradient" />
+
+      {/* Logo — mobile only */}
+      <div className="absolute left-5 top-5 z-10 lg:hidden">
+        <FlatPurseLogo className="h-6 w-auto" />
+      </div>
 
       {/* Theme toggle — mobile only */}
       <div className="absolute right-5 top-5 z-10 lg:hidden">
@@ -90,47 +94,7 @@ function SignupStep1() {
             </p>
           )}
 
-          {/* Google */}
-          <form action={signInWithGoogle} style={{ animation: fadeUp(80) }}>
-            <input type="hidden" name="next" value="/signup/shop" />
-            <button
-              type="submit"
-              style={{
-                width: "100%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 8,
-                background: "transparent",
-                border: "1px solid var(--auth-input-border)",
-                borderRadius: 10,
-                padding: "12px 16px",
-                color: "var(--auth-text)",
-                fontSize: 14,
-                fontWeight: 500,
-                cursor: "pointer",
-              }}
-            >
-              <GoogleIcon /> Google
-            </button>
-          </form>
-
-          {/* Or divider */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 12,
-              margin: "24px 0",
-              animation: fadeUp(120),
-            }}
-          >
-            <div style={{ flex: 1, height: 1, background: "var(--auth-input-border)" }} />
-            <span style={{ color: "var(--auth-text-sub)", fontSize: 13 }}>Or</span>
-            <div style={{ flex: 1, height: 1, background: "var(--auth-input-border)" }} />
-          </div>
-
-          <form action={createAccount} style={{ display: "flex", flexDirection: "column" }}>
+          <form action={createAccount} style={{ display: "flex", flexDirection: "column", animation: fadeUp(80) }}>
             {/* First / Last name */}
             <div
               style={{
