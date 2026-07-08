@@ -9,7 +9,7 @@ import {
   LayoutGrid, Users2, Settings,
   LogOut, Bell, ChevronLeft, ChevronRight, ChevronDown,
   Sun, Moon, User as UserIcon, Search, MessageSquare, Sparkles,
-  CalendarClock, UserRound,
+  CalendarClock, UserRound, MoreHorizontal,
 } from "lucide-react";
 import { logout, searchDashboard, type SearchResult } from "./actions";
 import type { ShopRole } from "@/lib/dashboard/shop";
@@ -19,12 +19,20 @@ const PURPLE_BG = "rgba(109,40,217,0.18)";
 
 const NAV_TABS = [
   { icon: LayoutDashboard, href: "/dashboard",              label: "Home",       badge: 0, ownerOnly: false },
-  { icon: CalendarDays,    href: "/dashboard/appointments", label: "Bookings",   badge: 4, ownerOnly: false },
+  { icon: CalendarDays,    href: "/dashboard/appointments", label: "Bookings",   badge: 0, ownerOnly: false },
   { icon: Users,           href: "/dashboard/clients",      label: "Clients",    badge: 0, ownerOnly: false },
   { icon: Users2,          href: "/dashboard/team",         label: "Team",       badge: 0, ownerOnly: true  },
-  { icon: Zap,             href: "/dashboard/autopilot",    label: "AutoPilot",  badge: 3, ownerOnly: true  },
+  { icon: Zap,             href: "/dashboard/autopilot",    label: "AutoPilot",  badge: 0, ownerOnly: true  },
   { icon: LayoutGrid,      href: "/dashboard/operations",   label: "Operations", badge: 0, ownerOnly: true  },
 ];
+
+const MOBILE_TABS = [
+  { icon: LayoutDashboard, href: "/dashboard",              label: "Home" },
+  { icon: CalendarDays,    href: "/dashboard/appointments", label: "Bookings" },
+  { icon: Users,           href: "/dashboard/clients",      label: "Clients" },
+  { icon: MoreHorizontal,  href: "/dashboard/more",         label: "More" },
+];
+const MOBILE_PRIMARY_HREFS = ["/dashboard", "/dashboard/appointments", "/dashboard/clients"];
 
 function isActive(href: string, pathname: string) {
   return href === "/dashboard" ? pathname === "/dashboard" : pathname.startsWith(href);
@@ -153,11 +161,14 @@ export function DashboardShell({ children, user, role, unreadCount }: { children
   })();
 
   useEffect(() => {
-    const stored = localStorage.getItem("portal-theme");
-    if (stored === "light") {
-      setDark(false);
-      document.documentElement.setAttribute("data-portal-theme", "light");
-    }
+    const timeout = setTimeout(() => {
+      const stored = localStorage.getItem("portal-theme");
+      if (stored === "light") {
+        setDark(false);
+        document.documentElement.setAttribute("data-portal-theme", "light");
+      }
+    }, 0);
+    return () => clearTimeout(timeout);
   }, []);
 
   const toggleDark = () => {
@@ -611,8 +622,11 @@ export function DashboardShell({ children, user, role, unreadCount }: { children
       }}
         className="mobile-bottom-nav"
       >
-        {visibleTabs.map(({ icon: Icon, href, label, badge }) => {
-          const active = isActive(href, pathname);
+        {MOBILE_TABS.map(({ icon: Icon, href, label }) => {
+          const active = href === "/dashboard/more"
+            ? !MOBILE_PRIMARY_HREFS.some(h => isActive(h, pathname))
+            : isActive(href, pathname);
+          const badge = href === "/dashboard/more" ? unreadCount : 0;
           return (
             <Link key={href} href={href} style={{
               display: "flex", flexDirection: "column", alignItems: "center", gap: 4,
@@ -629,7 +643,7 @@ export function DashboardShell({ children, user, role, unreadCount }: { children
                     fontSize: 8, fontWeight: 800,
                     display: "flex", alignItems: "center", justifyContent: "center",
                     padding: "0 3px",
-                  }}>{badge}</span>
+                  }}>{badge > 9 ? "9+" : badge}</span>
                 )}
               </div>
               <span style={{ fontSize: 10, fontWeight: active ? 700 : 500 }}>{label}</span>

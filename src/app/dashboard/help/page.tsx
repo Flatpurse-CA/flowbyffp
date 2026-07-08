@@ -99,7 +99,7 @@ export default function HelpPage() {
         <div style={{ ...card, overflow: "hidden" }}>
           {filtered.length === 0 ? (
             <div style={{ padding: "48px 24px", textAlign: "center", color: "rgba(255,255,255,0.25)", fontSize: 13 }}>
-              No results for "{query}"
+              No results for &quot;{query}&quot;
             </div>
           ) : filtered.map((f, i) => (
             <div key={i} style={{ borderBottom: i < filtered.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
