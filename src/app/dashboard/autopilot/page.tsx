@@ -1,4 +1,5 @@
-import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
+import { getShopContext } from "@/lib/dashboard/shop";
 import { getAutopilotState } from "./actions";
 import { AutoPilotClient } from "./AutoPilotClient";
 
@@ -6,14 +7,9 @@ export const dynamic = "force-dynamic";
 export const fetchCache = "force-no-store";
 
 export default async function AutoPilotPage() {
-  const supabase = await createClient();
-  const { data: userData } = await supabase.auth.getUser();
+  const ctx = await getShopContext();
 
-  const { data: shop } = userData.user
-    ? await supabase.from("shops").select("id").eq("owner_id", userData.user.id).maybeSingle()
-    : { data: null };
-
-  if (!shop) {
+  if (!ctx) {
     return (
       <div style={{ maxWidth: 460, margin: "100px auto 0", textAlign: "center" }}>
         <h1 style={{ color: "rgb(250,250,250)", fontSize: 19, fontWeight: 800, margin: "0 0 10px", letterSpacing: "-0.02em" }}>
@@ -25,6 +21,8 @@ export default async function AutoPilotPage() {
       </div>
     );
   }
+
+  if (ctx.role !== "owner") redirect("/dashboard");
 
   const state = await getAutopilotState();
   return <AutoPilotClient state={state} />;

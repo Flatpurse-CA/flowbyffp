@@ -11,17 +11,18 @@ import {
   Sun, Moon, User as UserIcon, Search, MessageSquare, Sparkles,
 } from "lucide-react";
 import { logout } from "./actions";
+import type { ShopRole } from "@/lib/dashboard/shop";
 
 const PURPLE    = "rgb(139,92,246)";
 const PURPLE_BG = "rgba(109,40,217,0.18)";
 
 const NAV_TABS = [
-  { icon: LayoutDashboard, href: "/dashboard",              label: "Home",       badge: 0 },
-  { icon: CalendarDays,    href: "/dashboard/appointments", label: "Bookings",   badge: 4 },
-  { icon: Users,           href: "/dashboard/clients",      label: "Clients",    badge: 0 },
-  { icon: Users2,          href: "/dashboard/team",         label: "Team",       badge: 0 },
-  { icon: Zap,             href: "/dashboard/autopilot",    label: "AutoPilot",  badge: 3 },
-  { icon: LayoutGrid,      href: "/dashboard/operations",   label: "Operations", badge: 0 },
+  { icon: LayoutDashboard, href: "/dashboard",              label: "Home",       badge: 0, ownerOnly: false },
+  { icon: CalendarDays,    href: "/dashboard/appointments", label: "Bookings",   badge: 4, ownerOnly: false },
+  { icon: Users,           href: "/dashboard/clients",      label: "Clients",    badge: 0, ownerOnly: false },
+  { icon: Users2,          href: "/dashboard/team",         label: "Team",       badge: 0, ownerOnly: true  },
+  { icon: Zap,             href: "/dashboard/autopilot",    label: "AutoPilot",  badge: 3, ownerOnly: true  },
+  { icon: LayoutGrid,      href: "/dashboard/operations",   label: "Operations", badge: 0, ownerOnly: true  },
 ];
 
 function isActive(href: string, pathname: string) {
@@ -78,10 +79,10 @@ const LIGHT = {
   dropHover:         "rgba(0,0,0,0.05)",
 };
 
-function SidebarNav({ open, pathname, T }: { open: boolean; pathname: string; T: typeof DARK }) {
+function SidebarNav({ open, pathname, T, tabs }: { open: boolean; pathname: string; T: typeof DARK; tabs: typeof NAV_TABS }) {
   return (
     <nav style={{ display: "flex", flexDirection: "column", gap: 1, padding: "0 8px", flexShrink: 0 }}>
-      {NAV_TABS.map(({ icon: Icon, href, label, badge }) => {
+      {tabs.map(({ icon: Icon, href, label, badge }) => {
         const active = isActive(href, pathname);
         return (
           <Link
@@ -125,8 +126,9 @@ function SidebarNav({ open, pathname, T }: { open: boolean; pathname: string; T:
   );
 }
 
-export function DashboardShell({ children, user }: { children: React.ReactNode; user: User }) {
+export function DashboardShell({ children, user, role }: { children: React.ReactNode; user: User; role: ShopRole }) {
   const pathname = usePathname();
+  const visibleTabs = role === "owner" ? NAV_TABS : NAV_TABS.filter(t => !t.ownerOnly);
   const [open, setOpen]             = useState(true);
   const [dark, setDark]             = useState(true);
   const [dropdownOpen, setDropdown] = useState(false);
@@ -294,27 +296,29 @@ export function DashboardShell({ children, user }: { children: React.ReactNode; 
 
         {/* Nav */}
         <div style={{ flex: 1, overflowY: "auto", paddingBottom: 8, paddingTop: 8 }}>
-          <SidebarNav open={open} pathname={pathname} T={T} />
+          <SidebarNav open={open} pathname={pathname} T={T} tabs={visibleTabs} />
         </div>
 
         {/* Bottom: Settings + Sign out */}
         <div style={{ padding: "0 8px 20px", flexShrink: 0 }}>
           <div style={{ height: 1, background: T.border, margin: "0 4px 8px" }} />
-          <Link
-            href="/dashboard/settings"
-            title={!open ? "Settings" : undefined}
-            style={{
-              display: "flex", alignItems: "center", gap: 12,
-              padding: open ? "9px 12px" : "11px", borderRadius: 10,
-              background: isActive("/dashboard/settings", pathname) ? T.activePill : "transparent",
-              color: isActive("/dashboard/settings", pathname) ? T.activeText : T.inactiveText,
-              fontSize: 13.5, fontWeight: 400, textDecoration: "none",
-              justifyContent: open ? "flex-start" : "center", marginBottom: 2,
-            }}
-          >
-            <Settings size={16} strokeWidth={1.7} style={{ flexShrink: 0 }} />
-            {open && <span>Settings</span>}
-          </Link>
+          {role === "owner" && (
+            <Link
+              href="/dashboard/settings"
+              title={!open ? "Settings" : undefined}
+              style={{
+                display: "flex", alignItems: "center", gap: 12,
+                padding: open ? "9px 12px" : "11px", borderRadius: 10,
+                background: isActive("/dashboard/settings", pathname) ? T.activePill : "transparent",
+                color: isActive("/dashboard/settings", pathname) ? T.activeText : T.inactiveText,
+                fontSize: 13.5, fontWeight: 400, textDecoration: "none",
+                justifyContent: open ? "flex-start" : "center", marginBottom: 2,
+              }}
+            >
+              <Settings size={16} strokeWidth={1.7} style={{ flexShrink: 0 }} />
+              {open && <span>Settings</span>}
+            </Link>
+          )}
           <form action={logout} style={{ width: "100%" }}>
             <button type="submit" style={{
               display: "flex", alignItems: "center", gap: 12,
@@ -450,7 +454,7 @@ export function DashboardShell({ children, user }: { children: React.ReactNode; 
 
                     {[
                       { icon: UserIcon, label: "Profile",  href: "/dashboard/profile"  },
-                      { icon: Settings, label: "Settings", href: "/dashboard/settings" },
+                      ...(role === "owner" ? [{ icon: Settings, label: "Settings", href: "/dashboard/settings" }] : []),
                     ].map(({ icon: Icon, label, href }) => (
                       <Link
                         key={href}
@@ -507,7 +511,7 @@ export function DashboardShell({ children, user }: { children: React.ReactNode; 
       }}
         className="mobile-bottom-nav"
       >
-        {NAV_TABS.map(({ icon: Icon, href, label, badge }) => {
+        {visibleTabs.map(({ icon: Icon, href, label, badge }) => {
           const active = isActive(href, pathname);
           return (
             <Link key={href} href={href} style={{

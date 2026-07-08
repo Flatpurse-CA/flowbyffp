@@ -1,9 +1,11 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireShop } from "@/lib/dashboard/shop";
+import { requireShop, getShopContext } from "@/lib/dashboard/shop";
 
 export async function updateFamilyHours(input: { enabled: boolean; start: string; end: string }) {
+  const ctx = await getShopContext();
+  if (!ctx || ctx.role !== "owner") throw new Error("Only the shop owner can change Family Hours");
   const { supabase, shopId } = await requireShop();
 
   const { error } = await supabase

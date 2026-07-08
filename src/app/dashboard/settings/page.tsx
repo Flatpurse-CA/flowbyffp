@@ -1,10 +1,15 @@
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getShopContext } from "@/lib/dashboard/shop";
 import { SettingsClient } from "./SettingsClient";
 
 export const dynamic = "force-dynamic";
 export const fetchCache = "force-no-store";
 
 export default async function SettingsPage() {
+  const ctx = await getShopContext();
+  if (ctx && ctx.role !== "owner") redirect("/dashboard");
+
   const supabase = await createClient();
   const { data: userData } = await supabase.auth.getUser();
 

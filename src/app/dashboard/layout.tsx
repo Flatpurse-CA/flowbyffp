@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getShopContext } from "@/lib/dashboard/shop";
 import { DashboardShell } from "./DashboardShell";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -7,5 +8,22 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const { data, error } = await supabase.auth.getUser();
   if (error || !data.user) redirect("/login");
 
-  return <DashboardShell user={data.user}>{children}</DashboardShell>;
+  const ctx = await getShopContext();
+
+  if (!ctx) {
+    return (
+      <div style={{ display: "flex", minHeight: "100vh", alignItems: "center", justifyContent: "center", background: "rgb(10,10,12)", padding: "0 24px" }}>
+        <div style={{ maxWidth: 420, textAlign: "center" }}>
+          <h1 style={{ color: "rgb(250,250,250)", fontSize: 19, fontWeight: 800, margin: "0 0 10px", letterSpacing: "-0.02em" }}>
+            Your account isn&apos;t linked to a shop yet
+          </h1>
+          <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 13.5, lineHeight: 1.6, margin: 0 }}>
+            If you were invited as a team member, ask your shop owner to send a fresh invite. Otherwise, complete onboarding to set up your shop.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return <DashboardShell user={data.user} role={ctx.role}>{children}</DashboardShell>;
 }

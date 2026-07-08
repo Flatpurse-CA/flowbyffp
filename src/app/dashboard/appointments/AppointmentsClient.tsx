@@ -130,11 +130,11 @@ function combineDateTime(dateStr: string, timeStr: string) {
 
 // ─── New Appointment Overlay ───────────────────────────────────────────────────
 
-function NewBookingOverlay({ onClose, onCreated, staff }: { onClose: () => void; onCreated: () => void; staff: StaffRow[] }) {
+function NewBookingOverlay({ onClose, onCreated, staff, selfStaffId }: { onClose: () => void; onCreated: () => void; staff: StaffRow[]; selfStaffId?: string | null }) {
   const [step, setStep] = useState<"client"|"service"|"datetime"|"confirm">("client");
   const [clientQ, setClientQ] = useState("");
   const [selectedService, setSelectedService] = useState("");
-  const [selectedStaffId, setSelectedStaffId] = useState("");
+  const [selectedStaffId, setSelectedStaffId] = useState(selfStaffId ?? "");
   const selectedStylist = staff.find(s => s.id === selectedStaffId)?.full_name ?? "";
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
@@ -251,7 +251,7 @@ function NewBookingOverlay({ onClose, onCreated, staff }: { onClose: () => void;
                 <input type="number" value={duration} onChange={e => setDuration(e.target.value)} style={inputStyle} />
               </div>
             </div>
-            {staff.length > 0 && (
+            {staff.length > 0 && !selfStaffId && (
               <div>
                 <label style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, fontWeight: 500, display: "block", marginBottom: 7 }}>Stylist</label>
                 <div style={{ display: "flex", gap: 8 }}>
@@ -1212,7 +1212,7 @@ function BookingLinkCard({ bookingLink }: { bookingLink: string }) {
 const VIEWS = ["Day", "Week", "List"] as const;
 type View = typeof VIEWS[number];
 
-export function AppointmentsClient({ initialAppointments, bookingLink, staff }: { initialAppointments: AppointmentRow[]; bookingLink: string; staff: StaffRow[] }) {
+export function AppointmentsClient({ initialAppointments, bookingLink, staff, selfStaffId }: { initialAppointments: AppointmentRow[]; bookingLink: string; staff: StaffRow[]; selfStaffId?: string | null }) {
   const router = useRouter();
   const [, startTransition] = useTransition();
   const [view, setView]           = useState<View>("Day");
@@ -1279,7 +1279,7 @@ export function AppointmentsClient({ initialAppointments, bookingLink, staff }: 
       {view === "List" && <ListView appts={appts} onSelect={a => setSelectedId(a.id)} />}
 
       {/* New booking overlay */}
-      {showNewBooking && <NewBookingOverlay onClose={() => setNew(false)} onCreated={refresh} staff={staff} />}
+      {showNewBooking && <NewBookingOverlay onClose={() => setNew(false)} onCreated={refresh} staff={staff} selfStaffId={selfStaffId} />}
 
       {/* Appointment detail → close-out */}
       {selectedAppt && !closingOut && (

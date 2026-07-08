@@ -4,7 +4,7 @@ import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, TrendingDown, TrendingUp, AlertTriangle, MoreHorizontal, X } from "lucide-react";
 import type { StaffRow } from "./actions";
-import { createStaff, archiveStaff } from "./actions";
+import { inviteStaff, resendInvite, archiveStaff } from "./actions";
 import type { AppointmentRow } from "../appointments/actions";
 import { computeStaffUtilization, computeRebookTrend, type MetricsAppointment } from "@/lib/dashboard/metrics";
 
@@ -55,6 +55,7 @@ function TrendChart({ data, avg, declining }: { data: number[]; avg: number; dec
 function AddStaffModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
   const [fullName, setFullName] = useState("");
   const [role, setRole] = useState("");
+  const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -66,14 +67,15 @@ function AddStaffModal({ onClose, onCreated }: { onClose: () => void; onCreated:
 
   const handleSubmit = async () => {
     if (!fullName.trim()) { setError("Name is required."); return; }
+    if (!email.trim()) { setError("Email is required to send them an invite."); return; }
     setError(null);
     setSubmitting(true);
     try {
-      await createStaff({ fullName: fullName.trim(), role: role.trim() || undefined });
+      await inviteStaff({ fullName: fullName.trim(), role: role.trim() || undefined, email: email.trim() });
       onCreated();
       onClose();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Couldn't add that team member — try again.");
+      setError(e instanceof Error ? e.message : "Couldn't send that invite — try again.");
     } finally {
       setSubmitting(false);
     }
@@ -93,7 +95,7 @@ function AddStaffModal({ onClose, onCreated }: { onClose: () => void; onCreated:
       }} onClick={e => e.stopPropagation()}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
           <h2 style={{ color: "rgb(250,250,250)", fontSize: 18, fontWeight: 800, margin: 0, letterSpacing: "-0.02em" }}>
-            Add team member
+            Invite team member
           </h2>
           <button onClick={onClose} style={{ background: "rgba(255,255,255,0.06)", border: "none", borderRadius: 8, width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "rgba(255,255,255,0.5)" }}>
             <X size={16} />
@@ -105,6 +107,11 @@ function AddStaffModal({ onClose, onCreated }: { onClose: () => void; onCreated:
             <input value={fullName} onChange={e => setFullName(e.target.value)} placeholder="e.g. Emma Watson" style={inputStyle} />
           </div>
           <div>
+            <label style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, fontWeight: 500, display: "block", marginBottom: 7 }}>Email</label>
+            <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="them@example.com" style={inputStyle} />
+            <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, margin: "6px 0 0" }}>They&apos;ll get an email to set up their own login, scoped to their own bookings.</p>
+          </div>
+          <div>
             <label style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, fontWeight: 500, display: "block", marginBottom: 7 }}>Role (optional)</label>
             <input value={role} onChange={e => setRole(e.target.value)} placeholder="e.g. Senior Stylist" style={inputStyle} />
           </div>
@@ -114,7 +121,7 @@ function AddStaffModal({ onClose, onCreated }: { onClose: () => void; onCreated:
             background: "rgb(109,40,217)", color: "white", fontSize: 14, fontWeight: 700,
             cursor: submitting ? "default" : "pointer", opacity: submitting ? 0.6 : 1,
           }}>
-            {submitting ? "Adding…" : "Add member"}
+            {submitting ? "Sending invite…" : "Send invite"}
           </button>
         </div>
       </div>
@@ -165,11 +172,24 @@ export function TeamClient({ staff, appointments }: { staff: StaffRow[]; appoint
     overflow: "hidden",
   };
 
+  const [resendError, setResendError] = useState<string | null>(null);
+
   const handleArchive = async (id: string) => {
     setMenuOpenId(null);
     if (selected === id) setSelected(null);
     await archiveStaff(id);
     refresh();
+  };
+
+  const handleResend = async (id: string) => {
+    setMenuOpenId(null);
+    setResendError(null);
+    try {
+      await resendInvite(id);
+      refresh();
+    } catch (e) {
+      setResendError(e instanceof Error ? e.message : "Couldn't resend that invite.");
+    }
   };
 
   if (staff.length === 0) {
@@ -188,7 +208,7 @@ export function TeamClient({ staff, appointments }: { staff: StaffRow[]; appoint
           background: "rgb(109,40,217)", border: "none",
           color: "white", fontSize: 14, fontWeight: 700, cursor: "pointer",
         }}>
-          <Plus size={16} strokeWidth={2.5} /> Add first team member
+          <Plus size={16} strokeWidth={2.5} /> Invite first team member
         </button>
         {showAdd && <AddStaffModal onClose={() => setShowAdd(false)} onCreated={refresh} />}
       </div>
@@ -213,9 +233,13 @@ export function TeamClient({ staff, appointments }: { staff: StaffRow[]; appoint
             background: "rgb(109,40,217)", border: "none",
             color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer",
           }}>
-            <Plus size={15} strokeWidth={2.5} /> Add member
+            <Plus size={15} strokeWidth={2.5} /> Invite member
           </button>
         </div>
+
+        {resendError && (
+          <p style={{ color: "rgb(248,113,113)", fontSize: 12.5, margin: 0 }}>{resendError}</p>
+        )}
 
         {/* Staff cards */}
         {rows.map(row => (
@@ -250,6 +274,22 @@ export function TeamClient({ staff, appointments }: { staff: StaffRow[]; appoint
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 2 }}>
                   <span style={{ color: "rgb(250,250,250)", fontSize: 14, fontWeight: 700 }}>{row.full_name}</span>
                   {row.role && <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 12 }}>{row.role}</span>}
+                  {row.invite_status === "pending" && (
+                    <span style={{
+                      fontSize: 10, fontWeight: 700, color: "rgb(251,191,36)",
+                      background: "rgba(245,158,11,0.1)", padding: "2px 8px", borderRadius: 20,
+                    }}>
+                      Invite pending
+                    </span>
+                  )}
+                  {row.invite_status === "not_invited" && (
+                    <span style={{
+                      fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.4)",
+                      background: "rgba(255,255,255,0.06)", padding: "2px 8px", borderRadius: 20,
+                    }}>
+                      No account
+                    </span>
+                  )}
                   {row.trend.declining && (
                     <span style={{
                       display: "flex", alignItems: "center", gap: 4,
@@ -291,6 +331,14 @@ export function TeamClient({ staff, appointments }: { staff: StaffRow[]; appoint
                       boxShadow: "0 12px 32px rgba(0,0,0,0.5)",
                     }}
                   >
+                    {row.invite_status === "pending" && (
+                      <button onClick={() => handleResend(row.id)} style={{
+                        display: "block", width: "100%", textAlign: "left", padding: "9px 14px",
+                        background: "none", border: "none", color: "rgba(255,255,255,0.7)", fontSize: 12.5, cursor: "pointer",
+                      }}>
+                        Resend invite
+                      </button>
+                    )}
                     <button onClick={() => handleArchive(row.id)} style={{
                       display: "block", width: "100%", textAlign: "left", padding: "9px 14px",
                       background: "none", border: "none", color: "rgb(248,113,113)", fontSize: 12.5, cursor: "pointer",
