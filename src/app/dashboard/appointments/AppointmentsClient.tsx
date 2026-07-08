@@ -131,7 +131,6 @@ function combineDateTime(dateStr: string, timeStr: string) {
 // ─── New Appointment Overlay ───────────────────────────────────────────────────
 
 function NewBookingOverlay({ onClose, onCreated, staff, selfStaffId }: { onClose: () => void; onCreated: () => void; staff: StaffRow[]; selfStaffId?: string | null }) {
-  const [step, setStep] = useState<"client"|"service"|"datetime"|"confirm">("client");
   const [clientQ, setClientQ] = useState("");
   const [selectedService, setSelectedService] = useState("");
   const [selectedStaffId, setSelectedStaffId] = useState(selfStaffId ?? "");
@@ -151,11 +150,15 @@ function NewBookingOverlay({ onClose, onCreated, staff, selfStaffId }: { onClose
     borderRadius: 10, padding: "10px 13px", color: "rgb(250,250,250)", fontSize: 13.5,
     outline: "none", boxSizing: "border-box",
   };
+  const sectionLabel: React.CSSProperties = {
+    color: "rgba(255,255,255,0.4)", fontSize: 11.5, fontWeight: 700, letterSpacing: "0.05em",
+    textTransform: "uppercase", display: "block", marginBottom: 9,
+  };
 
-  const STEPS = ["client","service","datetime","confirm"];
-  const stepIdx = STEPS.indexOf(step);
+  const canBook = Boolean(clientQ.trim() && selectedService && selectedDate && selectedTime);
 
   const handleBook = async () => {
+    if (!canBook) return;
     setError(null);
     setSubmitting(true);
     try {
@@ -180,6 +183,16 @@ function NewBookingOverlay({ onClose, onCreated, staff, selfStaffId }: { onClose
     }
   };
 
+  const summaryRows: { label: string; value: string }[] = [
+    { label: "Client", value: clientQ || "—" },
+    { label: "Service", value: selectedService || "—" },
+    { label: "Stylist", value: selectedStylist || "—" },
+    { label: "Date", value: selectedDate || "—" },
+    { label: "Time", value: selectedTime || "—" },
+  ];
+  const priceNum = parseFloat(price) || 0;
+  const depositNum = deposit ? priceNum * 0.25 : 0;
+
   return (
     <div style={{
       position: "fixed", inset: 0, zIndex: 300,
@@ -188,80 +201,65 @@ function NewBookingOverlay({ onClose, onCreated, staff, selfStaffId }: { onClose
     }} onClick={onClose}>
       <div style={{
         background: "rgb(14,14,18)", border: "1px solid rgba(255,255,255,0.1)",
-        borderRadius: 22, width: "100%", maxWidth: 520,
-        padding: "28px 28px 24px", margin: 20,
-        boxShadow: "0 24px 80px rgba(0,0,0,0.7)",
+        borderRadius: 22, width: "100%", maxWidth: 860, maxHeight: "88vh",
+        margin: 20, boxShadow: "0 24px 80px rgba(0,0,0,0.7)",
+        display: "flex", overflow: "hidden",
       }} onClick={e => e.stopPropagation()}>
 
-        {/* Header */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
-          <h2 style={{ color: "rgb(250,250,250)", fontSize: 18, fontWeight: 800, margin: 0, letterSpacing: "-0.02em" }}>
-            New Booking
-          </h2>
-          <button onClick={onClose} style={{ background: "rgba(255,255,255,0.06)", border: "none", borderRadius: 8, width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "rgba(255,255,255,0.5)" }}>
-            <X size={16} />
-          </button>
-        </div>
+        {/* Form */}
+        <div style={{ flex: 1, minWidth: 0, padding: "26px 28px", overflowY: "auto" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 22 }}>
+            <h2 style={{ color: "rgb(250,250,250)", fontSize: 18, fontWeight: 800, margin: 0, letterSpacing: "-0.02em" }}>
+              New Booking
+            </h2>
+            <button onClick={onClose} style={{ background: "rgba(255,255,255,0.06)", border: "none", borderRadius: 8, width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "rgba(255,255,255,0.5)" }}>
+              <X size={16} />
+            </button>
+          </div>
 
-        {/* Step progress */}
-        <div style={{ display: "flex", gap: 4, marginBottom: 24 }}>
-          {["Client","Service","Date & Time","Confirm"].map((s, i) => (
-            <div key={s} style={{ flex: 1, display: "flex", flexDirection: "column", gap: 5 }}>
-              <div style={{ height: 3, borderRadius: 2, background: i <= stepIdx ? "rgb(109,40,217)" : "rgba(255,255,255,0.08)" }} />
-              <span style={{ fontSize: 10, fontWeight: i === stepIdx ? 700 : 500, color: i === stepIdx ? "rgb(210,196,254)" : "rgba(255,255,255,0.25)" }}>{s}</span>
-            </div>
-          ))}
-        </div>
-
-        {/* Step: Client */}
-        {step === "client" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
             <div>
-              <label style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, fontWeight: 500, display: "block", marginBottom: 7 }}>Client name</label>
+              <label style={sectionLabel}>Client</label>
               <input value={clientQ} onChange={e => setClientQ(e.target.value)} placeholder="Full name…" style={inputStyle} />
             </div>
-          </div>
-        )}
 
-        {/* Step: Service */}
-        {step === "service" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             <div>
-              <label style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, fontWeight: 500, display: "block", marginBottom: 7 }}>Service</label>
-              <div style={{ display: "flex", flexDirection: "column", gap: 6, maxHeight: 200, overflowY: "auto" }}>
+              <label style={sectionLabel}>Service</label>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, marginBottom: 10 }}>
                 {SERVICES.map(s => (
                   <button key={s} onClick={() => setSelectedService(s)} style={{
-                    padding: "10px 14px", borderRadius: 10, border: `1px solid ${selectedService === s ? "rgba(139,92,246,0.5)" : "rgba(255,255,255,0.07)"}`,
+                    padding: "9px 12px", borderRadius: 10, border: `1px solid ${selectedService === s ? "rgba(139,92,246,0.5)" : "rgba(255,255,255,0.07)"}`,
                     background: selectedService === s ? "rgba(109,40,217,0.15)" : "rgba(255,255,255,0.02)",
                     color: selectedService === s ? "rgb(210,196,254)" : "rgba(255,255,255,0.6)",
-                    fontSize: 13, fontWeight: selectedService === s ? 700 : 400, cursor: "pointer", textAlign: "left",
+                    fontSize: 12.5, fontWeight: selectedService === s ? 700 : 400, cursor: "pointer", textAlign: "left",
                   }}>
                     {s}
                   </button>
                 ))}
               </div>
-            </div>
-            <div style={{ display: "flex", gap: 10 }}>
-              <div style={{ flex: 1 }}>
-                <label style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, fontWeight: 500, display: "block", marginBottom: 7 }}>Price (C$)</label>
-                <input type="number" value={price} onChange={e => setPrice(e.target.value)} style={inputStyle} />
+              <div style={{ display: "flex", gap: 10 }}>
+                <div style={{ flex: 1 }}>
+                  <label style={{ color: "rgba(255,255,255,0.35)", fontSize: 11.5, display: "block", marginBottom: 6 }}>Price (C$)</label>
+                  <input type="number" value={price} onChange={e => setPrice(e.target.value)} style={inputStyle} />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label style={{ color: "rgba(255,255,255,0.35)", fontSize: 11.5, display: "block", marginBottom: 6 }}>Duration (min)</label>
+                  <input type="number" value={duration} onChange={e => setDuration(e.target.value)} style={inputStyle} />
+                </div>
               </div>
-              <div style={{ flex: 1 }}>
-                <label style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, fontWeight: 500, display: "block", marginBottom: 7 }}>Duration (min)</label>
-                <input type="number" value={duration} onChange={e => setDuration(e.target.value)} style={inputStyle} />
-              </div>
             </div>
+
             {staff.length > 0 && !selfStaffId && (
               <div>
-                <label style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, fontWeight: 500, display: "block", marginBottom: 7 }}>Stylist</label>
-                <div style={{ display: "flex", gap: 8 }}>
+                <label style={sectionLabel}>Stylist</label>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                   {staff.map(s => (
                     <button key={s.id} onClick={() => setSelectedStaffId(s.id)} style={{
-                      flex: 1, padding: "9px 6px", borderRadius: 10,
+                      padding: "9px 16px", borderRadius: 10,
                       border: `1px solid ${selectedStaffId === s.id ? "rgba(139,92,246,0.5)" : "rgba(255,255,255,0.07)"}`,
                       background: selectedStaffId === s.id ? "rgba(109,40,217,0.15)" : "rgba(255,255,255,0.02)",
                       color: selectedStaffId === s.id ? "rgb(210,196,254)" : "rgba(255,255,255,0.5)",
-                      fontSize: 12, fontWeight: selectedStaffId === s.id ? 700 : 400, cursor: "pointer",
+                      fontSize: 12.5, fontWeight: selectedStaffId === s.id ? 700 : 400, cursor: "pointer",
                     }}>
                       {s.full_name.split(" ")[0]}
                     </button>
@@ -269,65 +267,36 @@ function NewBookingOverlay({ onClose, onCreated, staff, selfStaffId }: { onClose
                 </div>
               </div>
             )}
-          </div>
-        )}
 
-        {/* Step: Date & Time */}
-        {step === "datetime" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             <div>
-              <label style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, fontWeight: 500, display: "block", marginBottom: 7 }}>Date</label>
-              <input type="date" value={selectedDate} onChange={e => setSelectedDate(e.target.value)} style={{ ...inputStyle, colorScheme: "dark" }} />
-            </div>
-            <div>
-              <label style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, fontWeight: 500, display: "block", marginBottom: 7 }}>Time</label>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 6 }}>
+              <label style={sectionLabel}>Date &amp; time</label>
+              <input type="date" value={selectedDate} onChange={e => setSelectedDate(e.target.value)} style={{ ...inputStyle, colorScheme: "dark", marginBottom: 10 }} />
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(6,1fr)", gap: 6 }}>
                 {TIMES.map(t => (
                   <button key={t} onClick={() => setSelectedTime(t)} style={{
                     padding: "8px 4px", borderRadius: 9,
                     border: `1px solid ${selectedTime === t ? "rgba(139,92,246,0.5)" : "rgba(255,255,255,0.07)"}`,
                     background: selectedTime === t ? "rgba(109,40,217,0.15)" : "rgba(255,255,255,0.02)",
                     color: selectedTime === t ? "rgb(210,196,254)" : "rgba(255,255,255,0.5)",
-                    fontSize: 11.5, fontWeight: selectedTime === t ? 700 : 400, cursor: "pointer",
+                    fontSize: 11, fontWeight: selectedTime === t ? 700 : 400, cursor: "pointer",
                   }}>
                     {t}
                   </button>
                 ))}
               </div>
             </div>
+
             <div>
-              <label style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, fontWeight: 500, display: "block", marginBottom: 7 }}>Notes (optional)</label>
+              <label style={sectionLabel}>Notes</label>
               <textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="e.g. first time client, prefers no heat…" rows={2} style={{ ...inputStyle, resize: "none", fontFamily: "inherit" }} />
             </div>
-          </div>
-        )}
 
-        {/* Step: Confirm */}
-        {step === "confirm" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-            <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 14, padding: "16px 18px" }}>
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {[
-                  { label: "Client",  value: clientQ || "—" },
-                  { label: "Service", value: selectedService || "—" },
-                  { label: "Price",   value: price ? `C$${price}` : "—" },
-                  { label: "Stylist", value: selectedStylist || "—" },
-                  { label: "Date",    value: selectedDate || "—" },
-                  { label: "Time",    value: selectedTime || "—" },
-                ].map(row => (
-                  <div key={row.label} style={{ display: "flex", justifyContent: "space-between" }}>
-                    <span style={{ color: "rgba(255,255,255,0.35)", fontSize: 13 }}>{row.label}</span>
-                    <span style={{ color: "rgb(250,250,250)", fontSize: 13, fontWeight: 600 }}>{row.value}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {[
                 { label: "Require deposit", sub: "Marks 25% as paid upfront", value: deposit, set: setDeposit },
                 { label: "Send SMS confirmation", sub: "Text the client when booked", value: sms, set: setSms },
               ].map(t => (
-                <div key={t.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 14px", background: "rgba(255,255,255,0.03)", borderRadius: 10, border: "1px solid rgba(255,255,255,0.07)" }}>
+                <div key={t.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 14px", background: "rgba(255,255,255,0.03)", borderRadius: 10, border: "1px solid rgba(255,255,255,0.07)" }}>
                   <div>
                     <p style={{ color: "rgb(250,250,250)", fontSize: 13, fontWeight: 600, margin: "0 0 2px" }}>{t.label}</p>
                     <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 11.5, margin: 0 }}>{t.sub}</p>
@@ -335,7 +304,7 @@ function NewBookingOverlay({ onClose, onCreated, staff, selfStaffId }: { onClose
                   <button onClick={() => t.set(!t.value)} style={{
                     width: 40, height: 22, borderRadius: 11, border: "none", cursor: "pointer",
                     background: t.value ? "rgb(109,40,217)" : "rgba(255,255,255,0.12)",
-                    position: "relative", transition: "background 0.2s",
+                    position: "relative", transition: "background 0.2s", flexShrink: 0,
                   }}>
                     <span style={{
                       position: "absolute", top: 3, left: t.value ? 21 : 3,
@@ -346,48 +315,61 @@ function NewBookingOverlay({ onClose, onCreated, staff, selfStaffId }: { onClose
                 </div>
               ))}
             </div>
-            {error && (
-              <p style={{ color: "rgb(248,113,113)", fontSize: 12.5, margin: 0 }}>{error}</p>
+          </div>
+        </div>
+
+        {/* Live summary panel */}
+        <div style={{
+          width: 280, flexShrink: 0, background: "rgba(255,255,255,0.02)",
+          borderLeft: "1px solid rgba(255,255,255,0.08)", padding: "26px 22px",
+          display: "flex", flexDirection: "column",
+        }}>
+          <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", margin: "0 0 16px" }}>
+            Summary
+          </p>
+
+          <div style={{
+            width: 44, height: 44, borderRadius: 12, background: "rgba(139,92,246,0.15)", border: "1px solid rgba(139,92,246,0.3)",
+            display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 800, color: "rgb(167,139,250)", marginBottom: 14,
+          }}>
+            {clientQ.trim() ? initialsFor(clientQ) : "?"}
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 18 }}>
+            {summaryRows.map(row => (
+              <div key={row.label}>
+                <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 10.5, fontWeight: 600, letterSpacing: "0.04em", textTransform: "uppercase", margin: "0 0 2px" }}>{row.label}</p>
+                <p style={{ color: "rgb(250,250,250)", fontSize: 13.5, fontWeight: 600, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{row.value}</p>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, padding: "12px 14px", marginBottom: "auto" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: deposit ? 6 : 0 }}>
+              <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 12 }}>Price</span>
+              <span style={{ color: "rgb(250,250,250)", fontSize: 13, fontWeight: 700 }}>{fmtPrice(priceNum)}</span>
+            </div>
+            {deposit && (
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 12 }}>Deposit due</span>
+                <span style={{ color: "rgb(167,139,250)", fontSize: 13, fontWeight: 700 }}>{fmtPrice(depositNum)}</span>
+              </div>
             )}
           </div>
-        )}
 
-        {/* Footer buttons */}
-        <div style={{ display: "flex", gap: 10, marginTop: 22 }}>
-          {stepIdx > 0 && (
-            <button onClick={() => setStep(STEPS[stepIdx - 1] as typeof step)} style={{
-              flex: 1, padding: "12px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.1)",
-              background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.6)",
-              fontSize: 13.5, fontWeight: 700, cursor: "pointer",
-            }}>
-              Back
-            </button>
+          {error && (
+            <p style={{ color: "rgb(248,113,113)", fontSize: 12, margin: "16px 0 0" }}>{error}</p>
           )}
-          {step !== "confirm" ? (
-            <button
-              disabled={
-                (step === "client" && !clientQ) ||
-                (step === "service" && !selectedService) ||
-                (step === "datetime" && (!selectedDate || !selectedTime))
-              }
-              onClick={() => setStep(STEPS[stepIdx + 1] as typeof step)}
-              style={{
-                flex: 2, padding: "12px", borderRadius: 12, border: "none",
-                background: "rgb(109,40,217)", color: "white",
-                fontSize: 13.5, fontWeight: 700, cursor: "pointer",
-              }}>
-              Continue →
-            </button>
-          ) : (
-            <button disabled={submitting} onClick={handleBook} style={{
-              flex: 2, padding: "12px", borderRadius: 12, border: "none",
-              background: "rgb(52,211,153)", color: "rgb(5,40,20)",
-              fontSize: 13.5, fontWeight: 800, cursor: submitting ? "default" : "pointer",
-              opacity: submitting ? 0.7 : 1,
-            }}>
-              {submitting ? "Booking…" : "Book appointment"}
-            </button>
-          )}
+
+          <button disabled={!canBook || submitting} onClick={handleBook} style={{
+            marginTop: 16, padding: "13px", borderRadius: 12, border: "none",
+            background: canBook ? "rgb(52,211,153)" : "rgba(255,255,255,0.08)",
+            color: canBook ? "rgb(5,40,20)" : "rgba(255,255,255,0.3)",
+            fontSize: 13.5, fontWeight: 800, cursor: canBook && !submitting ? "pointer" : "default",
+            opacity: submitting ? 0.7 : 1,
+          }}>
+            {submitting ? "Booking…" : "Book appointment"}
+          </button>
         </div>
       </div>
     </div>
