@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getShopContext } from "@/lib/dashboard/shop";
+import { getUnreadCount } from "./messages/actions";
 import { DashboardShell } from "./DashboardShell";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -25,5 +26,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
     );
   }
 
-  return <DashboardShell user={data.user} role={ctx.role}>{children}</DashboardShell>;
+  const unreadCount = await getUnreadCount();
+
+  return <DashboardShell user={data.user} role={ctx.role} unreadCount={unreadCount}>{children}</DashboardShell>;
 }

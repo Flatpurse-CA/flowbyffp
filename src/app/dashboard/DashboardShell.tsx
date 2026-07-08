@@ -2,15 +2,16 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import {
   LayoutDashboard, CalendarDays, Users, Zap,
   LayoutGrid, Users2, Settings,
-  LogOut, Bell, ChevronLeft, ChevronRight,
+  LogOut, Bell, ChevronLeft, ChevronRight, ChevronDown,
   Sun, Moon, User as UserIcon, Search, MessageSquare, Sparkles,
+  CalendarClock, UserRound,
 } from "lucide-react";
-import { logout } from "./actions";
+import { logout, searchDashboard, type SearchResult } from "./actions";
 import type { ShopRole } from "@/lib/dashboard/shop";
 
 const PURPLE    = "rgb(139,92,246)";
@@ -126,13 +127,20 @@ function SidebarNav({ open, pathname, T, tabs }: { open: boolean; pathname: stri
   );
 }
 
-export function DashboardShell({ children, user, role }: { children: React.ReactNode; user: User; role: ShopRole }) {
+export function DashboardShell({ children, user, role, unreadCount }: { children: React.ReactNode; user: User; role: ShopRole; unreadCount: number }) {
+  const router = useRouter();
   const pathname = usePathname();
   const visibleTabs = role === "owner" ? NAV_TABS : NAV_TABS.filter(t => !t.ownerOnly);
   const [open, setOpen]             = useState(true);
   const [dark, setDark]             = useState(true);
   const [dropdownOpen, setDropdown] = useState(false);
   const dropdownRef                 = useRef<HTMLDivElement>(null);
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   const email    = user.email ?? "";
   const username = email.split("@")[0];
@@ -169,6 +177,49 @@ export function DashboardShell({ children, user, role }: { children: React.React
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, [dropdownOpen]);
+
+  useEffect(() => {
+    if (!searchOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+        setSearchOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [searchOpen]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const timeout = setTimeout(async () => {
+      if (searchQuery.trim().length < 2) {
+        if (!cancelled) setSearchResults([]);
+        return;
+      }
+      const results = await searchDashboard(searchQuery);
+      if (!cancelled) setSearchResults(results);
+    }, 250);
+    return () => { cancelled = true; clearTimeout(timeout); };
+  }, [searchQuery]);
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+        setSearchOpen(true);
+      }
+      if (e.key === "Escape") setSearchOpen(false);
+    };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, []);
+
+  const goToSearchResult = (r: SearchResult) => {
+    setSearchOpen(false);
+    setSearchQuery("");
+    router.push(r.kind === "appointment" ? "/dashboard/appointments" : "/dashboard/team");
+  };
 
   const T = dark ? DARK : LIGHT;
 
@@ -360,7 +411,7 @@ export function DashboardShell({ children, user, role }: { children: React.React
           </div>
 
           {/* Search */}
-          <div style={{ flex: 1, maxWidth: 300, margin: "0 32px" }}>
+          <div ref={searchRef} style={{ flex: 1, maxWidth: 300, margin: "0 32px", position: "relative" }}>
             <div style={{
               display: "flex", alignItems: "center", gap: 9,
               background: T.searchBg,
@@ -368,19 +419,63 @@ export function DashboardShell({ children, user, role }: { children: React.React
               borderRadius: 10, padding: "9px 14px",
             }}>
               <Search size={13} color={T.searchPlaceholder} />
-              <span style={{ color: T.searchPlaceholder, fontSize: 13, flex: 1 }}>Search anything...</span>
+              <input
+                ref={searchInputRef}
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                onFocus={() => setSearchOpen(true)}
+                placeholder="Search anything..."
+                style={{
+                  flex: 1, background: "none", border: "none", outline: "none",
+                  color: T.text, fontSize: 13, padding: 0, fontFamily: "inherit",
+                }}
+              />
               <span style={{
                 color: T.searchKbd, fontSize: 11, fontWeight: 600,
                 background: T.searchKbdBg, padding: "2px 6px", borderRadius: 5,
               }}>⌘K</span>
             </div>
+
+            {searchOpen && searchQuery.trim().length >= 2 && (
+              <div style={{
+                position: "absolute", top: "calc(100% + 8px)", left: 0, right: 0,
+                background: T.dropBg, border: `1px solid ${T.dropBorder}`, borderRadius: 12,
+                boxShadow: dark ? "0 12px 40px rgba(0,0,0,0.55)" : "0 8px 32px rgba(0,0,0,0.12)",
+                overflow: "hidden", zIndex: 200, maxHeight: 320, overflowY: "auto",
+              }}>
+                {searchResults.length === 0 ? (
+                  <p style={{ color: T.textMuted, fontSize: 12.5, margin: 0, padding: "14px 15px" }}>No matches for &quot;{searchQuery}&quot;</p>
+                ) : searchResults.map(r => (
+                  <button
+                    key={`${r.kind}-${r.id}`}
+                    onClick={() => goToSearchResult(r)}
+                    style={{
+                      width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "10px 15px",
+                      background: "none", border: "none", cursor: "pointer", textAlign: "left",
+                    }}
+                    onMouseEnter={e => (e.currentTarget.style.background = T.dropHover)}
+                    onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+                  >
+                    {r.kind === "appointment"
+                      ? <CalendarClock size={14} color={T.iconColor} style={{ flexShrink: 0 }} />
+                      : <UserRound size={14} color={T.iconColor} style={{ flexShrink: 0 }} />}
+                    <div style={{ minWidth: 0 }}>
+                      <p style={{ color: T.text, fontSize: 13, fontWeight: 600, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.title}</p>
+                      <p style={{ color: T.textMuted, fontSize: 11.5, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.subtitle}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Right icons */}
           <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
             <div style={{ position: "relative" }}>
-              <button style={headerIconBtn}><MessageSquare size={16} strokeWidth={1.6} /></button>
-              <span style={hdBadge}>2</span>
+              <Link href="/dashboard/messages" title="Messages" style={{ ...headerIconBtn, display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
+                <MessageSquare size={16} strokeWidth={1.6} color={T.iconColor} />
+              </Link>
+              {unreadCount > 0 && <span style={hdBadge}>{unreadCount > 9 ? "9+" : unreadCount}</span>}
             </div>
             <Link href="/dashboard/daily-brief" title="Daily Brief" style={{ ...headerIconBtn, display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
               <Sparkles size={16} strokeWidth={1.6} color={T.iconColor} />
@@ -419,10 +514,10 @@ export function DashboardShell({ children, user, role }: { children: React.React
                 <button
                   onClick={() => setDropdown(v => !v)}
                   style={{
-                    width: 44, height: 38,
-                    display: "flex", alignItems: "center", justifyContent: "center",
+                    width: 56, height: 38,
+                    display: "flex", alignItems: "center", justifyContent: "center", gap: 4,
                     background: "transparent", border: "none",
-                    cursor: "pointer", padding: 0,
+                    cursor: "pointer", padding: "0 8px 0 0",
                     borderRadius: "0 12px 12px 0",
                   }}
                 >
@@ -434,6 +529,11 @@ export function DashboardShell({ children, user, role }: { children: React.React
                   }}>
                     {initial}
                   </div>
+                  <ChevronDown
+                    size={13}
+                    color={T.iconColor}
+                    style={{ flexShrink: 0, transform: dropdownOpen ? "rotate(180deg)" : "none", transition: "transform 0.15s" }}
+                  />
                 </button>
 
                 {dropdownOpen && (
