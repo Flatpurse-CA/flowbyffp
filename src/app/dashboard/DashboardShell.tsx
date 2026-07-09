@@ -403,26 +403,27 @@ export function DashboardShell({ children, user, role, unreadCount }: { children
       <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", height: "100vh", overflow: "hidden" }}>
 
         {/* Top header */}
-        <header style={{
+        <header className="dashboard-header" style={{
           flexShrink: 0,
           height: 73,
           display: "flex", alignItems: "center", justifyContent: "space-between",
           padding: "0 32px",
           background: T.bg,
           borderBottom: `1px solid ${T.border}`,
+          gap: 12,
         }}>
           {/* Greeting */}
-          <div style={{ flexShrink: 0 }}>
-            <p style={{ color: T.text, fontSize: 15, fontWeight: 700, margin: 0, letterSpacing: "-0.01em" }}>
+          <div style={{ flexShrink: 1, minWidth: 0 }}>
+            <p style={{ color: T.text, fontSize: 15, fontWeight: 700, margin: 0, letterSpacing: "-0.01em", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               {greeting}, {name}
             </p>
-            <p style={{ color: T.textMuted, fontSize: 12, margin: 0 }}>
+            <p className="header-greeting-sub" style={{ color: T.textMuted, fontSize: 12, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               Here&apos;s what&apos;s happening today.
             </p>
           </div>
 
           {/* Search */}
-          <div ref={searchRef} style={{ flex: 1, maxWidth: 300, margin: "0 32px", position: "relative" }}>
+          <div ref={searchRef} className="header-search" style={{ flex: 1, maxWidth: 300, margin: "0 32px", position: "relative" }}>
             <div style={{
               display: "flex", alignItems: "center", gap: 9,
               background: T.searchBg,
@@ -481,17 +482,17 @@ export function DashboardShell({ children, user, role, unreadCount }: { children
           </div>
 
           {/* Right icons */}
-          <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
+          <div className="header-icons" style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
             <div style={{ position: "relative" }}>
               <Link href="/dashboard/messages" title="Messages" style={{ ...headerIconBtn, display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
                 <MessageSquare size={16} strokeWidth={1.6} color={T.iconColor} />
               </Link>
               {unreadCount > 0 && <span style={hdBadge}>{unreadCount > 9 ? "9+" : unreadCount}</span>}
             </div>
-            <Link href="/dashboard/daily-brief" title="Daily Brief" style={{ ...headerIconBtn, display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
+            <Link href="/dashboard/daily-brief" title="Daily Brief" className="header-icon-optional" style={{ ...headerIconBtn, display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
               <Sparkles size={16} strokeWidth={1.6} color={T.iconColor} />
             </Link>
-            <div style={{ position: "relative" }}>
+            <div className="header-icon-optional" style={{ position: "relative" }}>
               <Link href="/dashboard/notifications" style={{ ...headerIconBtn, display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
                 <Bell size={16} strokeWidth={1.6} color={T.iconColor} />
               </Link>
@@ -601,7 +602,7 @@ export function DashboardShell({ children, user, role, unreadCount }: { children
         </header>
 
         {/* Scrollable content */}
-        <main style={{ flex: 1, overflowY: "auto", padding: "28px 32px", background: T.bg, paddingBottom: 90 }}>
+        <main className="dashboard-main" style={{ flex: 1, overflowY: "auto", padding: "28px 32px", background: T.bg, paddingBottom: 90 }}>
           {children}
         </main>
       </div>

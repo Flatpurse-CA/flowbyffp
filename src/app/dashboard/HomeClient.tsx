@@ -156,12 +156,12 @@ function ScheduleRow({ row, isUpNext }: { row: AppointmentRow; isUpNext: boolean
   const s = isUpNext ? UP_NEXT : STATUS_LABEL[row.status];
   const color = colorFor(row.client_name);
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "12px 20px" }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 4, width: 60, flexShrink: 0 }}>
-        <Clock size={11} color="rgba(255,255,255,0.2)" />
+    <div className="schedule-row" style={{ display: "flex", alignItems: "center", gap: 14, padding: "12px 20px" }}>
+      <div className="schedule-row-time" style={{ display: "flex", alignItems: "center", gap: 4, width: 60, flexShrink: 0 }}>
+        <Clock className="schedule-row-time-icon" size={11} color="rgba(255,255,255,0.2)" />
         <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 11.5, fontWeight: 600 }}>{fmtTime(row.starts_at)}</span>
       </div>
-      <div style={{
+      <div className="schedule-row-avatar" style={{
         width: 34, height: 34, borderRadius: "50%", flexShrink: 0,
         background: color + "22", border: `1.5px solid ${color}44`,
         display: "flex", alignItems: "center", justifyContent: "center",
@@ -171,9 +171,9 @@ function ScheduleRow({ row, isUpNext }: { row: AppointmentRow; isUpNext: boolean
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
         <p style={{ color: "rgb(250,250,250)", fontSize: 13, fontWeight: 700, margin: "0 0 1px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{row.client_name}</p>
-        <p style={{ color: "rgba(255,255,255,0.32)", fontSize: 11.5, margin: 0 }}>{row.service_name}{row.stylist_name ? ` · ${row.stylist_name}` : ""}</p>
+        <p style={{ color: "rgba(255,255,255,0.32)", fontSize: 11.5, margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{row.service_name}{row.stylist_name ? ` · ${row.stylist_name}` : ""}</p>
       </div>
-      <span style={{ fontSize: 10.5, fontWeight: 700, padding: "3px 9px", borderRadius: 20, color: s.color, background: s.bg, whiteSpace: "nowrap", flexShrink: 0 }}>
+      <span className="schedule-row-badge" style={{ fontSize: 10.5, fontWeight: 700, padding: "3px 9px", borderRadius: 20, color: s.color, background: s.bg, whiteSpace: "nowrap", flexShrink: 0 }}>
         {s.label}
       </span>
       <span style={{ color: "rgb(52,211,153)", fontSize: 13, fontWeight: 700, flexShrink: 0, minWidth: 46, textAlign: "right" }}>
