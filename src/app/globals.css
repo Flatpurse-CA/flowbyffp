@@ -226,6 +226,16 @@ body {
   .schedule-row-badge {
     display: none !important;
   }
+  .bookings-header-controls {
+    width: 100%;
+  }
+  .bookings-search {
+    flex: 1 1 140px !important;
+    width: auto !important;
+  }
+  .bookings-new-btn {
+    flex-basis: 100% !important;
+  }
 }
 
 @keyframes ping {

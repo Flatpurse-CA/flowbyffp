@@ -1217,12 +1217,12 @@ export function AppointmentsClient({ initialAppointments, bookingLink, staff, se
     <div style={{ maxWidth: 1280, margin: "0 auto", display: "flex", flexDirection: "column", gap: 20 }}>
 
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+      <div className="bookings-header" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", rowGap: 12 }}>
         <div>
           <h1 style={{ color: "rgb(250,250,250)", fontSize: 22, fontWeight: 800, margin: "0 0 3px", letterSpacing: "-0.03em" }}>Bookings</h1>
           <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 13, margin: 0 }}>{dateStr}</p>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <div className="bookings-header-controls" style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
           {/* View switcher */}
           <div style={{ display: "flex", gap: 2, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 11, padding: 3 }}>
             {VIEWS.map(v => (
@@ -1239,13 +1239,13 @@ export function AppointmentsClient({ initialAppointments, bookingLink, staff, se
           </div>
 
           {/* Search */}
-          <div style={{ display: "flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10, padding: "8px 12px", width: 200 }}>
+          <div className="bookings-search" style={{ display: "flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10, padding: "8px 12px", width: 200 }}>
             <Search size={13} color="rgba(255,255,255,0.3)" />
-            <input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search…" style={{ background: "none", border: "none", outline: "none", color: "rgb(250,250,250)", fontSize: 12.5, flex: 1 }} />
+            <input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search…" style={{ background: "none", border: "none", outline: "none", color: "rgb(250,250,250)", fontSize: 12.5, flex: 1, minWidth: 0 }} />
           </div>
 
-          <button onClick={() => setNew(true)} style={{
-            display: "flex", alignItems: "center", gap: 7,
+          <button className="bookings-new-btn" onClick={() => setNew(true)} style={{
+            display: "flex", alignItems: "center", justifyContent: "center", gap: 7,
             padding: "10px 18px", borderRadius: 11,
             background: "rgb(109,40,217)", border: "none",
             color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer",
