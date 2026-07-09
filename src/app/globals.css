@@ -236,6 +236,15 @@ body {
   .bookings-new-btn {
     flex-basis: 100% !important;
   }
+  .clients-kpi-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .clients-table-wrap {
+    display: none !important;
+  }
+  .clients-card-list {
+    display: flex !important;
+  }
 }
 
 @keyframes ping {

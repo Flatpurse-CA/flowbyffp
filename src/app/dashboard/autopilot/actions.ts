@@ -4,6 +4,24 @@ import { requireShop, getCurrentShopId } from "@/lib/dashboard/shop";
 
 export type FlowKey = "noshow" | "filler" | "winback" | "frontdesk" | "reminders" | "birthday";
 
+export async function getAutopilotEngagedClientNames(): Promise<string[]> {
+  const shopId = await getCurrentShopId();
+  if (!shopId) return [];
+
+  const { supabase } = await requireShop();
+  const { data } = await supabase
+    .from("autopilot_events")
+    .select("client_name")
+    .eq("shop_id", shopId)
+    .not("client_name", "is", null);
+
+  const names = new Set<string>();
+  for (const row of data ?? []) {
+    if (row.client_name) names.add(String(row.client_name).trim().toLowerCase());
+  }
+  return Array.from(names);
+}
+
 export type AutopilotEvent = {
   id: string;
   flow_key: FlowKey;

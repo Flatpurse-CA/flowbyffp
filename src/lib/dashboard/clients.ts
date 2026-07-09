@@ -25,7 +25,7 @@ export type DerivedClient = {
   tag: ClientTag;
 };
 
-function keyFor(a: ClientAppointment) {
+export function keyFor(a: ClientAppointment) {
   return (a.client_phone || a.client_email || a.client_name).trim().toLowerCase();
 }
 
