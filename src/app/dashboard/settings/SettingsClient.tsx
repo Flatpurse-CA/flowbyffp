@@ -378,7 +378,7 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours }: { i
             <SectionLabel>Business hours</SectionLabel>
             <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
               {hours.map((row, i) => (
-                <div key={row.label} style={{ display: "flex", alignItems: "center", gap: 14, padding: "13px 0", borderBottom: i < hours.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none" }}>
+                <div key={row.label} style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap", padding: "13px 0", borderBottom: i < hours.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none" }}>
                   {/* Toggle */}
                   <button onClick={() => toggleHour(i)} style={{
                     width: 38, height: 22, borderRadius: 11, border: "none", cursor: "pointer", flexShrink: 0,

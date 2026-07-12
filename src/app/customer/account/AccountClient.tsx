@@ -82,12 +82,12 @@ export function AccountClient({ customerName, bookings }: { customerName: string
   return (
     <div style={{ minHeight: "100vh", background: "rgb(246,246,250)", fontFamily: "DM Sans, system-ui, sans-serif" }}>
       <div style={{ maxWidth: 640, margin: "0 auto", padding: "40px 24px 80px" }}>
-        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 28 }}>
-          <div>
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: 12, marginBottom: 28 }}>
+          <div style={{ minWidth: 0 }}>
             <h1 style={{ color: "rgb(20,20,30)", fontSize: 24, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.02em" }}>My bookings</h1>
-            <p style={{ color: "rgba(0,0,0,0.4)", fontSize: 14, margin: 0 }}>Signed in as {customerName}</p>
+            <p style={{ color: "rgba(0,0,0,0.4)", fontSize: 14, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>Signed in as {customerName}</p>
           </div>
-          <form action={customerLogout}>
+          <form action={customerLogout} style={{ flexShrink: 0 }}>
             <button type="submit" style={{ display: "flex", alignItems: "center", gap: 6, padding: "9px 14px", borderRadius: 10, background: "white", border: "1px solid rgba(0,0,0,0.1)", color: "rgba(0,0,0,0.55)", fontSize: 12.5, fontWeight: 600, cursor: "pointer" }}>
               <LogOut size={13} /> Sign out
             </button>

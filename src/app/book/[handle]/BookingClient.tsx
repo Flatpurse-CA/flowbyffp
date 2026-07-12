@@ -316,7 +316,7 @@ function DateTimeStep({ service, staff, dayRows, staffId, setStaffId, date, setD
           ) : slots.length === 0 ? (
             <p style={{ color: "rgba(0,0,0,0.35)", fontSize: 13 }}>No open times that day — try another date.</p>
           ) : (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 8 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 8 }}>
               {slots.map(t => (
                 <button key={t} onClick={() => setTime(t)} style={{
                   padding: "10px 6px", borderRadius: 10,

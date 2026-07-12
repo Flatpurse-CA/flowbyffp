@@ -248,6 +248,12 @@ body {
   .services-add-grid {
     grid-template-columns: 1fr !important;
   }
+  .services-table-wrap {
+    display: none !important;
+  }
+  .services-card-list {
+    display: flex !important;
+  }
 }
 
 @keyframes ping {

@@ -199,8 +199,9 @@ export function ServicesClient({ services }: { services: ServiceRow[] }) {
 
 function ServiceTable({ rows, onToggle, onRemove }: { rows: ServiceRow[]; onToggle: (s: ServiceRow) => void; onRemove: (id: string) => void }) {
   return (
-    <div style={{ background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 14, overflow: "hidden", marginBottom: 16 }}>
-      <table style={{ width: "100%", borderCollapse: "collapse" }}>
+    <>
+      <div className="services-table-wrap" style={{ background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 14, overflow: "hidden", marginBottom: 16 }}>
+        <table style={{ width: "100%", borderCollapse: "collapse" }}>
         <tbody>
           {rows.map((s, i) => {
             const cat = s.category || "Other";
@@ -233,7 +234,37 @@ function ServiceTable({ rows, onToggle, onRemove }: { rows: ServiceRow[]; onTogg
             );
           })}
         </tbody>
-      </table>
-    </div>
+        </table>
+      </div>
+
+      <div className="services-card-list" style={{ display: "none", flexDirection: "column", gap: 8, marginBottom: 16 }}>
+        {rows.map((s) => {
+          const cat = s.category || "Other";
+          const c = colorForCategory(cat);
+          return (
+            <div key={s.id} style={{ background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 14, padding: "14px 16px", opacity: s.active ? 1 : 0.45 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+                <button
+                  onClick={() => onToggle(s)}
+                  style={{
+                    width: 36, height: 20, borderRadius: 10, border: "none", cursor: "pointer", position: "relative", transition: "background 0.2s", flexShrink: 0,
+                    background: s.active ? "rgb(109,40,217)" : "rgba(255,255,255,0.12)",
+                  }}
+                >
+                  <span style={{ position: "absolute", top: 3, left: s.active ? 18 : 3, width: 14, height: 14, borderRadius: "50%", background: "white", transition: "left 0.2s" }} />
+                </button>
+                <span style={{ color: "rgb(250,250,250)", fontSize: 13.5, fontWeight: 600, flex: 1, minWidth: 0 }}>{s.name}</span>
+                <button onClick={() => onRemove(s.id)} style={{ background: "none", border: "none", color: "rgba(239,68,68,0.5)", cursor: "pointer", padding: 5, borderRadius: 7, flexShrink: 0 }}><Trash2 size={13} /></button>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                <span style={{ fontSize: 11, fontWeight: 600, padding: "3px 9px", borderRadius: 20, background: c.bg, color: c.text }}>{cat}</span>
+                <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 12.5 }}>{formatMinutes(s.duration_minutes)}</span>
+                <span style={{ color: "rgb(250,250,250)", fontSize: 14, fontWeight: 800, letterSpacing: "-0.02em", marginLeft: "auto" }}>C${s.price}</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </>
   );
 }
