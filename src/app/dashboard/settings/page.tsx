@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getShopContext } from "@/lib/dashboard/shop";
+import { getBusinessHours } from "./actions";
 import { SettingsClient } from "./SettingsClient";
 
 export const dynamic = "force-dynamic";
@@ -27,5 +28,7 @@ export default async function SettingsPage() {
     end: (shop?.family_hours_end as string | undefined)?.slice(0, 5) ?? "20:00",
   };
 
-  return <SettingsClient initialFamilyHours={initialFamilyHours} />;
+  const initialBusinessHours = await getBusinessHours();
+
+  return <SettingsClient initialFamilyHours={initialFamilyHours} initialBusinessHours={initialBusinessHours} />;
 }

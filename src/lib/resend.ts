@@ -46,6 +46,30 @@ export async function sendStaffInviteEmail(to: string, input: { shopName: string
   });
 }
 
+export async function sendBookingConfirmationEmail(to: string, input: { shopName: string; serviceName: string; startsAt: string; stylistName: string | null }) {
+  const when = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/Edmonton", weekday: "long", month: "long", day: "numeric", hour: "numeric", minute: "2-digit",
+  }).format(new Date(input.startsAt));
+
+  return client().emails.send({
+    from: FROM,
+    to,
+    subject: `Booking request received — ${input.shopName}`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
+        <h1 style="font-size: 20px;">Your booking request is in</h1>
+        <p style="color: #444; font-size: 14px; line-height: 1.6;">
+          ${input.serviceName}${input.stylistName ? ` with ${input.stylistName}` : ""} at ${input.shopName}.
+        </p>
+        <p style="font-size: 16px; font-weight: 700; margin: 20px 0;">${when}</p>
+        <p style="color: #444; font-size: 14px; line-height: 1.6;">
+          The shop will confirm shortly. You can view or cancel this booking anytime from your account.
+        </p>
+      </div>
+    `,
+  });
+}
+
 export async function sendOtpEmail(email: string, code: string, firstName: string) {
   await client().emails.send({
     from: FROM,

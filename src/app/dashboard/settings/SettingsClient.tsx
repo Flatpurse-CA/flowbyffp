@@ -7,7 +7,7 @@ import {
   Scissors, Clock, Receipt, Zap, Plus, Trash2, GripVertical,
   ChevronDown, ChevronUp,
 } from "lucide-react";
-import { updateFamilyHours } from "./actions";
+import { updateFamilyHours, updateBusinessHours, type BusinessHourRow } from "./actions";
 
 export type FamilyHoursSettings = { enabled: boolean; start: string; end: string };
 
@@ -128,29 +128,44 @@ const INITIAL_FLOWS: Flow[] = [
   { key:"frontdesk",   name:"AI front desk",          description:"Instantly respond to client messages 24/7",             enabled:false, channel:"SMS",   delay:"Immediate"                  },
 ];
 
-// ─── Family Hours data ────────────────────────────────────────────────────────
+// ─── Business hours ───────────────────────────────────────────────────────────
 
-type HourRow = { label: string; open: boolean; start: string; end: string };
+type HourRow = { weekday: number; label: string; open: boolean; start: string; end: string };
 
-const WEEKDAYS: HourRow[] = [
-  { label:"Monday",    open:true,  start:"09:00", end:"18:00" },
-  { label:"Tuesday",   open:true,  start:"09:00", end:"18:00" },
-  { label:"Wednesday", open:true,  start:"09:00", end:"18:00" },
-  { label:"Thursday",  open:true,  start:"09:00", end:"19:00" },
-  { label:"Friday",    open:true,  start:"09:00", end:"19:00" },
-  { label:"Saturday",  open:true,  start:"10:00", end:"17:00" },
-  { label:"Sunday",    open:false, start:"10:00", end:"15:00" },
+// Display order is Monday-first; `weekday` is the stored int (0=Sunday, matching the DB).
+const DAY_LABELS: Array<{ weekday: number; label: string }> = [
+  { weekday: 1, label: "Monday" },
+  { weekday: 2, label: "Tuesday" },
+  { weekday: 3, label: "Wednesday" },
+  { weekday: 4, label: "Thursday" },
+  { weekday: 5, label: "Friday" },
+  { weekday: 6, label: "Saturday" },
+  { weekday: 0, label: "Sunday" },
 ];
+
+function buildHourRows(initial: BusinessHourRow[]): HourRow[] {
+  return DAY_LABELS.map(({ weekday, label }) => {
+    const existing = initial.find(r => r.weekday === weekday);
+    return {
+      weekday, label,
+      open: existing?.open ?? weekday !== 0,
+      start: existing?.start ?? "09:00",
+      end: existing?.end ?? "18:00",
+    };
+  });
+}
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export function SettingsClient({ initialFamilyHours }: { initialFamilyHours: FamilyHoursSettings }) {
+export function SettingsClient({ initialFamilyHours, initialBusinessHours }: { initialFamilyHours: FamilyHoursSettings; initialBusinessHours: BusinessHourRow[] }) {
   const router = useRouter();
   const [tab, setTab]         = useState<TabLabel>("Business");
   const [copied, setCopied]   = useState(false);
   const [services, setServices] = useState<Service[]>(INITIAL_SERVICES);
   const [flows, setFlows]     = useState<Flow[]>(INITIAL_FLOWS);
-  const [hours, setHours]     = useState<HourRow[]>(WEEKDAYS);
+  const [hours, setHours]     = useState<HourRow[]>(() => buildHourRows(initialBusinessHours));
+  const [savingHours, setSavingHours] = useState(false);
+  const [hoursSaved, setHoursSaved]   = useState(false);
   const [expandedFlow, setExpandedFlow] = useState<FlowKey | null>(null);
   const [familyStart, setFamilyStart] = useState(initialFamilyHours.start);
   const [familyEnd, setFamilyEnd]     = useState(initialFamilyHours.end);
@@ -170,6 +185,19 @@ export function SettingsClient({ initialFamilyHours }: { initialFamilyHours: Fam
       setTimeout(() => setFamilySaved(false), 2500);
     } finally {
       setSavingFamily(false);
+    }
+  };
+
+  const saveBusinessHours = async () => {
+    setSavingHours(true);
+    setHoursSaved(false);
+    try {
+      await updateBusinessHours(hours.map(({ weekday, open, start, end }) => ({ weekday, open, start, end })));
+      setHoursSaved(true);
+      router.refresh();
+      setTimeout(() => setHoursSaved(false), 2500);
+    } finally {
+      setSavingHours(false);
     }
   };
 
@@ -365,9 +393,9 @@ export function SettingsClient({ initialFamilyHours }: { initialFamilyHours: Fam
 
                   {row.open ? (
                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                      <input type="time" defaultValue={row.start} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 9, padding: "6px 10px", color: "rgb(250,250,250)", fontSize: 12.5, outline: "none" }} />
+                      <input type="time" value={row.start} onChange={e => setHours(h => h.map((r, ri) => ri === i ? { ...r, start: e.target.value } : r))} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 9, padding: "6px 10px", color: "rgb(250,250,250)", fontSize: 12.5, outline: "none" }} />
                       <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 12 }}>to</span>
-                      <input type="time" defaultValue={row.end} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 9, padding: "6px 10px", color: "rgb(250,250,250)", fontSize: 12.5, outline: "none" }} />
+                      <input type="time" value={row.end} onChange={e => setHours(h => h.map((r, ri) => ri === i ? { ...r, end: e.target.value } : r))} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 9, padding: "6px 10px", color: "rgb(250,250,250)", fontSize: 12.5, outline: "none" }} />
                     </div>
                   ) : (
                     <span style={{ color: "rgba(255,255,255,0.22)", fontSize: 13, fontStyle: "italic" }}>Closed</span>
@@ -413,7 +441,16 @@ export function SettingsClient({ initialFamilyHours }: { initialFamilyHours: Fam
             </div>
           </div>
 
-          <SaveBar />
+          <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 10 }}>
+            {hoursSaved && <span style={{ color: "rgb(52,211,153)", fontSize: 12.5, fontWeight: 600 }}>Saved</span>}
+            <button onClick={saveBusinessHours} disabled={savingHours} style={{
+              padding: "10px 24px", borderRadius: 10, border: "none",
+              background: "rgb(109,40,217)", color: "white", fontSize: 13, fontWeight: 700,
+              cursor: savingHours ? "default" : "pointer", opacity: savingHours ? 0.6 : 1,
+            }}>
+              {savingHours ? "Saving…" : "Save business hours"}
+            </button>
+          </div>
         </>
       )}
 

@@ -245,6 +245,9 @@ body {
   .clients-card-list {
     display: flex !important;
   }
+  .services-add-grid {
+    grid-template-columns: 1fr !important;
+  }
 }
 
 @keyframes ping {
