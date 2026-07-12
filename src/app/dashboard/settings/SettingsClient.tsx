@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   Copy, Check, Link2, Bell, CreditCard, Shield, Building2,
-  Scissors, Clock, Receipt, Zap, Plus, Trash2, GripVertical,
+  Wallet, Clock, Receipt, Zap,
   ChevronDown, ChevronUp,
 } from "lucide-react";
 import { updateFamilyHours, updateBusinessHours, type BusinessHourRow } from "./actions";
@@ -86,7 +87,7 @@ function SaveBar() {
 
 const TABS = [
   { label: "Business",      Icon: Building2  },
-  { label: "Services",      Icon: Scissors   },
+  { label: "Payments",      Icon: Wallet     },
   { label: "Hours",         Icon: Clock      },
   { label: "Tax & GST",     Icon: Receipt    },
   { label: "AutoPilot",     Icon: Zap        },
@@ -95,20 +96,6 @@ const TABS = [
 ] as const;
 
 type TabLabel = typeof TABS[number]["label"];
-
-// ─── Services data ────────────────────────────────────────────────────────────
-
-type Service = { id: number; name: string; duration: number; price: number; category: string; active: boolean };
-
-const INITIAL_SERVICES: Service[] = [
-  { id:1, name:"Silk Press",           duration:60,  price:85,  category:"Styling",    active:true },
-  { id:2, name:"Full Highlights",      duration:120, price:120, category:"Colour",     active:true },
-  { id:3, name:"Colour + Gloss",       duration:90,  price:160, category:"Colour",     active:true },
-  { id:4, name:"Knotless Braids",      duration:180, price:180, category:"Protective", active:true },
-  { id:5, name:"Trim + Treatment",     duration:45,  price:70,  category:"Treatment",  active:true },
-  { id:6, name:"Scalp Treatment",      duration:30,  price:55,  category:"Treatment",  active:true },
-  { id:7, name:"Keratin Blowout",      duration:120, price:200, category:"Styling",    active:false },
-];
 
 // ─── AutoPilot flows data ─────────────────────────────────────────────────────
 
@@ -161,7 +148,6 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours }: { i
   const router = useRouter();
   const [tab, setTab]         = useState<TabLabel>("Business");
   const [copied, setCopied]   = useState(false);
-  const [services, setServices] = useState<Service[]>(INITIAL_SERVICES);
   const [flows, setFlows]     = useState<Flow[]>(INITIAL_FLOWS);
   const [hours, setHours]     = useState<HourRow[]>(() => buildHourRows(initialBusinessHours));
   const [savingHours, setSavingHours] = useState(false);
@@ -208,12 +194,6 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours }: { i
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
-
-  const toggleService = (id: number) =>
-    setServices(s => s.map(sv => sv.id === id ? { ...sv, active: !sv.active } : sv));
-
-  const removeService = (id: number) =>
-    setServices(s => s.filter(sv => sv.id !== id));
 
   const toggleFlow = (key: FlowKey) =>
     setFlows(f => f.map(fl => fl.key === key ? { ...fl, enabled: !fl.enabled } : fl));
@@ -303,63 +283,19 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours }: { i
         </>
       )}
 
-      {/* ── Services ── */}
-      {tab === "Services" && (
+      {/* ── Payments ── */}
+      {tab === "Payments" && (
         <>
-          <div style={card}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
-              <SectionLabel>Services & pricing</SectionLabel>
-              <button style={{ display: "flex", alignItems: "center", gap: 6, padding: "7px 14px", borderRadius: 9, background: "rgb(109,40,217)", border: "none", color: "white", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>
-                <Plus size={13} strokeWidth={2.5} /> Add service
-              </button>
+          <div style={{ ...card, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14 }}>
+            <div>
+              <p style={{ color: "rgb(250,250,250)", fontSize: 13.5, fontWeight: 700, margin: "0 0 2px" }}>Manage your services</p>
+              <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 12, margin: 0 }}>Add, price, and publish services from the Services page — that&apos;s what your booking page pulls from.</p>
             </div>
-
-            {/* Category groups */}
-            {["Styling","Colour","Protective","Treatment"].map(cat => {
-              const catServices = services.filter(s => s.category === cat);
-              if (!catServices.length) return null;
-              return (
-                <div key={cat} style={{ marginBottom: 22 }}>
-                  <p style={{ color: "rgba(255,255,255,0.28)", fontSize: 10, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 8px" }}>{cat}</p>
-                  <div style={{ border: "1px solid rgba(255,255,255,0.06)", borderRadius: 12, overflow: "hidden" }}>
-                    {catServices.map((sv, i) => (
-                      <div key={sv.id} style={{
-                        display: "flex", alignItems: "center", gap: 12, padding: "13px 16px",
-                        borderBottom: i < catServices.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none",
-                        background: sv.active ? "transparent" : "rgba(255,255,255,0.01)",
-                      }}>
-                        <GripVertical size={14} color="rgba(255,255,255,0.15)" style={{ cursor: "grab", flexShrink: 0 }} />
-
-                        <div style={{ flex: 1 }}>
-                          <p style={{ color: sv.active ? "rgb(250,250,250)" : "rgba(255,255,255,0.3)", fontSize: 13.5, fontWeight: 700, margin: "0 0 2px" }}>{sv.name}</p>
-                          <p style={{ color: "rgba(255,255,255,0.28)", fontSize: 12, margin: 0 }}>{sv.duration} min · C${sv.price}</p>
-                        </div>
-
-                        <span style={{
-                          fontSize: 10, fontWeight: 700, padding: "2px 9px", borderRadius: 20, whiteSpace: "nowrap",
-                          color: sv.active ? "rgb(52,211,153)" : "rgba(255,255,255,0.2)",
-                          background: sv.active ? "rgba(16,185,129,0.1)" : "rgba(255,255,255,0.04)",
-                        }}>
-                          {sv.active ? "Active" : "Hidden"}
-                        </span>
-
-                        <div style={{ display: "flex", gap: 8 }}>
-                          <button onClick={() => toggleService(sv.id)} style={{ padding: "5px 12px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.4)", fontSize: 11.5, cursor: "pointer" }}>
-                            {sv.active ? "Hide" : "Show"}
-                          </button>
-                          <button onClick={() => removeService(sv.id)} style={{ width: 28, height: 28, borderRadius: 8, border: "1px solid rgba(239,68,68,0.15)", background: "rgba(239,68,68,0.06)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
-                            <Trash2 size={12} color="rgba(248,113,113,0.7)" />
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              );
-            })}
+            <Link href="/dashboard/services" style={{ display: "flex", alignItems: "center", gap: 6, padding: "9px 16px", borderRadius: 10, background: "rgb(109,40,217)", color: "white", fontSize: 12.5, fontWeight: 700, textDecoration: "none", whiteSpace: "nowrap", flexShrink: 0 }}>
+              Go to Services
+            </Link>
           </div>
 
-          {/* Deposit setting */}
           <div style={card}>
             <SectionLabel>Deposit & payment</SectionLabel>
             <Toggle label="Require deposit at booking" sub="Clients pay 20% upfront to secure their appointment" on={true} />

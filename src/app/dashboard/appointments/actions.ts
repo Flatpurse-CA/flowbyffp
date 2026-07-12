@@ -104,6 +104,19 @@ export async function rescheduleAppointment(id: string, startsAt: string) {
   revalidatePath("/dashboard/appointments");
 }
 
+export async function confirmAppointment(id: string) {
+  const { supabase, shopId } = await requireShop();
+
+  const { error } = await supabase
+    .from("appointments")
+    .update({ status: "confirmed", updated_at: new Date().toISOString() })
+    .eq("id", id)
+    .eq("shop_id", shopId);
+
+  if (error) throw new Error(error.message);
+  revalidatePath("/dashboard/appointments");
+}
+
 export async function cancelAppointment(id: string) {
   const { supabase, shopId } = await requireShop();
 

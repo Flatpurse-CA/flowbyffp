@@ -9,7 +9,7 @@ import {
   Send, Pencil, Ban, CheckCircle2, StickyNote,
 } from "lucide-react";
 import type { AppointmentRow, AppointmentStatus } from "./actions";
-import { createAppointment, rescheduleAppointment, cancelAppointment, completeAppointment } from "./actions";
+import { createAppointment, rescheduleAppointment, cancelAppointment, completeAppointment, confirmAppointment } from "./actions";
 import type { StaffRow } from "../team/actions";
 
 // ─── Timezone-aware formatting (shop is Edmonton-based) ───────────────────────
@@ -655,6 +655,20 @@ function AppointmentDetail({ appt, onClose, onCloseOut, onChanged }: { appt: App
     }
   };
 
+  const doConfirm = async () => {
+    setError(null);
+    setBusy(true);
+    try {
+      await confirmAppointment(appt.id);
+      setStatus("confirmed");
+      onChanged();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Couldn't confirm — try again.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const doCancel = async () => {
     setError(null);
     setBusy(true);
@@ -821,6 +835,11 @@ function AppointmentDetail({ appt, onClose, onCloseOut, onChanged }: { appt: App
         {/* Footer actions */}
         {!isDone && (
           <div style={{ padding: "16px 22px 22px", flexShrink: 0, borderTop: "1px solid rgba(255,255,255,0.06)", display: "flex", flexDirection: "column", gap: 10 }}>
+            {status === "pending" && (
+              <button disabled={busy} onClick={doConfirm} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "13px", borderRadius: 13, border: "none", background: "rgb(109,40,217)", color: "white", fontSize: 13.5, fontWeight: 800, cursor: busy ? "default" : "pointer", opacity: busy ? 0.6 : 1 }}>
+                {busy ? "Confirming…" : "Confirm booking"}
+              </button>
+            )}
             <div style={{ display: "flex", gap: 8 }}>
               <button onClick={() => setRescheduling(v => !v)} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "11px", borderRadius: 11, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.65)", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>
                 <Pencil size={13} strokeWidth={2} /> Reschedule
