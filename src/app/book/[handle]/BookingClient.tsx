@@ -211,7 +211,7 @@ export function BookingClient({ shop, services, staff, businessHours, initialCus
       </div>
 
       {/* Profile info — centered column, avatar overlapping the cover */}
-      <div style={{ maxWidth: 680, margin: "0 auto", padding: "0 24px", textAlign: "center" }}>
+      <div style={{ position: "relative", zIndex: 1, maxWidth: 680, margin: "0 auto", padding: "0 24px", textAlign: "center" }}>
         <div style={{
           width: 96, height: 96, borderRadius: "50%", margin: "-48px auto 0",
           background: "linear-gradient(135deg, rgb(88,28,218), rgb(139,92,246))",
