@@ -216,10 +216,10 @@ export function TeamClient({ staff, appointments }: { staff: StaffRow[]; appoint
   }
 
   return (
-    <div style={{ maxWidth: 1280, margin: "0 auto", display: "flex", gap: 20 }}>
+    <div style={{ maxWidth: 1280, margin: "0 auto", display: "flex", flexWrap: "wrap", gap: 20 }}>
 
       {/* Staff list */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 16 }}>
+      <div style={{ flex: "3 1 400px", display: "flex", flexDirection: "column", gap: 16 }}>
 
         {/* Header */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -365,7 +365,7 @@ export function TeamClient({ staff, appointments }: { staff: StaffRow[]; appoint
 
       {/* Staff detail panel */}
       {selectedRow && (
-        <div style={{ width: 320, flexShrink: 0, display: "flex", flexDirection: "column", gap: 14 }}>
+        <div style={{ flex: "1 1 320px", maxWidth: 380, display: "flex", flexDirection: "column", gap: 14 }}>
 
           {/* Profile */}
           <div style={{ ...card, padding: 20 }}>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Send, MessageSquare } from "lucide-react";
+import { Send, MessageSquare, ChevronLeft } from "lucide-react";
 import type { ConversationSummary, MessageRow } from "./actions";
 import { getOrCreateConversation, listMessages, sendMessage, markConversationRead } from "./actions";
 
@@ -89,9 +89,14 @@ export function MessagesClient({ role, conversations, initialConversationId, ini
   };
 
   const thread = (
-    <div style={{ ...card, flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
+    <div className={selectedStaffId ? "messages-thread-panel messages-thread-active" : "messages-thread-panel"} style={{ ...card, flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
       {(role === "staff" || selected) && (
         <div style={{ padding: "16px 20px", borderBottom: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", gap: 12 }}>
+          {role === "owner" && selected && (
+            <button className="messages-back-btn" onClick={() => setSelectedStaffId(null)} style={{ display: "none", background: "none", border: "none", padding: 0, cursor: "pointer", color: "rgba(255,255,255,0.5)", flexShrink: 0 }}>
+              <ChevronLeft size={20} />
+            </button>
+          )}
           {role === "owner" && selected && (
             <div style={{
               width: 34, height: 34, borderRadius: 10, background: `${selected.staffColor}22`, border: `1.5px solid ${selected.staffColor}44`,
@@ -185,8 +190,8 @@ export function MessagesClient({ role, conversations, initialConversationId, ini
           </div>
         </div>
       ) : (
-        <div style={{ display: "flex", gap: 16, flex: 1, minHeight: 0 }}>
-          <div style={{ ...card, width: 280, flexShrink: 0, overflowY: "auto", padding: 8 }}>
+        <div className="messages-split" style={{ display: "flex", gap: 16, flex: 1, minHeight: 0 }}>
+          <div className={selectedStaffId ? "messages-list-panel messages-list-inactive" : "messages-list-panel"} style={{ ...card, width: 280, flexShrink: 0, overflowY: "auto", padding: 8 }}>
             {conversations.map(c => (
               <button
                 key={c.staffId}

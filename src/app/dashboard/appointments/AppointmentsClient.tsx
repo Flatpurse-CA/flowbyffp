@@ -271,7 +271,7 @@ function NewBookingOverlay({ onClose, onCreated, staff, selfStaffId }: { onClose
             <div>
               <label style={sectionLabel}>Date &amp; time</label>
               <input type="date" value={selectedDate} onChange={e => setSelectedDate(e.target.value)} style={{ ...inputStyle, colorScheme: "dark", marginBottom: 10 }} />
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(6,1fr)", gap: 6 }}>
+              <div className="apt-time-grid-6" style={{ display: "grid", gridTemplateColumns: "repeat(6,1fr)", gap: 6 }}>
                 {TIMES.map(t => (
                   <button key={t} onClick={() => setSelectedTime(t)} style={{
                     padding: "8px 4px", borderRadius: 9,
@@ -480,7 +480,7 @@ function CloseOutModal({ appt, onClose, onCompleted }: { appt: ApptRecord; onClo
                 {/* Gratuity selector */}
                 <div style={{ marginBottom: 18 }}>
                   <label style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, fontWeight: 500, display: "block", marginBottom: 8 }}>Gratuity</label>
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 6 }}>
+                  <div className="apt-gratuity-grid" style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 6 }}>
                     {GRATUITY_PRESETS.map(p => (
                       <button key={p} onClick={() => setGratuityPct(p)} style={{
                         padding: "9px 4px", borderRadius: 10,
@@ -784,7 +784,7 @@ function AppointmentDetail({ appt, onClose, onCloseOut, onChanged }: { appt: App
             <div style={{ ...card, padding: "14px 16px", display: "flex", flexDirection: "column", gap: 12 }}>
               <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 10, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", margin: 0 }}>Reschedule to</p>
               <input type="date" value={newDate} onChange={e => setNewDate(e.target.value)} style={inputStyle} />
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 6 }}>
+              <div className="apt-time-grid-4" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 6 }}>
                 {TIMES.map(t => (
                   <button key={t} onClick={() => setNewTime(t)} style={{
                     padding: "8px 4px", borderRadius: 9,
@@ -1055,8 +1055,8 @@ function WeekView({ appts }: { appts: ApptRecord[] }) {
       </div>
 
       {/* 7-day columns */}
-      <div style={{ ...card, padding: "20px" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 10 }}>
+      <div style={{ ...card, padding: "20px", overflowX: "auto" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 10, minWidth: 560 }}>
           {weekDays.map((day) => (
             <div key={day.label} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
               {/* Day header */}

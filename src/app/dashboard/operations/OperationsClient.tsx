@@ -158,7 +158,7 @@ function Overview({ operationsScore, fillRate, retention, revenueGrowthScore, ai
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-      <div style={{ display: "grid", gridTemplateColumns: "220px 1fr", gap: 20 }}>
+      <div className="ops-score-grid" style={{ display: "grid", gridTemplateColumns: "220px 1fr", gap: 20 }}>
         <div style={{ ...card, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 12 }}>
           <svg width={120} height={120} viewBox="0 0 120 120">
             <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="10" />
@@ -188,7 +188,7 @@ function Overview({ operationsScore, fillRate, retention, revenueGrowthScore, ai
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14 }}>
+      <div className="ops-kpi-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14 }}>
         <KPITile label="This month" value={fmtPrice(thisMonthRevenue)} sub="completed appointments" />
         <KPITile label="AutoPilot recovered" value={fmtPrice(autopilotRevenue)} sub="this month" />
         <KPITile label="Upcoming (7d)" value={String(upcomingCount)} sub="bookings scheduled" />
@@ -251,7 +251,7 @@ function Revenue({ appointments, now, thisMonthRevenue, autopilotRevenue, missed
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14 }}>
+      <div className="ops-kpi-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14 }}>
         <KPITile label="This month" value={fmtPrice(thisMonthRevenue)} sub="completed appointments" />
         <KPITile label="AutoPilot" value={fmtPrice(autopilotRevenue)} sub={`${autopilotPct}% of total`} />
         <KPITile label="Avg/day" value={fmtPrice(avgPerDay)} sub="this month so far" />
@@ -386,7 +386,7 @@ function ClientsModule({ clients, appointments, now, retention }: {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-      <div style={{ display: "grid", gridTemplateColumns: "220px 1fr", gap: 20 }}>
+      <div className="ops-score-grid" style={{ display: "grid", gridTemplateColumns: "220px 1fr", gap: 20 }}>
         <div style={{ ...card, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 12 }}>
           <svg width={120} height={120} viewBox="0 0 120 120">
             <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="10" />
@@ -473,7 +473,7 @@ function Finance() {
         <span style={{ fontSize: 10, fontWeight: 800, color: "rgb(251,191,36)", background: "rgba(245,158,11,0.12)", padding: "4px 10px", borderRadius: 20 }}>MOCK DATA</span>
         <span style={{ color: "rgba(255,255,255,0.5)", fontSize: 12.5 }}>Requires Stripe Connect for real payouts and GST figures — shown for layout reference only.</span>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14 }}>
+      <div className="ops-kpi-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14 }}>
         <KPITile label="Next payout" value="C$4,180" sub="Processing in 2 days" />
         <KPITile label="GST owing" value="C$424" sub="Due Jun 30" positive={false} />
         <KPITile label="Net this month" value="C$11,820" sub="+7.4% vs last" />

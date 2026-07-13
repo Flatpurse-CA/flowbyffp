@@ -129,7 +129,7 @@ export function AutoPilotClient({ state }: { state: AutopilotState }) {
       <div style={{
         background: "linear-gradient(135deg, rgba(109,40,217,0.3) 0%, rgba(88,28,218,0.12) 100%)",
         border: "1px solid rgba(139,92,246,0.25)", borderRadius: 20, padding: "28px 32px",
-        display: "flex", alignItems: "center", justifyContent: "space-between",
+        display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 20,
       }}>
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
@@ -159,7 +159,7 @@ export function AutoPilotClient({ state }: { state: AutopilotState }) {
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: 20 }}>
+      <div className="autopilot-sidebar-grid" style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: 20 }}>
 
         {/* Active flows */}
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>

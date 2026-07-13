@@ -254,6 +254,39 @@ body {
   .services-card-list {
     display: flex !important;
   }
+  .ops-score-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .ops-kpi-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .autopilot-sidebar-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .messages-split .messages-list-panel {
+    width: 100% !important;
+  }
+  .messages-split .messages-list-panel.messages-list-inactive {
+    display: none !important;
+  }
+  .messages-split .messages-thread-panel {
+    display: none !important;
+  }
+  .messages-split .messages-thread-panel.messages-thread-active {
+    display: flex !important;
+  }
+  .messages-back-btn {
+    display: flex !important;
+  }
+  .apt-time-grid-6 {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
+  .apt-gratuity-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+  .apt-time-grid-4 {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
 }
 
 @keyframes ping {
