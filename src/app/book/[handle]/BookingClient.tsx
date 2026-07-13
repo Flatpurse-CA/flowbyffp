@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
-  Clock, CheckCircle2, ChevronLeft, X, MapPin, Lock,
+  Clock, CheckCircle2, ChevronLeft, X, MapPin, Lock, CalendarClock,
 } from "lucide-react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
@@ -50,6 +50,44 @@ function nextDays(count: number) {
   const today = new Date();
   const startUTC = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
   return Array.from({ length: count }, (_, i) => new Date(startUTC + i * 86400000));
+}
+
+// ─── Open-now status + hours summary ───────────────────────────────────────────
+
+const WEEKDAY_FROM_SHORT: Record<string, number> = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+const HOURS_DAY_LABELS = [
+  { weekday: 1, label: "Mon" }, { weekday: 2, label: "Tue" }, { weekday: 3, label: "Wed" },
+  { weekday: 4, label: "Thu" }, { weekday: 5, label: "Fri" }, { weekday: 6, label: "Sat" }, { weekday: 0, label: "Sun" },
+];
+
+function fmtHourLabel(hhmm: string) {
+  const [h, m] = hhmm.slice(0, 5).split(":").map(Number);
+  const period = h >= 12 ? "PM" : "AM";
+  const h12 = h % 12 === 0 ? 12 : h % 12;
+  return m === 0 ? `${h12}${period}` : `${h12}:${String(m).padStart(2, "0")}${period}`;
+}
+
+function computeOpenStatus(businessHours: BusinessHour[]): { openNow: boolean; label: string } | null {
+  if (businessHours.length === 0) return null;
+
+  const now = new Date();
+  const dayStr = new Intl.DateTimeFormat("en-US", { timeZone: "America/Edmonton", weekday: "short" }).format(now);
+  const weekday = WEEKDAY_FROM_SHORT[dayStr];
+  const timeStr = new Intl.DateTimeFormat("en-US", { timeZone: "America/Edmonton", hour: "2-digit", minute: "2-digit", hour12: false }).format(now);
+  const [nowH, nowM] = timeStr.split(":").map(Number);
+  const nowMinutes = nowH * 60 + nowM;
+
+  const today = businessHours.find(h => h.weekday === weekday);
+  if (!today || !today.open) return { openNow: false, label: "Closed today" };
+
+  const [openH, openM] = today.start_time.slice(0, 5).split(":").map(Number);
+  const [closeH, closeM] = today.end_time.slice(0, 5).split(":").map(Number);
+  const openMinutes = openH * 60 + openM;
+  const closeMinutes = closeH * 60 + closeM;
+
+  if (nowMinutes < openMinutes) return { openNow: false, label: `Opens at ${fmtHourLabel(today.start_time)}` };
+  if (nowMinutes >= closeMinutes) return { openNow: false, label: "Closed for today" };
+  return { openNow: true, label: `Open until ${fmtHourLabel(today.end_time)}` };
 }
 
 // ─── Main component ────────────────────────────────────────────────────────────
@@ -141,6 +179,8 @@ export function BookingClient({ shop, services, staff, businessHours, initialCus
     return { label, day, dateStr, open };
   });
 
+  const openStatus = useMemo(() => computeOpenStatus(businessHours), [businessHours]);
+
   return (
     <div style={{ minHeight: "100vh", background: "rgb(246,246,250)", fontFamily: "DM Sans, system-ui, sans-serif" }}>
 
@@ -150,9 +190,22 @@ export function BookingClient({ shop, services, staff, businessHours, initialCus
         <div style={{ position: "relative", maxWidth: 680, margin: "0 auto", padding: "40px 24px 0", display: "flex", flexDirection: "column", justifyContent: "flex-end", height: "100%" }}>
           <div style={{ paddingBottom: 28 }}>
             <h1 style={{ color: "white", fontSize: 26, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.02em" }}>{shop.name}</h1>
-            <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 14, margin: 0, display: "flex", alignItems: "center", gap: 6 }}>
-              <MapPin size={13} /> {shop.city}, {shop.province}
-            </p>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+              <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 14, margin: 0, display: "flex", alignItems: "center", gap: 6 }}>
+                <MapPin size={13} /> {shop.city}, {shop.province}
+              </p>
+              {openStatus && (
+                <span style={{
+                  display: "flex", alignItems: "center", gap: 5, fontSize: 12, fontWeight: 700,
+                  padding: "3px 10px", borderRadius: 20,
+                  background: openStatus.openNow ? "rgba(52,211,153,0.18)" : "rgba(255,255,255,0.15)",
+                  color: openStatus.openNow ? "rgb(110,231,183)" : "rgba(255,255,255,0.75)",
+                }}>
+                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: openStatus.openNow ? "rgb(52,211,153)" : "rgba(255,255,255,0.5)" }} />
+                  {openStatus.label}
+                </span>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -167,6 +220,47 @@ export function BookingClient({ shop, services, staff, businessHours, initialCus
           )}
         </div>
       </div>
+
+      {/* Team + Hours */}
+      {(staff.length > 0 || businessHours.length > 0) && (
+        <div style={{ maxWidth: 680, margin: "0 auto", padding: "24px 24px 0", display: "flex", gap: 16, flexWrap: "wrap" }}>
+          {staff.length > 0 && (
+            <div style={{ flex: "1 1 280px", background: "white", border: "1px solid rgba(0,0,0,0.08)", borderRadius: 16, padding: "16px 18px" }}>
+              <p style={{ color: "rgba(0,0,0,0.35)", fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", margin: "0 0 12px" }}>Meet the team</p>
+              <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
+                {staff.map(s => (
+                  <div key={s.id} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, width: 64 }}>
+                    <div style={{ width: 40, height: 40, borderRadius: "50%", background: `${s.color}22`, border: `1.5px solid ${s.color}44`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800, color: s.color }}>
+                      {s.full_name.split(" ").map(p => p[0]).join("").slice(0, 2).toUpperCase()}
+                    </div>
+                    <span style={{ color: "rgb(20,20,30)", fontSize: 11.5, fontWeight: 700, textAlign: "center", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 64 }}>{s.full_name.split(" ")[0]}</span>
+                    {s.role && <span style={{ color: "rgba(0,0,0,0.35)", fontSize: 10, textAlign: "center" }}>{s.role}</span>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {businessHours.length > 0 && (
+            <div style={{ flex: "1 1 200px", background: "white", border: "1px solid rgba(0,0,0,0.08)", borderRadius: 16, padding: "16px 18px" }}>
+              <p style={{ color: "rgba(0,0,0,0.35)", fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", margin: "0 0 12px" }}>Hours</p>
+              <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                {HOURS_DAY_LABELS.map(({ weekday, label }) => {
+                  const row = businessHours.find(h => h.weekday === weekday);
+                  return (
+                    <div key={weekday} style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5 }}>
+                      <span style={{ color: "rgba(0,0,0,0.45)" }}>{label}</span>
+                      <span style={{ color: row?.open ? "rgb(20,20,30)" : "rgba(0,0,0,0.3)", fontWeight: row?.open ? 600 : 400 }}>
+                        {row?.open ? `${fmtHourLabel(row.start_time)} – ${fmtHourLabel(row.end_time)}` : "Closed"}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Services */}
       <div style={{ maxWidth: 680, margin: "0 auto", padding: "28px 24px 80px" }}>
@@ -190,8 +284,12 @@ export function BookingClient({ shop, services, staff, businessHours, initialCus
         </div>
 
         {services.length === 0 ? (
-          <div style={{ padding: "50px 20px", textAlign: "center", color: "rgba(0,0,0,0.35)", fontSize: 13.5, background: "white", border: "1px solid rgba(0,0,0,0.08)", borderRadius: 16 }}>
-            This shop hasn&apos;t published any services yet.
+          <div style={{ padding: "44px 20px", textAlign: "center", background: "white", border: "1px solid rgba(0,0,0,0.08)", borderRadius: 16 }}>
+            <div style={{ width: 48, height: 48, borderRadius: "50%", background: "rgba(109,40,217,0.08)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 14px" }}>
+              <CalendarClock size={22} color={ACCENT} strokeWidth={1.6} />
+            </div>
+            <p style={{ color: "rgb(20,20,30)", fontSize: 14, fontWeight: 700, margin: "0 0 4px" }}>Booking isn&apos;t open here yet</p>
+            <p style={{ color: "rgba(0,0,0,0.4)", fontSize: 13, margin: 0 }}>This shop is still setting up their services — check back soon.</p>
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
