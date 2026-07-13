@@ -265,19 +265,21 @@ export function BookingClient({ shop, services, staff, businessHours, initialCus
       <div style={{ maxWidth: 680, margin: "0 auto", padding: "24px 24px 80px" }}>
         {activeTab === "services" && (
           <>
-            <div style={{ display: "flex", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>
-              {categories.map(c => (
-                <button key={c} onClick={() => setCatFilter(c)} style={{
-                  padding: "6px 14px", borderRadius: 20,
-                  border: `1px solid ${catFilter === c ? ACCENT : "rgba(0,0,0,0.1)"}`,
-                  background: catFilter === c ? ACCENT : "white",
-                  color: catFilter === c ? "white" : "rgba(0,0,0,0.5)",
-                  fontSize: 12.5, fontWeight: catFilter === c ? 700 : 500, cursor: "pointer",
-                }}>
-                  {c}
-                </button>
-              ))}
-            </div>
+            {categories.length > 1 && (
+              <div style={{ display: "flex", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>
+                {categories.map(c => (
+                  <button key={c} onClick={() => setCatFilter(c)} style={{
+                    padding: "6px 14px", borderRadius: 20,
+                    border: `1px solid ${catFilter === c ? ACCENT : "rgba(0,0,0,0.1)"}`,
+                    background: catFilter === c ? ACCENT : "white",
+                    color: catFilter === c ? "white" : "rgba(0,0,0,0.5)",
+                    fontSize: 12.5, fontWeight: catFilter === c ? 700 : 500, cursor: "pointer",
+                  }}>
+                    {c}
+                  </button>
+                ))}
+              </div>
+            )}
 
             {services.length === 0 ? (
               <div style={{ padding: "44px 20px", textAlign: "center", background: "white", border: "1px solid rgba(0,0,0,0.08)", borderRadius: 16 }}>
