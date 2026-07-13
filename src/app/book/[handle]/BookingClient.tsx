@@ -100,6 +100,7 @@ export function BookingClient({ shop, services, staff, businessHours, initialCus
   const [paymentClientSecret, setPaymentClientSecret] = useState<string | null>(null);
   const [paymentError, setPaymentError]               = useState<string | null>(null);
   const [catFilter, setCatFilter]   = useState("All");
+  const [activeTab, setActiveTab]   = useState<"services" | "team" | "hours">("services");
   const [service, setService]       = useState<Service | null>(null);
   const [staffId, setStaffId]       = useState<string | "any">("any");
   const [date, setDate]             = useState<string | null>(null);
@@ -181,134 +182,167 @@ export function BookingClient({ shop, services, staff, businessHours, initialCus
 
   const openStatus = useMemo(() => computeOpenStatus(businessHours), [businessHours]);
 
+  const tabs = useMemo(() => {
+    const t: { id: "services" | "team" | "hours"; label: string; count: number | null }[] = [
+      { id: "services", label: "Services", count: services.length },
+    ];
+    if (staff.length > 0) t.push({ id: "team", label: "Team", count: staff.length });
+    if (businessHours.length > 0) t.push({ id: "hours", label: "Hours", count: null });
+    return t;
+  }, [services.length, staff.length, businessHours.length]);
+
   return (
     <div style={{ minHeight: "100vh", background: "rgb(246,246,250)", fontFamily: "DM Sans, system-ui, sans-serif" }}>
 
-      {/* Hero */}
-      <div style={{ position: "relative", height: 220, overflow: "hidden", background: "linear-gradient(135deg, rgb(30,10,80) 0%, rgb(88,28,218) 50%, rgb(109,40,217) 100%)" }}>
+      {/* Cover */}
+      <div style={{ position: "relative", height: 150, overflow: "hidden", background: "linear-gradient(135deg, rgb(30,10,80) 0%, rgb(88,28,218) 50%, rgb(109,40,217) 100%)" }}>
         <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.25)" }} />
-        <div style={{ position: "relative", maxWidth: 680, margin: "0 auto", padding: "40px 24px 0", display: "flex", flexDirection: "column", justifyContent: "flex-end", height: "100%" }}>
-          <div style={{ paddingBottom: 28 }}>
-            <h1 style={{ color: "white", fontSize: 26, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.02em" }}>{shop.name}</h1>
-            <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-              <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 14, margin: 0, display: "flex", alignItems: "center", gap: 6 }}>
-                <MapPin size={13} /> {shop.city}, {shop.province}
-              </p>
-              {openStatus && (
-                <span style={{
-                  display: "flex", alignItems: "center", gap: 5, fontSize: 12, fontWeight: 700,
-                  padding: "3px 10px", borderRadius: 20,
-                  background: openStatus.openNow ? "rgba(52,211,153,0.18)" : "rgba(255,255,255,0.15)",
-                  color: openStatus.openNow ? "rgb(110,231,183)" : "rgba(255,255,255,0.75)",
-                }}>
-                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: openStatus.openNow ? "rgb(52,211,153)" : "rgba(255,255,255,0.5)" }} />
-                  {openStatus.label}
-                </span>
-              )}
-            </div>
+      </div>
+
+      {/* Profile row (avatar overlaps cover, Twitter-style) */}
+      <div style={{ maxWidth: 680, margin: "0 auto", padding: "0 24px", background: "rgb(246,246,250)" }}>
+        <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 12, flexWrap: "wrap", marginTop: -44 }}>
+          <div style={{
+            width: 88, height: 88, borderRadius: "50%",
+            background: "linear-gradient(135deg, rgb(88,28,218), rgb(139,92,246))",
+            border: "4px solid rgb(246,246,250)", boxShadow: "0 2px 10px rgba(0,0,0,0.15)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            color: "white", fontSize: 28, fontWeight: 800, flexShrink: 0,
+          }}>
+            {shop.name.trim().split(/\s+/).map(w => w[0]).join("").slice(0, 2).toUpperCase()}
+          </div>
+          <div style={{ paddingBottom: 8 }}>
+            {customer ? (
+              <Link href="/customer/account" style={{ display: "inline-block", fontSize: 12.5, color: ACCENT, fontWeight: 700, textDecoration: "none", padding: "8px 16px", borderRadius: 20, border: `1px solid ${ACCENT}33`, background: "white" }}>
+                My bookings ({customer.fullName.split(" ")[0]})
+              </Link>
+            ) : (
+              <Link href="/customer/login" style={{ display: "inline-block", fontSize: 12.5, color: "rgba(0,0,0,0.55)", fontWeight: 600, textDecoration: "none", padding: "8px 16px", borderRadius: 20, border: "1px solid rgba(0,0,0,0.12)", background: "white" }}>
+                Sign in
+              </Link>
+            )}
+          </div>
+        </div>
+
+        <div style={{ padding: "10px 0 18px" }}>
+          <h1 style={{ color: "rgb(20,20,30)", fontSize: 22, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.02em" }}>{shop.name}</h1>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+            <p style={{ color: "rgba(0,0,0,0.45)", fontSize: 13.5, margin: 0, display: "flex", alignItems: "center", gap: 6 }}>
+              <MapPin size={13} /> {shop.city}, {shop.province}
+            </p>
+            {openStatus && (
+              <span style={{
+                display: "flex", alignItems: "center", gap: 5, fontSize: 12, fontWeight: 700,
+                padding: "3px 10px", borderRadius: 20,
+                background: openStatus.openNow ? "rgba(16,185,129,0.1)" : "rgba(0,0,0,0.05)",
+                color: openStatus.openNow ? "rgb(5,150,105)" : "rgba(0,0,0,0.45)",
+              }}>
+                <span style={{ width: 6, height: 6, borderRadius: "50%", background: openStatus.openNow ? "rgb(16,185,129)" : "rgba(0,0,0,0.25)" }} />
+                {openStatus.label}
+              </span>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Account bar */}
-      <div style={{ background: "white", borderBottom: "1px solid rgba(0,0,0,0.07)" }}>
-        <div style={{ maxWidth: 680, margin: "0 auto", padding: "10px 24px", display: "flex", justifyContent: "flex-end" }}>
-          {customer ? (
-            <Link href="/customer/account" style={{ fontSize: 12.5, color: ACCENT, fontWeight: 700, textDecoration: "none" }}>My bookings ({customer.fullName.split(" ")[0]})</Link>
-          ) : (
-            <Link href={`/customer/login`} style={{ fontSize: 12.5, color: "rgba(0,0,0,0.45)", fontWeight: 600, textDecoration: "none" }}>Already have an account? Sign in</Link>
-          )}
-        </div>
-      </div>
-
-      {/* Team + Hours */}
-      {(staff.length > 0 || businessHours.length > 0) && (
-        <div style={{ maxWidth: 680, margin: "0 auto", padding: "24px 24px 0", display: "flex", gap: 16, flexWrap: "wrap" }}>
-          {staff.length > 0 && (
-            <div style={{ flex: "1 1 280px", background: "white", border: "1px solid rgba(0,0,0,0.08)", borderRadius: 16, padding: "16px 18px" }}>
-              <p style={{ color: "rgba(0,0,0,0.35)", fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", margin: "0 0 12px" }}>Meet the team</p>
-              <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
-                {staff.map(s => (
-                  <div key={s.id} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, width: 64 }}>
-                    <div style={{ width: 40, height: 40, borderRadius: "50%", background: `${s.color}22`, border: `1.5px solid ${s.color}44`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800, color: s.color }}>
-                      {s.full_name.split(" ").map(p => p[0]).join("").slice(0, 2).toUpperCase()}
-                    </div>
-                    <span style={{ color: "rgb(20,20,30)", fontSize: 11.5, fontWeight: 700, textAlign: "center", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 64 }}>{s.full_name.split(" ")[0]}</span>
-                    {s.role && <span style={{ color: "rgba(0,0,0,0.35)", fontSize: 10, textAlign: "center" }}>{s.role}</span>}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {businessHours.length > 0 && (
-            <div style={{ flex: "1 1 200px", background: "white", border: "1px solid rgba(0,0,0,0.08)", borderRadius: 16, padding: "16px 18px" }}>
-              <p style={{ color: "rgba(0,0,0,0.35)", fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", margin: "0 0 12px" }}>Hours</p>
-              <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                {HOURS_DAY_LABELS.map(({ weekday, label }) => {
-                  const row = businessHours.find(h => h.weekday === weekday);
-                  return (
-                    <div key={weekday} style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5 }}>
-                      <span style={{ color: "rgba(0,0,0,0.45)" }}>{label}</span>
-                      <span style={{ color: row?.open ? "rgb(20,20,30)" : "rgba(0,0,0,0.3)", fontWeight: row?.open ? 600 : 400 }}>
-                        {row?.open ? `${fmtHourLabel(row.start_time)} – ${fmtHourLabel(row.end_time)}` : "Closed"}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Services */}
-      <div style={{ maxWidth: 680, margin: "0 auto", padding: "28px 24px 80px" }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-          <h2 style={{ color: "rgb(20,20,30)", fontSize: 18, fontWeight: 800, margin: 0 }}>Services</h2>
-          <span style={{ color: "rgba(0,0,0,0.35)", fontSize: 13 }}>{services.length} available</span>
-        </div>
-
-        <div style={{ display: "flex", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>
-          {categories.map(c => (
-            <button key={c} onClick={() => setCatFilter(c)} style={{
-              padding: "6px 14px", borderRadius: 20,
-              border: `1px solid ${catFilter === c ? ACCENT : "rgba(0,0,0,0.1)"}`,
-              background: catFilter === c ? ACCENT : "white",
-              color: catFilter === c ? "white" : "rgba(0,0,0,0.5)",
-              fontSize: 12.5, fontWeight: catFilter === c ? 700 : 500, cursor: "pointer",
+      {/* Tabs */}
+      <div style={{ background: "white", borderBottom: "1px solid rgba(0,0,0,0.08)", position: "sticky", top: 0, zIndex: 10 }}>
+        <div style={{ maxWidth: 680, margin: "0 auto", padding: "0 16px", display: "flex", gap: 2, overflowX: "auto" }}>
+          {tabs.map(t => (
+            <button key={t.id} onClick={() => setActiveTab(t.id)} style={{
+              padding: "14px 16px", background: "none", border: "none", cursor: "pointer", whiteSpace: "nowrap",
+              fontSize: 14, fontWeight: activeTab === t.id ? 800 : 600,
+              color: activeTab === t.id ? "rgb(20,20,30)" : "rgba(0,0,0,0.4)",
+              borderBottom: activeTab === t.id ? `3px solid ${ACCENT}` : "3px solid transparent",
+              marginBottom: -1, display: "flex", alignItems: "center", gap: 6,
             }}>
-              {c}
+              {t.label}
+              {t.count != null && <span style={{ fontSize: 12, fontWeight: 600, color: "rgba(0,0,0,0.35)" }}>{t.count}</span>}
             </button>
           ))}
         </div>
+      </div>
 
-        {services.length === 0 ? (
-          <div style={{ padding: "44px 20px", textAlign: "center", background: "white", border: "1px solid rgba(0,0,0,0.08)", borderRadius: 16 }}>
-            <div style={{ width: 48, height: 48, borderRadius: "50%", background: "rgba(109,40,217,0.08)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 14px" }}>
-              <CalendarClock size={22} color={ACCENT} strokeWidth={1.6} />
+      {/* Tab content */}
+      <div style={{ maxWidth: 680, margin: "0 auto", padding: "24px 24px 80px" }}>
+        {activeTab === "services" && (
+          <>
+            <div style={{ display: "flex", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>
+              {categories.map(c => (
+                <button key={c} onClick={() => setCatFilter(c)} style={{
+                  padding: "6px 14px", borderRadius: 20,
+                  border: `1px solid ${catFilter === c ? ACCENT : "rgba(0,0,0,0.1)"}`,
+                  background: catFilter === c ? ACCENT : "white",
+                  color: catFilter === c ? "white" : "rgba(0,0,0,0.5)",
+                  fontSize: 12.5, fontWeight: catFilter === c ? 700 : 500, cursor: "pointer",
+                }}>
+                  {c}
+                </button>
+              ))}
             </div>
-            <p style={{ color: "rgb(20,20,30)", fontSize: 14, fontWeight: 700, margin: "0 0 4px" }}>Booking isn&apos;t open here yet</p>
-            <p style={{ color: "rgba(0,0,0,0.4)", fontSize: 13, margin: 0 }}>This shop is still setting up their services — check back soon.</p>
-          </div>
-        ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {services.filter(s => catFilter === "All" || (s.category || "Other") === catFilter).map(s => (
-              <div key={s.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 18px", borderRadius: 16, background: "white", border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 1px 4px rgba(0,0,0,0.05)" }}>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <span style={{ color: "rgb(20,20,30)", fontSize: 15, fontWeight: 700 }}>{s.name}</span>
-                  <div style={{ color: "rgba(0,0,0,0.4)", fontSize: 13, display: "flex", alignItems: "center", gap: 4, marginTop: 4 }}>
-                    <Clock size={11} /> {fmtDuration(s.duration_minutes)}
-                  </div>
+
+            {services.length === 0 ? (
+              <div style={{ padding: "44px 20px", textAlign: "center", background: "white", border: "1px solid rgba(0,0,0,0.08)", borderRadius: 16 }}>
+                <div style={{ width: 48, height: 48, borderRadius: "50%", background: "rgba(109,40,217,0.08)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 14px" }}>
+                  <CalendarClock size={22} color={ACCENT} strokeWidth={1.6} />
                 </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
-                  <span style={{ color: "rgb(20,20,30)", fontSize: 17, fontWeight: 800 }}>C${s.price}</span>
-                  <button onClick={() => startBooking(s)} style={{ padding: "9px 18px", borderRadius: 10, border: "none", background: ACCENT, color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}>
-                    Book
-                  </button>
+                <p style={{ color: "rgb(20,20,30)", fontSize: 14, fontWeight: 700, margin: "0 0 4px" }}>Booking isn&apos;t open here yet</p>
+                <p style={{ color: "rgba(0,0,0,0.4)", fontSize: 13, margin: 0 }}>This shop is still setting up their services — check back soon.</p>
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                {services.filter(s => catFilter === "All" || (s.category || "Other") === catFilter).map(s => (
+                  <div key={s.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 18px", borderRadius: 16, background: "white", border: "1px solid rgba(0,0,0,0.08)", boxShadow: "0 1px 4px rgba(0,0,0,0.05)" }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <span style={{ color: "rgb(20,20,30)", fontSize: 15, fontWeight: 700 }}>{s.name}</span>
+                      <div style={{ color: "rgba(0,0,0,0.4)", fontSize: 13, display: "flex", alignItems: "center", gap: 4, marginTop: 4 }}>
+                        <Clock size={11} /> {fmtDuration(s.duration_minutes)}
+                      </div>
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
+                      <span style={{ color: "rgb(20,20,30)", fontSize: 17, fontWeight: 800 }}>C${s.price}</span>
+                      <button onClick={() => startBooking(s)} style={{ padding: "9px 18px", borderRadius: 10, border: "none", background: ACCENT, color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}>
+                        Book
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
+        )}
+
+        {activeTab === "team" && (
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
+            {staff.map(s => (
+              <div key={s.id} style={{ flex: "1 1 200px", display: "flex", alignItems: "center", gap: 12, background: "white", border: "1px solid rgba(0,0,0,0.08)", borderRadius: 16, padding: "14px 16px" }}>
+                <div style={{ width: 48, height: 48, borderRadius: "50%", background: `${s.color}22`, border: `1.5px solid ${s.color}44`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, fontWeight: 800, color: s.color, flexShrink: 0 }}>
+                  {s.full_name.split(" ").map(p => p[0]).join("").slice(0, 2).toUpperCase()}
+                </div>
+                <div style={{ minWidth: 0 }}>
+                  <p style={{ color: "rgb(20,20,30)", fontSize: 14, fontWeight: 700, margin: "0 0 2px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.full_name}</p>
+                  {s.role && <p style={{ color: "rgba(0,0,0,0.4)", fontSize: 12.5, margin: 0 }}>{s.role}</p>}
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {activeTab === "hours" && (
+          <div style={{ background: "white", border: "1px solid rgba(0,0,0,0.08)", borderRadius: 16, padding: "18px 20px", maxWidth: 320 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {HOURS_DAY_LABELS.map(({ weekday, label }) => {
+                const row = businessHours.find(h => h.weekday === weekday);
+                return (
+                  <div key={weekday} style={{ display: "flex", justifyContent: "space-between", fontSize: 13.5 }}>
+                    <span style={{ color: "rgba(0,0,0,0.45)" }}>{label}</span>
+                    <span style={{ color: row?.open ? "rgb(20,20,30)" : "rgba(0,0,0,0.3)", fontWeight: row?.open ? 600 : 400 }}>
+                      {row?.open ? `${fmtHourLabel(row.start_time)} – ${fmtHourLabel(row.end_time)}` : "Closed"}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
       </div>
