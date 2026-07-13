@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Zap, MessageSquare, RotateCcw, Calendar, Clock, Gift, ChevronRight } from "lucide-react";
 import type { AutopilotState, FlowKey } from "./actions";
 
@@ -67,16 +68,16 @@ export function AutoPilotClient({ state }: { state: AutopilotState }) {
           <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 15, margin: "0 0 28px", lineHeight: 1.6 }}>
             Connect Stripe to activate AutoPilot. Once live, the AI runs all 6 revenue flows — 24 hours a day, without you lifting a finger.
           </p>
-          <button disabled title="Stripe Connect isn't set up for this workspace yet" style={{
+          <Link href="/dashboard/settings?tab=Payments" style={{
             display: "inline-flex", alignItems: "center", gap: 8,
             padding: "14px 28px", borderRadius: 13,
-            background: "rgb(109,40,217)", border: "none",
-            color: "white", fontSize: 14, fontWeight: 700, cursor: "not-allowed", opacity: 0.6,
+            background: "rgb(109,40,217)", border: "none", textDecoration: "none",
+            color: "white", fontSize: 14, fontWeight: 700, cursor: "pointer",
             letterSpacing: "-0.01em",
           }}>
             Connect Stripe to activate
             <ChevronRight size={16} strokeWidth={2.5} />
-          </button>
+          </Link>
         </div>
 
         {/* Flows preview */}

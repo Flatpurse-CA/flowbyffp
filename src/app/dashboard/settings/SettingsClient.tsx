@@ -1,14 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   Copy, Check, Link2, Bell, CreditCard, Shield, Building2,
   Wallet, Clock, Receipt, Zap,
   ChevronDown, ChevronUp,
 } from "lucide-react";
-import { updateFamilyHours, updateBusinessHours, type BusinessHourRow } from "./actions";
+import { updateFamilyHours, updateBusinessHours, startStripeOnboarding, type BusinessHourRow } from "./actions";
 
 export type FamilyHoursSettings = { enabled: boolean; start: string; end: string };
 
@@ -144,9 +144,11 @@ function buildHourRows(initial: BusinessHourRow[]): HourRow[] {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export function SettingsClient({ initialFamilyHours, initialBusinessHours }: { initialFamilyHours: FamilyHoursSettings; initialBusinessHours: BusinessHourRow[] }) {
+export function SettingsClient({ initialFamilyHours, initialBusinessHours, initialStripeConnected }: { initialFamilyHours: FamilyHoursSettings; initialBusinessHours: BusinessHourRow[]; initialStripeConnected: boolean }) {
   const router = useRouter();
-  const [tab, setTab]         = useState<TabLabel>("Business");
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get("tab") as TabLabel | null;
+  const [tab, setTab]         = useState<TabLabel>(tabParam && TABS.some(t => t.label === tabParam) ? tabParam : "Business");
   const [copied, setCopied]   = useState(false);
   const [flows, setFlows]     = useState<Flow[]>(INITIAL_FLOWS);
   const [hours, setHours]     = useState<HourRow[]>(() => buildHourRows(initialBusinessHours));
@@ -160,6 +162,20 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours }: { i
   const [familySaved, setFamilySaved]   = useState(false);
   const [taxRate, setTaxRate]         = useState("13");
   const [taxInclusive, setTaxInclusive] = useState(false);
+  const [connectingStripe, setConnectingStripe] = useState(false);
+  const [stripeError, setStripeError]           = useState<string | null>(null);
+
+  const connectStripe = async () => {
+    setConnectingStripe(true);
+    setStripeError(null);
+    const res = await startStripeOnboarding();
+    if (res.error) {
+      setStripeError(res.error);
+      setConnectingStripe(false);
+      return;
+    }
+    if (res.url) window.location.href = res.url;
+  };
 
   const saveFamilyHours = async () => {
     setSavingFamily(true);
@@ -297,9 +313,35 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours }: { i
           </div>
 
           <div style={card}>
+            <SectionLabel>Stripe payments</SectionLabel>
+            {initialStripeConnected ? (
+              <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "4px 0" }}>
+                <span style={{ width: 8, height: 8, borderRadius: "50%", background: "rgb(52,211,153)", flexShrink: 0 }} />
+                <div>
+                  <p style={{ color: "rgb(250,250,250)", fontSize: 13.5, fontWeight: 700, margin: "0 0 2px" }}>Connected</p>
+                  <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 12, margin: 0 }}>Your booking page accepts real card payments, and AutoPilot is active.</p>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 13, margin: "0 0 14px", lineHeight: 1.6 }}>
+                  Connect Stripe to accept real card payments on your booking page and unlock AutoPilot.
+                </p>
+                {stripeError && <p style={{ color: "rgb(248,113,113)", fontSize: 12.5, margin: "0 0 12px" }}>{stripeError}</p>}
+                <button onClick={connectStripe} disabled={connectingStripe} style={{
+                  padding: "10px 20px", borderRadius: 10, border: "none",
+                  background: "rgb(109,40,217)", color: "white", fontSize: 13, fontWeight: 700,
+                  cursor: connectingStripe ? "default" : "pointer", opacity: connectingStripe ? 0.6 : 1,
+                }}>
+                  {connectingStripe ? "Redirecting…" : "Connect Stripe"}
+                </button>
+              </div>
+            )}
+          </div>
+
+          <div style={card}>
             <SectionLabel>Deposit & payment</SectionLabel>
             <Toggle label="Require deposit at booking" sub="Clients pay 20% upfront to secure their appointment" on={true} />
-            <Toggle label="Enable online payments"      sub="Accept card payments via Stripe on the booking page" on={false} />
             <Toggle label="Show gratuity prompt"       sub="Offer tip options (10% / 15% / 20% / 25%) at checkout" on={true} />
           </div>
 

@@ -4,6 +4,8 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { getCustomerContext } from "@/lib/dashboard/customer";
 import { shopWallTimeToUTC } from "@/lib/dashboard/familyHours";
 import { sendBookingConfirmationEmail } from "@/lib/resend";
+import { stripe } from "@/lib/stripe";
+import { attributeAutopilotRevenue } from "@/lib/dashboard/autopilotAttribution";
 
 const SLOT_INTERVAL_MINUTES = 30;
 
@@ -145,6 +147,8 @@ export async function createPublicBooking(input: {
 
   if (error || !inserted) return { error: error?.message ?? "Couldn't create that booking" };
 
+  await attributeAutopilotRevenue(admin, { shopId: input.shopId, clientEmail: ctx.email, price: Number(service.price) });
+
   try {
     await sendBookingConfirmationEmail(ctx.email, {
       shopName: shop.name as string,
@@ -157,4 +161,43 @@ export async function createPublicBooking(input: {
   }
 
   return { appointmentId: inserted.id as string };
+}
+
+export async function createPaymentIntent(input: {
+  appointmentId: string; depositOnly: boolean;
+}): Promise<{ clientSecret?: string; amount?: number; error?: string }> {
+  const ctx = await getCustomerContext();
+  if (!ctx) return { error: "You need to be signed in to pay" };
+
+  const admin = createAdminClient();
+
+  const { data: appt } = await admin
+    .from("appointments")
+    .select("id, shop_id, customer_id, price")
+    .eq("id", input.appointmentId)
+    .maybeSingle();
+  if (!appt || appt.customer_id !== ctx.customerId) return { error: "Booking not found" };
+
+  const { data: shop } = await admin
+    .from("shops")
+    .select("stripe_account_id, stripe_connected")
+    .eq("id", appt.shop_id)
+    .maybeSingle();
+  if (!shop?.stripe_connected || !shop.stripe_account_id) return { error: "This shop isn't set up for online payments" };
+
+  const fullAmount = Number(appt.price);
+  const amount = input.depositOnly ? Math.ceil(fullAmount * 0.2 * 100) / 100 : fullAmount;
+
+  try {
+    const intent = await stripe().paymentIntents.create({
+      amount: Math.round(amount * 100),
+      currency: "cad",
+      transfer_data: { destination: shop.stripe_account_id },
+      metadata: { appointment_id: appt.id },
+      automatic_payment_methods: { enabled: true },
+    });
+    return { clientSecret: intent.client_secret ?? undefined, amount };
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "Couldn't start payment" };
+  }
 }

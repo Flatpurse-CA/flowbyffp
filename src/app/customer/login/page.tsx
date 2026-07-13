@@ -51,10 +51,13 @@ function LoginForm() {
           <label style={{ color: "rgba(0,0,0,0.45)", fontSize: 12, fontWeight: 600, display: "block", marginBottom: 6 }}>Email</label>
           <input type="email" required value={email} onChange={e => setEmail(e.target.value)} style={inputStyle} />
         </div>
-        <div style={{ marginBottom: 20 }}>
+        <div style={{ marginBottom: 8 }}>
           <label style={{ color: "rgba(0,0,0,0.45)", fontSize: 12, fontWeight: 600, display: "block", marginBottom: 6 }}>Password</label>
           <input type="password" required value={password} onChange={e => setPassword(e.target.value)} style={inputStyle} />
         </div>
+        <p style={{ textAlign: "right", margin: "0 0 20px" }}>
+          <Link href="/customer/forgot-password" style={{ color: "rgba(0,0,0,0.4)", fontSize: 12.5, textDecoration: "none" }}>Forgot password?</Link>
+        </p>
 
         <button type="submit" disabled={loading} style={{
           width: "100%", padding: "13px", borderRadius: 12, border: "none",

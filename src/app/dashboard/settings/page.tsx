@@ -1,7 +1,8 @@
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getShopContext } from "@/lib/dashboard/shop";
-import { getBusinessHours } from "./actions";
+import { getBusinessHours, getStripeStatus } from "./actions";
 import { SettingsClient } from "./SettingsClient";
 
 export const dynamic = "force-dynamic";
@@ -29,6 +30,11 @@ export default async function SettingsPage() {
   };
 
   const initialBusinessHours = await getBusinessHours();
+  const { connected: initialStripeConnected } = await getStripeStatus();
 
-  return <SettingsClient initialFamilyHours={initialFamilyHours} initialBusinessHours={initialBusinessHours} />;
+  return (
+    <Suspense>
+      <SettingsClient initialFamilyHours={initialFamilyHours} initialBusinessHours={initialBusinessHours} initialStripeConnected={initialStripeConnected} />
+    </Suspense>
+  );
 }

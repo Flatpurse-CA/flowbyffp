@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { requireShop, getCurrentShopId } from "@/lib/dashboard/shop";
+import { attributeAutopilotRevenue } from "@/lib/dashboard/autopilotAttribution";
 
 export type AppointmentStatus = "confirmed" | "pending" | "deposit" | "completed" | "cancelled";
 
@@ -88,6 +89,9 @@ export async function createAppointment(input: {
   });
 
   if (error) throw new Error(error.message);
+
+  await attributeAutopilotRevenue(supabase, { shopId, clientEmail: input.clientEmail, price: input.price });
+
   revalidatePath("/dashboard/appointments");
 }
 

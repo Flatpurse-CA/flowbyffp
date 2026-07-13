@@ -7,6 +7,7 @@ export async function GET(request: NextRequest) {
   const token_hash = searchParams.get("token_hash");
   const type = searchParams.get("type") as EmailOtpType | null;
   const next = searchParams.get("next") ?? "/dashboard";
+  const loginPath = next.startsWith("/customer") ? "/customer/login" : "/login";
 
   if (token_hash && type) {
     const supabase = await createClient();
@@ -17,11 +18,11 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.redirect(
-      `${origin}/login?error=${encodeURIComponent(error.message)}`,
+      `${origin}${loginPath}?error=${encodeURIComponent(error.message)}`,
     );
   }
 
   return NextResponse.redirect(
-    `${origin}/login?error=${encodeURIComponent("Invalid confirmation link")}`,
+    `${origin}${loginPath}?error=${encodeURIComponent("Invalid confirmation link")}`,
   );
 }

@@ -3,14 +3,20 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
-  Clock, CheckCircle2, ChevronLeft, X, MapPin,
+  Clock, CheckCircle2, ChevronLeft, X, MapPin, Lock,
 } from "lucide-react";
-import { getAvailableSlots, createPublicBooking } from "./actions";
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
+import { getAvailableSlots, createPublicBooking, createPaymentIntent } from "./actions";
 import { customerLogin, customerSignup } from "../../customer/actions";
+
+const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+  ? loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
+  : null;
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type Shop = { id: string; name: string; city: string; province: string };
+type Shop = { id: string; name: string; city: string; province: string; stripeConnected: boolean };
 type Service = { id: string; name: string; price: number; duration_minutes: number; category: string | null };
 type Staff = { id: string; full_name: string; role: string | null; color: string };
 type BusinessHour = { weekday: number; open: boolean; start_time: string; end_time: string };
@@ -52,7 +58,9 @@ export function BookingClient({ shop, services, staff, businessHours, initialCus
   shop: Shop; services: Service[]; staff: Staff[]; businessHours: BusinessHour[]; initialCustomer: Customer | null;
 }) {
   const [showFlow, setShowFlow]     = useState(false);
-  const [step, setStep]             = useState<"datetime" | "account" | "confirm" | "done">("datetime");
+  const [step, setStep]             = useState<"datetime" | "account" | "confirm" | "pay" | "done">("datetime");
+  const [paymentClientSecret, setPaymentClientSecret] = useState<string | null>(null);
+  const [paymentError, setPaymentError]               = useState<string | null>(null);
   const [catFilter, setCatFilter]   = useState("All");
   const [service, setService]       = useState<Service | null>(null);
   const [staffId, setStaffId]       = useState<string | "any">("any");
@@ -111,8 +119,18 @@ export function BookingClient({ shop, services, staff, businessHours, initialCus
       startsAt: time,
       notes,
     });
+    if (res.error) { setBookingError(res.error); setBooking(false); return; }
+
+    if (shop.stripeConnected && res.appointmentId) {
+      const pi = await createPaymentIntent({ appointmentId: res.appointmentId, depositOnly: false });
+      setBooking(false);
+      if (pi.error || !pi.clientSecret) { setPaymentError(pi.error ?? "Couldn't start payment"); setStep("pay"); return; }
+      setPaymentClientSecret(pi.clientSecret);
+      setStep("pay");
+      return;
+    }
+
     setBooking(false);
-    if (res.error) { setBookingError(res.error); return; }
     setStep("done");
   };
 
@@ -228,9 +246,18 @@ export function BookingClient({ shop, services, staff, businessHours, initialCus
               <ConfirmStep
                 service={service} staffName={staffId === "any" ? "Anyone available" : staff.find(s => s.id === staffId)?.full_name ?? "Anyone available"}
                 time={time!} customer={customer} notes={notes} setNotes={setNotes}
-                error={bookingError} submitting={booking}
+                error={bookingError} submitting={booking} stripeConnected={shop.stripeConnected}
                 onBack={() => setStep(customer ? "datetime" : "account")}
                 onConfirm={handleConfirm}
+              />
+            )}
+            {step === "pay" && (
+              <PayStep
+                service={service}
+                clientSecret={paymentClientSecret}
+                error={paymentError}
+                onBack={() => setStep("confirm")}
+                onPaid={() => setStep("done")}
               />
             )}
             {step === "done" && (
@@ -415,10 +442,10 @@ function AccountStep({ onBack, onAuthed }: { onBack: () => void; onAuthed: (c: C
 
 // ─── Step: confirm ──────────────────────────────────────────────────────────────
 
-function ConfirmStep({ service, staffName, time, customer, notes, setNotes, error, submitting, onBack, onConfirm }: {
+function ConfirmStep({ service, staffName, time, customer, notes, setNotes, error, submitting, stripeConnected, onBack, onConfirm }: {
   service: Service; staffName: string; time: string; customer: Customer;
   notes: string; setNotes: (v: string) => void;
-  error: string | null; submitting: boolean;
+  error: string | null; submitting: boolean; stripeConnected: boolean;
   onBack: () => void; onConfirm: () => void;
 }) {
   return (
@@ -451,7 +478,9 @@ function ConfirmStep({ service, staffName, time, customer, notes, setNotes, erro
       </div>
 
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 7, padding: "10px", background: "rgba(0,0,0,0.03)", borderRadius: 10 }}>
-        <span style={{ color: "rgba(0,0,0,0.4)", fontSize: 12 }}>No payment required — the shop will confirm your booking.</span>
+        <span style={{ color: "rgba(0,0,0,0.4)", fontSize: 12 }}>
+          {stripeConnected ? "You'll pay on the next step." : "No payment required — the shop will confirm your booking."}
+        </span>
       </div>
 
       {error && <div style={{ padding: "10px 13px", borderRadius: 10, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", color: "rgb(185,28,28)", fontSize: 12.5 }}>{error}</div>}
@@ -461,9 +490,82 @@ function ConfirmStep({ service, staffName, time, customer, notes, setNotes, erro
         fontSize: 15, fontWeight: 800, cursor: submitting ? "default" : "pointer",
         display: "flex", alignItems: "center", justifyContent: "center", gap: 8, opacity: submitting ? 0.6 : 1,
       }}>
-        {submitting ? "Booking…" : "Request booking"}
+        {submitting ? "Booking…" : stripeConnected ? "Continue to payment" : "Request booking"}
       </button>
     </div>
+  );
+}
+
+// ─── Step: pay ───────────────────────────────────────────────────────────────────
+
+function PayStep({ service, clientSecret, error, onBack, onPaid }: {
+  service: Service; clientSecret: string | null; error: string | null;
+  onBack: () => void; onPaid: () => void;
+}) {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+      <button onClick={onBack} style={{ background: "none", border: "none", display: "flex", alignItems: "center", gap: 6, color: ACCENT, fontSize: 13, fontWeight: 700, cursor: "pointer", padding: 0 }}>
+        <ChevronLeft size={16} /> Back
+      </button>
+      <div>
+        <h2 style={{ color: "rgb(30,30,40)", fontSize: 20, fontWeight: 800, margin: "0 0 2px" }}>Pay for your booking</h2>
+        <p style={{ color: "rgba(0,0,0,0.4)", fontSize: 14, margin: 0 }}>{service.name} · C${service.price}</p>
+      </div>
+
+      {error && (
+        <div style={{ padding: "10px 13px", borderRadius: 10, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", color: "rgb(185,28,28)", fontSize: 12.5 }}>
+          {error} — your booking was still created and is waiting for the shop to confirm; you can pay later or contact them directly.
+        </div>
+      )}
+
+      {!error && !clientSecret && (
+        <p style={{ color: "rgba(0,0,0,0.35)", fontSize: 13 }}>Setting up payment…</p>
+      )}
+
+      {!error && clientSecret && stripePromise && (
+        <Elements stripe={stripePromise} options={{ clientSecret }}>
+          <PayForm onPaid={onPaid} />
+        </Elements>
+      )}
+
+      {!error && clientSecret && !stripePromise && (
+        <div style={{ padding: "10px 13px", borderRadius: 10, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", color: "rgb(185,28,28)", fontSize: 12.5 }}>
+          Payments aren&apos;t configured on this deployment (missing publishable key). Your booking was still created.
+        </div>
+      )}
+    </div>
+  );
+}
+
+function PayForm({ onPaid }: { onPaid: () => void }) {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!stripe || !elements) return;
+    setSubmitting(true);
+    setError(null);
+    const { error: confirmError } = await stripe.confirmPayment({ elements, redirect: "if_required" });
+    setSubmitting(false);
+    if (confirmError) { setError(confirmError.message ?? "Payment failed"); return; }
+    onPaid();
+  };
+
+  return (
+    <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      <PaymentElement />
+      {error && <p style={{ color: "rgb(185,28,28)", fontSize: 12.5, margin: 0 }}>{error}</p>}
+      <button type="submit" disabled={!stripe || submitting} style={{
+        padding: "15px", borderRadius: 14, border: "none", background: ACCENT, color: "white",
+        fontSize: 15, fontWeight: 800, cursor: submitting ? "default" : "pointer",
+        display: "flex", alignItems: "center", justifyContent: "center", gap: 8, opacity: submitting ? 0.6 : 1,
+      }}>
+        <Lock size={15} /> {submitting ? "Processing…" : "Pay now"}
+      </button>
+    </form>
   );
 }
 

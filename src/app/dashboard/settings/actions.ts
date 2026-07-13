@@ -2,8 +2,51 @@
 
 import { revalidatePath } from "next/cache";
 import { requireShop, getShopContext } from "@/lib/dashboard/shop";
+import { stripe } from "@/lib/stripe";
 
 export type BusinessHourRow = { weekday: number; open: boolean; start: string; end: string };
+
+export async function getStripeStatus(): Promise<{ connected: boolean }> {
+  const ctx = await getShopContext();
+  if (!ctx) return { connected: false };
+  const { supabase, shopId } = await requireShop();
+  const { data } = await supabase.from("shops").select("stripe_connected").eq("id", shopId).maybeSingle();
+  return { connected: Boolean(data?.stripe_connected) };
+}
+
+export async function startStripeOnboarding(): Promise<{ url?: string; error?: string }> {
+  const ctx = await getShopContext();
+  if (!ctx || ctx.role !== "owner") return { error: "Only the shop owner can connect Stripe" };
+  const { supabase, shopId } = await requireShop();
+
+  const { data: shop } = await supabase.from("shops").select("stripe_account_id, name").eq("id", shopId).maybeSingle();
+  if (!shop) return { error: "Shop not found" };
+
+  const origin = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  let accountId = shop.stripe_account_id as string | null;
+
+  try {
+    if (!accountId) {
+      const account = await stripe().accounts.create({
+        type: "express",
+        business_profile: { name: shop.name as string },
+      });
+      accountId = account.id;
+      await supabase.from("shops").update({ stripe_account_id: accountId }).eq("id", shopId);
+    }
+
+    const accountLink = await stripe().accountLinks.create({
+      account: accountId,
+      refresh_url: `${origin}/dashboard/settings/stripe-return?refresh=1`,
+      return_url: `${origin}/dashboard/settings/stripe-return`,
+      type: "account_onboarding",
+    });
+
+    return { url: accountLink.url };
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "Couldn't start Stripe onboarding" };
+  }
+}
 
 export async function getBusinessHours(): Promise<BusinessHourRow[]> {
   const ctx = await getShopContext();
