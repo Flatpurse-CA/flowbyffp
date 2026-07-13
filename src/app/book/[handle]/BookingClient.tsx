@@ -194,53 +194,54 @@ export function BookingClient({ shop, services, staff, businessHours, initialCus
   return (
     <div style={{ minHeight: "100vh", background: "rgb(246,246,250)", fontFamily: "DM Sans, system-ui, sans-serif" }}>
 
-      {/* Cover */}
-      <div style={{ position: "relative", height: 150, overflow: "hidden", background: "linear-gradient(135deg, rgb(30,10,80) 0%, rgb(88,28,218) 50%, rgb(109,40,217) 100%)" }}>
-        <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.25)" }} />
-      </div>
-
-      {/* Profile row (avatar overlaps cover, Twitter-style) */}
-      <div style={{ maxWidth: 680, margin: "0 auto", padding: "0 24px", background: "rgb(246,246,250)" }}>
-        <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 12, flexWrap: "wrap", marginTop: -44 }}>
-          <div style={{
-            width: 88, height: 88, borderRadius: "50%",
-            background: "linear-gradient(135deg, rgb(88,28,218), rgb(139,92,246))",
-            border: "4px solid rgb(246,246,250)", boxShadow: "0 2px 10px rgba(0,0,0,0.15)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            color: "white", fontSize: 28, fontWeight: 800, flexShrink: 0,
-          }}>
-            {shop.name.trim().split(/\s+/).map(w => w[0]).join("").slice(0, 2).toUpperCase()}
-          </div>
-          <div style={{ paddingBottom: 8 }}>
-            {customer ? (
-              <Link href="/customer/account" style={{ display: "inline-block", fontSize: 12.5, color: ACCENT, fontWeight: 700, textDecoration: "none", padding: "8px 16px", borderRadius: 20, border: `1px solid ${ACCENT}33`, background: "white" }}>
-                My bookings ({customer.fullName.split(" ")[0]})
-              </Link>
-            ) : (
-              <Link href="/customer/login" style={{ display: "inline-block", fontSize: 12.5, color: "rgba(0,0,0,0.55)", fontWeight: 600, textDecoration: "none", padding: "8px 16px", borderRadius: 20, border: "1px solid rgba(0,0,0,0.12)", background: "white" }}>
-                Sign in
-              </Link>
-            )}
-          </div>
+      {/* Cover + profile row share one centered column, Twitter-style */}
+      <div style={{ maxWidth: 680, margin: "0 auto" }}>
+        <div style={{ position: "relative", height: 150, overflow: "hidden", background: "linear-gradient(135deg, rgb(30,10,80) 0%, rgb(88,28,218) 50%, rgb(109,40,217) 100%)" }}>
+          <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.25)" }} />
         </div>
 
-        <div style={{ padding: "10px 0 18px" }}>
-          <h1 style={{ color: "rgb(20,20,30)", fontSize: 22, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.02em" }}>{shop.name}</h1>
-          <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-            <p style={{ color: "rgba(0,0,0,0.45)", fontSize: 13.5, margin: 0, display: "flex", alignItems: "center", gap: 6 }}>
-              <MapPin size={13} /> {shop.city}, {shop.province}
-            </p>
-            {openStatus && (
-              <span style={{
-                display: "flex", alignItems: "center", gap: 5, fontSize: 12, fontWeight: 700,
-                padding: "3px 10px", borderRadius: 20,
-                background: openStatus.openNow ? "rgba(16,185,129,0.1)" : "rgba(0,0,0,0.05)",
-                color: openStatus.openNow ? "rgb(5,150,105)" : "rgba(0,0,0,0.45)",
-              }}>
-                <span style={{ width: 6, height: 6, borderRadius: "50%", background: openStatus.openNow ? "rgb(16,185,129)" : "rgba(0,0,0,0.25)" }} />
-                {openStatus.label}
-              </span>
-            )}
+        <div style={{ padding: "0 24px", background: "rgb(246,246,250)" }}>
+          <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 12, flexWrap: "wrap", marginTop: -44 }}>
+            <div style={{
+              width: 88, height: 88, borderRadius: "50%",
+              background: "linear-gradient(135deg, rgb(88,28,218), rgb(139,92,246))",
+              border: "4px solid rgb(246,246,250)", boxShadow: "0 2px 10px rgba(0,0,0,0.15)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              color: "white", fontSize: 28, fontWeight: 800, flexShrink: 0,
+            }}>
+              {shop.name.trim().split(/\s+/).map(w => w[0]).join("").slice(0, 2).toUpperCase()}
+            </div>
+            <div style={{ paddingBottom: 8 }}>
+              {customer ? (
+                <Link href="/customer/account" style={{ display: "inline-block", fontSize: 12.5, color: ACCENT, fontWeight: 700, textDecoration: "none", padding: "8px 16px", borderRadius: 20, border: `1px solid ${ACCENT}33`, background: "white" }}>
+                  My bookings ({customer.fullName.split(" ")[0]})
+                </Link>
+              ) : (
+                <Link href="/customer/login" style={{ display: "inline-block", fontSize: 12.5, color: "rgba(0,0,0,0.55)", fontWeight: 600, textDecoration: "none", padding: "8px 16px", borderRadius: 20, border: "1px solid rgba(0,0,0,0.12)", background: "white" }}>
+                  Sign in
+                </Link>
+              )}
+            </div>
+          </div>
+
+          <div style={{ padding: "10px 0 18px" }}>
+            <h1 style={{ color: "rgb(20,20,30)", fontSize: 22, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.02em" }}>{shop.name}</h1>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+              <p style={{ color: "rgba(0,0,0,0.45)", fontSize: 13.5, margin: 0, display: "flex", alignItems: "center", gap: 6 }}>
+                <MapPin size={13} /> {shop.city}, {shop.province}
+              </p>
+              {openStatus && (
+                <span style={{
+                  display: "flex", alignItems: "center", gap: 5, fontSize: 12, fontWeight: 700,
+                  padding: "3px 10px", borderRadius: 20,
+                  background: openStatus.openNow ? "rgba(16,185,129,0.1)" : "rgba(0,0,0,0.05)",
+                  color: openStatus.openNow ? "rgb(5,150,105)" : "rgba(0,0,0,0.45)",
+                }}>
+                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: openStatus.openNow ? "rgb(16,185,129)" : "rgba(0,0,0,0.25)" }} />
+                  {openStatus.label}
+                </span>
+              )}
+            </div>
           </div>
         </div>
       </div>
