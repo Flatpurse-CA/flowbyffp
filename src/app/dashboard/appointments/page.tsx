@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { getShopContext } from "@/lib/dashboard/shop";
+import { getRequestOrigin } from "@/lib/requestOrigin";
 import { listAppointments } from "./actions";
 import { listStaff } from "../team/actions";
 import { AppointmentsClient } from "./AppointmentsClient";
@@ -32,16 +33,17 @@ export default async function BookingsPage() {
   const rangeEnd = new Date(now);
   rangeEnd.setDate(rangeEnd.getDate() + 45);
 
-  const [appointments, staff] = await Promise.all([
+  const [appointments, staff, origin] = await Promise.all([
     listAppointments(rangeStart.toISOString(), rangeEnd.toISOString()),
     listStaff(),
+    getRequestOrigin(),
   ]);
-  const bookingLink = shop?.handle ? `flowbyffp.co/book/${shop.handle}` : "flowbyffp.co/book/your-shop";
+  const bookingUrl = shop?.handle ? `${origin}/book/${shop.handle}` : null;
 
   return (
     <AppointmentsClient
       initialAppointments={appointments}
-      bookingLink={bookingLink}
+      bookingUrl={bookingUrl}
       staff={staff}
       selfStaffId={ctx.staffId}
     />

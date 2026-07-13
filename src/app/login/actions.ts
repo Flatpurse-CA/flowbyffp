@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getRequestOrigin } from "@/lib/requestOrigin";
 
 export async function loginWithPassword(formData: FormData) {
   const email = formData.get("email") as string;
@@ -19,7 +20,7 @@ export async function loginWithPassword(formData: FormData) {
 
 export async function loginWithMagicLink(formData: FormData) {
   const email = formData.get("email") as string;
-  const origin = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const origin = await getRequestOrigin();
 
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithOtp({

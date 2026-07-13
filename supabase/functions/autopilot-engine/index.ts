@@ -27,7 +27,10 @@ const supabase = createClient(
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY")!);
 const FROM = Deno.env.get("RESEND_FROM_EMAIL") ?? "FlatPurse Flow <onboarding@resend.dev>";
-const SITE_URL = Deno.env.get("SITE_URL") ?? "https://flowbyffp.co";
+// flowbyffp.co has no DNS configured yet (checked directly — it doesn't resolve).
+// Falls back to the real working deployment until SITE_URL is set as a function
+// secret (`supabase secrets set SITE_URL=https://flowbyffp.co`) once that's fixed.
+const SITE_URL = Deno.env.get("SITE_URL") ?? "https://flowbyffp.vercel.app";
 const SHOP_TZ = "America/Edmonton";
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;

@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { requireShop, getCurrentShopId, getShopContext } from "@/lib/dashboard/shop";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendStaffInviteEmail } from "@/lib/resend";
+import { getRequestOrigin } from "@/lib/requestOrigin";
 import type { AppointmentRow } from "../appointments/actions";
 
 export type InviteStatus = "not_invited" | "pending" | "accepted";
@@ -60,7 +61,7 @@ async function sendInvite(supabase: Awaited<ReturnType<typeof requireShop>>["sup
   const { data: shop } = await supabase.from("shops").select("name").eq("id", shopId).maybeSingle();
   const shopName = (shop?.name as string | undefined) ?? "your shop";
 
-  const origin = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const origin = await getRequestOrigin();
   const admin = createAdminClient();
 
   const { data: linkData, error: linkError } = await admin.auth.admin.generateLink({

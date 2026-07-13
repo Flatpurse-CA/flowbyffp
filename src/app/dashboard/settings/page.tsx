@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getShopContext } from "@/lib/dashboard/shop";
+import { getRequestOrigin } from "@/lib/requestOrigin";
 import { getBusinessHours, getStripeStatus } from "./actions";
 import { SettingsClient } from "./SettingsClient";
 
@@ -18,7 +19,7 @@ export default async function SettingsPage() {
   const { data: shop } = userData.user
     ? await supabase
         .from("shops")
-        .select("family_hours_enabled, family_hours_start, family_hours_end")
+        .select("family_hours_enabled, family_hours_start, family_hours_end, handle")
         .eq("owner_id", userData.user.id)
         .maybeSingle()
     : { data: null };
@@ -29,12 +30,21 @@ export default async function SettingsPage() {
     end: (shop?.family_hours_end as string | undefined)?.slice(0, 5) ?? "20:00",
   };
 
-  const initialBusinessHours = await getBusinessHours();
-  const { connected: initialStripeConnected } = await getStripeStatus();
+  const [initialBusinessHours, { connected: initialStripeConnected }, origin] = await Promise.all([
+    getBusinessHours(),
+    getStripeStatus(),
+    getRequestOrigin(),
+  ]);
+  const initialBookingUrl = shop?.handle ? `${origin}/book/${shop.handle}` : null;
 
   return (
     <Suspense>
-      <SettingsClient initialFamilyHours={initialFamilyHours} initialBusinessHours={initialBusinessHours} initialStripeConnected={initialStripeConnected} />
+      <SettingsClient
+        initialFamilyHours={initialFamilyHours}
+        initialBusinessHours={initialBusinessHours}
+        initialStripeConnected={initialStripeConnected}
+        initialBookingUrl={initialBookingUrl}
+      />
     </Suspense>
   );
 }

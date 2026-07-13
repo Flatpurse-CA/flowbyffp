@@ -144,7 +144,7 @@ function buildHourRows(initial: BusinessHourRow[]): HourRow[] {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export function SettingsClient({ initialFamilyHours, initialBusinessHours, initialStripeConnected }: { initialFamilyHours: FamilyHoursSettings; initialBusinessHours: BusinessHourRow[]; initialStripeConnected: boolean }) {
+export function SettingsClient({ initialFamilyHours, initialBusinessHours, initialStripeConnected, initialBookingUrl }: { initialFamilyHours: FamilyHoursSettings; initialBusinessHours: BusinessHourRow[]; initialStripeConnected: boolean; initialBookingUrl: string | null }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab") as TabLabel | null;
@@ -203,10 +203,11 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
     }
   };
 
-  const bookingLink = "flowbyffp.co/book/ffp";
+  const bookingLinkDisplay = initialBookingUrl ? initialBookingUrl.replace(/^https?:\/\//, "") : null;
 
   const copyLink = () => {
-    navigator.clipboard.writeText(bookingLink);
+    if (!initialBookingUrl) return;
+    navigator.clipboard.writeText(initialBookingUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -277,22 +278,35 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
           <div style={card}>
             <SectionLabel>Booking link</SectionLabel>
             <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, margin: "0 0 14px" }}>Share this with clients so they can self-book anytime.</p>
-            <div style={{ display: "flex", gap: 10 }}>
-              <div style={{ flex: 1, display: "flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "10px 13px" }}>
-                <Link2 size={13} color="rgba(255,255,255,0.3)" />
-                <span style={{ color: "rgba(255,255,255,0.5)", fontSize: 13 }}>{bookingLink}</span>
+            {bookingLinkDisplay ? (
+              <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                <div style={{ flex: "1 1 200px", display: "flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "10px 13px", minWidth: 0 }}>
+                  <Link2 size={13} color="rgba(255,255,255,0.3)" style={{ flexShrink: 0 }} />
+                  <span style={{ color: "rgba(255,255,255,0.5)", fontSize: 13, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{bookingLinkDisplay}</span>
+                </div>
+                <a href={initialBookingUrl!} target="_blank" rel="noopener noreferrer" style={{
+                  display: "flex", alignItems: "center", gap: 6, padding: "10px 16px",
+                  borderRadius: 10, fontSize: 13, whiteSpace: "nowrap", textDecoration: "none",
+                  background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.65)",
+                }}>
+                  Preview
+                </a>
+                <button onClick={copyLink} style={{
+                  display: "flex", alignItems: "center", gap: 6, padding: "10px 16px",
+                  borderRadius: 10, cursor: "pointer", fontSize: 13, transition: "all 0.2s", whiteSpace: "nowrap",
+                  background: copied ? "rgba(52,211,153,0.12)" : "rgba(255,255,255,0.06)",
+                  border: `1px solid ${copied ? "rgba(52,211,153,0.3)" : "rgba(255,255,255,0.1)"}`,
+                  color: copied ? "rgb(52,211,153)" : "rgba(255,255,255,0.5)",
+                }}>
+                  {copied ? <Check size={13} /> : <Copy size={13} />}
+                  {copied ? "Copied!" : "Copy link"}
+                </button>
               </div>
-              <button onClick={copyLink} style={{
-                display: "flex", alignItems: "center", gap: 6, padding: "10px 16px",
-                borderRadius: 10, cursor: "pointer", fontSize: 13, transition: "all 0.2s", whiteSpace: "nowrap",
-                background: copied ? "rgba(52,211,153,0.12)" : "rgba(255,255,255,0.06)",
-                border: `1px solid ${copied ? "rgba(52,211,153,0.3)" : "rgba(255,255,255,0.1)"}`,
-                color: copied ? "rgb(52,211,153)" : "rgba(255,255,255,0.5)",
-              }}>
-                {copied ? <Check size={13} /> : <Copy size={13} />}
-                {copied ? "Copied!" : "Copy link"}
-              </button>
-            </div>
+            ) : (
+              <p style={{ color: "rgba(248,113,113,0.8)", fontSize: 12.5, margin: 0 }}>
+                No handle set for your shop yet — contact support to get your booking page activated.
+              </p>
+            )}
           </div>
 
           <SaveBar />

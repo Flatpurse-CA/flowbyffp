@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import {
   Plus, Search, Copy, Check, MessageSquare,
   Mail, ExternalLink, Zap, Clock, ChevronRight,
-  X, Link2, Phone, CreditCard, Banknote, Smartphone,
+  X, Phone, CreditCard, Banknote, Smartphone,
   Send, Pencil, Ban, CheckCircle2, StickyNote,
 } from "lucide-react";
 import type { AppointmentRow, AppointmentStatus } from "./actions";
@@ -865,8 +865,8 @@ function AppointmentDetail({ appt, onClose, onCloseOut, onChanged }: { appt: App
 
 // ─── Day view ─────────────────────────────────────────────────────────────────
 
-function DayView({ appts, bookingLink, onNewBooking, onSelect }: {
-  appts: ApptRecord[]; bookingLink: string;
+function DayView({ appts, bookingUrl, onNewBooking, onSelect }: {
+  appts: ApptRecord[]; bookingUrl: string | null;
   onNewBooking: () => void; onSelect: (appt: ApptRecord) => void;
 }) {
   const todayAppts = useMemo(() => appts.filter(a => a.dateLabel === "Today" && a.status !== "cancelled"), [appts]);
@@ -877,7 +877,7 @@ function DayView({ appts, bookingLink, onNewBooking, onSelect }: {
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
 
       {/* Booking link card */}
-      <BookingLinkCard bookingLink={bookingLink} />
+      <BookingLinkCard bookingUrl={bookingUrl} />
 
       {/* Today summary banner */}
       <div style={{
@@ -1155,42 +1155,57 @@ function ListView({ appts, onSelect }: { appts: ApptRecord[]; onSelect: (appt: A
 
 // ─── Booking link card ─────────────────────────────────────────────────────────
 
-function BookingLinkCard({ bookingLink }: { bookingLink: string }) {
+function BookingLinkCard({ bookingUrl }: { bookingUrl: string | null }) {
   const [copied, setCopied] = useState(false);
 
+  if (!bookingUrl) {
+    return (
+      <div style={{ ...card, padding: "16px 20px" }}>
+        <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, margin: 0 }}>
+          Set up your booking page handle in Settings → Business to get a shareable booking link.
+        </p>
+      </div>
+    );
+  }
+
+  const displayText = bookingUrl.replace(/^https?:\/\//, "");
+  const smsHref = `sms:?&body=${encodeURIComponent(`Book with me: ${bookingUrl}`)}`;
+  const emailHref = `mailto:?subject=${encodeURIComponent("Book an appointment")}&body=${encodeURIComponent(`Book here: ${bookingUrl}`)}`;
+
   const copy = () => {
-    navigator.clipboard.writeText(`https://${bookingLink}`);
+    navigator.clipboard.writeText(bookingUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
   return (
     <div style={{ ...card, padding: "16px 20px" }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, flex: 1, minWidth: 0 }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+        <a href={bookingUrl} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 10, flex: 1, minWidth: 0, textDecoration: "none" }}>
           <div style={{ width: 34, height: 34, borderRadius: 9, background: "rgba(139,92,246,0.12)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
             <ExternalLink size={15} color="rgb(167,139,250)" strokeWidth={1.8} />
           </div>
           <div style={{ minWidth: 0 }}>
-            <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 10, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 2px" }}>Your booking link</p>
-            <p style={{ color: "rgb(210,196,254)", fontSize: 13.5, fontWeight: 600, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{bookingLink}</p>
+            <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 10, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 2px" }}>Your booking link · tap to preview</p>
+            <p style={{ color: "rgb(210,196,254)", fontSize: 13.5, fontWeight: 600, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{displayText}</p>
           </div>
-        </div>
+        </a>
 
         <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
-          {[
-            { Icon: Link2,         label: "Instagram", color: "rgb(232,121,249)" },
-            { Icon: MessageSquare, label: "SMS",       color: "rgb(52,211,153)"  },
-            { Icon: Mail,          label: "Email",     color: "rgb(96,165,250)"  },
-          ].map(({ Icon, label, color }) => (
-            <button key={label} title={label} style={{
-              width: 32, height: 32, borderRadius: 8, border: "1px solid rgba(255,255,255,0.08)",
-              background: "rgba(255,255,255,0.04)", display: "flex", alignItems: "center", justifyContent: "center",
-              cursor: "pointer", color,
-            }}>
-              <Icon size={14} strokeWidth={1.8} />
-            </button>
-          ))}
+          <a href={smsHref} title="Share via SMS" style={{
+            width: 32, height: 32, borderRadius: 8, border: "1px solid rgba(255,255,255,0.08)",
+            background: "rgba(255,255,255,0.04)", display: "flex", alignItems: "center", justifyContent: "center",
+            cursor: "pointer", color: "rgb(52,211,153)", textDecoration: "none",
+          }}>
+            <MessageSquare size={14} strokeWidth={1.8} />
+          </a>
+          <a href={emailHref} title="Share via email" style={{
+            width: 32, height: 32, borderRadius: 8, border: "1px solid rgba(255,255,255,0.08)",
+            background: "rgba(255,255,255,0.04)", display: "flex", alignItems: "center", justifyContent: "center",
+            cursor: "pointer", color: "rgb(96,165,250)", textDecoration: "none",
+          }}>
+            <Mail size={14} strokeWidth={1.8} />
+          </a>
           <button onClick={copy} style={{
             display: "flex", alignItems: "center", gap: 6,
             padding: "7px 14px", borderRadius: 9,
@@ -1213,7 +1228,7 @@ function BookingLinkCard({ bookingLink }: { bookingLink: string }) {
 const VIEWS = ["Day", "Week", "List"] as const;
 type View = typeof VIEWS[number];
 
-export function AppointmentsClient({ initialAppointments, bookingLink, staff, selfStaffId }: { initialAppointments: AppointmentRow[]; bookingLink: string; staff: StaffRow[]; selfStaffId?: string | null }) {
+export function AppointmentsClient({ initialAppointments, bookingUrl, staff, selfStaffId }: { initialAppointments: AppointmentRow[]; bookingUrl: string | null; staff: StaffRow[]; selfStaffId?: string | null }) {
   const router = useRouter();
   const [, startTransition] = useTransition();
   const [view, setView]           = useState<View>("Day");
@@ -1275,7 +1290,7 @@ export function AppointmentsClient({ initialAppointments, bookingLink, staff, se
       </div>
 
       {/* View content */}
-      {view === "Day"  && <DayView appts={appts} bookingLink={bookingLink} onNewBooking={() => setNew(true)} onSelect={a => setSelectedId(a.id)} />}
+      {view === "Day"  && <DayView appts={appts} bookingUrl={bookingUrl} onNewBooking={() => setNew(true)} onSelect={a => setSelectedId(a.id)} />}
       {view === "Week" && <WeekView appts={appts} />}
       {view === "List" && <ListView appts={appts} onSelect={a => setSelectedId(a.id)} />}
 

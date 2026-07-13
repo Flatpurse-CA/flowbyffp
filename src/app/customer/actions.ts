@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { sendPasswordResetEmail } from "@/lib/resend";
+import { getRequestOrigin } from "@/lib/requestOrigin";
 
 export async function customerSignup(input: { fullName: string; email: string; phone?: string; password: string }): Promise<{ error?: string }> {
   const fullName = input.fullName.trim();
@@ -46,7 +47,7 @@ export async function customerLogin(input: { email: string; password: string }):
 }
 
 export async function customerRequestPasswordReset(email: string): Promise<{ error?: string }> {
-  const origin = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const origin = await getRequestOrigin();
   const admin = createAdminClient();
 
   // Matches the staff-invite pattern exactly (team/actions.ts's sendInvite): generate the

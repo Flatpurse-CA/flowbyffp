@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { requireShop, getShopContext } from "@/lib/dashboard/shop";
 import { stripe } from "@/lib/stripe";
+import { getRequestOrigin } from "@/lib/requestOrigin";
 
 export type BusinessHourRow = { weekday: number; open: boolean; start: string; end: string };
 
@@ -22,7 +23,7 @@ export async function startStripeOnboarding(): Promise<{ url?: string; error?: s
   const { data: shop } = await supabase.from("shops").select("stripe_account_id, name").eq("id", shopId).maybeSingle();
   if (!shop) return { error: "Shop not found" };
 
-  const origin = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const origin = await getRequestOrigin();
   let accountId = shop.stripe_account_id as string | null;
 
   try {
