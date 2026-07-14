@@ -135,7 +135,7 @@ function SidebarNav({ open, pathname, T, tabs }: { open: boolean; pathname: stri
   );
 }
 
-export function DashboardShell({ children, user, role, unreadCount }: { children: React.ReactNode; user: User; role: ShopRole; unreadCount: number }) {
+export function DashboardShell({ children, user, role, staffName, unreadCount }: { children: React.ReactNode; user: User; role: ShopRole; staffName: string | null; unreadCount: number }) {
   const router = useRouter();
   const pathname = usePathname();
   const visibleTabs = role === "owner" ? NAV_TABS : NAV_TABS.filter(t => !t.ownerOnly);
@@ -150,9 +150,11 @@ export function DashboardShell({ children, user, role, unreadCount }: { children
   const searchRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
-  const email    = user.email ?? "";
-  const username = email.split("@")[0];
-  const name     = username.charAt(0).toUpperCase() + username.slice(1);
+  const email       = user.email ?? "";
+  const username    = email.split("@")[0];
+  const metaFirstName = (user.user_metadata as { first_name?: string } | undefined)?.first_name;
+  const fallbackName  = username.charAt(0).toUpperCase() + username.slice(1);
+  const name     = staffName?.split(" ")[0] ?? (metaFirstName ? metaFirstName.charAt(0).toUpperCase() + metaFirstName.slice(1) : fallbackName);
   const initial  = name.charAt(0);
 
   const greeting = (() => {

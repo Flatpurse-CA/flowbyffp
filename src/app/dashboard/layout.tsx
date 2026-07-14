@@ -28,5 +28,5 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   const unreadCount = await getUnreadCount();
 
-  return <DashboardShell user={data.user} role={ctx.role} unreadCount={unreadCount}>{children}</DashboardShell>;
+  return <DashboardShell user={data.user} role={ctx.role} staffName={ctx.staffName} unreadCount={unreadCount}>{children}</DashboardShell>;
 }
