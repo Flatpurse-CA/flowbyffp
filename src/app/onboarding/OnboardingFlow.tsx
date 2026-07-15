@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import {
   Scissors,
   Users,
@@ -16,10 +15,13 @@ import {
   Droplets,
   Baby,
   ArrowRight,
+  ArrowLeft,
+  LogOut,
   Check,
 } from "lucide-react";
 import { StepProgress } from "@/components/StepProgress";
-import { checkHandleAvailability } from "./actions";
+import { checkHandleAvailability, claimHandle, saveOnboardingServices, saveOnboardingTeam } from "./actions";
+import { logout } from "@/app/dashboard/actions";
 
 const easing = "cubic-bezier(0.16,1,0.3,1)";
 const ACCENT = "rgb(109,40,217)";
@@ -720,6 +722,8 @@ export function OnboardingFlow({ displayName }: { displayName: string }) {
   const [services, setServices]               = useState<Service[]>([]);
   const [members, setMembers]                 = useState([{ name: displayName, role: "Owner", color: MEMBER_COLORS[0] }]);
   const [flows, setFlows]                     = useState(FLOWS);
+  const [saving, setSaving]                   = useState(false);
+  const [stepError, setStepError]             = useState<string | null>(null);
 
   const checkHandle = async () => {
     setCheckingHandle(true);
@@ -742,12 +746,33 @@ export function OnboardingFlow({ displayName }: { displayName: string }) {
     setFlows((prev) => prev.map((f) => (f.id === id ? { ...f, on: !f.on } : f)));
 
   const isContinueDisabled =
+    saving ||
     (step === 1 && !handle) ||
     (step === 2 && services.length === 0) ||
     (step === 4 && flows.filter((f) => f.on).length === 0);
 
   const activeFlows = flows.filter((f) => f.on).length;
-  const btnLabel    = step === 4 ? "Launch your flow" : "Continue";
+  const btnLabel    = saving ? "Saving…" : step === 4 ? "Launch your flow" : "Continue";
+
+  const handleContinue = async () => {
+    setStepError(null);
+    setSaving(true);
+    try {
+      if (step === 1) {
+        const result = await claimHandle(handle);
+        if (result.error) { setStepError(result.error); return; }
+      } else if (step === 2) {
+        const result = await saveOnboardingServices(services.map(s => ({ name: s.name, price: s.price })));
+        if (result.error) { setStepError(result.error); return; }
+      } else if (step === 3) {
+        const result = await saveOnboardingTeam(members.map(m => ({ name: m.name, role: m.role })));
+        if (result.error) { setStepError(result.error); return; }
+      }
+      setStep((s) => s + 1);
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <div
@@ -777,10 +802,32 @@ export function OnboardingFlow({ displayName }: { displayName: string }) {
         }}
       />
 
-      {/* Logo — pinned to the top-left of the page */}
-      <div style={{ position: "absolute", top: 32, left: 32, zIndex: 2 }}>
-        <Image src="/group-starter.svg" alt="FlatPurse Flow" width={130} height={37} style={{ objectFit: "contain" }} priority />
-      </div>
+      {/* Header — back to login (left), log out (right) */}
+      <button
+        onClick={() => step > 1 ? setStep((s) => s - 1) : router.push("/login")}
+        style={{
+          position: "absolute", top: 28, left: 20, zIndex: 2,
+          display: "flex", alignItems: "center", gap: 6,
+          background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)",
+          borderRadius: 10, padding: "8px 12px",
+          color: "rgba(255,255,255,0.6)", fontSize: 13, fontWeight: 600, cursor: "pointer",
+        }}
+      >
+        <ArrowLeft size={14} strokeWidth={2} /> Back
+      </button>
+      <form action={logout} style={{ position: "absolute", top: 28, right: 20, zIndex: 2 }}>
+        <button
+          type="submit"
+          style={{
+            display: "flex", alignItems: "center", gap: 6,
+            background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)",
+            borderRadius: 10, padding: "8px 12px",
+            color: "rgba(255,255,255,0.6)", fontSize: 13, fontWeight: 600, cursor: "pointer",
+          }}
+        >
+          Log out <LogOut size={14} strokeWidth={2} />
+        </button>
+      </form>
 
       {/* Content */}
       <div
@@ -795,11 +842,7 @@ export function OnboardingFlow({ displayName }: { displayName: string }) {
 
         {/* Step indicator */}
         {step <= 4 && (
-          <StepProgress
-            step={step}
-            total={4}
-            onBack={step > 1 ? () => setStep((s) => s - 1) : undefined}
-          />
+          <StepProgress step={step} total={4} />
         )}
 
         {/* Step content */}
@@ -843,8 +886,11 @@ export function OnboardingFlow({ displayName }: { displayName: string }) {
         {/* CTA */}
         {step <= 4 && (
           <div style={{ marginTop: 28, display: "flex", flexDirection: "column", gap: 12 }}>
+            {stepError && (
+              <p style={{ color: "rgb(252,165,165)", fontSize: 13, textAlign: "center", margin: 0 }}>{stepError}</p>
+            )}
             <button
-              onClick={() => setStep((s) => s + 1)}
+              onClick={handleContinue}
               disabled={isContinueDisabled}
               style={{
                 width: "100%",
@@ -869,15 +915,6 @@ export function OnboardingFlow({ displayName }: { displayName: string }) {
               {btnLabel}
               <ArrowRight size={16} strokeWidth={2.5} />
             </button>
-
-            {step < 4 && (
-              <button
-                onClick={() => setStep((s) => s + 1)}
-                style={{ background: "none", border: "none", color: "rgba(255,255,255,0.3)", fontSize: 13, cursor: "pointer", padding: "4px 0" }}
-              >
-                Skip for now
-              </button>
-            )}
           </div>
         )}
       </div>

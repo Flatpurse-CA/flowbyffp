@@ -1,7 +1,9 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getOnboardingContext } from "@/lib/onboarding";
+import { requireShop } from "@/lib/dashboard/shop";
 
 const HANDLE_PATTERN = /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/;
 
@@ -40,4 +42,38 @@ export async function checkHandleAvailability(
   }
 
   return { available: false, reason: "That handle is taken. Try another." };
+}
+
+export async function claimHandle(handle: string): Promise<{ error?: string }> {
+  const check = await checkHandleAvailability(handle);
+  if (!check.available) return { error: check.reason ?? "That handle isn't available" };
+
+  const { supabase, shopId } = await requireShop();
+  const { error } = await supabase.from("shops").update({ handle }).eq("id", shopId);
+  if (error) return { error: error.message };
+  revalidatePath("/dashboard/settings");
+  return {};
+}
+
+export async function saveOnboardingServices(items: { name: string; price: number }[]): Promise<{ error?: string }> {
+  if (items.length === 0) return {};
+  const { supabase, shopId } = await requireShop();
+  const rows = items.map(s => ({ shop_id: shopId, name: s.name, price: s.price, duration_minutes: 30, category: null }));
+  const { error } = await supabase.from("services").insert(rows);
+  if (error) return { error: error.message };
+  revalidatePath("/dashboard/services");
+  return {};
+}
+
+export async function saveOnboardingTeam(members: { name: string; role: string }[]): Promise<{ error?: string }> {
+  const extra = members.filter(m => m.role !== "Owner");
+  if (extra.length === 0) return {};
+
+  const { supabase, shopId } = await requireShop();
+  const PALETTE = ["rgb(139,92,246)", "rgb(239,68,68)", "rgb(16,185,129)", "rgb(251,191,36)", "rgb(96,165,250)", "rgb(251,146,60)"];
+  const rows = extra.map((m, i) => ({ shop_id: shopId, full_name: m.name, role: null, color: PALETTE[i % PALETTE.length] }));
+  const { error } = await supabase.from("staff").insert(rows);
+  if (error) return { error: error.message };
+  revalidatePath("/dashboard/team");
+  return {};
 }

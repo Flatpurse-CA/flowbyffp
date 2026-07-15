@@ -95,7 +95,7 @@ function SuccessModal({ onContinue }: { onContinue: () => void }) {
             animation: "fp-fade-up 0.4s ease 1.25s both",
           }}
         >
-          Continue to Onboarding
+          Continue Setup
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
             <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
@@ -135,11 +135,6 @@ export function VerifyForm({ email, initialError }: { email: string; initialErro
 
   const submit = (code: string) => {
     setError(undefined);
-    // Demo bypass — type 123456 to preview the full success flow
-    if (code === "123456") {
-      triggerSuccess();
-      return;
-    }
     startTransition(async () => {
       const result = await verifyCode(email, code);
       if (result.error) {
@@ -229,7 +224,7 @@ export function VerifyForm({ email, initialError }: { email: string; initialErro
 
   return (
     <>
-      {showSuccess && <SuccessModal onContinue={() => router.push("/onboarding")} />}
+      {showSuccess && <SuccessModal onContinue={() => router.push("/signup/shop")} />}
 
       {/* Full-page dark background */}
       <div

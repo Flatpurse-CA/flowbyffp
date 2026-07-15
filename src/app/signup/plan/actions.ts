@@ -26,5 +26,5 @@ export async function choosePlan(formData: FormData) {
     redirect(`/signup/plan?error=${encodeURIComponent(error.message)}`);
   }
 
-  redirect("/dashboard");
+  redirect("/onboarding");
 }

@@ -93,7 +93,7 @@ export async function sendBookingConfirmationEmail(to: string, input: { shopName
 }
 
 export async function sendOtpEmail(email: string, code: string, firstName: string) {
-  await client().emails.send({
+  return client().emails.send({
     from: FROM,
     to: email,
     subject: `${code} is your FLOWBYFFP verification code`,

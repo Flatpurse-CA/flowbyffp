@@ -99,6 +99,44 @@ export async function inviteStaff(input: { fullName: string; role?: string; emai
   if (!ctx || ctx.role !== "owner") throw new Error("Only the shop owner can invite team members");
 
   const { supabase, shopId } = await requireShop();
+  const email = input.email.trim();
+
+  // staff.user_id has a unique index, so re-inserting a row for an email that's already
+  // linked to a staff record (this shop or another) would crash with a raw Postgres
+  // constraint error. Check for an existing row first and handle it explicitly instead.
+  const { data: existingRows } = await supabase
+    .from("staff")
+    .select("id, shop_id, active, invite_status")
+    .ilike("email", email);
+
+  const sameShopRow = (existingRows ?? []).find(r => r.shop_id === shopId);
+  const otherShopRow = (existingRows ?? []).find(r => r.shop_id !== shopId);
+
+  if (sameShopRow) {
+    if (sameShopRow.active) {
+      throw new Error(
+        sameShopRow.invite_status === "accepted"
+          ? `${email} is already an active team member.`
+          : `${email} has already been invited. Use "Resend invite" from their profile instead.`,
+      );
+    }
+    // Previously removed — reactivate rather than inserting a duplicate row.
+    await supabase
+      .from("staff")
+      .update({ active: true, full_name: input.fullName, role: input.role || null, updated_at: new Date().toISOString() })
+      .eq("id", sameShopRow.id);
+
+    if (sameShopRow.invite_status !== "accepted") {
+      await sendInvite(supabase, shopId, sameShopRow.id, email);
+    }
+    revalidatePath("/dashboard/team");
+    revalidatePath("/dashboard/operations");
+    return;
+  }
+
+  if (otherShopRow) {
+    throw new Error(`${email} is already registered as staff at another shop. Each team member can only be linked to one shop.`);
+  }
 
   const { count } = await supabase
     .from("staff")
@@ -116,7 +154,7 @@ export async function inviteStaff(input: { fullName: string; role?: string; emai
   if (error || !created) throw new Error(error?.message ?? "Couldn't create staff record");
 
   try {
-    await sendInvite(supabase, shopId, created.id as string, input.email);
+    await sendInvite(supabase, shopId, created.id as string, email);
   } catch (err) {
     // If the invite link itself couldn't be generated (e.g. email already has an account),
     // the staff row never got an email/user_id — remove it rather than leaving an orphaned,

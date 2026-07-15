@@ -41,11 +41,7 @@ export async function setupShop(formData: FormData) {
     );
 
   if (error) {
-    // If new address columns don't exist yet, still proceed — migration pending
-    const isMissingColumn = error.message?.includes("column") || error.code === "42703";
-    if (!isMissingColumn) {
-      redirect(`/signup/shop?error=${encodeURIComponent(error.message)}`);
-    }
+    redirect(`/signup/shop?error=${encodeURIComponent(error.message)}`);
   }
 
   redirect("/signup/plan");
