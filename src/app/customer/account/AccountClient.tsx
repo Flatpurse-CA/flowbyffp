@@ -6,13 +6,14 @@ import { Calendar, Clock, X, LogOut } from "lucide-react";
 import type { AppointmentRow, AppointmentStatus } from "@/app/dashboard/appointments/actions";
 import { cancelMyBooking } from "./actions";
 import { customerLogout } from "../actions";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const STATUS_LABEL: Record<AppointmentStatus, { label: string; color: string; bg: string }> = {
-  completed: { label: "Completed", color: "rgba(0,0,0,0.4)",     bg: "rgba(0,0,0,0.05)"       },
+  completed: { label: "Completed", color: "var(--cust-text-sub)", bg: "var(--cust-card-border)" },
   confirmed: { label: "Confirmed", color: "rgb(21,128,86)",      bg: "rgba(16,185,129,0.12)"  },
   pending:   { label: "Pending",   color: "rgb(180,120,10)",     bg: "rgba(245,158,11,0.12)"  },
   deposit:   { label: "Deposit paid", color: "rgb(180,120,10)",  bg: "rgba(245,158,11,0.12)"  },
-  cancelled: { label: "Cancelled", color: "rgba(0,0,0,0.35)",    bg: "rgba(0,0,0,0.04)"       },
+  cancelled: { label: "Cancelled", color: "var(--cust-text-faint)", bg: "var(--cust-card-border)" },
 };
 
 function fmtDate(iso: string) {
@@ -23,7 +24,7 @@ function fmtPrice(n: number) {
   return Number.isInteger(n) ? `C$${n.toLocaleString()}` : `C$${n.toFixed(2)}`;
 }
 
-const card: React.CSSProperties = { background: "white", border: "1px solid rgba(0,0,0,0.08)", borderRadius: 16, boxShadow: "0 1px 4px rgba(0,0,0,0.05)" };
+const card: React.CSSProperties = { background: "var(--cust-card-bg)", border: "1px solid var(--cust-card-border)", borderRadius: 16, boxShadow: "var(--cust-shadow)" };
 
 export function AccountClient({ customerName, bookings }: { customerName: string; bookings: AppointmentRow[] }) {
   const router = useRouter();
@@ -57,13 +58,13 @@ export function AccountClient({ customerName, bookings }: { customerName: string
           <Calendar size={17} color="rgb(109,40,217)" strokeWidth={1.8} />
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ color: "rgb(20,20,30)", fontSize: 14, fontWeight: 700, margin: "0 0 2px" }}>{b.service_name}</p>
-          <p style={{ color: "rgba(0,0,0,0.4)", fontSize: 12.5, margin: 0, display: "flex", alignItems: "center", gap: 5 }}>
+          <p style={{ color: "var(--cust-text)", fontSize: 14, fontWeight: 700, margin: "0 0 2px" }}>{b.service_name}</p>
+          <p style={{ color: "var(--cust-text-sub)", fontSize: 12.5, margin: 0, display: "flex", alignItems: "center", gap: 5 }}>
             <Clock size={11} /> {fmtDate(b.starts_at)}{b.stylist_name ? ` · ${b.stylist_name}` : ""}
           </p>
         </div>
         <div style={{ textAlign: "right", flexShrink: 0 }}>
-          <p style={{ color: "rgb(20,20,30)", fontSize: 14, fontWeight: 800, margin: "0 0 4px" }}>{fmtPrice(Number(b.price))}</p>
+          <p style={{ color: "var(--cust-text)", fontSize: 14, fontWeight: 800, margin: "0 0 4px" }}>{fmtPrice(Number(b.price))}</p>
           <span style={{ fontSize: 10.5, fontWeight: 700, padding: "3px 9px", borderRadius: 20, color: s.color, background: s.bg }}>{s.label}</span>
         </div>
         {canCancel && (
@@ -80,18 +81,21 @@ export function AccountClient({ customerName, bookings }: { customerName: string
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: "rgb(246,246,250)", fontFamily: "DM Sans, system-ui, sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "var(--cust-bg)", fontFamily: "DM Sans, system-ui, sans-serif" }}>
       <div style={{ maxWidth: 640, margin: "0 auto", padding: "40px 24px 80px" }}>
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: 12, marginBottom: 28 }}>
           <div style={{ minWidth: 0 }}>
-            <h1 style={{ color: "rgb(20,20,30)", fontSize: 24, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.02em" }}>My bookings</h1>
-            <p style={{ color: "rgba(0,0,0,0.4)", fontSize: 14, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>Signed in as {customerName}</p>
+            <h1 style={{ color: "var(--cust-text)", fontSize: 24, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.02em" }}>My bookings</h1>
+            <p style={{ color: "var(--cust-text-sub)", fontSize: 14, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>Signed in as {customerName}</p>
           </div>
-          <form action={customerLogout} style={{ flexShrink: 0 }}>
-            <button type="submit" style={{ display: "flex", alignItems: "center", gap: 6, padding: "9px 14px", borderRadius: 10, background: "white", border: "1px solid rgba(0,0,0,0.1)", color: "rgba(0,0,0,0.55)", fontSize: 12.5, fontWeight: 600, cursor: "pointer" }}>
-              <LogOut size={13} /> Sign out
-            </button>
-          </form>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+            <ThemeToggle />
+            <form action={customerLogout}>
+              <button type="submit" style={{ display: "flex", alignItems: "center", gap: 6, padding: "9px 14px", borderRadius: 10, background: "var(--cust-card-bg)", border: "1px solid var(--cust-card-border)", color: "var(--cust-text-sub)", fontSize: 12.5, fontWeight: 600, cursor: "pointer" }}>
+                <LogOut size={13} /> Sign out
+              </button>
+            </form>
+          </div>
         </div>
 
         {error && (
@@ -100,16 +104,16 @@ export function AccountClient({ customerName, bookings }: { customerName: string
           </div>
         )}
 
-        <p style={{ color: "rgba(0,0,0,0.4)", fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 10px" }}>Upcoming</p>
+        <p style={{ color: "var(--cust-text-sub)", fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 10px" }}>Upcoming</p>
         {upcoming.length === 0 ? (
-          <div style={{ ...card, padding: "30px 20px", textAlign: "center", color: "rgba(0,0,0,0.35)", fontSize: 13, marginBottom: 28 }}>No upcoming bookings</div>
+          <div style={{ ...card, padding: "30px 20px", textAlign: "center", color: "var(--cust-text-faint)", fontSize: 13, marginBottom: 28 }}>No upcoming bookings</div>
         ) : (
           <div style={{ marginBottom: 28 }}>{upcoming.map(b => <Row key={b.id} b={b} />)}</div>
         )}
 
-        <p style={{ color: "rgba(0,0,0,0.4)", fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 10px" }}>Past</p>
+        <p style={{ color: "var(--cust-text-sub)", fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 10px" }}>Past</p>
         {past.length === 0 ? (
-          <div style={{ ...card, padding: "30px 20px", textAlign: "center", color: "rgba(0,0,0,0.35)", fontSize: 13 }}>No past bookings yet</div>
+          <div style={{ ...card, padding: "30px 20px", textAlign: "center", color: "var(--cust-text-faint)", fontSize: 13 }}>No past bookings yet</div>
         ) : (
           <div>{past.map(b => <Row key={b.id} b={b} />)}</div>
         )}

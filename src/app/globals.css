@@ -55,6 +55,17 @@
   --auth-input-border: rgb(39, 39, 42);
   --auth-btn-bg: rgb(250, 250, 250);
   --auth-btn-text: rgb(9, 9, 11);
+
+  --cust-bg: rgb(10, 10, 14);
+  --cust-card-bg: rgba(255, 255, 255, 0.04);
+  --cust-card-border: rgba(255, 255, 255, 0.08);
+  --cust-shadow: none;
+  --cust-text: rgb(250, 250, 250);
+  --cust-text-sub: rgba(255, 255, 255, 0.45);
+  --cust-text-faint: rgba(255, 255, 255, 0.3);
+  --cust-input-bg: rgba(255, 255, 255, 0.05);
+  --cust-input-border: rgba(255, 255, 255, 0.14);
+  --cust-fill: rgba(255, 255, 255, 0.06);
 }
 
 [data-theme="light"] {
@@ -68,6 +79,17 @@
   --auth-input-border: rgb(228, 228, 231);
   --auth-btn-bg: rgb(9, 9, 11);
   --auth-btn-text: rgb(250, 250, 250);
+
+  --cust-bg: rgb(246, 246, 250);
+  --cust-card-bg: #ffffff;
+  --cust-card-border: rgba(0, 0, 0, 0.08);
+  --cust-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  --cust-text: rgb(20, 20, 30);
+  --cust-text-sub: rgba(0, 0, 0, 0.42);
+  --cust-text-faint: rgba(0, 0, 0, 0.3);
+  --cust-input-bg: #ffffff;
+  --cust-input-border: rgba(0, 0, 0, 0.12);
+  --cust-fill: rgba(0, 0, 0, 0.04);
 }
 
 @theme inline {

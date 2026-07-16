@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { customerSetNewPassword } from "../actions";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function ResetPasswordPage() {
   const router = useRouter();
@@ -23,17 +24,18 @@ export default function ResetPasswordPage() {
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: "rgb(246,246,250)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24, fontFamily: "DM Sans, system-ui, sans-serif" }}>
-      <div style={{ width: "100%", maxWidth: 380, background: "white", border: "1px solid rgba(0,0,0,0.08)", borderRadius: 20, padding: "32px 28px", boxShadow: "0 4px 24px rgba(0,0,0,0.06)" }}>
+    <div style={{ minHeight: "100vh", background: "var(--cust-bg)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24, fontFamily: "DM Sans, system-ui, sans-serif", position: "relative" }}>
+      <div style={{ position: "absolute", top: 20, right: 20 }}><ThemeToggle /></div>
+      <div style={{ width: "100%", maxWidth: 380, background: "var(--cust-card-bg)", border: "1px solid var(--cust-card-border)", borderRadius: 20, padding: "32px 28px", boxShadow: "var(--cust-shadow)" }}>
         {done ? (
           <>
-            <h1 style={{ color: "rgb(20,20,30)", fontSize: 20, fontWeight: 800, margin: "0 0 8px", letterSpacing: "-0.02em" }}>Password updated</h1>
-            <p style={{ color: "rgba(0,0,0,0.45)", fontSize: 13.5, margin: 0 }}>Taking you to your bookings…</p>
+            <h1 style={{ color: "var(--cust-text)", fontSize: 20, fontWeight: 800, margin: "0 0 8px", letterSpacing: "-0.02em" }}>Password updated</h1>
+            <p style={{ color: "var(--cust-text-sub)", fontSize: 13.5, margin: 0 }}>Taking you to your bookings…</p>
           </>
         ) : (
           <form onSubmit={submit}>
-            <h1 style={{ color: "rgb(20,20,30)", fontSize: 22, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.02em" }}>Choose a new password</h1>
-            <p style={{ color: "rgba(0,0,0,0.4)", fontSize: 13.5, margin: "0 0 22px" }}>At least 8 characters.</p>
+            <h1 style={{ color: "var(--cust-text)", fontSize: 22, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.02em" }}>Choose a new password</h1>
+            <p style={{ color: "var(--cust-text-sub)", fontSize: 13.5, margin: "0 0 22px" }}>At least 8 characters.</p>
 
             {error && (
               <div style={{ padding: "10px 13px", borderRadius: 10, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", color: "rgb(185,28,28)", fontSize: 12.5, marginBottom: 14 }}>
@@ -42,7 +44,7 @@ export default function ResetPasswordPage() {
             )}
 
             <div style={{ marginBottom: 20 }}>
-              <label style={{ color: "rgba(0,0,0,0.45)", fontSize: 12, fontWeight: 600, display: "block", marginBottom: 6 }}>New password</label>
+              <label style={{ color: "var(--cust-text-sub)", fontSize: 12, fontWeight: 600, display: "block", marginBottom: 6 }}>New password</label>
               <input type="password" required minLength={8} value={password} onChange={e => setPassword(e.target.value)} style={inputStyle} />
             </div>
 
@@ -62,7 +64,7 @@ export default function ResetPasswordPage() {
 
 const inputStyle: React.CSSProperties = {
   width: "100%", padding: "11px 13px", borderRadius: 10,
-  border: "1.5px solid rgba(0,0,0,0.12)", background: "white",
-  color: "rgb(20,20,30)", fontSize: 14, outline: "none",
+  border: "1.5px solid var(--cust-input-border)", background: "var(--cust-input-bg)",
+  color: "var(--cust-text)", fontSize: 14, outline: "none",
   boxSizing: "border-box", fontFamily: "inherit",
 };
