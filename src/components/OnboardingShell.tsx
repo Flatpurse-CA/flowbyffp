@@ -1,11 +1,12 @@
 import Image from "next/image";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export function OnboardingShell({ children }: { children: React.ReactNode }) {
   return (
     <div
       style={{
         minHeight: "100vh",
-        background: "rgb(10,10,10)",
+        background: "var(--auth-bg)",
         display: "flex",
         flexDirection: "column",
       }}
@@ -27,6 +28,7 @@ export function OnboardingShell({ children }: { children: React.ReactNode }) {
           height={52}
           style={{ objectFit: "contain" }}
         />
+        <ThemeToggle />
       </div>
 
       {/* Centered content — animates in like it's expanding from the right half */}

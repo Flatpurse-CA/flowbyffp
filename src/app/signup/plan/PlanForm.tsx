@@ -58,11 +58,11 @@ function CheckIcon({ active }: { active: boolean }) {
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
       <circle
         cx="12" cy="12" r="10"
-        fill={active ? "rgba(124,58,237,0.28)" : "rgba(255,255,255,0.06)"}
+        fill={active ? "rgba(124,58,237,0.28)" : "var(--auth-input-bg)"}
       />
       <path
         d="M8 12.5l2.5 2.5 5.5-5.5"
-        stroke={active ? "#A78BFA" : "rgba(255,255,255,0.35)"}
+        stroke={active ? "#A78BFA" : "var(--auth-text-sub)"}
         strokeWidth="1.8"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -82,7 +82,7 @@ export function PlanForm({ error }: { error?: string }) {
 
       <p
         style={{
-          color: "rgb(113,113,122)",
+          color: "var(--auth-text-sub)",
           fontSize: 14,
           marginBottom: 32,
           lineHeight: 1.6,
@@ -137,8 +137,8 @@ export function PlanForm({ error }: { error?: string }) {
                 onMouseLeave={() => setHovered(null)}
                 style={{
                   position: "relative",
-                  background: "rgba(255,255,255,0.03)",
-                  border: isSelected ? selectedBorder : isHovered ? hoverBorder : "1px solid rgba(255,255,255,0.08)",
+                  background: "var(--auth-input-bg)",
+                  border: isSelected ? selectedBorder : isHovered ? hoverBorder : "1px solid var(--auth-input-border)",
                   borderRadius: 0,
                   padding: "22px 18px 20px",
                   cursor: "pointer",
@@ -192,13 +192,13 @@ export function PlanForm({ error }: { error?: string }) {
                     <div
                       style={{
                         alignSelf: "flex-start",
-                        background: "rgb(28,28,33)",
+                        background: "var(--auth-input-bg)",
                         border: "1px solid rgb(39,39,42)",
                         borderRadius: 100,
                         padding: "3px 9px",
                         fontSize: 9,
                         fontWeight: 700,
-                        color: "rgb(113,113,122)",
+                        color: "var(--auth-text-sub)",
                         letterSpacing: "0.09em",
                         textTransform: "uppercase",
                         marginBottom: 12,
@@ -217,7 +217,7 @@ export function PlanForm({ error }: { error?: string }) {
                       fontWeight: 600,
                       letterSpacing: "0.14em",
                       textTransform: "uppercase",
-                      color: isSelected ? "rgba(196,181,253,0.65)" : "rgb(113,113,122)",
+                      color: isSelected ? "rgba(196,181,253,0.65)" : "var(--auth-text-sub)",
                       margin: "0 0 10px",
                       transition: "color 0.25s",
                     }}
@@ -233,7 +233,7 @@ export function PlanForm({ error }: { error?: string }) {
                         fontWeight: 800,
                         letterSpacing: "-0.04em",
                         lineHeight: 1,
-                        color: isSelected ? "rgb(237,233,254)" : "rgb(250,250,250)",
+                        color: isSelected ? "rgb(237,233,254)" : "var(--auth-text)",
                         transition: "color 0.25s",
                       }}
                     >
@@ -242,7 +242,7 @@ export function PlanForm({ error }: { error?: string }) {
                     <span
                       style={{
                         fontSize: 11,
-                        color: isSelected ? "rgba(196,181,253,0.55)" : "rgb(113,113,122)",
+                        color: isSelected ? "rgba(196,181,253,0.55)" : "var(--auth-text-sub)",
                         marginLeft: 3,
                         transition: "color 0.25s",
                       }}
@@ -255,7 +255,7 @@ export function PlanForm({ error }: { error?: string }) {
                   <p
                     style={{
                       fontSize: 11.5,
-                      color: isSelected ? "rgba(196,181,253,0.65)" : "rgb(113,113,122)",
+                      color: isSelected ? "rgba(196,181,253,0.65)" : "var(--auth-text-sub)",
                       lineHeight: 1.55,
                       margin: "0 0 14px",
                       minHeight: 36,
@@ -269,7 +269,7 @@ export function PlanForm({ error }: { error?: string }) {
                   <div
                     style={{
                       height: 1,
-                      background: isSelected ? "rgba(139,92,246,0.25)" : "rgb(39,39,42)",
+                      background: isSelected ? "rgba(139,92,246,0.25)" : "var(--auth-input-border)",
                       marginBottom: 13,
                       transition: "background 0.25s",
                     }}
@@ -285,7 +285,7 @@ export function PlanForm({ error }: { error?: string }) {
                           alignItems: "center",
                           gap: 7,
                           fontSize: 11.5,
-                          color: isSelected ? "rgba(224,213,255,0.82)" : "rgb(113,113,122)",
+                          color: isSelected ? "rgba(224,213,255,0.82)" : "var(--auth-text-sub)",
                           lineHeight: 1.3,
                           transition: "color 0.25s",
                         }}

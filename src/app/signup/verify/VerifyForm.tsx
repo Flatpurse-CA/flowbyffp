@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { verifyCode, resendCode } from "./actions";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 function SuccessModal({ onContinue }: { onContinue: () => void }) {
   const circumference = 2 * Math.PI * 36;
@@ -230,7 +231,7 @@ export function VerifyForm({ email, initialError }: { email: string; initialErro
       <div
         style={{
           minHeight: "100vh",
-          background: "rgb(6,6,8)",
+          background: "var(--auth-bg)",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -240,6 +241,10 @@ export function VerifyForm({ email, initialError }: { email: string; initialErro
           padding: "40px 16px",
         }}
       >
+        <div style={{ position: "absolute", top: 20, right: 20, zIndex: 2 }}>
+          <ThemeToggle />
+        </div>
+
         {/* Radial glow at top */}
         <div
           style={{
@@ -266,7 +271,7 @@ export function VerifyForm({ email, initialError }: { email: string; initialErro
         >
           <h1
             style={{
-              color: "white",
+              color: "var(--auth-text)",
               fontSize: "clamp(28px, 5vw, 42px)",
               fontWeight: 800,
               letterSpacing: "-0.03em",
@@ -278,14 +283,14 @@ export function VerifyForm({ email, initialError }: { email: string; initialErro
           </h1>
           <p
             style={{
-              color: "rgba(255,255,255,0.45)",
+              color: "var(--auth-text-sub)",
               fontSize: 15,
               margin: "0 0 52px",
               lineHeight: 1.5,
             }}
           >
             We sent a 6-digit code to{" "}
-            <span style={{ color: "rgba(255,255,255,0.8)" }}>{email}</span>
+            <span style={{ color: "var(--auth-text)" }}>{email}</span>
           </p>
 
           {/* Digit boxes */}
@@ -365,14 +370,14 @@ export function VerifyForm({ email, initialError }: { email: string; initialErro
                       background: allFilled
                         ? "rgba(109,40,217,0.12)"
                         : isFocused
-                        ? "rgba(255,255,255,0.09)"
-                        : "rgba(255,255,255,0.05)",
+                        ? "var(--auth-input-bg)"
+                        : "var(--auth-input-bg)",
                       border: allFilled
                         ? "1.5px solid rgba(139,92,246,0.5)"
                         : isFocused
-                        ? "1.5px solid rgba(255,255,255,0.65)"
-                        : "1.5px solid rgba(255,255,255,0.1)",
-                      color: allFilled ? "rgb(196,181,253)" : "white",
+                        ? "1.5px solid rgb(109,40,217)"
+                        : "1.5px solid var(--auth-input-border)",
+                      color: allFilled ? "rgb(196,181,253)" : "var(--auth-text)",
                       fontSize: 36,
                       fontWeight: 700,
                       textAlign: "center",
@@ -407,7 +412,7 @@ export function VerifyForm({ email, initialError }: { email: string; initialErro
           {/* Resend */}
           <p
             style={{
-              color: "rgba(255,255,255,0.45)",
+              color: "var(--auth-text-sub)",
               fontSize: 14,
               margin: "0 0 20px",
               fontWeight: 500,
@@ -416,7 +421,7 @@ export function VerifyForm({ email, initialError }: { email: string; initialErro
             {countdown > 0 ? (
               <>
                 Resend code in{" "}
-                <span style={{ color: "white", fontWeight: 700 }}>
+                <span style={{ color: "var(--auth-text)", fontWeight: 700 }}>
                   {mm}:{ss}
                 </span>
               </>
@@ -427,7 +432,7 @@ export function VerifyForm({ email, initialError }: { email: string; initialErro
                 style={{
                   background: "none",
                   border: "none",
-                  color: "white",
+                  color: "var(--auth-text)",
                   fontSize: 14,
                   fontWeight: 600,
                   cursor: "pointer",
@@ -447,7 +452,7 @@ export function VerifyForm({ email, initialError }: { email: string; initialErro
             style={{
               background: "none",
               border: "none",
-              color: "rgba(255,255,255,0.35)",
+              color: "var(--auth-text-sub)",
               fontSize: 13,
               cursor: "pointer",
               padding: 0,
