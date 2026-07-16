@@ -40,7 +40,11 @@ export async function resendCode(email: string): Promise<{ error?: string }> {
     .eq("id", linkData.user.id)
     .maybeSingle();
 
-  const { error: emailError } = await sendOtpEmail(email, linkData.properties.email_otp, (profile?.first_name as string | undefined) ?? "there");
-  if (emailError) return { error: "Couldn't send the email — try again" };
+  try {
+    const { error: emailError } = await sendOtpEmail(email, linkData.properties.email_otp, (profile?.first_name as string | undefined) ?? "there");
+    if (emailError) return { error: "Couldn't send the email — try again" };
+  } catch {
+    return { error: "Couldn't send the email — try again" };
+  }
   return {};
 }

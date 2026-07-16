@@ -2,14 +2,23 @@ import { Resend } from "resend";
 
 const FROM = process.env.RESEND_FROM_EMAIL ?? "FlatPurse Flow <onboarding@resend.dev>";
 
-function client() {
+function client(): Resend | null {
   const key = process.env.RESEND_API_KEY;
-  if (!key) {
-    throw new Error(
-      "RESEND_API_KEY is not set — add it to .env.local before sending email.",
-    );
-  }
+  if (!key) return null;
   return new Resend(key);
+}
+
+// Never throws — callers destructure `{ error }` the same way the Resend SDK
+// itself responds, whether the failure is a missing API key or a real send error.
+async function send(payload: { to: string; subject: string; html: string }) {
+  const c = client();
+  if (!c) {
+    return {
+      data: null,
+      error: { name: "config_error", message: "RESEND_API_KEY is not set — add it to .env.local (or the deployment's env vars) before sending email." },
+    };
+  }
+  return c.emails.send({ from: FROM, ...payload });
 }
 
 export async function sendEmail({
@@ -21,12 +30,11 @@ export async function sendEmail({
   subject: string;
   html: string;
 }) {
-  return client().emails.send({ from: FROM, to, subject, html });
+  return send({ to, subject, html });
 }
 
 export async function sendPasswordResetEmail(to: string, input: { resetUrl: string }) {
-  return client().emails.send({
-    from: FROM,
+  return send({
     to,
     subject: "Reset your FLOWBYFFP password",
     html: `
@@ -47,8 +55,7 @@ export async function sendPasswordResetEmail(to: string, input: { resetUrl: stri
 }
 
 export async function sendStaffInviteEmail(to: string, input: { shopName: string; inviteUrl: string }) {
-  return client().emails.send({
-    from: FROM,
+  return send({
     to,
     subject: `You've been invited to join ${input.shopName} on FLOWBYFFP`,
     html: `
@@ -73,8 +80,7 @@ export async function sendBookingConfirmationEmail(to: string, input: { shopName
     timeZone: "America/Edmonton", weekday: "long", month: "long", day: "numeric", hour: "numeric", minute: "2-digit",
   }).format(new Date(input.startsAt));
 
-  return client().emails.send({
-    from: FROM,
+  return send({
     to,
     subject: `Booking request received — ${input.shopName}`,
     html: `
@@ -93,8 +99,7 @@ export async function sendBookingConfirmationEmail(to: string, input: { shopName
 }
 
 export async function sendOtpEmail(email: string, code: string, firstName: string) {
-  return client().emails.send({
-    from: FROM,
+  return send({
     to: email,
     subject: `${code} is your FLOWBYFFP verification code`,
     html: `

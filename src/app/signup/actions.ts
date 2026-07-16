@@ -46,8 +46,14 @@ export async function createAccount(formData: FormData) {
     .upsert({ id: userId, first_name: firstName, last_name: lastName });
 
   if (otp) {
-    const { error: emailError } = await sendOtpEmail(email, otp, firstName);
-    if (emailError) {
+    try {
+      const { error: emailError } = await sendOtpEmail(email, otp, firstName);
+      if (emailError) {
+        redirect(`/signup?error=${encodeURIComponent("Account created but the verification email failed to send — try again")}`);
+      }
+    } catch (err) {
+      const digest = (err as { digest?: string })?.digest ?? "";
+      if (digest.startsWith("NEXT_REDIRECT")) throw err;
       redirect(`/signup?error=${encodeURIComponent("Account created but the verification email failed to send — try again")}`);
     }
   }
