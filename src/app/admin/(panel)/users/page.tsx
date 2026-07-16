@@ -1,9 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-import { banUser, unbanUser, deleteUser, changeUserPlan } from "./actions";
+import { banUser, unbanUser, deleteUser } from "./actions";
 import { UserX, UserCheck, Trash2 } from "lucide-react";
-import { PLAN_COLORS, PLAN_BG } from "@/lib/plans";
-
-const PLAN_OPTIONS = ["starter", "pro", "unlimited", "founders"];
+import { PlanSelect } from "./PlanSelect";
 
 export default async function AdminUsersPage() {
   const admin = createAdminClient();
@@ -43,8 +41,8 @@ export default async function AdminUsersPage() {
           No users yet.
         </div>
       ) : (
-        <div style={{ background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 16, overflow: "hidden" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <div style={{ background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 16, overflowY: "hidden", overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 700 }}>
             <thead>
               <tr style={{ background: "rgba(255,255,255,0.015)" }}>
                 {["User", "Shop", "Plan", "Joined", "Status", "Actions"].map(h => (
@@ -93,36 +91,7 @@ export default async function AdminUsersPage() {
                     {/* Plan */}
                     <td style={{ padding: "13px 18px" }}>
                       {row.plan ? (
-                        <form action={changeUserPlan} style={{ display: "inline" }}>
-                          <input type="hidden" name="userId" value={row.id} />
-                          <select
-                            name="plan"
-                            defaultValue={row.plan}
-                            onChange={() => {}}
-                            style={{
-                              background: PLAN_BG[row.plan] ?? "rgba(255,255,255,0.06)",
-                              border: `1px solid ${PLAN_COLORS[row.plan] ?? "rgba(255,255,255,0.15)"}33`,
-                              borderRadius: 20,
-                              color: PLAN_COLORS[row.plan] ?? "rgba(255,255,255,0.35)",
-                              fontSize: 10.5,
-                              fontWeight: 700,
-                              padding: "3px 8px",
-                              cursor: "pointer",
-                              outline: "none",
-                              fontFamily: "inherit",
-                              textTransform: "capitalize",
-                              letterSpacing: "0.03em",
-                            }}
-                            onBlur={(e) => {
-                              const form = e.target.closest("form") as HTMLFormElement;
-                              if (form) form.requestSubmit();
-                            }}
-                          >
-                            {PLAN_OPTIONS.map(p => (
-                              <option key={p} value={p} style={{ background: "#1a1a1a", textTransform: "capitalize" }}>{p}</option>
-                            ))}
-                          </select>
-                        </form>
+                        <PlanSelect userId={row.id} plan={row.plan} />
                       ) : (
                         <span style={{ color: "rgba(255,255,255,0.18)", fontSize: 12 }}>—</span>
                       )}
@@ -186,7 +155,6 @@ export default async function AdminUsersPage() {
                           <button
                             type="submit"
                             title="Delete"
-                            onClick={() => {}}
                             style={{
                               display: "flex", alignItems: "center", justifyContent: "center",
                               width: 28, height: 28, borderRadius: 8, cursor: "pointer",
