@@ -32,8 +32,8 @@ function LoginForm() {
       {/* Mobile purple gradient — only visible on small screens in dark mode (CSS controls this) */}
       <div className="auth-mobile-gradient" />
 
-      {/* Theme toggle — mobile only */}
-      <div className="absolute right-5 top-5 z-10 lg:hidden">
+      {/* Theme toggle */}
+      <div className="absolute right-5 top-5 z-10">
         <ThemeToggle />
       </div>
 

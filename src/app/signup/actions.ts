@@ -3,7 +3,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { sendOtpEmail } from "@/lib/resend";
 
 const ONBOARDING_COOKIE_MAX_AGE = 60 * 30;
 
@@ -22,11 +21,9 @@ export async function createAccount(formData: FormData) {
 
   const admin = createAdminClient();
 
-  // Create the user unconfirmed and get a numeric email OTP back in the same call,
-  // rather than admin.createUser + Supabase's own mailer — that mailer has no custom
-  // SMTP configured for this project and is capped at 2 emails/hour, so OTPs sent
-  // through it were never reliably arriving. We send the OTP ourselves via Resend,
-  // the same pattern already used for staff invites and password resets.
+  // Create the user unconfirmed here; the OTP itself isn't sent until the end of
+  // the wizard (signup/plan/actions.ts, after shop + plan) — verification is the
+  // last step right before onboarding, not the first thing after this form.
   const { data: linkData, error } = await admin.auth.admin.generateLink({
     type: "signup",
     email,
@@ -39,24 +36,10 @@ export async function createAccount(formData: FormData) {
   }
 
   const userId = linkData.user.id;
-  const otp = linkData.properties?.email_otp;
 
   await admin
     .from("profiles")
     .upsert({ id: userId, first_name: firstName, last_name: lastName });
-
-  if (otp) {
-    try {
-      const { error: emailError } = await sendOtpEmail(email, otp, firstName);
-      if (emailError) {
-        redirect(`/signup?error=${encodeURIComponent("Account created but the verification email failed to send — try again")}`);
-      }
-    } catch (err) {
-      const digest = (err as { digest?: string })?.digest ?? "";
-      if (digest.startsWith("NEXT_REDIRECT")) throw err;
-      redirect(`/signup?error=${encodeURIComponent("Account created but the verification email failed to send — try again")}`);
-    }
-  }
 
   // Pending (pre-verification) identity — shop/plan/verify steps read this via
   // getOnboardingContext() until the real session takes over after OTP verification.
@@ -74,5 +57,5 @@ export async function createAccount(formData: FormData) {
     maxAge: ONBOARDING_COOKIE_MAX_AGE,
   });
 
-  redirect("/signup/verify");
+  redirect("/signup/shop");
 }

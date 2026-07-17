@@ -37,8 +37,8 @@ function SignupStep1() {
         <FlatPurseLogo className="h-6 w-auto" />
       </div>
 
-      {/* Theme toggle — mobile only */}
-      <div className="absolute right-5 top-5 z-10 lg:hidden">
+      {/* Theme toggle */}
+      <div className="absolute right-5 top-5 z-10">
         <ThemeToggle />
       </div>
 

@@ -225,7 +225,7 @@ export function VerifyForm({ email, initialError }: { email: string; initialErro
 
   return (
     <>
-      {showSuccess && <SuccessModal onContinue={() => router.push("/signup/shop")} />}
+      {showSuccess && <SuccessModal onContinue={() => router.push("/onboarding")} />}
 
       {/* Full-page dark background */}
       <div
