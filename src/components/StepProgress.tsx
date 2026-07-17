@@ -35,7 +35,7 @@ export function StepProgress({
           const isCompleted = i < step - 1;
           const isCurrent = i === step - 1;
           const isLast = i === total - 1;
-          const lineColor = isCompleted ? "rgb(107,99,232)" : "rgba(255,255,255,0.1)";
+          const lineColor = isCompleted ? "rgb(107,99,232)" : "var(--auth-input-border)";
 
           return (
             <div key={i} style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -45,7 +45,7 @@ export function StepProgress({
                     width: isCompleted || isCurrent ? 22 : 8,
                     height: 8,
                     borderRadius: 100,
-                    background: isCompleted || isCurrent ? "rgb(107,99,232)" : "rgba(255,255,255,0.1)",
+                    background: isCompleted || isCurrent ? "rgb(107,99,232)" : "var(--auth-input-border)",
                     transition: "all 0.3s",
                     boxShadow: isCurrent ? "0 0 10px rgb(107,99,232)" : "none",
                   }}
@@ -58,7 +58,7 @@ export function StepProgress({
           );
         })}
 
-        <span style={{ color: "rgb(113,113,122)", fontSize: 12, marginLeft: 4, flex: 1 }}>
+        <span style={{ color: "var(--auth-text-sub)", fontSize: 12, marginLeft: 4, flex: 1 }}>
           Step {step} of {total}
         </span>
 
@@ -71,10 +71,10 @@ export function StepProgress({
               alignItems: "center",
               gap: 5,
               background: "none",
-              border: "1px solid rgb(39,39,42)",
+              border: "1px solid var(--auth-input-border)",
               borderRadius: 8,
               padding: "5px 12px",
-              color: "rgb(113,113,122)",
+              color: "var(--auth-text-sub)",
               fontSize: 12,
               fontWeight: 500,
               cursor: "pointer",
@@ -99,7 +99,7 @@ export function StepProgress({
         >
           <h1
             style={{
-              color: "rgb(250,250,250)",
+              color: "var(--auth-text)",
               fontSize: 26,
               fontWeight: 700,
               letterSpacing: "-0.025em",
