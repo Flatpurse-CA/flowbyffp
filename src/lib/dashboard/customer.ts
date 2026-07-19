@@ -1,6 +1,9 @@
 import { createClient } from "@/lib/supabase/server";
 
-export type CustomerContext = { customerId: string; userId: string; fullName: string; email: string; phone: string | null };
+export type CustomerContext = {
+  customerId: string; userId: string; fullName: string; email: string; phone: string | null;
+  dateOfBirth: string | null;
+};
 
 export async function getCustomerContext(): Promise<CustomerContext | null> {
   const supabase = await createClient();
@@ -9,7 +12,7 @@ export async function getCustomerContext(): Promise<CustomerContext | null> {
 
   const { data: customer } = await supabase
     .from("customers")
-    .select("id, full_name, email, phone")
+    .select("id, full_name, email, phone, date_of_birth")
     .eq("user_id", userData.user.id)
     .maybeSingle();
 
@@ -21,6 +24,7 @@ export async function getCustomerContext(): Promise<CustomerContext | null> {
     fullName: customer.full_name as string,
     email: customer.email as string,
     phone: customer.phone as string | null,
+    dateOfBirth: customer.date_of_birth as string | null,
   };
 }
 

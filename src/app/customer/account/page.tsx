@@ -12,5 +12,5 @@ export default async function CustomerAccountPage() {
 
   const bookings = await listMyBookings();
 
-  return <AccountClient customerName={ctx.fullName} bookings={bookings} />;
+  return <AccountClient customerName={ctx.fullName} bookings={bookings} dateOfBirth={ctx.dateOfBirth} />;
 }

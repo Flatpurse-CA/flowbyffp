@@ -190,6 +190,25 @@ export function AutoPilotClient({ state }: { state: AutopilotState }) {
           })}
         </div>
 
+        <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+        {/* AI Front Desk today */}
+        <div style={{
+          background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.07)",
+          borderRadius: 16, padding: 18, display: "flex", flexDirection: "column", gap: 12,
+        }}>
+          <span style={{ color: "rgba(255,255,255,0.5)", fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" }}>AI Front Desk today</span>
+          <div style={{ display: "flex", gap: 20 }}>
+            <div>
+              <p style={{ color: "rgb(96,165,250)", fontSize: 22, fontWeight: 800, margin: "0 0 2px" }}>{state.frontDeskToday.handled}</p>
+              <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 11, margin: 0 }}>Handled</p>
+            </div>
+            <div>
+              <p style={{ color: "rgb(251,191,36)", fontSize: 22, fontWeight: 800, margin: "0 0 2px" }}>{state.frontDeskToday.escalated}</p>
+              <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 11, margin: 0 }}>Escalated to you</p>
+            </div>
+          </div>
+        </div>
+
         {/* Live feed */}
         <div style={{
           background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.07)",
@@ -219,6 +238,7 @@ export function AutoPilotClient({ state }: { state: AutopilotState }) {
               </div>
             );
           })}
+        </div>
         </div>
       </div>
     </div>

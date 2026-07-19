@@ -2,9 +2,9 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Calendar, Clock, X, LogOut } from "lucide-react";
+import { Calendar, Clock, X, LogOut, Gift } from "lucide-react";
 import type { AppointmentRow, AppointmentStatus } from "@/app/dashboard/appointments/actions";
-import { cancelMyBooking } from "./actions";
+import { cancelMyBooking, updateBirthday } from "./actions";
 import { customerLogout } from "../actions";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
@@ -26,11 +26,23 @@ function fmtPrice(n: number) {
 
 const card: React.CSSProperties = { background: "var(--cust-card-bg)", border: "1px solid var(--cust-card-border)", borderRadius: 16, boxShadow: "var(--cust-shadow)" };
 
-export function AccountClient({ customerName, bookings }: { customerName: string; bookings: AppointmentRow[] }) {
+export function AccountClient({ customerName, bookings, dateOfBirth }: { customerName: string; bookings: AppointmentRow[]; dateOfBirth: string | null }) {
   const router = useRouter();
   const [, startTransition] = useTransition();
   const [cancellingId, setCancellingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [birthday, setBirthday] = useState(dateOfBirth ?? "");
+  const [savingBirthday, setSavingBirthday] = useState(false);
+  const [birthdaySaved, setBirthdaySaved] = useState(false);
+
+  const handleSaveBirthday = async () => {
+    setSavingBirthday(true);
+    setBirthdaySaved(false);
+    const res = await updateBirthday(birthday);
+    setSavingBirthday(false);
+    if (res.error) { setError(res.error); return; }
+    setBirthdaySaved(true);
+  };
 
   const now = new Date();
   const upcoming = bookings.filter(b => b.status !== "cancelled" && b.status !== "completed" && new Date(b.starts_at) >= now);
@@ -103,6 +115,36 @@ export function AccountClient({ customerName, bookings }: { customerName: string
             {error}
           </div>
         )}
+
+        <div style={{ ...card, padding: "14px 18px", display: "flex", alignItems: "center", gap: 14, marginBottom: 24, flexWrap: "wrap" }}>
+          <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(109,40,217,0.08)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            <Gift size={16} color="rgb(109,40,217)" strokeWidth={1.8} />
+          </div>
+          <div style={{ flex: 1, minWidth: 160 }}>
+            <p style={{ color: "var(--cust-text)", fontSize: 13, fontWeight: 700, margin: "0 0 2px" }}>Birthday (optional)</p>
+            <p style={{ color: "var(--cust-text-sub)", fontSize: 11.5, margin: 0 }}>Add it and shops you visit can send you a birthday offer.</p>
+          </div>
+          <input
+            type="date"
+            value={birthday}
+            onChange={e => { setBirthday(e.target.value); setBirthdaySaved(false); }}
+            style={{
+              padding: "8px 10px", borderRadius: 8, border: "1.5px solid var(--cust-input-border)",
+              background: "var(--cust-input-bg)", color: "var(--cust-text)", fontSize: 13, outline: "none", fontFamily: "inherit",
+            }}
+          />
+          <button
+            onClick={handleSaveBirthday}
+            disabled={savingBirthday || birthday === (dateOfBirth ?? "")}
+            style={{
+              padding: "8px 14px", borderRadius: 8, border: "none", background: "rgb(109,40,217)", color: "white",
+              fontSize: 12.5, fontWeight: 700, cursor: savingBirthday ? "default" : "pointer",
+              opacity: savingBirthday || birthday === (dateOfBirth ?? "") ? 0.5 : 1,
+            }}
+          >
+            {savingBirthday ? "Saving…" : birthdaySaved ? "Saved" : "Save"}
+          </button>
+        </div>
 
         <p style={{ color: "var(--cust-text-sub)", fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 10px" }}>Upcoming</p>
         {upcoming.length === 0 ? (

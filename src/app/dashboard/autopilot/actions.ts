@@ -36,6 +36,7 @@ export type AutopilotState = {
   events: AutopilotEvent[];
   flowStats: Record<FlowKey, { count: number; revenue: number }>;
   totals: { actions: number; customers: number; revenue: number };
+  frontDeskToday: { handled: number; escalated: number };
 };
 
 const EMPTY_FLOW_STATS: Record<FlowKey, { count: number; revenue: number }> = {
@@ -50,7 +51,10 @@ const EMPTY_FLOW_STATS: Record<FlowKey, { count: number; revenue: number }> = {
 export async function getAutopilotState(): Promise<AutopilotState> {
   const shopId = await getCurrentShopId();
   if (!shopId) {
-    return { stripeConnected: false, events: [], flowStats: EMPTY_FLOW_STATS, totals: { actions: 0, customers: 0, revenue: 0 } };
+    return {
+      stripeConnected: false, events: [], flowStats: EMPTY_FLOW_STATS,
+      totals: { actions: 0, customers: 0, revenue: 0 }, frontDeskToday: { handled: 0, escalated: 0 },
+    };
   }
 
   const { supabase } = await requireShop();
@@ -77,6 +81,22 @@ export async function getAutopilotState(): Promise<AutopilotState> {
     .eq("shop_id", shopId)
     .order("created_at", { ascending: false })
     .limit(20);
+
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+
+  const { data: frontdeskTodayEvents } = await supabase
+    .from("autopilot_events")
+    .select("outcome")
+    .eq("shop_id", shopId)
+    .eq("flow_key", "frontdesk")
+    .gte("created_at", todayStart.toISOString());
+
+  const frontDeskToday = { handled: 0, escalated: 0 };
+  for (const e of frontdeskTodayEvents ?? []) {
+    if (e.outcome === "escalated") frontDeskToday.escalated += 1;
+    else frontDeskToday.handled += 1;
+  }
 
   const flowStats: Record<FlowKey, { count: number; revenue: number }> = {
     noshow: { count: 0, revenue: 0 },
@@ -105,5 +125,6 @@ export async function getAutopilotState(): Promise<AutopilotState> {
     events: (recentEvents ?? []) as AutopilotEvent[],
     flowStats,
     totals: { actions: (monthEvents ?? []).length, customers: customers.size, revenue },
+    frontDeskToday,
   };
 }

@@ -5,6 +5,20 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { requireCustomer } from "@/lib/dashboard/customer";
 import type { AppointmentRow } from "@/app/dashboard/appointments/actions";
 
+export async function updateBirthday(dateOfBirth: string): Promise<{ error?: string }> {
+  const { customerId } = await requireCustomer();
+  const admin = createAdminClient();
+
+  const { error } = await admin
+    .from("customers")
+    .update({ date_of_birth: dateOfBirth || null })
+    .eq("id", customerId);
+
+  if (error) return { error: error.message };
+  revalidatePath("/customer/account");
+  return {};
+}
+
 export async function listMyBookings(): Promise<AppointmentRow[]> {
   const { supabase, customerId } = await requireCustomer();
 
