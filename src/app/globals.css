@@ -309,6 +309,9 @@ body {
   .apt-time-grid-4 {
     grid-template-columns: repeat(3, 1fr) !important;
   }
+  .signup-plan-grid {
+    grid-template-columns: 1fr !important;
+  }
 }
 
 @keyframes ping {

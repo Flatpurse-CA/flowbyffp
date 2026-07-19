@@ -111,6 +111,7 @@ export function PlanForm({ error }: { error?: string }) {
       <form action={choosePlan}>
         <input type="hidden" name="plan" value={selected} />
         <div
+          className="signup-plan-grid"
           style={{
             display: "grid",
             gridTemplateColumns: "1fr 1fr 1fr 1fr",
