@@ -19,8 +19,8 @@ function fmtPrice(n: number) {
 }
 
 const card: React.CSSProperties = {
-  background: "rgba(255,255,255,0.025)",
-  border: "1px solid rgba(255,255,255,0.07)",
+  background: "var(--dw025)",
+  border: "1px solid var(--dw07)",
   borderRadius: 16,
   padding: 20,
 };
@@ -28,8 +28,8 @@ const card: React.CSSProperties = {
 function KPITile({ label, value, sub, positive }: { label: string; value: string; sub: string; positive?: boolean }) {
   return (
     <div style={{ ...card, padding: "16px 18px" }}>
-      <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 10, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 6px" }}>{label}</p>
-      <p style={{ color: "rgb(250,250,250)", fontSize: 22, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.03em" }}>{value}</p>
+      <p style={{ color: "var(--dw35)", fontSize: 10, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 6px" }}>{label}</p>
+      <p style={{ color: "var(--dtext)", fontSize: 22, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.03em" }}>{value}</p>
       <p style={{ color: positive === false ? "rgb(248,113,113)" : "rgb(52,211,153)", fontSize: 11, margin: 0, display: "flex", alignItems: "center", gap: 3 }}>
         {positive === false ? <TrendingDown size={11} /> : <TrendingUp size={11} />} {sub}
       </p>
@@ -100,16 +100,16 @@ export function OperationsClient({ data }: { data: OperationsData }) {
     <div style={{ maxWidth: 1280, margin: "0 auto", display: "flex", flexDirection: "column", gap: 22 }}>
 
       <div>
-        <h1 style={{ color: "rgb(250,250,250)", fontSize: 22, fontWeight: 800, margin: "0 0 3px", letterSpacing: "-0.03em" }}>Operations</h1>
-        <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 13, margin: 0 }}>Run smarter. Waste less. Profit more.</p>
+        <h1 style={{ color: "var(--dtext)", fontSize: 22, fontWeight: 800, margin: "0 0 3px", letterSpacing: "-0.03em" }}>Operations</h1>
+        <p style={{ color: "var(--dw35)", fontSize: 13, margin: 0 }}>Run smarter. Waste less. Profit more.</p>
       </div>
 
-      <div style={{ display: "flex", gap: 2, borderBottom: "1px solid rgba(255,255,255,0.07)", paddingBottom: 0, overflowX: "auto" }}>
+      <div style={{ display: "flex", gap: 2, borderBottom: "1px solid var(--dw07)", paddingBottom: 0, overflowX: "auto" }}>
         {MODULES.map(m => (
           <button key={m} onClick={() => setMod(m)} style={{
             padding: "10px 18px", border: "none", background: "transparent", cursor: "pointer",
             fontSize: 13, fontWeight: mod === m ? 700 : 500,
-            color: mod === m ? "rgb(210,196,254)" : "rgba(255,255,255,0.4)",
+            color: mod === m ? "rgb(210,196,254)" : "var(--dw4)",
             borderBottom: mod === m ? "2px solid rgb(139,92,246)" : "2px solid transparent",
             transition: "color 0.15s, border-color 0.15s",
             whiteSpace: "nowrap",
@@ -161,14 +161,14 @@ function Overview({ operationsScore, fillRate, retention, revenueGrowthScore, ai
       <div className="ops-score-grid" style={{ display: "grid", gridTemplateColumns: "220px 1fr", gap: 20 }}>
         <div style={{ ...card, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 12 }}>
           <svg width={120} height={120} viewBox="0 0 120 120">
-            <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="10" />
+            <circle cx="60" cy="60" r="50" fill="none" stroke="var(--dw06)" strokeWidth="10" />
             <circle cx="60" cy="60" r="50" fill="none" stroke="rgb(139,92,246)" strokeWidth="10"
               strokeDasharray={`${(operationsScore / 100) * 314} 314`} strokeLinecap="round"
               transform="rotate(-90 60 60)" />
-            <text x="60" y="56" textAnchor="middle" fill="rgb(250,250,250)" fontSize="24" fontWeight="800">{operationsScore}</text>
-            <text x="60" y="72" textAnchor="middle" fill="rgba(255,255,255,0.35)" fontSize="10">/100</text>
+            <text x="60" y="56" textAnchor="middle" fill="var(--dtext)" fontSize="24" fontWeight="800">{operationsScore}</text>
+            <text x="60" y="72" textAnchor="middle" fill="var(--dw35)" fontSize="10">/100</text>
           </svg>
-          <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", margin: 0 }}>
+          <p style={{ color: "var(--dw5)", fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", margin: 0 }}>
             Operations Score
           </p>
         </div>
@@ -177,10 +177,10 @@ function Overview({ operationsScore, fillRate, retention, revenueGrowthScore, ai
           {subMetrics.map(m => (
             <div key={m.label}>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
-                <span style={{ color: "rgba(255,255,255,0.5)", fontSize: 12 }}>{m.label}</span>
-                <span style={{ color: "rgb(250,250,250)", fontSize: 12, fontWeight: 700 }}>{m.value}%</span>
+                <span style={{ color: "var(--dw5)", fontSize: 12 }}>{m.label}</span>
+                <span style={{ color: "var(--dtext)", fontSize: 12, fontWeight: 700 }}>{m.value}%</span>
               </div>
-              <div style={{ height: 5, background: "rgba(255,255,255,0.06)", borderRadius: 3 }}>
+              <div style={{ height: 5, background: "var(--dw06)", borderRadius: 3 }}>
                 <div style={{ height: "100%", width: `${m.value}%`, borderRadius: 3, background: m.value > 80 ? "rgb(52,211,153)" : m.value > 60 ? "rgb(251,191,36)" : "rgb(248,113,113)", transition: "width 0.5s ease" }} />
               </div>
             </div>
@@ -196,12 +196,12 @@ function Overview({ operationsScore, fillRate, retention, revenueGrowthScore, ai
       </div>
 
       <div style={card}>
-        <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 14px" }}>Top AI opportunities</p>
+        <p style={{ color: "var(--dw4)", fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 14px" }}>Top AI opportunities</p>
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {opportunities.map(o => (
-            <div key={o.tag} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", background: "rgba(255,255,255,0.02)", borderRadius: 10 }}>
+            <div key={o.tag} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", background: "var(--dw02)", borderRadius: 10 }}>
               <span style={{ fontSize: 9, fontWeight: 800, color: o.color, background: `${o.color}18`, padding: "3px 8px", borderRadius: 20, whiteSpace: "nowrap", letterSpacing: "0.06em" }}>{o.tag}</span>
-              <span style={{ color: "rgba(255,255,255,0.6)", fontSize: 13, flex: 1 }}>{o.text}</span>
+              <span style={{ color: "var(--dw6)", fontSize: 13, flex: 1 }}>{o.text}</span>
               {o.impact && <span style={{ color: "rgb(52,211,153)", fontSize: 12, fontWeight: 700, whiteSpace: "nowrap" }}>{o.impact}</span>}
             </div>
           ))}
@@ -259,7 +259,7 @@ function Revenue({ appointments, now, thisMonthRevenue, autopilotRevenue, missed
       </div>
 
       <div style={card}>
-        <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 16px" }}>Daily revenue — last 30 days</p>
+        <p style={{ color: "var(--dw4)", fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 16px" }}>Daily revenue — last 30 days</p>
         <svg viewBox="0 0 100 70" preserveAspectRatio="none" style={{ width: "100%", height: 140 }}>
           <defs>
             <linearGradient id="rev-grad" x1="0" y1="0" x2="0" y2="1">
@@ -272,21 +272,21 @@ function Revenue({ appointments, now, thisMonthRevenue, autopilotRevenue, missed
         </svg>
         <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8 }}>
           {days.filter((_, i) => i % 5 === 0).map(d => (
-            <span key={d.label} style={{ color: "rgba(255,255,255,0.2)", fontSize: 10 }}>{d.label}</span>
+            <span key={d.label} style={{ color: "var(--dw2)", fontSize: 10 }}>{d.label}</span>
           ))}
         </div>
       </div>
 
       <div style={card}>
-        <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 14px" }}>Service performance</p>
+        <p style={{ color: "var(--dw4)", fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 14px" }}>Service performance</p>
         {services.length === 0 ? (
-          <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 13, margin: 0 }}>No completed appointments yet.</p>
+          <p style={{ color: "var(--dw3)", fontSize: 13, margin: 0 }}>No completed appointments yet.</p>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {services.map(s => (
               <div key={s.name} style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <span style={{ color: "rgba(255,255,255,0.6)", fontSize: 13, width: 150, flexShrink: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.name}</span>
-                <div style={{ flex: 1, height: 6, background: "rgba(255,255,255,0.06)", borderRadius: 3 }}>
+                <span style={{ color: "var(--dw6)", fontSize: 13, width: 150, flexShrink: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.name}</span>
+                <div style={{ flex: 1, height: 6, background: "var(--dw06)", borderRadius: 3 }}>
                   <div style={{ height: "100%", width: `${(s.revenue / maxServiceRevenue) * 100}%`, borderRadius: 3, background: "rgb(139,92,246)" }} />
                 </div>
                 <span style={{ color: "rgb(52,211,153)", fontSize: 12, fontWeight: 700, width: 72, textAlign: "right", flexShrink: 0 }}>{fmtPrice(s.revenue)}</span>
@@ -313,7 +313,7 @@ function TeamModule({ staff, metricsAppts, monthStart, now }: {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
       <div style={card}>
-        <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 14px" }}>Per-staff efficiency — this month</p>
+        <p style={{ color: "var(--dw4)", fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 14px" }}>Per-staff efficiency — this month</p>
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {rows.map(r => (
             <div key={r.id} style={{ display: "flex", alignItems: "center", gap: 14 }}>
@@ -323,18 +323,18 @@ function TeamModule({ staff, metricsAppts, monthStart, now }: {
               }}>
                 {r.full_name.split(" ").map(w => w[0]).slice(0, 2).join("")}
               </div>
-              <span style={{ color: "rgb(250,250,250)", fontSize: 13, fontWeight: 600, width: 140, flexShrink: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.full_name}</span>
-              <div style={{ flex: 1, height: 6, background: "rgba(255,255,255,0.06)", borderRadius: 3 }}>
+              <span style={{ color: "var(--dtext)", fontSize: 13, fontWeight: 600, width: 140, flexShrink: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.full_name}</span>
+              <div style={{ flex: 1, height: 6, background: "var(--dw06)", borderRadius: 3 }}>
                 <div style={{ height: "100%", width: `${r.utilizationPct}%`, borderRadius: 3, background: r.utilizationPct > 85 ? "rgb(52,211,153)" : r.utilizationPct > 65 ? "rgb(251,191,36)" : "rgb(248,113,113)" }} />
               </div>
-              <span style={{ color: "rgba(255,255,255,0.5)", fontSize: 12, width: 44, textAlign: "right", flexShrink: 0 }}>{r.utilizationPct}%</span>
+              <span style={{ color: "var(--dw5)", fontSize: 12, width: 44, textAlign: "right", flexShrink: 0 }}>{r.utilizationPct}%</span>
               <span style={{ color: "rgb(52,211,153)", fontSize: 12, fontWeight: 700, width: 72, textAlign: "right", flexShrink: 0 }}>{fmtPrice(r.revenue)}</span>
             </div>
           ))}
         </div>
       </div>
       <div style={{ ...card, textAlign: "center", padding: "28px 20px" }}>
-        <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 13, margin: 0 }}>
+        <p style={{ color: "var(--dw35)", fontSize: 13, margin: 0 }}>
           Booking-conversion funnel needs booking-page visit analytics — not available yet.
         </p>
       </div>
@@ -389,26 +389,26 @@ function ClientsModule({ clients, appointments, now, retention }: {
       <div className="ops-score-grid" style={{ display: "grid", gridTemplateColumns: "220px 1fr", gap: 20 }}>
         <div style={{ ...card, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 12 }}>
           <svg width={120} height={120} viewBox="0 0 120 120">
-            <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="10" />
+            <circle cx="60" cy="60" r="50" fill="none" stroke="var(--dw06)" strokeWidth="10" />
             <circle cx="60" cy="60" r="50" fill="none" stroke="rgb(96,165,250)" strokeWidth="10"
               strokeDasharray={`${(retention / 100) * 314} 314`} strokeLinecap="round" transform="rotate(-90 60 60)" />
-            <text x="60" y="56" textAnchor="middle" fill="rgb(250,250,250)" fontSize="24" fontWeight="800">{retention}</text>
-            <text x="60" y="72" textAnchor="middle" fill="rgba(255,255,255,0.35)" fontSize="10">%</text>
+            <text x="60" y="56" textAnchor="middle" fill="var(--dtext)" fontSize="24" fontWeight="800">{retention}</text>
+            <text x="60" y="72" textAnchor="middle" fill="var(--dw35)" fontSize="10">%</text>
           </svg>
-          <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", margin: 0 }}>Rebooking rate</p>
+          <p style={{ color: "var(--dw5)", fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", margin: 0 }}>Rebooking rate</p>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
           {segments.map(s => (
             <div key={s.label} style={{ ...card, padding: "14px 16px" }}>
               <p style={{ color: s.color, fontSize: 10, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", margin: "0 0 6px" }}>{s.label}</p>
-              <p style={{ color: "rgb(250,250,250)", fontSize: 26, fontWeight: 800, margin: 0, letterSpacing: "-0.03em" }}>{s.count}</p>
+              <p style={{ color: "var(--dtext)", fontSize: 26, fontWeight: 800, margin: 0, letterSpacing: "-0.03em" }}>{s.count}</p>
             </div>
           ))}
         </div>
       </div>
 
       <div style={card}>
-        <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 14px" }}>New vs. returning — last 8 weeks</p>
+        <p style={{ color: "var(--dw4)", fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 14px" }}>New vs. returning — last 8 weeks</p>
         <div style={{ display: "flex", alignItems: "flex-end", gap: 8, height: 100 }}>
           {buckets.map((b, i) => (
             <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "flex-end", height: "100%", gap: 2 }}>
@@ -418,8 +418,8 @@ function ClientsModule({ clients, appointments, now, retention }: {
           ))}
         </div>
         <div style={{ display: "flex", gap: 16, marginTop: 12 }}>
-          <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: "rgba(255,255,255,0.4)" }}><span style={{ width: 8, height: 8, borderRadius: 2, background: "rgb(139,92,246)" }} /> New</span>
-          <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: "rgba(255,255,255,0.4)" }}><span style={{ width: 8, height: 8, borderRadius: 2, background: "rgb(52,211,153)" }} /> Returning</span>
+          <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: "var(--dw4)" }}><span style={{ width: 8, height: 8, borderRadius: 2, background: "rgb(139,92,246)" }} /> New</span>
+          <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: "var(--dw4)" }}><span style={{ width: 8, height: 8, borderRadius: 2, background: "rgb(52,211,153)" }} /> Returning</span>
         </div>
       </div>
     </div>
@@ -447,12 +447,12 @@ function AIModule({ opportunities }: { opportunities: ReturnType<typeof computeO
               background: "none", border: "none", cursor: "pointer", textAlign: "left",
             }}>
               <span style={{ fontSize: 9, fontWeight: 800, color: o.color, background: `${o.color}18`, padding: "3px 8px", borderRadius: 20, whiteSpace: "nowrap", letterSpacing: "0.06em" }}>{o.tag}</span>
-              <span style={{ color: "rgba(255,255,255,0.7)", fontSize: 13, flex: 1 }}>{o.text}</span>
+              <span style={{ color: "var(--dw7)", fontSize: 13, flex: 1 }}>{o.text}</span>
               {o.impact && <span style={{ color: "rgb(52,211,153)", fontSize: 12, fontWeight: 700 }}>{o.impact}</span>}
-              <ChevronDown size={15} color="rgba(255,255,255,0.3)" style={{ transform: isOpen ? "rotate(180deg)" : "none", transition: "transform 0.15s" }} />
+              <ChevronDown size={15} color="var(--dw3)" style={{ transform: isOpen ? "rotate(180deg)" : "none", transition: "transform 0.15s" }} />
             </button>
             {isOpen && (
-              <div style={{ padding: "0 18px 16px", color: "rgba(255,255,255,0.4)", fontSize: 12, lineHeight: 1.6 }}>
+              <div style={{ padding: "0 18px 16px", color: "var(--dw4)", fontSize: 12, lineHeight: 1.6 }}>
                 {o.available
                   ? "Computed from your real appointment and client history."
                   : "This insight needs an integration that isn't connected for this shop yet."}
@@ -471,7 +471,7 @@ function Finance() {
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
       <div style={{ ...card, display: "flex", alignItems: "center", gap: 10 }}>
         <span style={{ fontSize: 10, fontWeight: 800, color: "rgb(251,191,36)", background: "rgba(245,158,11,0.12)", padding: "4px 10px", borderRadius: 20 }}>MOCK DATA</span>
-        <span style={{ color: "rgba(255,255,255,0.5)", fontSize: 12.5 }}>Requires Stripe Connect for real payouts and GST figures — shown for layout reference only.</span>
+        <span style={{ color: "var(--dw5)", fontSize: 12.5 }}>Requires Stripe Connect for real payouts and GST figures — shown for layout reference only.</span>
       </div>
       <div className="ops-kpi-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14 }}>
         <KPITile label="Next payout" value="C$4,180" sub="Processing in 2 days" />
@@ -479,12 +479,12 @@ function Finance() {
         <KPITile label="Net this month" value="C$11,820" sub="+7.4% vs last" />
       </div>
       <div style={card}>
-        <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 14px" }}>Exports</p>
+        <p style={{ color: "var(--dw4)", fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 14px" }}>Exports</p>
         <div style={{ display: "flex", gap: 10 }}>
           {["GST34 Report", "Accountant Summary", "Itemised Transactions"].map(label => (
             <button key={label} disabled style={{
-              padding: "9px 16px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.1)",
-              background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.4)",
+              padding: "9px 16px", borderRadius: 10, border: "1px solid var(--dw1)",
+              background: "var(--dw04)", color: "var(--dw4)",
               fontSize: 12, fontWeight: 600, cursor: "not-allowed",
             }}>
               {label}
@@ -500,9 +500,9 @@ function Finance() {
 function Placeholder({ icon, title, desc }: { icon: React.ReactNode; title: string; desc: string }) {
   return (
     <div style={{ textAlign: "center", padding: "80px 20px" }}>
-      <div style={{ width: 64, height: 64, borderRadius: 20, background: "rgba(255,255,255,0.05)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 18px" }}>{icon}</div>
-      <h3 style={{ color: "rgb(250,250,250)", fontSize: 18, fontWeight: 800, margin: "0 0 8px" }}>{title}</h3>
-      <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 14, maxWidth: 380, margin: "0 auto" }}>{desc}</p>
+      <div style={{ width: 64, height: 64, borderRadius: 20, background: "var(--dw05)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 18px" }}>{icon}</div>
+      <h3 style={{ color: "var(--dtext)", fontSize: 18, fontWeight: 800, margin: "0 0 8px" }}>{title}</h3>
+      <p style={{ color: "var(--dw35)", fontSize: 14, maxWidth: 380, margin: "0 auto" }}>{desc}</p>
     </div>
   );
 }

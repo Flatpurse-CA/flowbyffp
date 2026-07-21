@@ -46,7 +46,7 @@ function TrendChart({ data, avg, declining }: { data: number[]; avg: number; dec
       </defs>
       <polygon points={area} fill={`url(#g-${color})`} />
       <polyline points={pts} stroke={color} strokeWidth="1.6" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-      <line x1="0" y1={avgY} x2={W} y2={avgY} stroke="rgba(255,255,255,0.2)" strokeWidth="0.8" strokeDasharray="3,2" />
+      <line x1="0" y1={avgY} x2={W} y2={avgY} stroke="var(--dw2)" strokeWidth="0.8" strokeDasharray="3,2" />
       <circle cx={x(data.length - 1)} cy={y(data[data.length - 1])} r="2" fill={color} />
     </svg>
   );
@@ -60,8 +60,8 @@ function AddStaffModal({ onClose, onCreated }: { onClose: () => void; onCreated:
   const [error, setError] = useState<string | null>(null);
 
   const inputStyle: React.CSSProperties = {
-    width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)",
-    borderRadius: 10, padding: "10px 13px", color: "rgb(250,250,250)", fontSize: 13.5,
+    width: "100%", background: "var(--dw05)", border: "1px solid var(--dw1)",
+    borderRadius: 10, padding: "10px 13px", color: "var(--dtext)", fontSize: 13.5,
     outline: "none", boxSizing: "border-box",
   };
 
@@ -88,31 +88,31 @@ function AddStaffModal({ onClose, onCreated }: { onClose: () => void; onCreated:
       display: "flex", alignItems: "center", justifyContent: "center",
     }} onClick={onClose}>
       <div style={{
-        background: "rgb(14,14,18)", border: "1px solid rgba(255,255,255,0.1)",
+        background: "var(--dm1)", border: "1px solid var(--dw1)",
         borderRadius: 22, width: "100%", maxWidth: 420,
         padding: "28px 28px 24px", margin: 20,
         boxShadow: "0 24px 80px rgba(0,0,0,0.7)",
       }} onClick={e => e.stopPropagation()}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
-          <h2 style={{ color: "rgb(250,250,250)", fontSize: 18, fontWeight: 800, margin: 0, letterSpacing: "-0.02em" }}>
+          <h2 style={{ color: "var(--dtext)", fontSize: 18, fontWeight: 800, margin: 0, letterSpacing: "-0.02em" }}>
             Invite team member
           </h2>
-          <button onClick={onClose} style={{ background: "rgba(255,255,255,0.06)", border: "none", borderRadius: 8, width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "rgba(255,255,255,0.5)" }}>
+          <button onClick={onClose} style={{ background: "var(--dw06)", border: "none", borderRadius: 8, width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "var(--dw5)" }}>
             <X size={16} />
           </button>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           <div>
-            <label style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, fontWeight: 500, display: "block", marginBottom: 7 }}>Full name</label>
+            <label style={{ color: "var(--dw4)", fontSize: 12, fontWeight: 500, display: "block", marginBottom: 7 }}>Full name</label>
             <input value={fullName} onChange={e => setFullName(e.target.value)} placeholder="e.g. Emma Watson" style={inputStyle} />
           </div>
           <div>
-            <label style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, fontWeight: 500, display: "block", marginBottom: 7 }}>Email</label>
+            <label style={{ color: "var(--dw4)", fontSize: 12, fontWeight: 500, display: "block", marginBottom: 7 }}>Email</label>
             <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="them@example.com" style={inputStyle} />
-            <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, margin: "6px 0 0" }}>They&apos;ll get an email to set up their own login, scoped to their own bookings.</p>
+            <p style={{ color: "var(--dw3)", fontSize: 11, margin: "6px 0 0" }}>They&apos;ll get an email to set up their own login, scoped to their own bookings.</p>
           </div>
           <div>
-            <label style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, fontWeight: 500, display: "block", marginBottom: 7 }}>Role (optional)</label>
+            <label style={{ color: "var(--dw4)", fontSize: 12, fontWeight: 500, display: "block", marginBottom: 7 }}>Role (optional)</label>
             <input value={role} onChange={e => setRole(e.target.value)} placeholder="e.g. Senior Stylist" style={inputStyle} />
           </div>
           {error && <p style={{ color: "rgb(248,113,113)", fontSize: 12.5, margin: 0 }}>{error}</p>}
@@ -166,8 +166,8 @@ export function TeamClient({ staff, appointments }: { staff: StaffRow[]; appoint
   const selectedRow = rows.find(r => r.id === selected) ?? null;
 
   const card: React.CSSProperties = {
-    background: "rgba(255,255,255,0.025)",
-    border: "1px solid rgba(255,255,255,0.07)",
+    background: "var(--dw025)",
+    border: "1px solid var(--dw07)",
     borderRadius: 16,
     overflow: "hidden",
   };
@@ -196,10 +196,10 @@ export function TeamClient({ staff, appointments }: { staff: StaffRow[]; appoint
     return (
       <div style={{ maxWidth: 480, margin: "80px auto", textAlign: "center", padding: "0 20px" }}>
         <div style={{ fontSize: 40, marginBottom: 20 }}>👥</div>
-        <h2 style={{ color: "rgb(240,240,248)", fontSize: 22, fontWeight: 800, margin: "0 0 10px", letterSpacing: "-0.03em" }}>
+        <h2 style={{ color: "var(--dtext2)", fontSize: 22, fontWeight: 800, margin: "0 0 10px", letterSpacing: "-0.03em" }}>
           Add your team when ready
         </h2>
-        <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, lineHeight: 1.6, margin: "0 0 28px" }}>
+        <p style={{ color: "var(--dw4)", fontSize: 14, lineHeight: 1.6, margin: "0 0 28px" }}>
           Each staff member gets their own calendar column so clients can book with the person they love.
         </p>
         <button onClick={() => setShowAdd(true)} style={{
@@ -224,8 +224,8 @@ export function TeamClient({ staff, appointments }: { staff: StaffRow[]; appoint
         {/* Header */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div>
-            <h1 style={{ color: "rgb(250,250,250)", fontSize: 22, fontWeight: 800, margin: "0 0 3px", letterSpacing: "-0.03em" }}>Team</h1>
-            <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 13, margin: 0 }}>{staff.length} active staff member{staff.length === 1 ? "" : "s"}</p>
+            <h1 style={{ color: "var(--dtext)", fontSize: 22, fontWeight: 800, margin: "0 0 3px", letterSpacing: "-0.03em" }}>Team</h1>
+            <p style={{ color: "var(--dw35)", fontSize: 13, margin: 0 }}>{staff.length} active staff member{staff.length === 1 ? "" : "s"}</p>
           </div>
           <button onClick={() => setShowAdd(true)} style={{
             display: "flex", alignItems: "center", gap: 7,
@@ -253,7 +253,7 @@ export function TeamClient({ staff, appointments }: { staff: StaffRow[]; appoint
                 ? "1px solid rgba(139,92,246,0.5)"
                 : row.trend.declining
                   ? "1px solid rgba(248,113,113,0.25)"
-                  : "1px solid rgba(255,255,255,0.07)",
+                  : "1px solid var(--dw07)",
               transition: "border-color 0.15s",
               position: "relative",
             }}
@@ -272,8 +272,8 @@ export function TeamClient({ staff, appointments }: { staff: StaffRow[]; appoint
 
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 2 }}>
-                  <span style={{ color: "rgb(250,250,250)", fontSize: 14, fontWeight: 700 }}>{row.full_name}</span>
-                  {row.role && <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 12 }}>{row.role}</span>}
+                  <span style={{ color: "var(--dtext)", fontSize: 14, fontWeight: 700 }}>{row.full_name}</span>
+                  {row.role && <span style={{ color: "var(--dw3)", fontSize: 12 }}>{row.role}</span>}
                   {row.invite_status === "pending" && (
                     <span style={{
                       fontSize: 10, fontWeight: 700, color: "rgb(251,191,36)",
@@ -284,8 +284,8 @@ export function TeamClient({ staff, appointments }: { staff: StaffRow[]; appoint
                   )}
                   {row.invite_status === "not_invited" && (
                     <span style={{
-                      fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.4)",
-                      background: "rgba(255,255,255,0.06)", padding: "2px 8px", borderRadius: 20,
+                      fontSize: 10, fontWeight: 700, color: "var(--dw4)",
+                      background: "var(--dw06)", padding: "2px 8px", borderRadius: 20,
                     }}>
                       No account
                     </span>
@@ -302,14 +302,14 @@ export function TeamClient({ staff, appointments }: { staff: StaffRow[]; appoint
                   )}
                 </div>
                 <div style={{ display: "flex", gap: 18, flexWrap: "wrap" }}>
-                  <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 12 }}>
-                    <span style={{ color: "rgb(250,250,250)", fontWeight: 600 }}>{row.bookings}</span> bookings · {period.toLowerCase()}
+                  <span style={{ color: "var(--dw4)", fontSize: 12 }}>
+                    <span style={{ color: "var(--dtext)", fontWeight: 600 }}>{row.bookings}</span> bookings · {period.toLowerCase()}
                   </span>
-                  <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 12 }}>
+                  <span style={{ color: "var(--dw4)", fontSize: 12 }}>
                     <span style={{ color: "rgb(52,211,153)", fontWeight: 600 }}>{fmtPrice(row.revenue)}</span> revenue
                   </span>
-                  <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 12 }}>
-                    <span style={{ color: "rgb(250,250,250)", fontWeight: 600 }}>{row.utilizationPct}%</span> utilized
+                  <span style={{ color: "var(--dw4)", fontSize: 12 }}>
+                    <span style={{ color: "var(--dtext)", fontWeight: 600 }}>{row.utilizationPct}%</span> utilized
                   </span>
                 </div>
               </div>
@@ -317,7 +317,7 @@ export function TeamClient({ staff, appointments }: { staff: StaffRow[]; appoint
               <div style={{ position: "relative" }}>
                 <button
                   onClick={e => { e.stopPropagation(); setMenuOpenId(menuOpenId === row.id ? null : row.id); }}
-                  style={{ background: "none", border: "none", color: "rgba(255,255,255,0.3)", cursor: "pointer", padding: 4 }}
+                  style={{ background: "none", border: "none", color: "var(--dw3)", cursor: "pointer", padding: 4 }}
                 >
                   <MoreHorizontal size={16} />
                 </button>
@@ -326,7 +326,7 @@ export function TeamClient({ staff, appointments }: { staff: StaffRow[]; appoint
                     onClick={e => e.stopPropagation()}
                     style={{
                       position: "absolute", top: "calc(100% + 4px)", right: 0, zIndex: 10,
-                      background: "rgb(20,20,26)", border: "1px solid rgba(255,255,255,0.1)",
+                      background: "var(--dm3)", border: "1px solid var(--dw1)",
                       borderRadius: 10, overflow: "hidden", minWidth: 140,
                       boxShadow: "0 12px 32px rgba(0,0,0,0.5)",
                     }}
@@ -334,7 +334,7 @@ export function TeamClient({ staff, appointments }: { staff: StaffRow[]; appoint
                     {row.invite_status === "pending" && (
                       <button onClick={() => handleResend(row.id)} style={{
                         display: "block", width: "100%", textAlign: "left", padding: "9px 14px",
-                        background: "none", border: "none", color: "rgba(255,255,255,0.7)", fontSize: 12.5, cursor: "pointer",
+                        background: "none", border: "none", color: "var(--dw7)", fontSize: 12.5, cursor: "pointer",
                       }}>
                         Resend invite
                       </button>
@@ -351,7 +351,7 @@ export function TeamClient({ staff, appointments }: { staff: StaffRow[]; appoint
             </div>
 
             {/* Utilization bar */}
-            <div style={{ height: 3, background: "rgba(255,255,255,0.06)", margin: "0 20px 18px" }}>
+            <div style={{ height: 3, background: "var(--dw06)", margin: "0 20px 18px" }}>
               <div style={{
                 height: "100%", borderRadius: 2,
                 width: `${row.utilizationPct}%`,
@@ -380,19 +380,19 @@ export function TeamClient({ staff, appointments }: { staff: StaffRow[]; appoint
                 {initialsFor(selectedRow.full_name)}
               </div>
               <div>
-                <p style={{ color: "rgb(250,250,250)", fontSize: 16, fontWeight: 800, margin: "0 0 2px" }}>{selectedRow.full_name}</p>
-                {selectedRow.role && <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, margin: 0 }}>{selectedRow.role}</p>}
+                <p style={{ color: "var(--dtext)", fontSize: 16, fontWeight: 800, margin: "0 0 2px" }}>{selectedRow.full_name}</p>
+                {selectedRow.role && <p style={{ color: "var(--dw4)", fontSize: 12, margin: 0 }}>{selectedRow.role}</p>}
               </div>
             </div>
 
             {/* Period picker */}
-            <div style={{ display: "flex", gap: 4, background: "rgba(255,255,255,0.04)", borderRadius: 10, padding: 3, marginBottom: 16 }}>
+            <div style={{ display: "flex", gap: 4, background: "var(--dw04)", borderRadius: 10, padding: 3, marginBottom: 16 }}>
               {PERIODS.map(p => (
                 <button key={p} onClick={() => setPeriod(p)} style={{
                   flex: 1, padding: "5px 0", borderRadius: 7, border: "none", cursor: "pointer",
                   fontSize: 11, fontWeight: period === p ? 700 : 500,
                   background: period === p ? "rgba(139,92,246,0.35)" : "transparent",
-                  color: period === p ? "rgb(210,196,254)" : "rgba(255,255,255,0.35)",
+                  color: period === p ? "rgb(210,196,254)" : "var(--dw35)",
                 }}>
                   {p}
                 </button>
@@ -408,12 +408,12 @@ export function TeamClient({ staff, appointments }: { staff: StaffRow[]; appoint
                 { label: "Avg ticket", value: selectedRow.avgTicket > 0 ? fmtPrice(selectedRow.avgTicket) : "—", sub: "per completed visit" },
               ].map(m => (
                 <div key={m.label} style={{
-                  background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)",
+                  background: "var(--dw03)", border: "1px solid var(--dw07)",
                   borderRadius: 12, padding: "12px 14px",
                 }}>
-                  <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 10, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", margin: "0 0 4px" }}>{m.label}</p>
-                  <p style={{ color: "rgb(250,250,250)", fontSize: 18, fontWeight: 800, margin: "0 0 2px", letterSpacing: "-0.03em" }}>{m.value}</p>
-                  {m.sub && <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 10, margin: 0 }}>{m.sub}</p>}
+                  <p style={{ color: "var(--dw35)", fontSize: 10, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", margin: "0 0 4px" }}>{m.label}</p>
+                  <p style={{ color: "var(--dtext)", fontSize: 18, fontWeight: 800, margin: "0 0 2px", letterSpacing: "-0.03em" }}>{m.value}</p>
+                  {m.sub && <p style={{ color: "var(--dw3)", fontSize: 10, margin: 0 }}>{m.sub}</p>}
                 </div>
               ))}
             </div>
@@ -435,7 +435,7 @@ export function TeamClient({ staff, appointments }: { staff: StaffRow[]; appoint
               </div>
             )}
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-              <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 11, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", margin: 0 }}>
+              <p style={{ color: "var(--dw5)", fontSize: 11, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", margin: 0 }}>
                 8-week rebook trend
               </p>
               {selectedRow.trend.declining
@@ -450,7 +450,7 @@ export function TeamClient({ staff, appointments }: { staff: StaffRow[]; appoint
             />
             <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
               {["W1","W2","W3","W4","W5","W6","W7","W8"].map(w => (
-                <span key={w} style={{ color: "rgba(255,255,255,0.2)", fontSize: 9 }}>{w}</span>
+                <span key={w} style={{ color: "var(--dw2)", fontSize: 9 }}>{w}</span>
               ))}
             </div>
           </div>

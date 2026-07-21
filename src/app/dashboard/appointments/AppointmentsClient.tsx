@@ -92,12 +92,12 @@ const STATUS_STYLE: Record<string, { label: string; color: string; bg: string; b
   pending:   { label: "Pending",   color: "rgb(251,191,36)",  bg: "rgba(245,158,11,0.1)", border: "rgba(245,158,11,0.2)"  },
   deposit:   { label: "⚠ Deposit", color: "rgb(248,113,113)", bg: "rgba(239,68,68,0.1)",  border: "rgba(239,68,68,0.2)"   },
   completed: { label: "Completed", color: "rgb(96,165,250)",  bg: "rgba(59,130,246,0.1)", border: "rgba(59,130,246,0.2)"  },
-  cancelled: { label: "Cancelled", color: "rgba(255,255,255,0.4)", bg: "rgba(255,255,255,0.06)", border: "rgba(255,255,255,0.1)" },
+  cancelled: { label: "Cancelled", color: "var(--dw4)", bg: "var(--dw06)", border: "var(--dw1)" },
 };
 
 const card: React.CSSProperties = {
-  background: "rgba(255,255,255,0.025)",
-  border: "1px solid rgba(255,255,255,0.07)",
+  background: "var(--dw025)",
+  border: "1px solid var(--dw07)",
   borderRadius: 16,
   overflow: "hidden",
 };
@@ -146,12 +146,12 @@ function NewBookingOverlay({ onClose, onCreated, staff, selfStaffId }: { onClose
   const [error, setError] = useState<string | null>(null);
 
   const inputStyle: React.CSSProperties = {
-    width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)",
-    borderRadius: 10, padding: "10px 13px", color: "rgb(250,250,250)", fontSize: 13.5,
+    width: "100%", background: "var(--dw05)", border: "1px solid var(--dw1)",
+    borderRadius: 10, padding: "10px 13px", color: "var(--dtext)", fontSize: 13.5,
     outline: "none", boxSizing: "border-box",
   };
   const sectionLabel: React.CSSProperties = {
-    color: "rgba(255,255,255,0.4)", fontSize: 11.5, fontWeight: 700, letterSpacing: "0.05em",
+    color: "var(--dw4)", fontSize: 11.5, fontWeight: 700, letterSpacing: "0.05em",
     textTransform: "uppercase", display: "block", marginBottom: 9,
   };
 
@@ -200,7 +200,7 @@ function NewBookingOverlay({ onClose, onCreated, staff, selfStaffId }: { onClose
       display: "flex", alignItems: "center", justifyContent: "center",
     }} onClick={onClose}>
       <div style={{
-        background: "rgb(14,14,18)", border: "1px solid rgba(255,255,255,0.1)",
+        background: "var(--dm1)", border: "1px solid var(--dw1)",
         borderRadius: 22, width: "100%", maxWidth: 860, maxHeight: "88vh",
         margin: 20, boxShadow: "0 24px 80px rgba(0,0,0,0.7)",
         display: "flex", overflow: "hidden",
@@ -209,10 +209,10 @@ function NewBookingOverlay({ onClose, onCreated, staff, selfStaffId }: { onClose
         {/* Form */}
         <div style={{ flex: 1, minWidth: 0, padding: "26px 28px", overflowY: "auto" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 22 }}>
-            <h2 style={{ color: "rgb(250,250,250)", fontSize: 18, fontWeight: 800, margin: 0, letterSpacing: "-0.02em" }}>
+            <h2 style={{ color: "var(--dtext)", fontSize: 18, fontWeight: 800, margin: 0, letterSpacing: "-0.02em" }}>
               New Booking
             </h2>
-            <button onClick={onClose} style={{ background: "rgba(255,255,255,0.06)", border: "none", borderRadius: 8, width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "rgba(255,255,255,0.5)" }}>
+            <button onClick={onClose} style={{ background: "var(--dw06)", border: "none", borderRadius: 8, width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "var(--dw5)" }}>
               <X size={16} />
             </button>
           </div>
@@ -228,9 +228,9 @@ function NewBookingOverlay({ onClose, onCreated, staff, selfStaffId }: { onClose
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, marginBottom: 10 }}>
                 {SERVICES.map(s => (
                   <button key={s} onClick={() => setSelectedService(s)} style={{
-                    padding: "9px 12px", borderRadius: 10, border: `1px solid ${selectedService === s ? "rgba(139,92,246,0.5)" : "rgba(255,255,255,0.07)"}`,
-                    background: selectedService === s ? "rgba(109,40,217,0.15)" : "rgba(255,255,255,0.02)",
-                    color: selectedService === s ? "rgb(210,196,254)" : "rgba(255,255,255,0.6)",
+                    padding: "9px 12px", borderRadius: 10, border: `1px solid ${selectedService === s ? "rgba(139,92,246,0.5)" : "var(--dw07)"}`,
+                    background: selectedService === s ? "rgba(109,40,217,0.15)" : "var(--dw02)",
+                    color: selectedService === s ? "rgb(210,196,254)" : "var(--dw6)",
                     fontSize: 12.5, fontWeight: selectedService === s ? 700 : 400, cursor: "pointer", textAlign: "left",
                   }}>
                     {s}
@@ -239,11 +239,11 @@ function NewBookingOverlay({ onClose, onCreated, staff, selfStaffId }: { onClose
               </div>
               <div style={{ display: "flex", gap: 10 }}>
                 <div style={{ flex: 1 }}>
-                  <label style={{ color: "rgba(255,255,255,0.35)", fontSize: 11.5, display: "block", marginBottom: 6 }}>Price (C$)</label>
+                  <label style={{ color: "var(--dw35)", fontSize: 11.5, display: "block", marginBottom: 6 }}>Price (C$)</label>
                   <input type="number" value={price} onChange={e => setPrice(e.target.value)} style={inputStyle} />
                 </div>
                 <div style={{ flex: 1 }}>
-                  <label style={{ color: "rgba(255,255,255,0.35)", fontSize: 11.5, display: "block", marginBottom: 6 }}>Duration (min)</label>
+                  <label style={{ color: "var(--dw35)", fontSize: 11.5, display: "block", marginBottom: 6 }}>Duration (min)</label>
                   <input type="number" value={duration} onChange={e => setDuration(e.target.value)} style={inputStyle} />
                 </div>
               </div>
@@ -256,9 +256,9 @@ function NewBookingOverlay({ onClose, onCreated, staff, selfStaffId }: { onClose
                   {staff.map(s => (
                     <button key={s.id} onClick={() => setSelectedStaffId(s.id)} style={{
                       padding: "9px 16px", borderRadius: 10,
-                      border: `1px solid ${selectedStaffId === s.id ? "rgba(139,92,246,0.5)" : "rgba(255,255,255,0.07)"}`,
-                      background: selectedStaffId === s.id ? "rgba(109,40,217,0.15)" : "rgba(255,255,255,0.02)",
-                      color: selectedStaffId === s.id ? "rgb(210,196,254)" : "rgba(255,255,255,0.5)",
+                      border: `1px solid ${selectedStaffId === s.id ? "rgba(139,92,246,0.5)" : "var(--dw07)"}`,
+                      background: selectedStaffId === s.id ? "rgba(109,40,217,0.15)" : "var(--dw02)",
+                      color: selectedStaffId === s.id ? "rgb(210,196,254)" : "var(--dw5)",
                       fontSize: 12.5, fontWeight: selectedStaffId === s.id ? 700 : 400, cursor: "pointer",
                     }}>
                       {s.full_name.split(" ")[0]}
@@ -275,9 +275,9 @@ function NewBookingOverlay({ onClose, onCreated, staff, selfStaffId }: { onClose
                 {TIMES.map(t => (
                   <button key={t} onClick={() => setSelectedTime(t)} style={{
                     padding: "8px 4px", borderRadius: 9,
-                    border: `1px solid ${selectedTime === t ? "rgba(139,92,246,0.5)" : "rgba(255,255,255,0.07)"}`,
-                    background: selectedTime === t ? "rgba(109,40,217,0.15)" : "rgba(255,255,255,0.02)",
-                    color: selectedTime === t ? "rgb(210,196,254)" : "rgba(255,255,255,0.5)",
+                    border: `1px solid ${selectedTime === t ? "rgba(139,92,246,0.5)" : "var(--dw07)"}`,
+                    background: selectedTime === t ? "rgba(109,40,217,0.15)" : "var(--dw02)",
+                    color: selectedTime === t ? "rgb(210,196,254)" : "var(--dw5)",
                     fontSize: 11, fontWeight: selectedTime === t ? 700 : 400, cursor: "pointer",
                   }}>
                     {t}
@@ -296,14 +296,14 @@ function NewBookingOverlay({ onClose, onCreated, staff, selfStaffId }: { onClose
                 { label: "Require deposit", sub: "Marks 25% as paid upfront", value: deposit, set: setDeposit },
                 { label: "Send SMS confirmation", sub: "Text the client when booked", value: sms, set: setSms },
               ].map(t => (
-                <div key={t.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 14px", background: "rgba(255,255,255,0.03)", borderRadius: 10, border: "1px solid rgba(255,255,255,0.07)" }}>
+                <div key={t.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 14px", background: "var(--dw03)", borderRadius: 10, border: "1px solid var(--dw07)" }}>
                   <div>
-                    <p style={{ color: "rgb(250,250,250)", fontSize: 13, fontWeight: 600, margin: "0 0 2px" }}>{t.label}</p>
-                    <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 11.5, margin: 0 }}>{t.sub}</p>
+                    <p style={{ color: "var(--dtext)", fontSize: 13, fontWeight: 600, margin: "0 0 2px" }}>{t.label}</p>
+                    <p style={{ color: "var(--dw35)", fontSize: 11.5, margin: 0 }}>{t.sub}</p>
                   </div>
                   <button onClick={() => t.set(!t.value)} style={{
                     width: 40, height: 22, borderRadius: 11, border: "none", cursor: "pointer",
-                    background: t.value ? "rgb(109,40,217)" : "rgba(255,255,255,0.12)",
+                    background: t.value ? "rgb(109,40,217)" : "var(--dw12)",
                     position: "relative", transition: "background 0.2s", flexShrink: 0,
                   }}>
                     <span style={{
@@ -320,11 +320,11 @@ function NewBookingOverlay({ onClose, onCreated, staff, selfStaffId }: { onClose
 
         {/* Live summary panel */}
         <div style={{
-          width: 280, flexShrink: 0, background: "rgba(255,255,255,0.02)",
-          borderLeft: "1px solid rgba(255,255,255,0.08)", padding: "26px 22px",
+          width: 280, flexShrink: 0, background: "var(--dw02)",
+          borderLeft: "1px solid var(--dw08)", padding: "26px 22px",
           display: "flex", flexDirection: "column",
         }}>
-          <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", margin: "0 0 16px" }}>
+          <p style={{ color: "var(--dw4)", fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", margin: "0 0 16px" }}>
             Summary
           </p>
 
@@ -338,20 +338,20 @@ function NewBookingOverlay({ onClose, onCreated, staff, selfStaffId }: { onClose
           <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 18 }}>
             {summaryRows.map(row => (
               <div key={row.label}>
-                <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 10.5, fontWeight: 600, letterSpacing: "0.04em", textTransform: "uppercase", margin: "0 0 2px" }}>{row.label}</p>
-                <p style={{ color: "rgb(250,250,250)", fontSize: 13.5, fontWeight: 600, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{row.value}</p>
+                <p style={{ color: "var(--dw3)", fontSize: 10.5, fontWeight: 600, letterSpacing: "0.04em", textTransform: "uppercase", margin: "0 0 2px" }}>{row.label}</p>
+                <p style={{ color: "var(--dtext)", fontSize: 13.5, fontWeight: 600, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{row.value}</p>
               </div>
             ))}
           </div>
 
-          <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, padding: "12px 14px", marginBottom: "auto" }}>
+          <div style={{ background: "var(--dw03)", border: "1px solid var(--dw08)", borderRadius: 12, padding: "12px 14px", marginBottom: "auto" }}>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: deposit ? 6 : 0 }}>
-              <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 12 }}>Price</span>
-              <span style={{ color: "rgb(250,250,250)", fontSize: 13, fontWeight: 700 }}>{fmtPrice(priceNum)}</span>
+              <span style={{ color: "var(--dw4)", fontSize: 12 }}>Price</span>
+              <span style={{ color: "var(--dtext)", fontSize: 13, fontWeight: 700 }}>{fmtPrice(priceNum)}</span>
             </div>
             {deposit && (
               <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 12 }}>Deposit due</span>
+                <span style={{ color: "var(--dw4)", fontSize: 12 }}>Deposit due</span>
                 <span style={{ color: "rgb(167,139,250)", fontSize: 13, fontWeight: 700 }}>{fmtPrice(depositNum)}</span>
               </div>
             )}
@@ -363,8 +363,8 @@ function NewBookingOverlay({ onClose, onCreated, staff, selfStaffId }: { onClose
 
           <button disabled={!canBook || submitting} onClick={handleBook} style={{
             marginTop: 16, padding: "13px", borderRadius: 12, border: "none",
-            background: canBook ? "rgb(52,211,153)" : "rgba(255,255,255,0.08)",
-            color: canBook ? "rgb(5,40,20)" : "rgba(255,255,255,0.3)",
+            background: canBook ? "rgb(52,211,153)" : "var(--dw08)",
+            color: canBook ? "rgb(5,40,20)" : "var(--dw3)",
             fontSize: 13.5, fontWeight: 800, cursor: canBook && !submitting ? "pointer" : "default",
             opacity: submitting ? 0.7 : 1,
           }}>
@@ -410,8 +410,8 @@ function CloseOutModal({ appt, onClose, onCompleted }: { appt: ApptRecord; onClo
   };
 
   const inputStyle: React.CSSProperties = {
-    width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)",
-    borderRadius: 10, padding: "10px 13px", color: "rgb(250,250,250)", fontSize: 13.5,
+    width: "100%", background: "var(--dw05)", border: "1px solid var(--dw1)",
+    borderRadius: 10, padding: "10px 13px", color: "var(--dtext)", fontSize: 13.5,
     outline: "none", boxSizing: "border-box",
   };
 
@@ -422,7 +422,7 @@ function CloseOutModal({ appt, onClose, onCompleted }: { appt: ApptRecord; onClo
       display: "flex", alignItems: "center", justifyContent: "center",
     }} onClick={stage === "select" ? onClose : undefined}>
       <div style={{
-        background: "rgb(14,14,18)", border: "1px solid rgba(255,255,255,0.1)",
+        background: "var(--dm1)", border: "1px solid var(--dw1)",
         borderRadius: 22, width: "100%", maxWidth: 440,
         padding: "26px 26px 24px", margin: 20,
         boxShadow: "0 24px 80px rgba(0,0,0,0.7)",
@@ -433,14 +433,14 @@ function CloseOutModal({ appt, onClose, onCompleted }: { appt: ApptRecord; onClo
             <div style={{ width: 64, height: 64, borderRadius: "50%", background: "rgba(52,211,153,0.12)", border: "2px solid rgba(52,211,153,0.35)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
               <CheckCircle2 size={30} color="rgb(52,211,153)" strokeWidth={1.8} />
             </div>
-            <h2 style={{ color: "rgb(250,250,250)", fontSize: 19, fontWeight: 800, margin: "0 0 6px", letterSpacing: "-0.02em" }}>{fmtMoney(total)} collected</h2>
-            <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 13, margin: "0 0 4px" }}>
+            <h2 style={{ color: "var(--dtext)", fontSize: 19, fontWeight: 800, margin: "0 0 6px", letterSpacing: "-0.02em" }}>{fmtMoney(total)} collected</h2>
+            <p style={{ color: "var(--dw45)", fontSize: 13, margin: "0 0 4px" }}>
               {method === "link" ? `Payment link sent via ${linkChannel === "sms" ? "SMS" : linkChannel === "whatsapp" ? "WhatsApp" : "Email"}`
                 : method === "cash" ? "Marked as received in cash"
                 : "Charged card on file"}
             </p>
             {receiptSms ? (
-              <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 12, margin: "0 0 22px" }}>Receipt texted to {appt.phone || "client"}</p>
+              <p style={{ color: "var(--dw3)", fontSize: 12, margin: "0 0 22px" }}>Receipt texted to {appt.phone || "client"}</p>
             ) : (
               <div style={{ marginBottom: 22 }} />
             )}
@@ -453,10 +453,10 @@ function CloseOutModal({ appt, onClose, onCompleted }: { appt: ApptRecord; onClo
             {/* Header */}
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
               <div>
-                <h2 style={{ color: "rgb(250,250,250)", fontSize: 17, fontWeight: 800, margin: "0 0 2px", letterSpacing: "-0.02em" }}>Close out</h2>
-                <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 12.5, margin: 0 }}>{appt.name} · {appt.service}</p>
+                <h2 style={{ color: "var(--dtext)", fontSize: 17, fontWeight: 800, margin: "0 0 2px", letterSpacing: "-0.02em" }}>Close out</h2>
+                <p style={{ color: "var(--dw35)", fontSize: 12.5, margin: 0 }}>{appt.name} · {appt.service}</p>
               </div>
-              <button onClick={onClose} disabled={stage === "processing"} style={{ background: "rgba(255,255,255,0.06)", border: "none", borderRadius: 8, width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", cursor: stage === "processing" ? "default" : "pointer", color: "rgba(255,255,255,0.5)" }}>
+              <button onClick={onClose} disabled={stage === "processing"} style={{ background: "var(--dw06)", border: "none", borderRadius: 8, width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", cursor: stage === "processing" ? "default" : "pointer", color: "var(--dw5)" }}>
                 <X size={16} />
               </button>
             </div>
@@ -470,23 +470,23 @@ function CloseOutModal({ appt, onClose, onCompleted }: { appt: ApptRecord; onClo
                     {method === "tap" ? <Smartphone size={22} color="rgb(167,139,250)" /> : method === "link" ? <Send size={20} color="rgb(167,139,250)" /> : method === "cash" ? <Banknote size={20} color="rgb(167,139,250)" /> : <CreditCard size={20} color="rgb(167,139,250)" />}
                   </div>
                 </div>
-                <p style={{ color: "rgb(250,250,250)", fontSize: 13.5, fontWeight: 700, margin: "0 0 4px" }}>
+                <p style={{ color: "var(--dtext)", fontSize: 13.5, fontWeight: 700, margin: "0 0 4px" }}>
                   {method === "tap" ? "Hold card or phone near reader…" : method === "link" ? "Sending payment link…" : method === "cash" ? "Marking as received…" : "Charging card on file…"}
                 </p>
-                <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 12, margin: 0 }}>{fmtMoney(total)}</p>
+                <p style={{ color: "var(--dw3)", fontSize: 12, margin: 0 }}>{fmtMoney(total)}</p>
               </div>
             ) : (
               <>
                 {/* Gratuity selector */}
                 <div style={{ marginBottom: 18 }}>
-                  <label style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, fontWeight: 500, display: "block", marginBottom: 8 }}>Gratuity</label>
+                  <label style={{ color: "var(--dw4)", fontSize: 12, fontWeight: 500, display: "block", marginBottom: 8 }}>Gratuity</label>
                   <div className="apt-gratuity-grid" style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 6 }}>
                     {GRATUITY_PRESETS.map(p => (
                       <button key={p} onClick={() => setGratuityPct(p)} style={{
                         padding: "9px 4px", borderRadius: 10,
-                        border: `1px solid ${gratuityPct === p ? "rgba(139,92,246,0.5)" : "rgba(255,255,255,0.07)"}`,
-                        background: gratuityPct === p ? "rgba(109,40,217,0.15)" : "rgba(255,255,255,0.02)",
-                        color: gratuityPct === p ? "rgb(210,196,254)" : "rgba(255,255,255,0.5)",
+                        border: `1px solid ${gratuityPct === p ? "rgba(139,92,246,0.5)" : "var(--dw07)"}`,
+                        background: gratuityPct === p ? "rgba(109,40,217,0.15)" : "var(--dw02)",
+                        color: gratuityPct === p ? "rgb(210,196,254)" : "var(--dw5)",
                         fontSize: 12.5, fontWeight: gratuityPct === p ? 700 : 400, cursor: "pointer",
                       }}>
                         {p === 0 ? "No tip" : `${p}%`}
@@ -494,9 +494,9 @@ function CloseOutModal({ appt, onClose, onCompleted }: { appt: ApptRecord; onClo
                     ))}
                     <button onClick={() => setGratuityPct("custom")} style={{
                       padding: "9px 4px", borderRadius: 10,
-                      border: `1px solid ${gratuityPct === "custom" ? "rgba(139,92,246,0.5)" : "rgba(255,255,255,0.07)"}`,
-                      background: gratuityPct === "custom" ? "rgba(109,40,217,0.15)" : "rgba(255,255,255,0.02)",
-                      color: gratuityPct === "custom" ? "rgb(210,196,254)" : "rgba(255,255,255,0.5)",
+                      border: `1px solid ${gratuityPct === "custom" ? "rgba(139,92,246,0.5)" : "var(--dw07)"}`,
+                      background: gratuityPct === "custom" ? "rgba(109,40,217,0.15)" : "var(--dw02)",
+                      color: gratuityPct === "custom" ? "rgb(210,196,254)" : "var(--dw5)",
                       fontSize: 12.5, fontWeight: gratuityPct === "custom" ? 700 : 400, cursor: "pointer",
                     }}>
                       Custom
@@ -508,31 +508,31 @@ function CloseOutModal({ appt, onClose, onCompleted }: { appt: ApptRecord; onClo
                 </div>
 
                 {/* Total breakdown */}
-                <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 14, padding: "14px 16px", marginBottom: 18, display: "flex", flexDirection: "column", gap: 7 }}>
+                <div style={{ background: "var(--dw03)", border: "1px solid var(--dw08)", borderRadius: 14, padding: "14px 16px", marginBottom: 18, display: "flex", flexDirection: "column", gap: 7 }}>
                   <div style={{ display: "flex", justifyContent: "space-between" }}>
-                    <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 12.5 }}>Service</span>
-                    <span style={{ color: "rgba(255,255,255,0.7)", fontSize: 12.5 }}>{appt.price}</span>
+                    <span style={{ color: "var(--dw4)", fontSize: 12.5 }}>Service</span>
+                    <span style={{ color: "var(--dw7)", fontSize: 12.5 }}>{appt.price}</span>
                   </div>
                   {depositNum > 0 && (
                     <div style={{ display: "flex", justifyContent: "space-between" }}>
-                      <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 12.5 }}>Deposit already paid</span>
+                      <span style={{ color: "var(--dw4)", fontSize: 12.5 }}>Deposit already paid</span>
                       <span style={{ color: "rgb(52,211,153)", fontSize: 12.5 }}>-{appt.depositAmount}</span>
                     </div>
                   )}
                   <div style={{ display: "flex", justifyContent: "space-between" }}>
-                    <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 12.5 }}>Gratuity</span>
-                    <span style={{ color: "rgba(255,255,255,0.7)", fontSize: 12.5 }}>{fmtMoney(tipAmount)}</span>
+                    <span style={{ color: "var(--dw4)", fontSize: 12.5 }}>Gratuity</span>
+                    <span style={{ color: "var(--dw7)", fontSize: 12.5 }}>{fmtMoney(tipAmount)}</span>
                   </div>
-                  <div style={{ height: 1, background: "rgba(255,255,255,0.07)", margin: "3px 0" }} />
+                  <div style={{ height: 1, background: "var(--dw07)", margin: "3px 0" }} />
                   <div style={{ display: "flex", justifyContent: "space-between" }}>
-                    <span style={{ color: "rgb(250,250,250)", fontSize: 14, fontWeight: 700 }}>Total due</span>
+                    <span style={{ color: "var(--dtext)", fontSize: 14, fontWeight: 700 }}>Total due</span>
                     <span style={{ color: "rgb(52,211,153)", fontSize: 16, fontWeight: 800 }}>{fmtMoney(total)}</span>
                   </div>
                 </div>
 
                 {/* Payment method */}
                 <div style={{ marginBottom: 14 }}>
-                  <label style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, fontWeight: 500, display: "block", marginBottom: 8 }}>Payment method</label>
+                  <label style={{ color: "var(--dw4)", fontSize: 12, fontWeight: 500, display: "block", marginBottom: 8 }}>Payment method</label>
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
                     {[
                       { id: "tap" as const, Icon: Smartphone, label: "Tap to Pay", sub: "NFC / contactless" },
@@ -543,14 +543,14 @@ function CloseOutModal({ appt, onClose, onCompleted }: { appt: ApptRecord; onClo
                       <button key={m.id} onClick={() => setMethod(m.id)} style={{
                         display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 6,
                         padding: "12px 13px", borderRadius: 12,
-                        border: `1px solid ${method === m.id ? "rgba(139,92,246,0.5)" : "rgba(255,255,255,0.07)"}`,
-                        background: method === m.id ? "rgba(109,40,217,0.15)" : "rgba(255,255,255,0.02)",
+                        border: `1px solid ${method === m.id ? "rgba(139,92,246,0.5)" : "var(--dw07)"}`,
+                        background: method === m.id ? "rgba(109,40,217,0.15)" : "var(--dw02)",
                         cursor: "pointer", textAlign: "left",
                       }}>
-                        <m.Icon size={17} color={method === m.id ? "rgb(167,139,250)" : "rgba(255,255,255,0.5)"} strokeWidth={1.7} />
+                        <m.Icon size={17} color={method === m.id ? "rgb(167,139,250)" : "var(--dw5)"} strokeWidth={1.7} />
                         <div>
-                          <p style={{ color: method === m.id ? "rgb(210,196,254)" : "rgb(250,250,250)", fontSize: 12.5, fontWeight: 700, margin: "0 0 1px" }}>{m.label}</p>
-                          <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 10.5, margin: 0 }}>{m.sub}</p>
+                          <p style={{ color: method === m.id ? "rgb(210,196,254)" : "var(--dtext)", fontSize: 12.5, fontWeight: 700, margin: "0 0 1px" }}>{m.label}</p>
+                          <p style={{ color: "var(--dw3)", fontSize: 10.5, margin: 0 }}>{m.sub}</p>
                         </div>
                       </button>
                     ))}
@@ -567,9 +567,9 @@ function CloseOutModal({ appt, onClose, onCompleted }: { appt: ApptRecord; onClo
                     ].map(c => (
                       <button key={c.id} onClick={() => setLinkChannel(c.id)} style={{
                         flex: 1, padding: "8px 6px", borderRadius: 9,
-                        border: `1px solid ${linkChannel === c.id ? "rgba(139,92,246,0.5)" : "rgba(255,255,255,0.07)"}`,
-                        background: linkChannel === c.id ? "rgba(109,40,217,0.15)" : "rgba(255,255,255,0.02)",
-                        color: linkChannel === c.id ? "rgb(210,196,254)" : "rgba(255,255,255,0.5)",
+                        border: `1px solid ${linkChannel === c.id ? "rgba(139,92,246,0.5)" : "var(--dw07)"}`,
+                        background: linkChannel === c.id ? "rgba(109,40,217,0.15)" : "var(--dw02)",
+                        color: linkChannel === c.id ? "rgb(210,196,254)" : "var(--dw5)",
                         fontSize: 12, fontWeight: linkChannel === c.id ? 700 : 400, cursor: "pointer",
                       }}>
                         {c.label}
@@ -579,14 +579,14 @@ function CloseOutModal({ appt, onClose, onCompleted }: { appt: ApptRecord; onClo
                 )}
 
                 {/* Receipt SMS toggle */}
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 14px", background: "rgba(255,255,255,0.03)", borderRadius: 10, border: "1px solid rgba(255,255,255,0.07)", marginBottom: 20 }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 14px", background: "var(--dw03)", borderRadius: 10, border: "1px solid var(--dw07)", marginBottom: 20 }}>
                   <div>
-                    <p style={{ color: "rgb(250,250,250)", fontSize: 13, fontWeight: 600, margin: "0 0 2px" }}>Text receipt to client</p>
-                    <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 11.5, margin: 0 }}>{appt.phone || "No phone on file"}</p>
+                    <p style={{ color: "var(--dtext)", fontSize: 13, fontWeight: 600, margin: "0 0 2px" }}>Text receipt to client</p>
+                    <p style={{ color: "var(--dw35)", fontSize: 11.5, margin: 0 }}>{appt.phone || "No phone on file"}</p>
                   </div>
                   <button onClick={() => setReceiptSms(v => !v)} style={{
                     width: 40, height: 22, borderRadius: 11, border: "none", cursor: "pointer",
-                    background: receiptSms ? "rgb(109,40,217)" : "rgba(255,255,255,0.12)",
+                    background: receiptSms ? "rgb(109,40,217)" : "var(--dw12)",
                     position: "relative", transition: "background 0.2s",
                   }}>
                     <span style={{ position: "absolute", top: 3, left: receiptSms ? 21 : 3, width: 16, height: 16, borderRadius: "50%", background: "white", transition: "left 0.2s" }} />
@@ -603,8 +603,8 @@ function CloseOutModal({ appt, onClose, onCompleted }: { appt: ApptRecord; onClo
                   onClick={runCharge}
                   style={{
                     width: "100%", padding: "14px", borderRadius: 13, border: "none",
-                    background: method ? "rgb(52,211,153)" : "rgba(255,255,255,0.08)",
-                    color: method ? "rgb(5,40,20)" : "rgba(255,255,255,0.3)",
+                    background: method ? "rgb(52,211,153)" : "var(--dw08)",
+                    color: method ? "rgb(5,40,20)" : "var(--dw3)",
                     fontSize: 14, fontWeight: 800, cursor: method ? "pointer" : "default",
                   }}
                 >
@@ -633,8 +633,8 @@ function AppointmentDetail({ appt, onClose, onCloseOut, onChanged }: { appt: App
   const s = STATUS_STYLE[status];
 
   const inputStyle: React.CSSProperties = {
-    width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)",
-    borderRadius: 10, padding: "10px 13px", color: "rgb(250,250,250)", fontSize: 13.5,
+    width: "100%", background: "var(--dw05)", border: "1px solid var(--dw1)",
+    borderRadius: 10, padding: "10px 13px", color: "var(--dtext)", fontSize: 13.5,
     outline: "none", boxSizing: "border-box", colorScheme: "dark",
   };
 
@@ -691,7 +691,7 @@ function AppointmentDetail({ appt, onClose, onCloseOut, onChanged }: { appt: App
       display: "flex", alignItems: "center", justifyContent: "center",
     }} onClick={onClose}>
       <div style={{
-        background: "rgb(12,12,16)", border: "1px solid rgba(255,255,255,0.1)",
+        background: "var(--dm2)", border: "1px solid var(--dw1)",
         borderRadius: 24, width: "100%", maxWidth: 480,
         maxHeight: "90vh", display: "flex", flexDirection: "column",
         margin: 20, overflow: "hidden",
@@ -706,11 +706,11 @@ function AppointmentDetail({ appt, onClose, onCloseOut, onChanged }: { appt: App
                 {appt.initials}
               </div>
               <div>
-                <h2 style={{ color: "rgb(250,250,250)", fontSize: 17, fontWeight: 800, margin: "0 0 3px", letterSpacing: "-0.02em" }}>{appt.name}</h2>
-                <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 12.5, margin: 0 }}>{appt.dateLabel} · {appt.time}</p>
+                <h2 style={{ color: "var(--dtext)", fontSize: 17, fontWeight: 800, margin: "0 0 3px", letterSpacing: "-0.02em" }}>{appt.name}</h2>
+                <p style={{ color: "var(--dw4)", fontSize: 12.5, margin: 0 }}>{appt.dateLabel} · {appt.time}</p>
               </div>
             </div>
-            <button onClick={onClose} style={{ background: "rgba(255,255,255,0.06)", border: "none", borderRadius: 8, width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "rgba(255,255,255,0.45)", flexShrink: 0 }}>
+            <button onClick={onClose} style={{ background: "var(--dw06)", border: "none", borderRadius: 8, width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "var(--dw45)", flexShrink: 0 }}>
               <X size={16} />
             </button>
           </div>
@@ -733,17 +733,17 @@ function AppointmentDetail({ appt, onClose, onCloseOut, onChanged }: { appt: App
 
           {/* Client card */}
           <div style={{ ...card, padding: "14px 16px" }}>
-            <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 10, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", margin: "0 0 10px" }}>Client</p>
+            <p style={{ color: "var(--dw35)", fontSize: 10, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", margin: "0 0 10px" }}>Client</p>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ color: "rgb(250,250,250)", fontSize: 13, fontWeight: 600, margin: "0 0 2px" }}>{appt.phone || "No phone on file"}</p>
-                <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 12, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{appt.email || "No email on file"}</p>
+                <p style={{ color: "var(--dtext)", fontSize: 13, fontWeight: 600, margin: "0 0 2px" }}>{appt.phone || "No phone on file"}</p>
+                <p style={{ color: "var(--dw35)", fontSize: 12, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{appt.email || "No email on file"}</p>
               </div>
               <div style={{ display: "flex", gap: 6 }}>
-                <button style={{ width: 32, height: 32, borderRadius: 8, border: "1px solid rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.04)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "rgb(52,211,153)" }}>
+                <button style={{ width: 32, height: 32, borderRadius: 8, border: "1px solid var(--dw08)", background: "var(--dw04)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "rgb(52,211,153)" }}>
                   <MessageSquare size={14} strokeWidth={1.8} />
                 </button>
-                <button style={{ width: 32, height: 32, borderRadius: 8, border: "1px solid rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.04)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "rgb(96,165,250)" }}>
+                <button style={{ width: 32, height: 32, borderRadius: 8, border: "1px solid var(--dw08)", background: "var(--dw04)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "rgb(96,165,250)" }}>
                   <Phone size={14} strokeWidth={1.8} />
                 </button>
               </div>
@@ -752,7 +752,7 @@ function AppointmentDetail({ appt, onClose, onCloseOut, onChanged }: { appt: App
 
           {/* Service details */}
           <div style={{ ...card, padding: "14px 16px" }}>
-            <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 10, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", margin: "0 0 10px" }}>Service</p>
+            <p style={{ color: "var(--dw35)", fontSize: 10, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", margin: "0 0 10px" }}>Service</p>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {[
                 { label: "Service", value: appt.service },
@@ -761,8 +761,8 @@ function AppointmentDetail({ appt, onClose, onCloseOut, onChanged }: { appt: App
                 { label: "Price", value: appt.price },
               ].map(row => (
                 <div key={row.label} style={{ display: "flex", justifyContent: "space-between" }}>
-                  <span style={{ color: "rgba(255,255,255,0.35)", fontSize: 12.5 }}>{row.label}</span>
-                  <span style={{ color: "rgb(250,250,250)", fontSize: 12.5, fontWeight: 600 }}>{row.value}</span>
+                  <span style={{ color: "var(--dw35)", fontSize: 12.5 }}>{row.label}</span>
+                  <span style={{ color: "var(--dtext)", fontSize: 12.5, fontWeight: 600 }}>{row.value}</span>
                 </div>
               ))}
             </div>
@@ -771,10 +771,10 @@ function AppointmentDetail({ appt, onClose, onCloseOut, onChanged }: { appt: App
           {/* Client notes */}
           <div style={{ ...card, padding: "14px 16px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
-              <StickyNote size={12} color="rgba(255,255,255,0.35)" />
-              <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 10, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", margin: 0 }}>Client notes</p>
+              <StickyNote size={12} color="var(--dw35)" />
+              <p style={{ color: "var(--dw35)", fontSize: 10, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", margin: 0 }}>Client notes</p>
             </div>
-            <p style={{ color: appt.notes ? "rgba(255,255,255,0.65)" : "rgba(255,255,255,0.25)", fontSize: 12.5, margin: 0, lineHeight: 1.55 }}>
+            <p style={{ color: appt.notes ? "var(--dw65)" : "var(--dw25)", fontSize: 12.5, margin: 0, lineHeight: 1.55 }}>
               {appt.notes || "No notes on file for this client."}
             </p>
           </div>
@@ -782,15 +782,15 @@ function AppointmentDetail({ appt, onClose, onCloseOut, onChanged }: { appt: App
           {/* Reschedule panel */}
           {rescheduling && (
             <div style={{ ...card, padding: "14px 16px", display: "flex", flexDirection: "column", gap: 12 }}>
-              <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 10, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", margin: 0 }}>Reschedule to</p>
+              <p style={{ color: "var(--dw35)", fontSize: 10, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", margin: 0 }}>Reschedule to</p>
               <input type="date" value={newDate} onChange={e => setNewDate(e.target.value)} style={inputStyle} />
               <div className="apt-time-grid-4" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 6 }}>
                 {TIMES.map(t => (
                   <button key={t} onClick={() => setNewTime(t)} style={{
                     padding: "8px 4px", borderRadius: 9,
-                    border: `1px solid ${newTime === t ? "rgba(139,92,246,0.5)" : "rgba(255,255,255,0.07)"}`,
-                    background: newTime === t ? "rgba(109,40,217,0.15)" : "rgba(255,255,255,0.02)",
-                    color: newTime === t ? "rgb(210,196,254)" : "rgba(255,255,255,0.5)",
+                    border: `1px solid ${newTime === t ? "rgba(139,92,246,0.5)" : "var(--dw07)"}`,
+                    background: newTime === t ? "rgba(109,40,217,0.15)" : "var(--dw02)",
+                    color: newTime === t ? "rgb(210,196,254)" : "var(--dw5)",
                     fontSize: 11.5, fontWeight: newTime === t ? 700 : 400, cursor: "pointer",
                   }}>
                     {t}
@@ -799,13 +799,13 @@ function AppointmentDetail({ appt, onClose, onCloseOut, onChanged }: { appt: App
               </div>
               {error && <p style={{ color: "rgb(248,113,113)", fontSize: 12, margin: 0 }}>{error}</p>}
               <div style={{ display: "flex", gap: 8 }}>
-                <button onClick={() => setRescheduling(false)} style={{ flex: 1, padding: "10px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.6)", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>
+                <button onClick={() => setRescheduling(false)} style={{ flex: 1, padding: "10px", borderRadius: 10, border: "1px solid var(--dw1)", background: "var(--dw04)", color: "var(--dw6)", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>
                   Cancel
                 </button>
                 <button
                   disabled={!newDate || !newTime || busy}
                   onClick={doReschedule}
-                  style={{ flex: 2, padding: "10px", borderRadius: 10, border: "none", background: newDate && newTime ? "rgb(109,40,217)" : "rgba(255,255,255,0.08)", color: newDate && newTime ? "white" : "rgba(255,255,255,0.3)", fontSize: 12.5, fontWeight: 700, cursor: newDate && newTime ? "pointer" : "default" }}
+                  style={{ flex: 2, padding: "10px", borderRadius: 10, border: "none", background: newDate && newTime ? "rgb(109,40,217)" : "var(--dw08)", color: newDate && newTime ? "white" : "var(--dw3)", fontSize: 12.5, fontWeight: 700, cursor: newDate && newTime ? "pointer" : "default" }}
                 >
                   {busy ? "Saving…" : "Confirm new time"}
                 </button>
@@ -821,7 +821,7 @@ function AppointmentDetail({ appt, onClose, onCloseOut, onChanged }: { appt: App
               </p>
               {error && <p style={{ color: "rgb(248,113,113)", fontSize: 12, margin: 0 }}>{error}</p>}
               <div style={{ display: "flex", gap: 8 }}>
-                <button onClick={() => setConfirmCancel(false)} style={{ flex: 1, padding: "9px", borderRadius: 9, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.6)", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+                <button onClick={() => setConfirmCancel(false)} style={{ flex: 1, padding: "9px", borderRadius: 9, border: "1px solid var(--dw1)", background: "var(--dw04)", color: "var(--dw6)", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
                   Never mind
                 </button>
                 <button disabled={busy} onClick={doCancel} style={{ flex: 1, padding: "9px", borderRadius: 9, border: "none", background: "rgb(239,68,68)", color: "white", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
@@ -834,14 +834,14 @@ function AppointmentDetail({ appt, onClose, onCloseOut, onChanged }: { appt: App
 
         {/* Footer actions */}
         {!isDone && (
-          <div style={{ padding: "16px 22px 22px", flexShrink: 0, borderTop: "1px solid rgba(255,255,255,0.06)", display: "flex", flexDirection: "column", gap: 10 }}>
+          <div style={{ padding: "16px 22px 22px", flexShrink: 0, borderTop: "1px solid var(--dw06)", display: "flex", flexDirection: "column", gap: 10 }}>
             {status === "pending" && (
               <button disabled={busy} onClick={doConfirm} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "13px", borderRadius: 13, border: "none", background: "rgb(109,40,217)", color: "white", fontSize: 13.5, fontWeight: 800, cursor: busy ? "default" : "pointer", opacity: busy ? 0.6 : 1 }}>
                 {busy ? "Confirming…" : "Confirm booking"}
               </button>
             )}
             <div style={{ display: "flex", gap: 8 }}>
-              <button onClick={() => setRescheduling(v => !v)} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "11px", borderRadius: 11, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.65)", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>
+              <button onClick={() => setRescheduling(v => !v)} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "11px", borderRadius: 11, border: "1px solid var(--dw1)", background: "var(--dw04)", color: "var(--dw65)", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>
                 <Pencil size={13} strokeWidth={2} /> Reschedule
               </button>
               <button onClick={() => setConfirmCancel(v => !v)} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "11px", borderRadius: 11, border: "1px solid rgba(239,68,68,0.2)", background: "rgba(239,68,68,0.06)", color: "rgb(248,113,113)", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>
@@ -854,8 +854,8 @@ function AppointmentDetail({ appt, onClose, onCloseOut, onChanged }: { appt: App
           </div>
         )}
         {status === "cancelled" && (
-          <div style={{ padding: "16px 22px 22px", flexShrink: 0, borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-            <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 12, textAlign: "center", margin: 0 }}>This appointment has been cancelled.</p>
+          <div style={{ padding: "16px 22px 22px", flexShrink: 0, borderTop: "1px solid var(--dw06)" }}>
+            <p style={{ color: "var(--dw3)", fontSize: 12, textAlign: "center", margin: 0 }}>This appointment has been cancelled.</p>
           </div>
         )}
       </div>
@@ -890,7 +890,7 @@ function DayView({ appts, bookingUrl, onNewBooking, onSelect }: {
           <span style={{ color: "rgb(210,196,254)", fontSize: 13.5, fontWeight: 700 }}>
             {todayAppts.length} booked today
           </span>
-          <span style={{ color: "rgba(255,255,255,0.35)", fontSize: 13 }}>— {openCount} open slot{openCount === 1 ? "" : "s"}</span>
+          <span style={{ color: "var(--dw35)", fontSize: 13 }}>— {openCount} open slot{openCount === 1 ? "" : "s"}</span>
         </div>
         <button onClick={onNewBooking} style={{
           display: "flex", alignItems: "center", gap: 6,
@@ -904,8 +904,8 @@ function DayView({ appts, bookingUrl, onNewBooking, onSelect }: {
 
       {/* Time rail */}
       <div style={{ ...card, padding: 0 }}>
-        <div style={{ padding: "16px 20px 12px", borderBottom: "1px solid rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <p style={{ color: "rgb(250,250,250)", fontSize: 14, fontWeight: 700, margin: 0 }}>Today</p>
+        <div style={{ padding: "16px 20px 12px", borderBottom: "1px solid var(--dw06)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <p style={{ color: "var(--dtext)", fontSize: 14, fontWeight: 700, margin: 0 }}>Today</p>
           <button onClick={onNewBooking} style={{
             display: "flex", alignItems: "center", gap: 6,
             padding: "7px 14px", borderRadius: 9,
@@ -923,7 +923,7 @@ function DayView({ appts, bookingUrl, onNewBooking, onSelect }: {
           return (
             <div key={h} style={{
               display: "flex", alignItems: "stretch",
-              borderBottom: h < HOURS[HOURS.length - 1] ? "1px solid rgba(255,255,255,0.04)" : "none",
+              borderBottom: h < HOURS[HOURS.length - 1] ? "1px solid var(--dw04)" : "none",
               minHeight: 56,
             }}>
               {/* Time label */}
@@ -931,7 +931,7 @@ function DayView({ appts, bookingUrl, onNewBooking, onSelect }: {
                 width: 72, flexShrink: 0, padding: "16px 0 16px 20px",
                 display: "flex", alignItems: "flex-start",
               }}>
-                <span style={{ color: "rgba(255,255,255,0.22)", fontSize: 11.5, fontWeight: 600 }}>{fmt12(h)}</span>
+                <span style={{ color: "var(--dw22)", fontSize: 11.5, fontWeight: 600 }}>{fmt12(h)}</span>
               </div>
 
               {/* Slot content */}
@@ -950,8 +950,8 @@ function DayView({ appts, bookingUrl, onNewBooking, onSelect }: {
                       fontSize: 10, fontWeight: 800, color: booking.color,
                     }}>{booking.initials}</div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ color: "rgb(250,250,250)", fontSize: 13, fontWeight: 700, margin: "0 0 2px" }}>{booking.name}</p>
-                      <p style={{ color: "rgba(255,255,255,0.38)", fontSize: 11.5, margin: 0 }}>{booking.service} · {booking.stylist}</p>
+                      <p style={{ color: "var(--dtext)", fontSize: 13, fontWeight: 700, margin: "0 0 2px" }}>{booking.name}</p>
+                      <p style={{ color: "var(--dw38)", fontSize: 11.5, margin: 0 }}>{booking.service} · {booking.stylist}</p>
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                       <span style={{
@@ -984,7 +984,7 @@ function DayView({ appts, bookingUrl, onNewBooking, onSelect }: {
                   }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                       <Clock size={13} color="rgba(139,92,246,0.4)" />
-                      <span style={{ color: "rgba(255,255,255,0.25)", fontSize: 12.5 }}>Open slot</span>
+                      <span style={{ color: "var(--dw25)", fontSize: 12.5 }}>Open slot</span>
                     </div>
                     <span style={{
                       padding: "5px 12px", borderRadius: 8,
@@ -1047,9 +1047,9 @@ function WeekView({ appts }: { appts: ApptRecord[] }) {
           { label: "Appointments", value: String(totalAppts), sub: "booked this week" },
         ].map(t => (
           <div key={t.label} style={{ ...card, padding: "16px 18px" }}>
-            <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 10, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 6px" }}>{t.label}</p>
-            <p style={{ color: "rgb(250,250,250)", fontSize: 24, fontWeight: 800, margin: "0 0 3px", letterSpacing: "-0.03em" }}>{t.value}</p>
-            <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 11.5, margin: 0 }}>{t.sub}</p>
+            <p style={{ color: "var(--dw35)", fontSize: 10, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 6px" }}>{t.label}</p>
+            <p style={{ color: "var(--dtext)", fontSize: 24, fontWeight: 800, margin: "0 0 3px", letterSpacing: "-0.03em" }}>{t.value}</p>
+            <p style={{ color: "var(--dw35)", fontSize: 11.5, margin: 0 }}>{t.sub}</p>
           </div>
         ))}
       </div>
@@ -1061,13 +1061,13 @@ function WeekView({ appts }: { appts: ApptRecord[] }) {
             <div key={day.label} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
               {/* Day header */}
               <div style={{ textAlign: "center" }}>
-                <p style={{ color: day.isToday ? "rgb(167,139,250)" : "rgba(255,255,255,0.35)", fontSize: 11, fontWeight: 700, margin: "0 0 2px", textTransform: "uppercase" }}>{day.label}</p>
+                <p style={{ color: day.isToday ? "rgb(167,139,250)" : "var(--dw35)", fontSize: 11, fontWeight: 700, margin: "0 0 2px", textTransform: "uppercase" }}>{day.label}</p>
                 <div style={{
                   width: 30, height: 30, borderRadius: "50%",
                   background: day.isToday ? "rgb(109,40,217)" : "transparent",
                   display: "flex", alignItems: "center", justifyContent: "center",
                 }}>
-                  <p style={{ color: day.isToday ? "white" : "rgba(255,255,255,0.5)", fontSize: 13, fontWeight: day.isToday ? 800 : 500, margin: 0 }}>{day.date.split(" ")[1]}</p>
+                  <p style={{ color: day.isToday ? "white" : "var(--dw5)", fontSize: 13, fontWeight: day.isToday ? 800 : 500, margin: 0 }}>{day.date.split(" ")[1]}</p>
                 </div>
               </div>
 
@@ -1082,8 +1082,8 @@ function WeekView({ appts }: { appts: ApptRecord[] }) {
               </div>
 
               {/* Booked */}
-              <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 11, margin: 0, textAlign: "center" }}>
-                <span style={{ color: "rgb(250,250,250)", fontWeight: 700 }}>{day.booked}</span> booked
+              <p style={{ color: "var(--dw5)", fontSize: 11, margin: 0, textAlign: "center" }}>
+                <span style={{ color: "var(--dtext)", fontWeight: 700 }}>{day.booked}</span> booked
               </p>
 
               {/* Revenue */}
@@ -1111,7 +1111,7 @@ function ListView({ appts, onSelect }: { appts: ApptRecord[]; onSelect: (appt: A
   if (upcoming.length === 0) {
     return (
       <div style={{ ...card, padding: "40px 20px", textAlign: "center" }}>
-        <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 13, margin: 0 }}>No appointments yet — add your first booking to see it here.</p>
+        <p style={{ color: "var(--dw35)", fontSize: 13, margin: 0 }}>No appointments yet — add your first booking to see it here.</p>
       </div>
     );
   }
@@ -1120,7 +1120,7 @@ function ListView({ appts, onSelect }: { appts: ApptRecord[]; onSelect: (appt: A
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
       {Object.entries(grouped).map(([date, bookings]) => (
         <div key={date}>
-          <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 10px" }}>{date}</p>
+          <p style={{ color: "var(--dw35)", fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 10px" }}>{date}</p>
           <div style={{ ...card }}>
             {bookings.map((b, i) => {
               const s = STATUS_STYLE[b.status];
@@ -1128,16 +1128,16 @@ function ListView({ appts, onSelect }: { appts: ApptRecord[]; onSelect: (appt: A
                 <div key={b.id} onClick={() => onSelect(b)} style={{
                   display: "flex", alignItems: "center", gap: 14,
                   padding: "13px 18px", cursor: "pointer",
-                  borderBottom: i < bookings.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none",
+                  borderBottom: i < bookings.length - 1 ? "1px solid var(--dw04)" : "none",
                 }}>
                   <div style={{ width: 34, height: 34, borderRadius: "50%", background: `${b.color}22`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 800, color: b.color, flexShrink: 0 }}>
                     {b.initials}
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ color: "rgb(250,250,250)", fontSize: 13, fontWeight: 700, margin: "0 0 2px" }}>{b.name}</p>
-                    <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 12, margin: 0 }}>{b.service} · {b.stylist}</p>
+                    <p style={{ color: "var(--dtext)", fontSize: 13, fontWeight: 700, margin: "0 0 2px" }}>{b.name}</p>
+                    <p style={{ color: "var(--dw35)", fontSize: 12, margin: 0 }}>{b.service} · {b.stylist}</p>
                   </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, color: "rgba(255,255,255,0.4)", fontSize: 12, flexShrink: 0 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--dw4)", fontSize: 12, flexShrink: 0 }}>
                     <Clock size={11} />
                     {b.time}
                   </div>
@@ -1161,7 +1161,7 @@ function BookingLinkCard({ bookingUrl }: { bookingUrl: string | null }) {
   if (!bookingUrl) {
     return (
       <div style={{ ...card, padding: "16px 20px" }}>
-        <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, margin: 0 }}>
+        <p style={{ color: "var(--dw4)", fontSize: 13, margin: 0 }}>
           Set up your booking page handle in Settings → Business to get a shareable booking link.
         </p>
       </div>
@@ -1186,22 +1186,22 @@ function BookingLinkCard({ bookingUrl }: { bookingUrl: string | null }) {
             <ExternalLink size={15} color="rgb(167,139,250)" strokeWidth={1.8} />
           </div>
           <div style={{ minWidth: 0 }}>
-            <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 10, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 2px" }}>Your booking link · tap to preview</p>
+            <p style={{ color: "var(--dw35)", fontSize: 10, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 2px" }}>Your booking link · tap to preview</p>
             <p style={{ color: "rgb(210,196,254)", fontSize: 13.5, fontWeight: 600, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{displayText}</p>
           </div>
         </a>
 
         <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
           <a href={smsHref} title="Share via SMS" style={{
-            width: 32, height: 32, borderRadius: 8, border: "1px solid rgba(255,255,255,0.08)",
-            background: "rgba(255,255,255,0.04)", display: "flex", alignItems: "center", justifyContent: "center",
+            width: 32, height: 32, borderRadius: 8, border: "1px solid var(--dw08)",
+            background: "var(--dw04)", display: "flex", alignItems: "center", justifyContent: "center",
             cursor: "pointer", color: "rgb(52,211,153)", textDecoration: "none",
           }}>
             <MessageSquare size={14} strokeWidth={1.8} />
           </a>
           <a href={emailHref} title="Share via email" style={{
-            width: 32, height: 32, borderRadius: 8, border: "1px solid rgba(255,255,255,0.08)",
-            background: "rgba(255,255,255,0.04)", display: "flex", alignItems: "center", justifyContent: "center",
+            width: 32, height: 32, borderRadius: 8, border: "1px solid var(--dw08)",
+            background: "var(--dw04)", display: "flex", alignItems: "center", justifyContent: "center",
             cursor: "pointer", color: "rgb(96,165,250)", textDecoration: "none",
           }}>
             <Mail size={14} strokeWidth={1.8} />
@@ -1209,9 +1209,9 @@ function BookingLinkCard({ bookingUrl }: { bookingUrl: string | null }) {
           <button onClick={copy} style={{
             display: "flex", alignItems: "center", gap: 6,
             padding: "7px 14px", borderRadius: 9,
-            background: copied ? "rgba(52,211,153,0.12)" : "rgba(255,255,255,0.06)",
-            border: `1px solid ${copied ? "rgba(52,211,153,0.3)" : "rgba(255,255,255,0.1)"}`,
-            color: copied ? "rgb(52,211,153)" : "rgba(255,255,255,0.6)",
+            background: copied ? "rgba(52,211,153,0.12)" : "var(--dw06)",
+            border: `1px solid ${copied ? "rgba(52,211,153,0.3)" : "var(--dw1)"}`,
+            color: copied ? "rgb(52,211,153)" : "var(--dw6)",
             fontSize: 12.5, fontWeight: 700, cursor: "pointer", transition: "all 0.2s",
           }}>
             {copied ? <Check size={13} /> : <Copy size={13} />}
@@ -1253,18 +1253,18 @@ export function AppointmentsClient({ initialAppointments, bookingUrl, staff, sel
       {/* Header */}
       <div className="bookings-header" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", rowGap: 12 }}>
         <div>
-          <h1 style={{ color: "rgb(250,250,250)", fontSize: 22, fontWeight: 800, margin: "0 0 3px", letterSpacing: "-0.03em" }}>Bookings</h1>
-          <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 13, margin: 0 }}>{dateStr}</p>
+          <h1 style={{ color: "var(--dtext)", fontSize: 22, fontWeight: 800, margin: "0 0 3px", letterSpacing: "-0.03em" }}>Bookings</h1>
+          <p style={{ color: "var(--dw35)", fontSize: 13, margin: 0 }}>{dateStr}</p>
         </div>
         <div className="bookings-header-controls" style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
           {/* View switcher */}
-          <div style={{ display: "flex", gap: 2, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 11, padding: 3 }}>
+          <div style={{ display: "flex", gap: 2, background: "var(--dw04)", border: "1px solid var(--dw07)", borderRadius: 11, padding: 3 }}>
             {VIEWS.map(v => (
               <button key={v} onClick={() => setView(v)} style={{
                 padding: "6px 16px", borderRadius: 8, border: "none", cursor: "pointer",
                 fontSize: 12.5, fontWeight: view === v ? 700 : 500,
                 background: view === v ? "rgba(109,40,217,0.45)" : "transparent",
-                color: view === v ? "rgb(210,196,254)" : "rgba(255,255,255,0.4)",
+                color: view === v ? "rgb(210,196,254)" : "var(--dw4)",
                 transition: "all 0.15s",
               }}>
                 {v}
@@ -1273,9 +1273,9 @@ export function AppointmentsClient({ initialAppointments, bookingUrl, staff, sel
           </div>
 
           {/* Search */}
-          <div className="bookings-search" style={{ display: "flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10, padding: "8px 12px", width: 200 }}>
-            <Search size={13} color="rgba(255,255,255,0.3)" />
-            <input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search…" style={{ background: "none", border: "none", outline: "none", color: "rgb(250,250,250)", fontSize: 12.5, flex: 1, minWidth: 0 }} />
+          <div className="bookings-search" style={{ display: "flex", alignItems: "center", gap: 8, background: "var(--dw04)", border: "1px solid var(--dw07)", borderRadius: 10, padding: "8px 12px", width: 200 }}>
+            <Search size={13} color="var(--dw3)" />
+            <input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search…" style={{ background: "none", border: "none", outline: "none", color: "var(--dtext)", fontSize: 12.5, flex: 1, minWidth: 0 }} />
           </div>
 
           <button className="bookings-new-btn" onClick={() => setNew(true)} style={{

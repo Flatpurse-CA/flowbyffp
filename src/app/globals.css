@@ -92,6 +92,86 @@
   --cust-fill: rgba(0, 0, 0, 0.04);
 }
 
+/* ── Dashboard portal content tokens (data-portal-theme on <html>) ──
+   Neutral white-overlay values used by the dashboard content pages
+   (Home/Bookings/Clients/Team/AutoPilot/Operations/Settings). Dark values
+   are unchanged from the original hardcoded literals; light values are the
+   flipped-to-black equivalents. */
+:root,
+[data-portal-theme="dark"] {
+  --dtext: rgb(250,250,250);
+  --dtext2: rgb(240,240,248);
+  --dm1: rgb(14,14,18);
+  --dm2: rgb(12,12,16);
+  --dm3: rgb(20,20,26);
+  --dring: rgb(10,10,12);
+
+  --dw015: rgba(255,255,255,0.015);
+  --dw02:  rgba(255,255,255,0.02);
+  --dw025: rgba(255,255,255,0.025);
+  --dw03:  rgba(255,255,255,0.03);
+  --dw04:  rgba(255,255,255,0.04);
+  --dw05:  rgba(255,255,255,0.05);
+  --dw06:  rgba(255,255,255,0.06);
+  --dw07:  rgba(255,255,255,0.07);
+  --dw08:  rgba(255,255,255,0.08);
+  --dw09:  rgba(255,255,255,0.09);
+  --dw1:   rgba(255,255,255,0.1);
+  --dw12:  rgba(255,255,255,0.12);
+  --dw2:   rgba(255,255,255,0.2);
+  --dw22:  rgba(255,255,255,0.22);
+  --dw25:  rgba(255,255,255,0.25);
+  --dw3:   rgba(255,255,255,0.3);
+  --dw32:  rgba(255,255,255,0.32);
+  --dw35:  rgba(255,255,255,0.35);
+  --dw38:  rgba(255,255,255,0.38);
+  --dw4:   rgba(255,255,255,0.4);
+  --dw45:  rgba(255,255,255,0.45);
+  --dw5:   rgba(255,255,255,0.5);
+  --dw55:  rgba(255,255,255,0.55);
+  --dw6:   rgba(255,255,255,0.6);
+  --dw65:  rgba(255,255,255,0.65);
+  --dw7:   rgba(255,255,255,0.7);
+  --dw75:  rgba(255,255,255,0.75);
+}
+
+[data-portal-theme="light"] {
+  --dtext: rgb(12,12,20);
+  --dtext2: rgb(12,12,20);
+  --dm1: rgb(255,255,255);
+  --dm2: rgb(255,255,255);
+  --dm3: rgb(255,255,255);
+  --dring: rgb(246,246,250);
+
+  --dw015: rgba(0,0,0,0.035);
+  --dw02:  rgba(0,0,0,0.04);
+  --dw025: rgba(0,0,0,0.045);
+  --dw03:  rgba(0,0,0,0.05);
+  --dw04:  rgba(0,0,0,0.06);
+  --dw05:  rgba(0,0,0,0.07);
+  --dw06:  rgba(0,0,0,0.08);
+  --dw07:  rgba(0,0,0,0.09);
+  --dw08:  rgba(0,0,0,0.1);
+  --dw09:  rgba(0,0,0,0.11);
+  --dw1:   rgba(0,0,0,0.12);
+  --dw12:  rgba(0,0,0,0.18);
+  --dw2:   rgba(0,0,0,0.28);
+  --dw22:  rgba(0,0,0,0.3);
+  --dw25:  rgba(0,0,0,0.33);
+  --dw3:   rgba(0,0,0,0.38);
+  --dw32:  rgba(0,0,0,0.4);
+  --dw35:  rgba(0,0,0,0.43);
+  --dw38:  rgba(0,0,0,0.46);
+  --dw4:   rgba(0,0,0,0.48);
+  --dw45:  rgba(0,0,0,0.52);
+  --dw5:   rgba(0,0,0,0.56);
+  --dw55:  rgba(0,0,0,0.6);
+  --dw6:   rgba(0,0,0,0.62);
+  --dw65:  rgba(0,0,0,0.65);
+  --dw7:   rgba(0,0,0,0.68);
+  --dw75:  rgba(0,0,0,0.7);
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -164,6 +244,33 @@ body {
 .nav-link:hover {
   background: rgba(255, 255, 255, 0.12) !important;
   border-radius: 8px;
+}
+/* ── Cookie banner (responsive) ── */
+.cookie-banner {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 20px 24px;
+  bottom: 24px;
+  width: calc(100% - 40px);
+}
+.cookie-banner-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+@media (max-width: 640px) {
+  .cookie-banner {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 16px 18px;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
+    width: calc(100% - 24px);
+  }
+  .cookie-banner-actions {
+    justify-content: flex-end;
+  }
 }
 
 /* ── Mobile auth gradient ── */

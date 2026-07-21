@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { logout, searchDashboard, type SearchResult } from "./actions";
 import type { ShopRole } from "@/lib/dashboard/shop";
+import { DashboardThemeProvider, useDashboardTheme, type DashboardTheme } from "./theme-context";
 
 const PURPLE    = "rgb(139,92,246)";
 const PURPLE_BG = "rgba(109,40,217,0.18)";
@@ -38,57 +39,7 @@ function isActive(href: string, pathname: string) {
   return href === "/dashboard" ? pathname === "/dashboard" : pathname.startsWith(href);
 }
 
-const DARK = {
-  bg:                "rgb(10,10,12)",
-  border:            "rgba(255,255,255,0.06)",
-  border2:           "rgba(255,255,255,0.09)",
-  text:              "rgb(240,240,248)",
-  textMuted:         "rgba(255,255,255,0.3)",
-  textDim:           "rgba(255,255,255,0.42)",
-  iconBtn:           "rgba(255,255,255,0.04)",
-  iconBtnBorder:     "rgba(255,255,255,0.07)",
-  iconColor:         "rgba(255,255,255,0.35)",
-  sectionLabel:      "rgba(255,255,255,0.2)",
-  activePill:        "rgba(139,92,246,0.14)",
-  activeText:        "rgb(200,180,255)",
-  inactiveText:      "rgba(255,255,255,0.42)",
-  searchBg:          "rgba(255,255,255,0.04)",
-  searchBorder:      "rgba(255,255,255,0.07)",
-  searchPlaceholder: "rgba(255,255,255,0.2)",
-  searchKbd:         "rgba(255,255,255,0.15)",
-  searchKbdBg:       "rgba(255,255,255,0.06)",
-  dropBg:            "rgb(18,18,24)",
-  dropBorder:        "rgba(255,255,255,0.1)",
-  dropItem:          "rgba(255,255,255,0.65)",
-  dropHover:         "rgba(255,255,255,0.06)",
-};
-
-const LIGHT = {
-  bg:                "rgb(246,246,250)",
-  border:            "rgba(0,0,0,0.08)",
-  border2:           "rgba(0,0,0,0.1)",
-  text:              "rgb(12,12,20)",
-  textMuted:         "rgba(0,0,0,0.38)",
-  textDim:           "rgba(0,0,0,0.48)",
-  iconBtn:           "rgba(0,0,0,0.04)",
-  iconBtnBorder:     "rgba(0,0,0,0.09)",
-  iconColor:         "rgba(0,0,0,0.4)",
-  sectionLabel:      "rgba(0,0,0,0.25)",
-  activePill:        "rgba(139,92,246,0.1)",
-  activeText:        "rgb(109,40,217)",
-  inactiveText:      "rgba(0,0,0,0.48)",
-  searchBg:          "rgba(0,0,0,0.04)",
-  searchBorder:      "rgba(0,0,0,0.09)",
-  searchPlaceholder: "rgba(0,0,0,0.3)",
-  searchKbd:         "rgba(0,0,0,0.2)",
-  searchKbdBg:       "rgba(0,0,0,0.06)",
-  dropBg:            "rgb(255,255,255)",
-  dropBorder:        "rgba(0,0,0,0.1)",
-  dropItem:          "rgba(0,0,0,0.65)",
-  dropHover:         "rgba(0,0,0,0.05)",
-};
-
-function SidebarNav({ open, pathname, T, tabs }: { open: boolean; pathname: string; T: typeof DARK; tabs: typeof NAV_TABS }) {
+function SidebarNav({ open, pathname, T, tabs }: { open: boolean; pathname: string; T: DashboardTheme; tabs: typeof NAV_TABS }) {
   return (
     <nav style={{ display: "flex", flexDirection: "column", gap: 1, padding: "0 8px", flexShrink: 0 }}>
       {tabs.map(({ icon: Icon, href, label, badge }) => {
@@ -135,12 +86,20 @@ function SidebarNav({ open, pathname, T, tabs }: { open: boolean; pathname: stri
   );
 }
 
-export function DashboardShell({ children, user, role, staffName, unreadCount }: { children: React.ReactNode; user: User; role: ShopRole; staffName: string | null; unreadCount: number }) {
+export function DashboardShell(props: { children: React.ReactNode; user: User; role: ShopRole; staffName: string | null; unreadCount: number }) {
+  return (
+    <DashboardThemeProvider>
+      <DashboardShellInner {...props} />
+    </DashboardThemeProvider>
+  );
+}
+
+function DashboardShellInner({ children, user, role, staffName, unreadCount }: { children: React.ReactNode; user: User; role: ShopRole; staffName: string | null; unreadCount: number }) {
   const router = useRouter();
   const pathname = usePathname();
   const visibleTabs = role === "owner" ? NAV_TABS : NAV_TABS.filter(t => !t.ownerOnly);
   const [open, setOpen]             = useState(true);
-  const [dark, setDark]             = useState(true);
+  const { dark, T, toggle }         = useDashboardTheme();
   const [dropdownOpen, setDropdown] = useState(false);
   const dropdownRef                 = useRef<HTMLDivElement>(null);
 
@@ -161,24 +120,6 @@ export function DashboardShell({ children, user, role, staffName, unreadCount }:
     const h = new Date().getHours();
     return h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening";
   })();
-
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      const stored = localStorage.getItem("portal-theme");
-      if (stored === "light") {
-        setDark(false);
-        document.documentElement.setAttribute("data-portal-theme", "light");
-      }
-    }, 0);
-    return () => clearTimeout(timeout);
-  }, []);
-
-  const toggleDark = () => {
-    const next = !dark;
-    setDark(next);
-    localStorage.setItem("portal-theme", next ? "dark" : "light");
-    document.documentElement.setAttribute("data-portal-theme", next ? "dark" : "light");
-  };
 
   useEffect(() => {
     if (!dropdownOpen) return;
@@ -233,8 +174,6 @@ export function DashboardShell({ children, user, role, staffName, unreadCount }:
     setSearchQuery("");
     router.push(r.kind === "appointment" ? "/dashboard/appointments" : "/dashboard/team");
   };
-
-  const T = dark ? DARK : LIGHT;
 
   const headerIconBtn: React.CSSProperties = {
     width: 36, height: 36,
@@ -510,7 +449,7 @@ export function DashboardShell({ children, user, role, staffName, unreadCount }:
               height: 38,
             }}>
               <button
-                onClick={toggleDark}
+                onClick={toggle}
                 title={dark ? "Switch to light" : "Switch to dark"}
                 style={{
                   width: 38, height: 38,

@@ -62,10 +62,10 @@ export function AutoPilotClient({ state }: { state: AutopilotState }) {
           }}>
             <Zap size={28} color="rgb(167,139,250)" strokeWidth={2} />
           </div>
-          <h1 style={{ color: "rgb(250,250,250)", fontSize: 26, fontWeight: 800, margin: "0 0 10px", letterSpacing: "-0.03em" }}>
+          <h1 style={{ color: "var(--dtext)", fontSize: 26, fontWeight: 800, margin: "0 0 10px", letterSpacing: "-0.03em" }}>
             Your AI team is ready to work
           </h1>
-          <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 15, margin: "0 0 28px", lineHeight: 1.6 }}>
+          <p style={{ color: "var(--dw45)", fontSize: 15, margin: "0 0 28px", lineHeight: 1.6 }}>
             Connect Stripe to activate AutoPilot. Once live, the AI runs all 6 revenue flows — 24 hours a day, without you lifting a finger.
           </p>
           <Link href="/dashboard/settings?tab=Payments" style={{
@@ -81,7 +81,7 @@ export function AutoPilotClient({ state }: { state: AutopilotState }) {
         </div>
 
         {/* Flows preview */}
-        <h2 style={{ color: "rgba(255,255,255,0.5)", fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", margin: "0 0 14px" }}>
+        <h2 style={{ color: "var(--dw5)", fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", margin: "0 0 14px" }}>
           6 flows ready
         </h2>
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -90,7 +90,7 @@ export function AutoPilotClient({ state }: { state: AutopilotState }) {
             return (
               <div key={flow.id} style={{
                 display: "flex", alignItems: "center", gap: 14,
-                background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.07)",
+                background: "var(--dw025)", border: "1px solid var(--dw07)",
                 borderRadius: 14, padding: "16px 18px",
               }}>
                 <div style={{
@@ -101,13 +101,13 @@ export function AutoPilotClient({ state }: { state: AutopilotState }) {
                   <Icon size={18} color={flow.color} strokeWidth={1.8} />
                 </div>
                 <div style={{ flex: 1 }}>
-                  <p style={{ color: "rgb(250,250,250)", fontSize: 13.5, fontWeight: 700, margin: "0 0 2px" }}>{flow.name}</p>
-                  <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 12, margin: 0 }}>{flow.desc}</p>
+                  <p style={{ color: "var(--dtext)", fontSize: 13.5, fontWeight: 700, margin: "0 0 2px" }}>{flow.name}</p>
+                  <p style={{ color: "var(--dw35)", fontSize: 12, margin: 0 }}>{flow.desc}</p>
                 </div>
                 <span style={{
-                  fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.25)",
-                  background: "rgba(255,255,255,0.05)", padding: "4px 10px", borderRadius: 20,
-                  border: "1px solid rgba(255,255,255,0.08)",
+                  fontSize: 10, fontWeight: 700, color: "var(--dw25)",
+                  background: "var(--dw05)", padding: "4px 10px", borderRadius: 20,
+                  border: "1px solid var(--dw08)",
                 }}>
                   Paused
                 </span>
@@ -138,10 +138,10 @@ export function AutoPilotClient({ state }: { state: AutopilotState }) {
               AutoPilot live
             </span>
           </div>
-          <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 13, margin: "0 0 4px", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 600 }}>
+          <p style={{ color: "var(--dw5)", fontSize: 13, margin: "0 0 4px", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 600 }}>
             Recovered this month
           </p>
-          <p style={{ color: "rgb(250,250,250)", fontSize: 44, fontWeight: 800, margin: 0, letterSpacing: "-0.04em" }}>
+          <p style={{ color: "var(--dtext)", fontSize: 44, fontWeight: 800, margin: 0, letterSpacing: "-0.04em" }}>
             {fmtPrice(state.totals.revenue)}
           </p>
         </div>
@@ -152,8 +152,8 @@ export function AutoPilotClient({ state }: { state: AutopilotState }) {
             { label: "Avg per action", value: avgPerAction > 0 ? fmtPrice(avgPerAction) : "—" },
           ].map(s => (
             <div key={s.label} style={{ textAlign: "center" }}>
-              <p style={{ color: "rgb(250,250,250)", fontSize: 24, fontWeight: 800, margin: "0 0 2px", letterSpacing: "-0.03em" }}>{s.value}</p>
-              <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 11, margin: 0 }}>{s.label}</p>
+              <p style={{ color: "var(--dtext)", fontSize: 24, fontWeight: 800, margin: "0 0 2px", letterSpacing: "-0.03em" }}>{s.value}</p>
+              <p style={{ color: "var(--dw35)", fontSize: 11, margin: 0 }}>{s.label}</p>
             </div>
           ))}
         </div>
@@ -163,22 +163,22 @@ export function AutoPilotClient({ state }: { state: AutopilotState }) {
 
         {/* Active flows */}
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          <h2 style={{ color: "rgba(255,255,255,0.5)", fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", margin: 0 }}>Active flows</h2>
+          <h2 style={{ color: "var(--dw5)", fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", margin: 0 }}>Active flows</h2>
           {FLOWS.map(flow => {
             const Icon = flow.icon;
             const stats = state.flowStats[flow.id];
             return (
               <div key={flow.id} style={{
                 display: "flex", alignItems: "center", gap: 14,
-                background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.07)",
+                background: "var(--dw025)", border: "1px solid var(--dw07)",
                 borderRadius: 14, padding: "16px 18px",
               }}>
                 <div style={{ width: 38, height: 38, borderRadius: 10, background: flow.bg, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <Icon size={18} color={flow.color} strokeWidth={1.8} />
                 </div>
                 <div style={{ flex: 1 }}>
-                  <p style={{ color: "rgb(250,250,250)", fontSize: 13.5, fontWeight: 700, margin: "0 0 2px" }}>{flow.name}</p>
-                  <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 12, margin: 0 }}>
+                  <p style={{ color: "var(--dtext)", fontSize: 13.5, fontWeight: 700, margin: "0 0 2px" }}>{flow.name}</p>
+                  <p style={{ color: "var(--dw35)", fontSize: 12, margin: 0 }}>
                     {stats.count} action{stats.count === 1 ? "" : "s"} · {fmtPrice(stats.revenue)} contributed
                   </p>
                 </div>
@@ -193,45 +193,45 @@ export function AutoPilotClient({ state }: { state: AutopilotState }) {
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
         {/* AI Front Desk today */}
         <div style={{
-          background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.07)",
+          background: "var(--dw025)", border: "1px solid var(--dw07)",
           borderRadius: 16, padding: 18, display: "flex", flexDirection: "column", gap: 12,
         }}>
-          <span style={{ color: "rgba(255,255,255,0.5)", fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" }}>AI Front Desk today</span>
+          <span style={{ color: "var(--dw5)", fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" }}>AI Front Desk today</span>
           <div style={{ display: "flex", gap: 20 }}>
             <div>
               <p style={{ color: "rgb(96,165,250)", fontSize: 22, fontWeight: 800, margin: "0 0 2px" }}>{state.frontDeskToday.handled}</p>
-              <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 11, margin: 0 }}>Handled</p>
+              <p style={{ color: "var(--dw35)", fontSize: 11, margin: 0 }}>Handled</p>
             </div>
             <div>
               <p style={{ color: "rgb(251,191,36)", fontSize: 22, fontWeight: 800, margin: "0 0 2px" }}>{state.frontDeskToday.escalated}</p>
-              <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 11, margin: 0 }}>Escalated to you</p>
+              <p style={{ color: "var(--dw35)", fontSize: 11, margin: 0 }}>Escalated to you</p>
             </div>
           </div>
         </div>
 
         {/* Live feed */}
         <div style={{
-          background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.07)",
+          background: "var(--dw025)", border: "1px solid var(--dw07)",
           borderRadius: 16, padding: 20, display: "flex", flexDirection: "column", gap: 14,
           height: "fit-content",
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <div style={{ width: 6, height: 6, borderRadius: "50%", background: "rgb(52,211,153)", animation: "pulse 2s infinite" }} />
-            <span style={{ color: "rgba(255,255,255,0.5)", fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" }}>Live feed</span>
+            <span style={{ color: "var(--dw5)", fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" }}>Live feed</span>
           </div>
           {state.events.length === 0 ? (
-            <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 12.5, margin: 0, lineHeight: 1.6 }}>
+            <p style={{ color: "var(--dw3)", fontSize: 12.5, margin: 0, lineHeight: 1.6 }}>
               No AutoPilot activity yet. Once a flow fires, it&apos;ll show up here in real time.
             </p>
           ) : state.events.map(ev => {
             const flow = FLOWS.find(f => f.id === ev.flow_key);
             return (
-              <div key={ev.id} style={{ display: "flex", gap: 10, paddingBottom: 14, borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+              <div key={ev.id} style={{ display: "flex", gap: 10, paddingBottom: 14, borderBottom: "1px solid var(--dw05)" }}>
                 <div style={{ width: 6, height: 6, borderRadius: "50%", background: flow?.color ?? "rgb(255,255,255)", marginTop: 5, flexShrink: 0 }} />
                 <div style={{ flex: 1 }}>
-                  <p style={{ color: "rgba(255,255,255,0.7)", fontSize: 12, margin: "0 0 3px", lineHeight: 1.4 }}>{ev.event_text}</p>
+                  <p style={{ color: "var(--dw7)", fontSize: 12, margin: "0 0 3px", lineHeight: 1.4 }}>{ev.event_text}</p>
                   <div style={{ display: "flex", justifyContent: "space-between" }}>
-                    <span style={{ color: "rgba(255,255,255,0.25)", fontSize: 11 }}>{timeAgo(ev.created_at)}</span>
+                    <span style={{ color: "var(--dw25)", fontSize: 11 }}>{timeAgo(ev.created_at)}</span>
                     {ev.amount != null && <span style={{ color: "rgb(52,211,153)", fontSize: 11, fontWeight: 700 }}>+{fmtPrice(Number(ev.amount))}</span>}
                   </div>
                 </div>

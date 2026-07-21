@@ -15,8 +15,8 @@ export type FamilyHoursSettings = { enabled: boolean; start: string; end: string
 // ─── Shared styles ────────────────────────────────────────────────────────────
 
 const card: React.CSSProperties = {
-  background: "rgba(255,255,255,0.025)",
-  border: "1px solid rgba(255,255,255,0.07)",
+  background: "var(--dw025)",
+  border: "1px solid var(--dw07)",
   borderRadius: 16,
   padding: "22px 24px",
 };
@@ -25,7 +25,7 @@ const card: React.CSSProperties = {
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 10, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 14px" }}>
+    <p style={{ color: "var(--dw3)", fontSize: 10, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 14px" }}>
       {children}
     </p>
   );
@@ -36,17 +36,17 @@ function Field({ label, value, type = "text", readOnly, placeholder, half }: {
 }) {
   return (
     <div style={{ flex: half ? "1 1 45%" : "1 1 100%" }}>
-      <label style={{ color: "rgba(255,255,255,0.38)", fontSize: 12, fontWeight: 600, display: "block", marginBottom: 6, letterSpacing: "0.03em" }}>{label}</label>
+      <label style={{ color: "var(--dw38)", fontSize: 12, fontWeight: 600, display: "block", marginBottom: 6, letterSpacing: "0.03em" }}>{label}</label>
       <input
         defaultValue={value}
         type={type}
         readOnly={readOnly}
         placeholder={placeholder}
         style={{
-          width: "100%", background: readOnly ? "rgba(255,255,255,0.02)" : "rgba(255,255,255,0.05)",
-          border: `1px solid ${readOnly ? "rgba(255,255,255,0.05)" : "rgba(255,255,255,0.09)"}`,
+          width: "100%", background: readOnly ? "var(--dw02)" : "var(--dw05)",
+          border: `1px solid ${readOnly ? "var(--dw05)" : "var(--dw09)"}`,
           borderRadius: 10, padding: "10px 13px",
-          color: readOnly ? "rgba(255,255,255,0.3)" : "rgb(250,250,250)",
+          color: readOnly ? "var(--dw3)" : "var(--dtext)",
           fontSize: 13.5, outline: "none", boxSizing: "border-box",
           cursor: readOnly ? "default" : "text",
         }}
@@ -58,14 +58,14 @@ function Field({ label, value, type = "text", readOnly, placeholder, half }: {
 function Toggle({ label, sub, on }: { label: string; sub: string; on: boolean }) {
   const [active, setActive] = useState(on);
   return (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 0", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 0", borderBottom: "1px solid var(--dw04)" }}>
       <div>
-        <p style={{ color: "rgb(250,250,250)", fontSize: 13.5, fontWeight: 600, margin: "0 0 2px" }}>{label}</p>
-        <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 12, margin: 0 }}>{sub}</p>
+        <p style={{ color: "var(--dtext)", fontSize: 13.5, fontWeight: 600, margin: "0 0 2px" }}>{label}</p>
+        <p style={{ color: "var(--dw35)", fontSize: 12, margin: 0 }}>{sub}</p>
       </div>
       <button onClick={() => setActive(v => !v)} style={{
         width: 42, height: 24, borderRadius: 12, border: "none", cursor: "pointer",
-        background: active ? "rgb(109,40,217)" : "rgba(255,255,255,0.12)",
+        background: active ? "rgb(109,40,217)" : "var(--dw12)",
         position: "relative", transition: "background 0.2s", flexShrink: 0,
       }}>
         <span style={{ position: "absolute", top: 4, left: active ? 20 : 4, width: 16, height: 16, borderRadius: "50%", background: "white", transition: "left 0.2s" }} />
@@ -77,7 +77,7 @@ function Toggle({ label, sub, on }: { label: string; sub: string; on: boolean })
 function SaveBar() {
   return (
     <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
-      <button style={{ padding: "10px 20px", borderRadius: 10, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", color: "rgba(255,255,255,0.45)", fontSize: 13, cursor: "pointer" }}>Discard</button>
+      <button style={{ padding: "10px 20px", borderRadius: 10, background: "var(--dw05)", border: "1px solid var(--dw09)", color: "var(--dw45)", fontSize: 13, cursor: "pointer" }}>Discard</button>
       <button style={{ padding: "10px 24px", borderRadius: 10, background: "rgb(109,40,217)", border: "none", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Save changes</button>
     </div>
   );
@@ -223,8 +223,8 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
 
       {/* Header */}
       <div>
-        <h1 style={{ color: "rgb(250,250,250)", fontSize: 22, fontWeight: 800, margin: "0 0 3px", letterSpacing: "-0.03em" }}>Settings</h1>
-        <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 13, margin: 0 }}>Manage your business, services, and preferences</p>
+        <h1 style={{ color: "var(--dtext)", fontSize: 22, fontWeight: 800, margin: "0 0 3px", letterSpacing: "-0.03em" }}>Settings</h1>
+        <p style={{ color: "var(--dw35)", fontSize: 13, margin: 0 }}>Manage your business, services, and preferences</p>
       </div>
 
       {/* Tab bar */}
@@ -235,10 +235,10 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
             onClick={() => setTab(label)}
             style={{
               display: "flex", alignItems: "center", gap: 6, padding: "8px 15px",
-              borderRadius: 10, border: `1px solid ${tab === label ? "rgba(139,92,246,0.4)" : "rgba(255,255,255,0.08)"}`,
+              borderRadius: 10, border: `1px solid ${tab === label ? "rgba(139,92,246,0.4)" : "var(--dw08)"}`,
               cursor: "pointer", fontSize: 12.5, fontWeight: tab === label ? 700 : 500,
-              background: tab === label ? "rgba(109,40,217,0.15)" : "rgba(255,255,255,0.03)",
-              color: tab === label ? "rgb(210,196,254)" : "rgba(255,255,255,0.4)",
+              background: tab === label ? "rgba(109,40,217,0.15)" : "var(--dw03)",
+              color: tab === label ? "rgb(210,196,254)" : "var(--dw4)",
               transition: "all 0.15s",
             }}
           >
@@ -260,11 +260,11 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
               </div>
               <Field label="Business type" value="Hair salon / Independent stylist" />
               <div>
-                <label style={{ color: "rgba(255,255,255,0.38)", fontSize: 12, fontWeight: 600, display: "block", marginBottom: 6 }}>About / Bio</label>
+                <label style={{ color: "var(--dw38)", fontSize: 12, fontWeight: 600, display: "block", marginBottom: 6 }}>About / Bio</label>
                 <textarea
                   defaultValue="Toronto-based luxury hair studio specialising in colour, silk press, and protective styles."
                   rows={3}
-                  style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 10, padding: "10px 13px", color: "rgb(250,250,250)", fontSize: 13, outline: "none", resize: "vertical", boxSizing: "border-box", fontFamily: "inherit", lineHeight: 1.5 }}
+                  style={{ width: "100%", background: "var(--dw05)", border: "1px solid var(--dw09)", borderRadius: 10, padding: "10px 13px", color: "var(--dtext)", fontSize: 13, outline: "none", resize: "vertical", boxSizing: "border-box", fontFamily: "inherit", lineHeight: 1.5 }}
                 />
               </div>
               <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
@@ -277,26 +277,26 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
 
           <div style={card}>
             <SectionLabel>Booking link</SectionLabel>
-            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, margin: "0 0 14px" }}>Share this with clients so they can self-book anytime.</p>
+            <p style={{ color: "var(--dw4)", fontSize: 13, margin: "0 0 14px" }}>Share this with clients so they can self-book anytime.</p>
             {bookingLinkDisplay ? (
               <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                <div style={{ flex: "1 1 200px", display: "flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "10px 13px", minWidth: 0 }}>
-                  <Link2 size={13} color="rgba(255,255,255,0.3)" style={{ flexShrink: 0 }} />
-                  <span style={{ color: "rgba(255,255,255,0.5)", fontSize: 13, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{bookingLinkDisplay}</span>
+                <div style={{ flex: "1 1 200px", display: "flex", alignItems: "center", gap: 8, background: "var(--dw04)", border: "1px solid var(--dw08)", borderRadius: 10, padding: "10px 13px", minWidth: 0 }}>
+                  <Link2 size={13} color="var(--dw3)" style={{ flexShrink: 0 }} />
+                  <span style={{ color: "var(--dw5)", fontSize: 13, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{bookingLinkDisplay}</span>
                 </div>
                 <a href={initialBookingUrl!} target="_blank" rel="noopener noreferrer" style={{
                   display: "flex", alignItems: "center", gap: 6, padding: "10px 16px",
                   borderRadius: 10, fontSize: 13, whiteSpace: "nowrap", textDecoration: "none",
-                  background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.65)",
+                  background: "var(--dw06)", border: "1px solid var(--dw1)", color: "var(--dw65)",
                 }}>
                   Preview
                 </a>
                 <button onClick={copyLink} style={{
                   display: "flex", alignItems: "center", gap: 6, padding: "10px 16px",
                   borderRadius: 10, cursor: "pointer", fontSize: 13, transition: "all 0.2s", whiteSpace: "nowrap",
-                  background: copied ? "rgba(52,211,153,0.12)" : "rgba(255,255,255,0.06)",
-                  border: `1px solid ${copied ? "rgba(52,211,153,0.3)" : "rgba(255,255,255,0.1)"}`,
-                  color: copied ? "rgb(52,211,153)" : "rgba(255,255,255,0.5)",
+                  background: copied ? "rgba(52,211,153,0.12)" : "var(--dw06)",
+                  border: `1px solid ${copied ? "rgba(52,211,153,0.3)" : "var(--dw1)"}`,
+                  color: copied ? "rgb(52,211,153)" : "var(--dw5)",
                 }}>
                   {copied ? <Check size={13} /> : <Copy size={13} />}
                   {copied ? "Copied!" : "Copy link"}
@@ -318,8 +318,8 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
         <>
           <div style={{ ...card, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14 }}>
             <div>
-              <p style={{ color: "rgb(250,250,250)", fontSize: 13.5, fontWeight: 700, margin: "0 0 2px" }}>Manage your services</p>
-              <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 12, margin: 0 }}>Add, price, and publish services from the Services page — that&apos;s what your booking page pulls from.</p>
+              <p style={{ color: "var(--dtext)", fontSize: 13.5, fontWeight: 700, margin: "0 0 2px" }}>Manage your services</p>
+              <p style={{ color: "var(--dw35)", fontSize: 12, margin: 0 }}>Add, price, and publish services from the Services page — that&apos;s what your booking page pulls from.</p>
             </div>
             <Link href="/dashboard/services" style={{ display: "flex", alignItems: "center", gap: 6, padding: "9px 16px", borderRadius: 10, background: "rgb(109,40,217)", color: "white", fontSize: 12.5, fontWeight: 700, textDecoration: "none", whiteSpace: "nowrap", flexShrink: 0 }}>
               Go to Services
@@ -332,13 +332,13 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
               <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "4px 0" }}>
                 <span style={{ width: 8, height: 8, borderRadius: "50%", background: "rgb(52,211,153)", flexShrink: 0 }} />
                 <div>
-                  <p style={{ color: "rgb(250,250,250)", fontSize: 13.5, fontWeight: 700, margin: "0 0 2px" }}>Connected</p>
-                  <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 12, margin: 0 }}>Your booking page accepts real card payments, and AutoPilot is active.</p>
+                  <p style={{ color: "var(--dtext)", fontSize: 13.5, fontWeight: 700, margin: "0 0 2px" }}>Connected</p>
+                  <p style={{ color: "var(--dw35)", fontSize: 12, margin: 0 }}>Your booking page accepts real card payments, and AutoPilot is active.</p>
                 </div>
               </div>
             ) : (
               <div>
-                <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 13, margin: "0 0 14px", lineHeight: 1.6 }}>
+                <p style={{ color: "var(--dw45)", fontSize: 13, margin: "0 0 14px", lineHeight: 1.6 }}>
                   Connect Stripe to accept real card payments on your booking page and unlock AutoPilot.
                 </p>
                 {stripeError && <p style={{ color: "rgb(248,113,113)", fontSize: 12.5, margin: "0 0 12px" }}>{stripeError}</p>}
@@ -370,27 +370,27 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
             <SectionLabel>Business hours</SectionLabel>
             <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
               {hours.map((row, i) => (
-                <div key={row.label} style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap", padding: "13px 0", borderBottom: i < hours.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none" }}>
+                <div key={row.label} style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap", padding: "13px 0", borderBottom: i < hours.length - 1 ? "1px solid var(--dw04)" : "none" }}>
                   {/* Toggle */}
                   <button onClick={() => toggleHour(i)} style={{
                     width: 38, height: 22, borderRadius: 11, border: "none", cursor: "pointer", flexShrink: 0,
-                    background: row.open ? "rgb(109,40,217)" : "rgba(255,255,255,0.1)",
+                    background: row.open ? "rgb(109,40,217)" : "var(--dw1)",
                     position: "relative", transition: "background 0.2s",
                   }}>
                     <span style={{ position: "absolute", top: 3, left: row.open ? 18 : 3, width: 16, height: 16, borderRadius: "50%", background: "white", transition: "left 0.2s" }} />
                   </button>
 
                   {/* Day */}
-                  <span style={{ color: row.open ? "rgb(250,250,250)" : "rgba(255,255,255,0.3)", fontSize: 13.5, fontWeight: 600, width: 100, flexShrink: 0 }}>{row.label}</span>
+                  <span style={{ color: row.open ? "var(--dtext)" : "var(--dw3)", fontSize: 13.5, fontWeight: 600, width: 100, flexShrink: 0 }}>{row.label}</span>
 
                   {row.open ? (
                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                      <input type="time" value={row.start} onChange={e => setHours(h => h.map((r, ri) => ri === i ? { ...r, start: e.target.value } : r))} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 9, padding: "6px 10px", color: "rgb(250,250,250)", fontSize: 12.5, outline: "none" }} />
-                      <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 12 }}>to</span>
-                      <input type="time" value={row.end} onChange={e => setHours(h => h.map((r, ri) => ri === i ? { ...r, end: e.target.value } : r))} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 9, padding: "6px 10px", color: "rgb(250,250,250)", fontSize: 12.5, outline: "none" }} />
+                      <input type="time" value={row.start} onChange={e => setHours(h => h.map((r, ri) => ri === i ? { ...r, start: e.target.value } : r))} style={{ background: "var(--dw05)", border: "1px solid var(--dw09)", borderRadius: 9, padding: "6px 10px", color: "var(--dtext)", fontSize: 12.5, outline: "none" }} />
+                      <span style={{ color: "var(--dw3)", fontSize: 12 }}>to</span>
+                      <input type="time" value={row.end} onChange={e => setHours(h => h.map((r, ri) => ri === i ? { ...r, end: e.target.value } : r))} style={{ background: "var(--dw05)", border: "1px solid var(--dw09)", borderRadius: 9, padding: "6px 10px", color: "var(--dtext)", fontSize: 12.5, outline: "none" }} />
                     </div>
                   ) : (
-                    <span style={{ color: "rgba(255,255,255,0.22)", fontSize: 13, fontStyle: "italic" }}>Closed</span>
+                    <span style={{ color: "var(--dw22)", fontSize: 13, fontStyle: "italic" }}>Closed</span>
                   )}
                 </div>
               ))}
@@ -402,11 +402,11 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
             <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 14 }}>
               <div>
                 <p style={{ color: "rgb(210,196,254)", fontSize: 14, fontWeight: 700, margin: "0 0 4px" }}>Family hours</p>
-                <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 12.5, margin: 0 }}>Block a window each evening — AutoPilot won&apos;t book clients during this time.</p>
+                <p style={{ color: "var(--dw4)", fontSize: 12.5, margin: 0 }}>Block a window each evening — AutoPilot won&apos;t book clients during this time.</p>
               </div>
               <button onClick={() => setFamilyOn(v => !v)} style={{
                 width: 42, height: 24, borderRadius: 12, border: "none", cursor: "pointer", flexShrink: 0,
-                background: familyOn ? "rgb(109,40,217)" : "rgba(255,255,255,0.12)",
+                background: familyOn ? "rgb(109,40,217)" : "var(--dw12)",
                 position: "relative", transition: "background 0.2s",
               }}>
                 <span style={{ position: "absolute", top: 4, left: familyOn ? 20 : 4, width: 16, height: 16, borderRadius: "50%", background: "white", transition: "left 0.2s" }} />
@@ -414,10 +414,10 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
             </div>
             {familyOn && (
               <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-                <span style={{ color: "rgba(255,255,255,0.45)", fontSize: 13 }}>Block every evening from</span>
-                <input type="time" value={familyStart} onChange={e => setFamilyStart(e.target.value)} style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(139,92,246,0.25)", borderRadius: 9, padding: "7px 12px", color: "rgb(250,250,250)", fontSize: 13, outline: "none" }} />
-                <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 13 }}>to</span>
-                <input type="time" value={familyEnd} onChange={e => setFamilyEnd(e.target.value)} style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(139,92,246,0.25)", borderRadius: 9, padding: "7px 12px", color: "rgb(250,250,250)", fontSize: 13, outline: "none" }} />
+                <span style={{ color: "var(--dw45)", fontSize: 13 }}>Block every evening from</span>
+                <input type="time" value={familyStart} onChange={e => setFamilyStart(e.target.value)} style={{ background: "var(--dw07)", border: "1px solid rgba(139,92,246,0.25)", borderRadius: 9, padding: "7px 12px", color: "var(--dtext)", fontSize: 13, outline: "none" }} />
+                <span style={{ color: "var(--dw3)", fontSize: 13 }}>to</span>
+                <input type="time" value={familyEnd} onChange={e => setFamilyEnd(e.target.value)} style={{ background: "var(--dw07)", border: "1px solid rgba(139,92,246,0.25)", borderRadius: 9, padding: "7px 12px", color: "var(--dtext)", fontSize: 13, outline: "none" }} />
                 <span style={{ fontSize: 11, padding: "3px 10px", borderRadius: 20, background: "rgba(139,92,246,0.15)", color: "rgb(167,139,250)", fontWeight: 700 }}>Protected</span>
               </div>
             )}
@@ -453,28 +453,28 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
             <SectionLabel>Tax settings</SectionLabel>
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
               <div>
-                <label style={{ color: "rgba(255,255,255,0.38)", fontSize: 12, fontWeight: 600, display: "block", marginBottom: 6 }}>Tax rate (%)</label>
+                <label style={{ color: "var(--dw38)", fontSize: 12, fontWeight: 600, display: "block", marginBottom: 6 }}>Tax rate (%)</label>
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                   <input
                     type="number" value={taxRate} min="0" max="30" step="0.1"
                     onChange={e => setTaxRate(e.target.value)}
-                    style={{ width: 100, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 10, padding: "10px 13px", color: "rgb(250,250,250)", fontSize: 15, fontWeight: 700, outline: "none" }}
+                    style={{ width: 100, background: "var(--dw05)", border: "1px solid var(--dw09)", borderRadius: 10, padding: "10px 13px", color: "var(--dtext)", fontSize: 15, fontWeight: 700, outline: "none" }}
                   />
-                  <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 13 }}>%  (Ontario HST = 13%)</span>
+                  <span style={{ color: "var(--dw3)", fontSize: 13 }}>%  (Ontario HST = 13%)</span>
                 </div>
               </div>
 
               <Field label="Business registration number (GST/HST)" value="123456789 RT0001" placeholder="e.g. 123456789 RT0001" />
               <Field label="Legal business name" value="Flow by FFP Inc." />
 
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 0", borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 0", borderTop: "1px solid var(--dw05)" }}>
                 <div>
-                  <p style={{ color: "rgb(250,250,250)", fontSize: 13.5, fontWeight: 600, margin: "0 0 2px" }}>Tax-inclusive pricing</p>
-                  <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 12, margin: 0 }}>Service prices shown already include tax (no tax added at checkout)</p>
+                  <p style={{ color: "var(--dtext)", fontSize: 13.5, fontWeight: 600, margin: "0 0 2px" }}>Tax-inclusive pricing</p>
+                  <p style={{ color: "var(--dw35)", fontSize: 12, margin: 0 }}>Service prices shown already include tax (no tax added at checkout)</p>
                 </div>
                 <button onClick={() => setTaxInclusive(v => !v)} style={{
                   width: 42, height: 24, borderRadius: 12, border: "none", cursor: "pointer", flexShrink: 0,
-                  background: taxInclusive ? "rgb(109,40,217)" : "rgba(255,255,255,0.12)",
+                  background: taxInclusive ? "rgb(109,40,217)" : "var(--dw12)",
                   position: "relative", transition: "background 0.2s",
                 }}>
                   <span style={{ position: "absolute", top: 4, left: taxInclusive ? 20 : 4, width: 16, height: 16, borderRadius: "50%", background: "white", transition: "left 0.2s" }} />
@@ -486,15 +486,15 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
           {/* Tax preview */}
           <div style={{ ...card, background: "rgba(52,211,153,0.04)", border: "1px solid rgba(52,211,153,0.12)" }}>
             <SectionLabel>Preview</SectionLabel>
-            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 12.5, margin: "0 0 12px" }}>How a C$120 Highlights service would appear on receipts:</p>
+            <p style={{ color: "var(--dw4)", fontSize: 12.5, margin: "0 0 12px" }}>How a C$120 Highlights service would appear on receipts:</p>
             {[
               { label: "Service",  value: "C$120.00",  color: undefined       },
               { label: `HST (${taxRate}%)`, value: taxInclusive ? "Included" : `C$${(120 * parseFloat(taxRate||"0") / 100).toFixed(2)}`, color: undefined },
               { label: "Total",    value: taxInclusive ? "C$120.00" : `C$${(120 * (1 + parseFloat(taxRate||"0") / 100)).toFixed(2)}`, color: "rgb(52,211,153)" },
             ].map(r => (
-              <div key={r.label} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
-                <span style={{ color: "rgba(255,255,255,0.45)", fontSize: 13 }}>{r.label}</span>
-                <span style={{ color: r.color ?? "rgb(250,250,250)", fontSize: 13, fontWeight: r.color ? 800 : 600 }}>{r.value}</span>
+              <div key={r.label} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid var(--dw04)" }}>
+                <span style={{ color: "var(--dw45)", fontSize: 13 }}>{r.label}</span>
+                <span style={{ color: r.color ?? "var(--dtext)", fontSize: 13, fontWeight: r.color ? 800 : 600 }}>{r.value}</span>
               </div>
             ))}
           </div>
@@ -510,7 +510,7 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
             <Zap size={20} color="rgb(167,139,250)" strokeWidth={2} />
             <div>
               <p style={{ color: "rgb(210,196,254)", fontSize: 13.5, fontWeight: 700, margin: "0 0 2px" }}>AutoPilot is active</p>
-              <p style={{ color: "rgba(255,255,255,0.38)", fontSize: 12.5, margin: 0 }}>Configure each flow below — changes take effect immediately.</p>
+              <p style={{ color: "var(--dw38)", fontSize: 12.5, margin: 0 }}>Configure each flow below — changes take effect immediately.</p>
             </div>
           </div>
 
@@ -518,43 +518,43 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
             <SectionLabel>Automation flows</SectionLabel>
             <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
               {flows.map((fl, i) => (
-                <div key={fl.key} style={{ borderBottom: i < flows.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none" }}>
+                <div key={fl.key} style={{ borderBottom: i < flows.length - 1 ? "1px solid var(--dw04)" : "none" }}>
                   {/* Row */}
                   <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "15px 0" }}>
                     {/* Toggle */}
                     <button onClick={() => toggleFlow(fl.key)} style={{
                       width: 38, height: 22, borderRadius: 11, border: "none", cursor: "pointer", flexShrink: 0,
-                      background: fl.enabled ? "rgb(109,40,217)" : "rgba(255,255,255,0.1)",
+                      background: fl.enabled ? "rgb(109,40,217)" : "var(--dw1)",
                       position: "relative", transition: "background 0.2s",
                     }}>
                       <span style={{ position: "absolute", top: 3, left: fl.enabled ? 18 : 3, width: 16, height: 16, borderRadius: "50%", background: "white", transition: "left 0.2s" }} />
                     </button>
 
                     <div style={{ flex: 1 }}>
-                      <p style={{ color: fl.enabled ? "rgb(250,250,250)" : "rgba(255,255,255,0.35)", fontSize: 13.5, fontWeight: 700, margin: "0 0 2px" }}>{fl.name}</p>
-                      <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 12, margin: 0 }}>{fl.description}</p>
+                      <p style={{ color: fl.enabled ? "var(--dtext)" : "var(--dw35)", fontSize: 13.5, fontWeight: 700, margin: "0 0 2px" }}>{fl.name}</p>
+                      <p style={{ color: "var(--dw3)", fontSize: 12, margin: 0 }}>{fl.description}</p>
                     </div>
 
                     <div style={{ textAlign: "right", marginRight: 10 }}>
-                      <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 20, color: "rgba(255,255,255,0.3)", background: "rgba(255,255,255,0.05)" }}>
+                      <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 20, color: "var(--dw3)", background: "var(--dw05)" }}>
                         {fl.channel}
                       </span>
-                      <p style={{ color: "rgba(255,255,255,0.22)", fontSize: 11, margin: "3px 0 0", whiteSpace: "nowrap" }}>{fl.delay}</p>
+                      <p style={{ color: "var(--dw22)", fontSize: 11, margin: "3px 0 0", whiteSpace: "nowrap" }}>{fl.delay}</p>
                     </div>
 
                     <button
                       onClick={() => setExpandedFlow(expandedFlow === fl.key ? null : fl.key)}
-                      style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}
+                      style={{ background: "var(--dw04)", border: "1px solid var(--dw07)", borderRadius: 8, width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}
                     >
-                      {expandedFlow === fl.key ? <ChevronUp size={13} color="rgba(255,255,255,0.4)" /> : <ChevronDown size={13} color="rgba(255,255,255,0.4)" />}
+                      {expandedFlow === fl.key ? <ChevronUp size={13} color="var(--dw4)" /> : <ChevronDown size={13} color="var(--dw4)" />}
                     </button>
                   </div>
 
                   {/* Expanded editor */}
                   {expandedFlow === fl.key && (
-                    <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 12, padding: "16px 18px", marginBottom: 14, display: "flex", flexDirection: "column", gap: 14 }}>
+                    <div style={{ background: "var(--dw02)", border: "1px solid var(--dw06)", borderRadius: 12, padding: "16px 18px", marginBottom: 14, display: "flex", flexDirection: "column", gap: 14 }}>
                       <div>
-                        <label style={{ color: "rgba(255,255,255,0.38)", fontSize: 11.5, fontWeight: 600, display: "block", marginBottom: 6, letterSpacing: "0.03em", textTransform: "uppercase" }}>Message template</label>
+                        <label style={{ color: "var(--dw38)", fontSize: 11.5, fontWeight: 600, display: "block", marginBottom: 6, letterSpacing: "0.03em", textTransform: "uppercase" }}>Message template</label>
                         <textarea
                           rows={3}
                           defaultValue={
@@ -565,22 +565,22 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
                             fl.key === "lastminute" ? "Hi {{first_name}}! We just had a cancellation at {{time}} today — interested? Tap to grab the slot: {{booking_link}}" :
                             "Hi! I'm the AI assistant for {{business_name}}. I can help you book, reschedule, or answer questions. What can I do for you?"
                           }
-                          style={{ width: "100%", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "10px 13px", color: "rgba(255,255,255,0.75)", fontSize: 12.5, outline: "none", resize: "vertical", boxSizing: "border-box", fontFamily: "inherit", lineHeight: 1.6 }}
+                          style={{ width: "100%", background: "var(--dw04)", border: "1px solid var(--dw08)", borderRadius: 10, padding: "10px 13px", color: "var(--dw75)", fontSize: 12.5, outline: "none", resize: "vertical", boxSizing: "border-box", fontFamily: "inherit", lineHeight: 1.6 }}
                         />
-                        <p style={{ color: "rgba(255,255,255,0.2)", fontSize: 11, margin: "5px 0 0" }}>Variables: {"{{first_name}}"} · {"{{days_since}}"} · {"{{booking_link}}"} · {"{{time}}"} · {"{{business_name}}"}</p>
+                        <p style={{ color: "var(--dw2)", fontSize: 11, margin: "5px 0 0" }}>Variables: {"{{first_name}}"} · {"{{days_since}}"} · {"{{booking_link}}"} · {"{{time}}"} · {"{{business_name}}"}</p>
                       </div>
                       <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
                         <div style={{ flex: 1 }}>
-                          <label style={{ color: "rgba(255,255,255,0.38)", fontSize: 11.5, fontWeight: 600, display: "block", marginBottom: 6, letterSpacing: "0.03em", textTransform: "uppercase" }}>Channel</label>
-                          <select defaultValue={fl.channel} style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 9, padding: "9px 12px", color: "rgb(250,250,250)", fontSize: 13, outline: "none", cursor: "pointer" }}>
+                          <label style={{ color: "var(--dw38)", fontSize: 11.5, fontWeight: 600, display: "block", marginBottom: 6, letterSpacing: "0.03em", textTransform: "uppercase" }}>Channel</label>
+                          <select defaultValue={fl.channel} style={{ width: "100%", background: "var(--dw05)", border: "1px solid var(--dw09)", borderRadius: 9, padding: "9px 12px", color: "var(--dtext)", fontSize: 13, outline: "none", cursor: "pointer" }}>
                             <option value="SMS">SMS</option>
                             <option value="Email">Email</option>
                             <option value="Both">SMS + Email</option>
                           </select>
                         </div>
                         <div style={{ flex: 1 }}>
-                          <label style={{ color: "rgba(255,255,255,0.38)", fontSize: 11.5, fontWeight: 600, display: "block", marginBottom: 6, letterSpacing: "0.03em", textTransform: "uppercase" }}>Timing</label>
-                          <input defaultValue={fl.delay} style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 9, padding: "9px 12px", color: "rgb(250,250,250)", fontSize: 13, outline: "none", boxSizing: "border-box" }} />
+                          <label style={{ color: "var(--dw38)", fontSize: 11.5, fontWeight: 600, display: "block", marginBottom: 6, letterSpacing: "0.03em", textTransform: "uppercase" }}>Timing</label>
+                          <input defaultValue={fl.delay} style={{ width: "100%", background: "var(--dw05)", border: "1px solid var(--dw09)", borderRadius: 9, padding: "9px 12px", color: "var(--dtext)", fontSize: 13, outline: "none", boxSizing: "border-box" }} />
                         </div>
                       </div>
                       <div style={{ display: "flex", justifyContent: "flex-end" }}>
@@ -643,33 +643,33 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
 
           {/* Payment method */}
           <div style={card}>
-            <p style={{ color: "rgb(250,250,250)", fontSize: 14, fontWeight: 700, margin: "0 0 14px" }}>Payment method</p>
-            <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 16px", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12 }}>
+            <p style={{ color: "var(--dtext)", fontSize: 14, fontWeight: 700, margin: "0 0 14px" }}>Payment method</p>
+            <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 16px", background: "var(--dw04)", border: "1px solid var(--dw08)", borderRadius: 12 }}>
               <div style={{ width: 40, height: 26, borderRadius: 5, background: "linear-gradient(135deg, #1434CB, #0052CC)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <CreditCard size={14} color="white" strokeWidth={1.5} />
               </div>
               <div style={{ flex: 1 }}>
-                <p style={{ color: "rgb(250,250,250)", fontSize: 13, fontWeight: 600, margin: "0 0 2px" }}>•••• •••• •••• 4242</p>
-                <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 11, margin: 0 }}>Expires 04/28</p>
+                <p style={{ color: "var(--dtext)", fontSize: 13, fontWeight: 600, margin: "0 0 2px" }}>•••• •••• •••• 4242</p>
+                <p style={{ color: "var(--dw35)", fontSize: 11, margin: 0 }}>Expires 04/28</p>
               </div>
               <span style={{ fontSize: 10, fontWeight: 700, padding: "3px 9px", borderRadius: 20, background: "rgba(52,211,153,0.1)", color: "rgb(52,211,153)" }}>DEFAULT</span>
             </div>
-            <button style={{ marginTop: 12, padding: "9px 18px", borderRadius: 9, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", color: "rgba(255,255,255,0.5)", fontSize: 13, cursor: "pointer" }}>
+            <button style={{ marginTop: 12, padding: "9px 18px", borderRadius: 9, background: "var(--dw05)", border: "1px solid var(--dw09)", color: "var(--dw5)", fontSize: 13, cursor: "pointer" }}>
               + Add payment method
             </button>
           </div>
 
           {/* Invoices */}
           <div style={card}>
-            <p style={{ color: "rgb(250,250,250)", fontSize: 14, fontWeight: 700, margin: "0 0 14px" }}>Recent invoices</p>
+            <p style={{ color: "var(--dtext)", fontSize: 14, fontWeight: 700, margin: "0 0 14px" }}>Recent invoices</p>
             {[
               { date: "Jun 17, 2026", amount: "C$29.00" },
               { date: "May 17, 2026", amount: "C$29.00" },
               { date: "Apr 17, 2026", amount: "C$29.00" },
             ].map((inv, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0", borderBottom: i < 2 ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
-                <span style={{ color: "rgba(255,255,255,0.5)", fontSize: 13 }}>{inv.date}</span>
-                <span style={{ color: "rgb(250,250,250)", fontSize: 13, fontWeight: 600 }}>{inv.amount}</span>
+              <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0", borderBottom: i < 2 ? "1px solid var(--dw05)" : "none" }}>
+                <span style={{ color: "var(--dw5)", fontSize: 13 }}>{inv.date}</span>
+                <span style={{ color: "var(--dtext)", fontSize: 13, fontWeight: 600 }}>{inv.amount}</span>
                 <span style={{ fontSize: 10, fontWeight: 700, padding: "3px 9px", borderRadius: 20, background: "rgba(52,211,153,0.1)", color: "rgb(52,211,153)" }}>Paid</span>
                 <button style={{ fontSize: 12, color: "rgba(139,92,246,0.7)", background: "none", border: "none", cursor: "pointer" }}>Download</button>
               </div>
