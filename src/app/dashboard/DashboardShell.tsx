@@ -9,7 +9,7 @@ import {
   LayoutGrid, Users2, Settings,
   LogOut, Bell, ChevronLeft, ChevronRight, ChevronDown,
   Sun, Moon, User as UserIcon, Search, MessageSquare, Sparkles,
-  CalendarClock, UserRound, MoreHorizontal,
+  CalendarClock, UserRound, MoreHorizontal, type LucideIcon,
 } from "lucide-react";
 import { logout, searchDashboard, type SearchResult } from "./actions";
 import type { ShopRole } from "@/lib/dashboard/shop";
@@ -18,9 +18,21 @@ import { DashboardThemeProvider, useDashboardTheme, type DashboardTheme } from "
 const PURPLE    = "rgb(139,92,246)";
 const PURPLE_BG = "rgba(109,40,217,0.18)";
 
-const NAV_TABS = [
+type NavTab = {
+  icon: LucideIcon; href: string; label: string; badge: number; ownerOnly: boolean;
+  subTabs?: { href: string; label: string }[];
+};
+
+const NAV_TABS: NavTab[] = [
   { icon: LayoutDashboard, href: "/dashboard",              label: "Home",       badge: 0, ownerOnly: false },
-  { icon: CalendarDays,    href: "/dashboard/appointments", label: "Bookings",   badge: 0, ownerOnly: false },
+  { icon: CalendarDays,    href: "/dashboard/appointments", label: "Bookings",   badge: 0, ownerOnly: false,
+    subTabs: [
+      { href: "/dashboard/appointments",           label: "All Bookings" },
+      { href: "/dashboard/appointments/active",    label: "Active Bookings" },
+      { href: "/dashboard/appointments/cancelled", label: "Cancelled Bookings" },
+      { href: "/dashboard/appointments/pending",   label: "Pending Bookings" },
+    ],
+  },
   { icon: Users,           href: "/dashboard/clients",      label: "Clients",    badge: 0, ownerOnly: false },
   { icon: Users2,          href: "/dashboard/team",         label: "Team",       badge: 0, ownerOnly: true  },
   { icon: Zap,             href: "/dashboard/autopilot",    label: "AutoPilot",  badge: 0, ownerOnly: true  },
@@ -39,47 +51,74 @@ function isActive(href: string, pathname: string) {
   return href === "/dashboard" ? pathname === "/dashboard" : pathname.startsWith(href);
 }
 
-function SidebarNav({ open, pathname, T, tabs }: { open: boolean; pathname: string; T: DashboardTheme; tabs: typeof NAV_TABS }) {
+function SidebarNav({ open, pathname, T, tabs }: { open: boolean; pathname: string; T: DashboardTheme; tabs: NavTab[] }) {
   return (
     <nav style={{ display: "flex", flexDirection: "column", gap: 1, padding: "0 8px", flexShrink: 0 }}>
-      {tabs.map(({ icon: Icon, href, label, badge }) => {
+      {tabs.map(({ icon: Icon, href, label, badge, subTabs }) => {
         const active = isActive(href, pathname);
         return (
-          <Link
-            key={href}
-            href={href}
-            title={!open ? label : undefined}
-            style={{
-              display: "flex", alignItems: "center",
-              gap: 12,
-              padding: open ? "9px 12px" : "11px",
-              borderRadius: 10,
-              background: active ? T.activePill : "transparent",
-              color: active ? T.activeText : T.inactiveText,
-              fontSize: 13.5, fontWeight: active ? 600 : 400,
-              textDecoration: "none",
-              transition: "background 0.15s, color 0.15s",
-              justifyContent: open ? "flex-start" : "center",
-            }}
-          >
-            <Icon size={16} strokeWidth={active ? 2.1 : 1.7} style={{ flexShrink: 0 }} />
-            {open && (
-              <>
-                <span style={{ flex: 1, whiteSpace: "nowrap" }}>{label}</span>
-                {badge > 0 && (
-                  <span style={{
-                    minWidth: 18, height: 18, borderRadius: 9,
-                    background: PURPLE, color: "white",
-                    fontSize: 10, fontWeight: 800,
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    padding: "0 4px", flexShrink: 0,
-                  }}>
-                    {badge}
-                  </span>
-                )}
-              </>
+          <div key={href}>
+            <Link
+              href={href}
+              title={!open ? label : undefined}
+              style={{
+                display: "flex", alignItems: "center",
+                gap: 12,
+                padding: open ? "9px 12px" : "11px",
+                borderRadius: 10,
+                background: active ? T.activePill : "transparent",
+                color: active ? T.activeText : T.inactiveText,
+                fontSize: 13.5, fontWeight: active ? 600 : 400,
+                textDecoration: "none",
+                transition: "background 0.15s, color 0.15s",
+                justifyContent: open ? "flex-start" : "center",
+              }}
+            >
+              <Icon size={16} strokeWidth={active ? 2.1 : 1.7} style={{ flexShrink: 0 }} />
+              {open && (
+                <>
+                  <span style={{ flex: 1, whiteSpace: "nowrap" }}>{label}</span>
+                  {badge > 0 && (
+                    <span style={{
+                      minWidth: 18, height: 18, borderRadius: 9,
+                      background: PURPLE, color: "white",
+                      fontSize: 10, fontWeight: 800,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      padding: "0 4px", flexShrink: 0,
+                    }}>
+                      {badge}
+                    </span>
+                  )}
+                </>
+              )}
+            </Link>
+
+            {open && active && subTabs && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 1, margin: "2px 0 4px", paddingLeft: 16 }}>
+                {subTabs.map(sub => {
+                  const subActive = pathname === sub.href;
+                  return (
+                    <Link
+                      key={sub.href}
+                      href={sub.href}
+                      style={{
+                        display: "flex", alignItems: "center",
+                        padding: "7px 12px",
+                        borderRadius: 8,
+                        borderLeft: `2px solid ${subActive ? T.activeText : T.border2}`,
+                        color: subActive ? T.activeText : T.textDim,
+                        fontSize: 12.5, fontWeight: subActive ? 600 : 400,
+                        textDecoration: "none",
+                        transition: "background 0.15s, color 0.15s",
+                      }}
+                    >
+                      <span style={{ whiteSpace: "nowrap" }}>{sub.label}</span>
+                    </Link>
+                  );
+                })}
+              </div>
             )}
-          </Link>
+          </div>
         );
       })}
     </nav>

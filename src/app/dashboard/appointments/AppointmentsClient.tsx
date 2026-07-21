@@ -1228,7 +1228,15 @@ function BookingLinkCard({ bookingUrl }: { bookingUrl: string | null }) {
 const VIEWS = ["Day", "Week", "List"] as const;
 type View = typeof VIEWS[number];
 
-export function AppointmentsClient({ initialAppointments, bookingUrl, staff, selfStaffId }: { initialAppointments: AppointmentRow[]; bookingUrl: string | null; staff: StaffRow[]; selfStaffId?: string | null }) {
+export type BookingsStatusFilter = "active" | "cancelled" | "pending";
+
+const STATUS_FILTER_TITLE: Record<BookingsStatusFilter, string> = {
+  active: "Active Bookings",
+  cancelled: "Cancelled Bookings",
+  pending: "Pending Bookings",
+};
+
+export function AppointmentsClient({ initialAppointments, bookingUrl, staff, selfStaffId, statusFilter }: { initialAppointments: AppointmentRow[]; bookingUrl: string | null; staff: StaffRow[]; selfStaffId?: string | null; statusFilter?: BookingsStatusFilter }) {
   const router = useRouter();
   const [, startTransition] = useTransition();
   const [view, setView]           = useState<View>("Day");
@@ -1238,7 +1246,13 @@ export function AppointmentsClient({ initialAppointments, bookingUrl, staff, sel
   const [closingOut, setClosingOut] = useState(false);
 
   const now = useMemo(() => new Date(), []);
-  const appts = useMemo(() => initialAppointments.map(r => rowToAppt(r, now)), [initialAppointments, now]);
+  const allAppts = useMemo(() => initialAppointments.map(r => rowToAppt(r, now)), [initialAppointments, now]);
+  const appts = useMemo(() => {
+    if (statusFilter === "active") return allAppts.filter(a => a.status === "confirmed" || a.status === "deposit");
+    if (statusFilter === "cancelled") return allAppts.filter(a => a.status === "cancelled");
+    if (statusFilter === "pending") return allAppts.filter(a => a.status === "pending");
+    return allAppts;
+  }, [allAppts, statusFilter]);
   const selectedAppt = appts.find(a => a.id === selectedId) ?? null;
 
   const refresh = () => startTransition(() => router.refresh());
@@ -1253,7 +1267,7 @@ export function AppointmentsClient({ initialAppointments, bookingUrl, staff, sel
       {/* Header */}
       <div className="bookings-header" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", rowGap: 12 }}>
         <div>
-          <h1 style={{ color: "var(--dtext)", fontSize: 22, fontWeight: 800, margin: "0 0 3px", letterSpacing: "-0.03em" }}>Bookings</h1>
+          <h1 style={{ color: "var(--dtext)", fontSize: 22, fontWeight: 800, margin: "0 0 3px", letterSpacing: "-0.03em" }}>{statusFilter ? STATUS_FILTER_TITLE[statusFilter] : "Bookings"}</h1>
           <p style={{ color: "var(--dw35)", fontSize: 13, margin: 0 }}>{dateStr}</p>
         </div>
         <div className="bookings-header-controls" style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
