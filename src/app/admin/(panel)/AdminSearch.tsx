@@ -16,12 +16,14 @@ const ICON = { user: Users, shop: Store, waitlist: ClipboardList };
 
 export function AdminSearch({
   T,
+  compact = false,
 }: {
   T: {
     searchBg: string; searchBorder: string; searchPlaceholder: string;
     searchKbd: string; searchKbdBg: string;
     dropBg: string; dropBorder: string; dropItem: string; textMuted: string; dropHover: string;
   };
+  compact?: boolean;
 }) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
@@ -81,12 +83,12 @@ export function AdminSearch({
   };
 
   return (
-    <div ref={wrapRef} style={{ position: "relative", flex: 1, maxWidth: 300 }}>
+    <div ref={wrapRef} style={{ position: "relative", flex: 1, maxWidth: compact ? "none" : 300 }}>
       <div style={{
         display: "flex", alignItems: "center", gap: 9,
         background: T.searchBg,
         border: `1px solid ${T.searchBorder}`,
-        borderRadius: 10, padding: "9px 14px",
+        borderRadius: 10, padding: compact ? "9px 12px" : "9px 14px",
       }}>
         <Search size={13} color={T.searchPlaceholder} />
         <input
@@ -94,13 +96,13 @@ export function AdminSearch({
           value={query}
           onChange={e => { setQuery(e.target.value); setOpen(true); }}
           onFocus={() => setOpen(true)}
-          placeholder="Search users, shops, waitlist..."
+          placeholder={compact ? "Search..." : "Search users, shops, waitlist..."}
           style={{
-            flex: 1, background: "transparent", border: "none", outline: "none",
+            flex: 1, minWidth: 0, background: "transparent", border: "none", outline: "none",
             color: T.dropItem, fontSize: 13, fontFamily: "inherit",
           }}
         />
-        {!query && (
+        {!query && !compact && (
           <span style={{
             color: T.searchKbd, fontSize: 11, fontWeight: 600,
             background: T.searchKbdBg, padding: "2px 6px", borderRadius: 5,
