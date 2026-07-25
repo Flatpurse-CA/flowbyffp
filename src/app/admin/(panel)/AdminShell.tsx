@@ -5,8 +5,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Users, ClipboardList, Store, CreditCard,
-  LogOut, ChevronLeft, ChevronRight,
+  LogOut, ChevronLeft, ChevronRight, Menu, X,
   Sun, Moon, MessageSquare, User as UserIcon, Settings, Mail,
+  BarChart3, GitFork, Zap, ShieldAlert, Flag,
 } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 import { adminLogout } from "@/app/admin/actions";
@@ -17,12 +18,17 @@ const PURPLE = "rgb(139,92,246)";
 const PURPLE_BG = "rgba(109,40,217,0.18)";
 
 const NAV = [
-  { icon: LayoutDashboard, href: "/admin",          label: "Overview"  },
-  { icon: Users,           href: "/admin/users",    label: "Users"     },
-  { icon: ClipboardList,   href: "/admin/waitlist", label: "Waitlist"  },
-  { icon: Mail,            href: "/admin/emails",   label: "Emails"    },
-  { icon: Store,           href: "/admin/shops",    label: "Shops"     },
-  { icon: CreditCard,      href: "/admin/plans",    label: "Plans"     },
+  { icon: LayoutDashboard, href: "/admin",                    label: "Overview"          },
+  { icon: Users,           href: "/admin/users",              label: "Users"             },
+  { icon: ClipboardList,   href: "/admin/waitlist",           label: "Waitlist"          },
+  { icon: Mail,            href: "/admin/emails",             label: "Emails"            },
+  { icon: Store,           href: "/admin/shops",              label: "Shops"             },
+  { icon: CreditCard,      href: "/admin/plans",              label: "Plans"             },
+  { icon: BarChart3,       href: "/admin/analytics",          label: "Analytics"         },
+  { icon: GitFork,         href: "/admin/cohorts",            label: "Cohort Analysis"   },
+  { icon: Zap,             href: "/admin/autopilot-activity", label: "AutoPilot Activity"},
+  { icon: ShieldAlert,     href: "/admin/payments-risk",      label: "Payments Risk"     },
+  { icon: Flag,            href: "/admin/feature-flags",      label: "Feature Flags"     },
 ];
 
 function isActive(href: string, pathname: string) {
@@ -86,7 +92,28 @@ export function AdminShell({ children, user }: { children: React.ReactNode; user
   const [open, setOpen] = useState(true);
   const [dark, setDark] = useState(true);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 768px)");
+    const update = () => setIsMobile(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    document.body.style.overflow = isMobile && mobileOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [isMobile, mobileOpen]);
+
+  const asideExpanded = isMobile || open;
 
   const email    = user.email ?? "";
   const username = email.split("@")[0];
@@ -147,26 +174,41 @@ export function AdminShell({ children, user }: { children: React.ReactNode; user
   return (
     <div style={{ minHeight: "100vh", background: T.bg, display: "flex" }}>
 
+      {/* Mobile drawer backdrop */}
+      {isMobile && mobileOpen && (
+        <div
+          onClick={() => setMobileOpen(false)}
+          style={{
+            position: "fixed", inset: 0,
+            background: "rgba(0,0,0,0.5)",
+            zIndex: 290,
+          }}
+        />
+      )}
+
       {/* ═══════════════════════════════════════════════
           SIDEBAR
           ═══════════════════════════════════════════════ */}
-      <aside style={{
-        width: open ? 260 : 62,
+      <div style={{
+        width: isMobile ? 260 : (open ? 260 : 62),
         minHeight: "100vh",
         background: T.bg,
         borderRight: `1px solid ${T.border}`,
         display: "flex",
         flexDirection: "column",
-        transition: "width 0.22s cubic-bezier(0.4,0,0.2,1)",
+        transition: isMobile ? "transform 0.25s cubic-bezier(0.4,0,0.2,1)" : "width 0.22s cubic-bezier(0.4,0,0.2,1)",
         overflow: "hidden",
         flexShrink: 0,
-        position: "sticky",
+        position: isMobile ? "fixed" : "sticky",
         top: 0,
+        left: 0,
         height: "100vh",
+        transform: isMobile ? `translateX(${mobileOpen ? 0 : -100}%)` : "none",
+        zIndex: isMobile ? 300 : "auto",
       }}>
 
         {/* User profile header */}
-        {open ? (
+        {asideExpanded ? (
           <div style={{
             display: "flex", alignItems: "center", justifyContent: "space-between",
             padding: "17px 14px", flexShrink: 0,
@@ -190,7 +232,7 @@ export function AdminShell({ children, user }: { children: React.ReactNode; user
               </span>
             </div>
             <button
-              onClick={() => setOpen(false)}
+              onClick={() => (isMobile ? setMobileOpen(false) : setOpen(false))}
               style={{
                 background: "none", border: "none",
                 color: T.textMuted, cursor: "pointer",
@@ -198,7 +240,7 @@ export function AdminShell({ children, user }: { children: React.ReactNode; user
                 width: 28, height: 28, borderRadius: 7, flexShrink: 0, padding: 0,
               }}
             >
-              <ChevronLeft size={15} />
+              {isMobile ? <X size={16} /> : <ChevronLeft size={15} />}
             </button>
           </div>
         ) : (
@@ -232,7 +274,7 @@ export function AdminShell({ children, user }: { children: React.ReactNode; user
         <div style={{ height: 1, background: T.divider, margin: "0 0 14px", flexShrink: 0 }} />
 
         {/* MENU label */}
-        {open && (
+        {asideExpanded && (
           <p style={{
             color: T.menuLabel, fontSize: 10, fontWeight: 700,
             letterSpacing: "0.1em", textTransform: "uppercase",
@@ -250,12 +292,13 @@ export function AdminShell({ children, user }: { children: React.ReactNode; user
               <Link
                 key={href}
                 href={href}
-                title={!open ? label : undefined}
+                title={!asideExpanded ? label : undefined}
+                onClick={() => isMobile && setMobileOpen(false)}
                 style={{
                   display: "flex",
                   alignItems: "center",
                   gap: 12,
-                  padding: open ? "10px 12px" : "11px",
+                  padding: asideExpanded ? "10px 12px" : "11px",
                   borderRadius: 10,
                   background: active ? T.activePill : "transparent",
                   color: active ? T.activeText : T.inactiveText,
@@ -263,11 +306,11 @@ export function AdminShell({ children, user }: { children: React.ReactNode; user
                   fontWeight: active ? 600 : 500,
                   textDecoration: "none",
                   transition: "background 0.15s, color 0.15s",
-                  justifyContent: open ? "flex-start" : "center",
+                  justifyContent: asideExpanded ? "flex-start" : "center",
                 }}
               >
                 <Icon size={17} strokeWidth={active ? 2.1 : 1.7} style={{ flexShrink: 0 }} />
-                {open && (
+                {asideExpanded && (
                   <>
                     <span style={{ flex: 1, whiteSpace: "nowrap" }}>{label}</span>
                     <ChevronRight size={13} style={{ opacity: 0.28, flexShrink: 0 }} />
@@ -285,20 +328,20 @@ export function AdminShell({ children, user }: { children: React.ReactNode; user
             <button type="submit" style={{
               display: "flex", alignItems: "center",
               gap: 12,
-              padding: open ? "10px 12px" : "11px",
+              padding: asideExpanded ? "10px 12px" : "11px",
               borderRadius: 10,
               background: "transparent", border: "none",
               color: T.textDim, fontSize: 14, fontWeight: 500,
               cursor: "pointer", fontFamily: "inherit",
               width: "100%",
-              justifyContent: open ? "flex-start" : "center",
+              justifyContent: asideExpanded ? "flex-start" : "center",
             }}>
               <LogOut size={17} strokeWidth={1.7} style={{ flexShrink: 0 }} />
-              {open && <span>Sign out</span>}
+              {asideExpanded && <span>Sign out</span>}
             </button>
           </form>
         </div>
-      </aside>
+      </div>
 
       {/* ═══════════════════════════════════════════════
           RIGHT SIDE
@@ -308,14 +351,26 @@ export function AdminShell({ children, user }: { children: React.ReactNode; user
         {/* Top header */}
         <header style={{
           flexShrink: 0,
-          height: 73,
+          height: isMobile ? 60 : 73,
           display: "flex", alignItems: "center", justifyContent: "space-between",
-          padding: "0 32px",
+          padding: isMobile ? "0 12px" : "0 32px",
+          gap: isMobile ? 10 : 0,
           background: T.bg,
           borderBottom: `1px solid ${T.border}`,
         }}>
+          {/* Hamburger (mobile only) */}
+          {isMobile && (
+            <button
+              onClick={() => setMobileOpen(true)}
+              style={{ ...headerIconBtn, flexShrink: 0 }}
+              aria-label="Open menu"
+            >
+              <Menu size={18} strokeWidth={1.8} />
+            </button>
+          )}
+
           {/* Greeting */}
-          <div style={{ flexShrink: 0 }}>
+          <div style={{ flexShrink: 0, minWidth: 0, display: isMobile ? "none" : "block" }}>
             <p style={{ color: T.text, fontSize: 15, fontWeight: 700, margin: 0, letterSpacing: "-0.01em" }}>
               {greeting}, {name}
             </p>
@@ -325,8 +380,9 @@ export function AdminShell({ children, user }: { children: React.ReactNode; user
           </div>
 
           {/* Search */}
-          <div style={{ margin: "0 32px", flex: 1, maxWidth: 300 }}>
+          <div style={{ margin: isMobile ? 0 : "0 32px", flex: 1, minWidth: 0, maxWidth: isMobile ? "none" : 300 }}>
             <AdminSearch
+              compact={isMobile}
               T={{
                 searchBg: T.searchBg, searchBorder: T.searchBorder, searchPlaceholder: T.searchPlaceholder,
                 searchKbd: T.searchKbd, searchKbdBg: T.searchKbdBg,
@@ -337,10 +393,12 @@ export function AdminShell({ children, user }: { children: React.ReactNode; user
 
           {/* Action icons */}
           <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
-            <div style={{ position: "relative" }}>
-              <button style={headerIconBtn}><MessageSquare size={16} strokeWidth={1.6} /></button>
-              <span style={hdBadge}>3</span>
-            </div>
+            {!isMobile && (
+              <div style={{ position: "relative" }}>
+                <button style={headerIconBtn}><MessageSquare size={16} strokeWidth={1.6} /></button>
+                <span style={hdBadge}>3</span>
+              </div>
+            )}
             <NotificationsBell
               headerIconBtn={headerIconBtn}
               badgeStyle={hdBadge}

@@ -92,6 +92,37 @@ export async function POST(req: Request) {
       .eq("stripe_customer_id", customerId);
   }
 
+  // Disputes on either a platform subscription charge or a shop's own Connect
+  // charge. `event.account` is only set for events on a connected account —
+  // requires this endpoint to also be enabled for Connect events in the
+  // Stripe Dashboard (Developers > Webhooks > this endpoint > "Listen to
+  // events on Connected accounts"), not just direct platform events.
+  if (event.type === "charge.dispute.created" || event.type === "charge.dispute.updated") {
+    const dispute = event.data.object as Stripe.Dispute;
+    const connectedAccountId = event.account ?? null;
+
+    let shopId: string | null = null;
+    if (connectedAccountId) {
+      const { data: shop } = await admin.from("shops").select("id").eq("stripe_account_id", connectedAccountId).maybeSingle();
+      shopId = (shop?.id as string | undefined) ?? null;
+    }
+
+    await admin.from("disputes").upsert(
+      {
+        stripe_dispute_id: dispute.id,
+        stripe_charge_id: typeof dispute.charge === "string" ? dispute.charge : dispute.charge.id,
+        shop_id: shopId,
+        amount: dispute.amount / 100,
+        currency: dispute.currency,
+        reason: dispute.reason,
+        status: dispute.status,
+        is_platform: !connectedAccountId,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "stripe_dispute_id" },
+    );
+  }
+
   if (event.type === "payment_intent.succeeded") {
     const pi = event.data.object as Stripe.PaymentIntent;
     const appointmentId = pi.metadata?.appointment_id;

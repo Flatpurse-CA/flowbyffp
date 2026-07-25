@@ -2,19 +2,23 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { banUser, unbanUser, deleteUser } from "./actions";
 import { UserX, UserCheck, Trash2 } from "lucide-react";
 import { PlanSelect } from "./PlanSelect";
+import { formatCAD } from "@/lib/plans";
+import { sumRevenueByShop } from "@/lib/admin/shopRevenue";
 
 export default async function AdminUsersPage() {
   const admin = createAdminClient();
 
-  const [usersRes, profilesRes, shopsRes] = await Promise.all([
+  const [usersRes, profilesRes, shopsRes, apptsRes] = await Promise.all([
     admin.auth.admin.listUsers({ perPage: 1000 }),
     admin.from("profiles").select("id, first_name, last_name"),
-    admin.from("shops").select("owner_id, name, plan"),
+    admin.from("shops").select("id, owner_id, name, plan"),
+    admin.from("appointments").select("shop_id, price").eq("status", "completed"),
   ]);
 
   const users    = usersRes.data?.users ?? [];
   const profiles = Object.fromEntries((profilesRes.data ?? []).map(p => [p.id, p]));
   const shops    = Object.fromEntries((shopsRes.data ?? []).map(s => [s.owner_id, s]));
+  const revenueByShop = sumRevenueByShop((apptsRes.data ?? []) as { shop_id: string; price: number }[]);
 
   const rows = users
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
@@ -24,6 +28,7 @@ export default async function AdminUsersPage() {
       name:      profiles[u.id] ? `${profiles[u.id].first_name} ${profiles[u.id].last_name}` : null,
       shopName:  shops[u.id]?.name ?? null,
       plan:      shops[u.id]?.plan ?? null,
+      revenue:   shops[u.id] ? revenueByShop[shops[u.id].id] ?? 0 : null,
       createdAt: u.created_at,
       isBanned:  !!(u.banned_until && new Date(u.banned_until) > new Date()),
     }));
@@ -42,10 +47,10 @@ export default async function AdminUsersPage() {
         </div>
       ) : (
         <div style={{ background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 16, overflowY: "hidden", overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 700 }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 800 }}>
             <thead>
               <tr style={{ background: "rgba(255,255,255,0.015)" }}>
-                {["User", "Shop", "Plan", "Joined", "Status", "Actions"].map(h => (
+                {["User", "Shop", "Plan", "Revenue", "Joined", "Status", "Actions"].map(h => (
                   <th key={h} style={{
                     padding: "11px 18px", textAlign: "left",
                     color: "rgba(255,255,255,0.28)", fontSize: 11,
@@ -95,6 +100,11 @@ export default async function AdminUsersPage() {
                       ) : (
                         <span style={{ color: "rgba(255,255,255,0.18)", fontSize: 12 }}>—</span>
                       )}
+                    </td>
+
+                    {/* Revenue */}
+                    <td style={{ padding: "13px 18px", color: row.revenue ? "rgba(255,255,255,0.55)" : "rgba(255,255,255,0.18)", fontSize: 12.5, fontWeight: 600, whiteSpace: "nowrap" }}>
+                      {row.revenue !== null ? formatCAD(row.revenue) : "—"}
                     </td>
 
                     {/* Joined */}

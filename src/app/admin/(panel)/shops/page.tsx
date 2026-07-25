@@ -1,13 +1,15 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { MapPin } from "lucide-react";
-import { PLAN_COLORS, PLAN_BG, planLabel } from "@/lib/plans";
+import { PLAN_COLORS, PLAN_BG, planLabel, formatCAD } from "@/lib/plans";
+import { sumRevenueByShop } from "@/lib/admin/shopRevenue";
 
 export default async function AdminShopsPage() {
   const admin = createAdminClient();
 
-  const [shopsRes, usersRes] = await Promise.all([
+  const [shopsRes, usersRes, apptsRes] = await Promise.all([
     admin.from("shops").select("*").order("created_at", { ascending: false }),
     admin.auth.admin.listUsers({ perPage: 1000 }),
+    admin.from("appointments").select("shop_id, price").eq("status", "completed"),
   ]);
 
   const shops = (shopsRes.data ?? []) as {
@@ -18,12 +20,15 @@ export default async function AdminShopsPage() {
     city: string;
     province: string;
     plan: string;
+    subscription_status: string | null;
     created_at: string;
   }[];
 
   const emailMap = Object.fromEntries(
     (usersRes.data?.users ?? []).map(u => [u.id, u.email ?? "—"])
   );
+
+  const revenueByShop = sumRevenueByShop((apptsRes.data ?? []) as { shop_id: string; price: number }[]);
 
   return (
     <div style={{ maxWidth: 1100 }}>
@@ -39,10 +44,10 @@ export default async function AdminShopsPage() {
         </div>
       ) : (
         <div style={{ background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 16, overflowY: "hidden", overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 640 }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 820 }}>
             <thead>
               <tr style={{ background: "rgba(255,255,255,0.015)" }}>
-                {["Shop", "Type", "Location", "Owner", "Plan", "Joined"].map(h => (
+                {["Shop", "Type", "Location", "Owner", "Plan", "Billing", "Revenue", "Joined"].map(h => (
                   <th key={h} style={{
                     padding: "11px 18px", textAlign: "left",
                     color: "rgba(255,255,255,0.28)", fontSize: 11,
@@ -106,6 +111,27 @@ export default async function AdminShopsPage() {
                       }}>
                         {planLabel(shop.plan)}
                       </span>
+                    </td>
+
+                    {/* Billing status */}
+                    <td style={{ padding: "13px 18px" }}>
+                      {shop.subscription_status ? (
+                        <span style={{
+                          fontSize: 10, fontWeight: 700, padding: "3px 9px", borderRadius: 20,
+                          letterSpacing: "0.04em", textTransform: "capitalize",
+                          color: shop.subscription_status === "active" ? "rgb(52,211,153)" : "rgb(251,191,36)",
+                          background: shop.subscription_status === "active" ? "rgba(16,185,129,0.1)" : "rgba(245,158,11,0.1)",
+                        }}>
+                          {shop.subscription_status}
+                        </span>
+                      ) : (
+                        <span style={{ color: "rgba(255,255,255,0.2)", fontSize: 12 }}>—</span>
+                      )}
+                    </td>
+
+                    {/* Revenue */}
+                    <td style={{ padding: "13px 18px", color: "rgba(255,255,255,0.55)", fontSize: 12.5, fontWeight: 600, whiteSpace: "nowrap" }}>
+                      {formatCAD(revenueByShop[shop.id] ?? 0)}
                     </td>
 
                     {/* Date */}
