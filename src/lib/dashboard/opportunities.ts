@@ -5,9 +5,9 @@
 
 import type { ClientAppointment } from "./clients";
 import { deriveClients } from "./clients";
+import { findSlowestWeekday } from "./metrics";
 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
 export type Opportunity = {
   tag: string;
@@ -35,21 +35,12 @@ export function computeOpportunities(appointments: ClientAppointment[], now: Dat
       }
     : { tag: "WIN-BACK", color: "rgb(167,139,250)", text: "No overdue clients right now — nice work.", impact: null, available: true };
 
-  // Trailing 28 days, bucketed by weekday, to find the historically slowest day.
-  const trailingStart = new Date(now.getTime() - 28 * MS_PER_DAY);
-  const recent = appointments.filter(a => {
-    const t = new Date(a.starts_at).getTime();
-    return t >= trailingStart.getTime() && t <= now.getTime() && a.status !== "cancelled";
-  });
-  const byWeekday = new Array(7).fill(0);
-  for (const a of recent) byWeekday[new Date(a.starts_at).getDay()]++;
-  const weekdayCounts = byWeekday.map((count, i) => ({ count, i }));
-  const slowest = recent.length > 0 ? weekdayCounts.reduce((min, d) => d.count < min.count ? d : min) : null;
+  const slowest = findSlowestWeekday(appointments, now);
 
-  const slots: Opportunity = slowest && recent.length > 0
+  const slots: Opportunity = slowest
     ? {
         tag: "SLOTS", color: "rgb(52,211,153)",
-        text: `${WEEKDAYS[slowest.i]}s are your lowest-booked day over the last 4 weeks — consider a flash deal`,
+        text: `${WEEKDAYS[slowest.weekdayIndex]}s are your lowest-booked day over the last 4 weeks — consider a flash deal`,
         impact: avgTicket > 0 ? `+${fmtPrice(avgTicket)}/wk potential` : null,
         available: true,
       }

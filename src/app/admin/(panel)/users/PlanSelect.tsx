@@ -1,9 +1,9 @@
 "use client";
 
 import { changeUserPlan } from "./actions";
-import { PLAN_COLORS, PLAN_BG } from "@/lib/plans";
+import { PLAN_COLORS, PLAN_BG, planLabel } from "@/lib/plans";
 
-const PLAN_OPTIONS = ["starter", "pro", "unlimited", "founders"];
+const PLAN_OPTIONS = ["starter", "pro", "pro_plus", "enterprise"];
 
 export function PlanSelect({ userId, plan }: { userId: string; plan: string }) {
   return (
@@ -32,7 +32,7 @@ export function PlanSelect({ userId, plan }: { userId: string; plan: string }) {
         }}
       >
         {PLAN_OPTIONS.map(p => (
-          <option key={p} value={p} style={{ background: "#1a1a1a", textTransform: "capitalize" }}>{p}</option>
+          <option key={p} value={p} style={{ background: "#1a1a1a" }}>{planLabel(p)}</option>
         ))}
       </select>
     </form>

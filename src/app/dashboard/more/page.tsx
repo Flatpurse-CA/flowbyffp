@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import {
-  Users2, Zap, LayoutGrid, Sparkles, Settings, MessageSquare, LogOut,
+  Users2, Zap, LayoutGrid, Compass, Sparkles, Settings, MessageSquare, LogOut,
   ChevronRight, type LucideIcon,
 } from "lucide-react";
 import { getShopContext } from "@/lib/dashboard/shop";
@@ -82,6 +82,8 @@ export default async function MorePage() {
             <Row icon={Zap}        label="AutoPilot"   sub="Automated recovery flows"        href="/dashboard/autopilot" />
             <Divider />
             <Row icon={LayoutGrid} label="Operations"  sub="Ops score, KPIs, AI insights"    href="/dashboard/operations" />
+            <Divider />
+            <Row icon={Compass}    label="Flow Coach"  sub="Your AI business advisor"        href="/dashboard/flow-coach" />
             <Divider />
             <Row icon={Sparkles}   label="Daily Brief" sub="Your morning shop summary"       href="/dashboard/daily-brief" />
           </div>

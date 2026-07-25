@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { Users, Store, ClipboardList, CreditCard, TrendingUp } from "lucide-react";
-import { PLAN_COLORS as PLAN_COLOR, planPrice, formatCAD } from "@/lib/plans";
+import { PLAN_COLORS as PLAN_COLOR, planPrice, planLabel, formatCAD } from "@/lib/plans";
 
 function StatCard({
   label, value, Icon, iconColor, iconBg, subtitle,
@@ -96,7 +96,7 @@ export default async function AdminOverviewPage() {
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
 
       {/* ── Stat cards ── */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14 }}>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5">
         <StatCard
           label="Total Members"
           value={users.length}
@@ -132,7 +132,7 @@ export default async function AdminOverviewPage() {
       </div>
 
       {/* ── Growth chart + Recent members ── */}
-      <div style={{ display: "grid", gridTemplateColumns: "1.6fr 1fr", gap: 14 }}>
+      <div className="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-3.5">
 
         {/* Member growth */}
         <div style={{ ...card, padding: "22px 24px" }}>
@@ -298,7 +298,7 @@ export default async function AdminOverviewPage() {
             <p style={{ color: "rgba(255,255,255,0.18)", fontSize: 12, margin: 0 }}>Shops will appear here once owners register</p>
           </div>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
             {recentShops.map((shop, i) => {
               const color = PLAN_COLOR[shop.plan] ?? PLAN_COLOR.starter;
               const date  = new Date(shop.created_at).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" });
@@ -321,7 +321,7 @@ export default async function AdminOverviewPage() {
                       textTransform: "capitalize", color,
                       background: `${color}1A`,
                     }}>
-                      {shop.plan}
+                      {planLabel(shop.plan)}
                     </span>
                   </div>
                   <p style={{ color: "rgb(240,240,248)", fontSize: 13, fontWeight: 700, margin: "0 0 4px" }}>{shop.name}</p>
@@ -368,7 +368,7 @@ export default async function AdminOverviewPage() {
             <p style={{ color: "rgba(255,255,255,0.25)", fontSize: 13, margin: 0 }}>No waitlist entries yet</p>
           </div>
         ) : (
-          <div style={card}>
+          <div style={card} className="overflow-x-auto">
             <table style={{ width: "100%", borderCollapse: "collapse" }}>
               <thead>
                 <tr style={{ background: "rgba(255,255,255,0.02)" }}>

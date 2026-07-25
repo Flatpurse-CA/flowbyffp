@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { requireShop, getShopContext } from "@/lib/dashboard/shop";
 import { stripe } from "@/lib/stripe";
 import { getRequestOrigin } from "@/lib/requestOrigin";
+import { getPlan, getStripePriceId, type BillingInterval } from "@/lib/plans";
 
 export type BusinessHourRow = { weekday: number; open: boolean; start: string; end: string };
 
@@ -46,6 +47,129 @@ export async function startStripeOnboarding(): Promise<{ url?: string; error?: s
     return { url: accountLink.url };
   } catch (e) {
     return { error: e instanceof Error ? e.message : "Couldn't start Stripe onboarding" };
+  }
+}
+
+export type BillingStatus = {
+  plan: string;
+  subscriptionStatus: string | null;
+  billingInterval: BillingInterval | null;
+  isFounder: boolean;
+  foundersEligible: boolean;
+  foundersSpotsRemaining: number;
+};
+
+export async function getBillingStatus(): Promise<BillingStatus | null> {
+  const ctx = await getShopContext();
+  if (!ctx) return null;
+  const { supabase, shopId } = await requireShop();
+
+  const [{ data: shop }, { data: founders }] = await Promise.all([
+    supabase.from("shops").select("plan, subscription_status, billing_interval, is_founder, founder_discount_claimed_at").eq("id", shopId).maybeSingle(),
+    supabase.from("founders_program").select("spots_remaining").eq("id", true).maybeSingle(),
+  ]);
+
+  const spotsRemaining = founders?.spots_remaining ?? 0;
+  return {
+    plan: (shop?.plan as string) ?? "starter",
+    subscriptionStatus: (shop?.subscription_status as string | null) ?? null,
+    billingInterval: (shop?.billing_interval as BillingInterval | null) ?? null,
+    isFounder: Boolean(shop?.is_founder),
+    foundersEligible: !shop?.founder_discount_claimed_at && spotsRemaining > 0,
+    foundersSpotsRemaining: spotsRemaining,
+  };
+}
+
+/**
+ * Starts Stripe Checkout for Pro/Pro+. Starter needs no payment (handled by
+ * just writing shops.plan directly); Enterprise is sales-negotiated, not
+ * self-serve. `claimFounders` shows the 40%-off coupon on the Checkout page
+ * itself so the customer sees the real price they're agreeing to — the spot is
+ * only actually decremented once the webhook sees payment succeed.
+ */
+export async function startCheckout(input: { planKey: "pro" | "pro_plus"; interval: BillingInterval; claimFounders: boolean }): Promise<{ url?: string; error?: string }> {
+  const ctx = await getShopContext();
+  if (!ctx || ctx.role !== "owner") return { error: "Only the shop owner can manage billing" };
+  const { supabase, shopId } = await requireShop();
+
+  const { data: shop } = await supabase
+    .from("shops")
+    .select("stripe_customer_id, name, founder_discount_claimed_at")
+    .eq("id", shopId)
+    .maybeSingle();
+  if (!shop) return { error: "Shop not found" };
+
+  const plan = getPlan(input.planKey);
+  const origin = await getRequestOrigin();
+
+  try {
+    let customerId = shop.stripe_customer_id as string | null;
+    if (!customerId) {
+      const customer = await stripe().customers.create({ name: shop.name as string, metadata: { shop_id: shopId } });
+      customerId = customer.id;
+      await supabase.from("shops").update({ stripe_customer_id: customerId }).eq("id", shopId);
+    }
+
+    const wantsFounders = input.claimFounders && !shop.founder_discount_claimed_at;
+    let foundersSpotsLeft = 0;
+    if (wantsFounders) {
+      const { data } = await supabase.from("founders_program").select("spots_remaining").eq("id", true).maybeSingle();
+      foundersSpotsLeft = data?.spots_remaining ?? 0;
+    }
+    const applyFoundersDiscount = wantsFounders && foundersSpotsLeft > 0;
+
+    const session = await stripe().checkout.sessions.create({
+      mode: "subscription",
+      customer: customerId,
+      line_items: [{ price: getStripePriceId(input.planKey, input.interval), quantity: 1 }],
+      discounts: applyFoundersDiscount ? [{ coupon: "founders-40-off" }] : undefined,
+      allow_promotion_codes: !applyFoundersDiscount,
+      success_url: `${origin}/dashboard/settings?tab=Billing&checkout=success`,
+      cancel_url: `${origin}/dashboard/settings?tab=Billing&checkout=cancelled`,
+      metadata: {
+        context: "platform_subscription",
+        shop_id: shopId,
+        plan_key: plan.key,
+        interval: input.interval,
+        founder_claim: applyFoundersDiscount ? "true" : "false",
+      },
+    });
+
+    return { url: session.url ?? undefined };
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "Couldn't start checkout" };
+  }
+}
+
+/** Starter has no Stripe subscription — just record the plan directly. Downgrading off a paid plan should go through openBillingPortal (cancel) instead, so subscription_status stays truthful. */
+export async function chooseStarterPlan(): Promise<{ error?: string }> {
+  const ctx = await getShopContext();
+  if (!ctx || ctx.role !== "owner") return { error: "Only the shop owner can change plans" };
+  const { supabase, shopId } = await requireShop();
+
+  const { error } = await supabase.from("shops").update({ plan: "starter" }).eq("id", shopId);
+  if (error) return { error: error.message };
+  revalidatePath("/dashboard/settings");
+  return {};
+}
+
+export async function openBillingPortal(): Promise<{ url?: string; error?: string }> {
+  const ctx = await getShopContext();
+  if (!ctx || ctx.role !== "owner") return { error: "Only the shop owner can manage billing" };
+  const { supabase, shopId } = await requireShop();
+
+  const { data: shop } = await supabase.from("shops").select("stripe_customer_id").eq("id", shopId).maybeSingle();
+  if (!shop?.stripe_customer_id) return { error: "No billing account yet — subscribe to a plan first" };
+
+  const origin = await getRequestOrigin();
+  try {
+    const session = await stripe().billingPortal.sessions.create({
+      customer: shop.stripe_customer_id as string,
+      return_url: `${origin}/dashboard/settings?tab=Billing`,
+    });
+    return { url: session.url };
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "Couldn't open billing portal" };
   }
 }
 

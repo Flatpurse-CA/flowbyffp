@@ -29,7 +29,7 @@ export default async function AdminPlansPage() {
       </div>
 
       {/* Plan cards */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, marginBottom: 28 }}>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3" style={{ marginBottom: 28 }}>
         {PLANS.map(({ key, label, priceLabel, color, bg, border }) => {
           const count = planCounts[key] ?? 0;
           const pct   = totalShops ? Math.round((count / totalShops) * 100) : 0;
@@ -71,8 +71,8 @@ export default async function AdminPlansPage() {
               </span>
               <span style={{ color: "rgba(255,255,255,0.28)", fontSize: 12 }}>{planShops.length} shop{planShops.length !== 1 ? "s" : ""}</span>
             </div>
-            <div style={{ background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 14, overflow: "hidden" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <div style={{ background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 14, overflowY: "hidden", overflowX: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 480 }}>
                 <thead>
                   <tr style={{ background: "rgba(255,255,255,0.015)" }}>
                     {["Shop", "Owner", "Joined"].map(h => (

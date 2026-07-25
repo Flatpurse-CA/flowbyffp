@@ -1,6 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { MapPin } from "lucide-react";
-import { PLAN_COLORS, PLAN_BG } from "@/lib/plans";
+import { PLAN_COLORS, PLAN_BG, planLabel } from "@/lib/plans";
 
 export default async function AdminShopsPage() {
   const admin = createAdminClient();
@@ -38,8 +38,8 @@ export default async function AdminShopsPage() {
           No shops yet.
         </div>
       ) : (
-        <div style={{ background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 16, overflow: "hidden" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <div style={{ background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 16, overflowY: "hidden", overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 640 }}>
             <thead>
               <tr style={{ background: "rgba(255,255,255,0.015)" }}>
                 {["Shop", "Type", "Location", "Owner", "Plan", "Joined"].map(h => (
@@ -104,7 +104,7 @@ export default async function AdminShopsPage() {
                         letterSpacing: "0.04em", textTransform: "capitalize",
                         color: planColor, background: planBg,
                       }}>
-                        {shop.plan}
+                        {planLabel(shop.plan)}
                       </span>
                     </td>
 

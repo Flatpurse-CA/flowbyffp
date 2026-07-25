@@ -8,9 +8,14 @@ import {
   Wallet, Clock, Receipt, Zap,
   ChevronDown, ChevronUp,
 } from "lucide-react";
-import { updateFamilyHours, updateBusinessHours, startStripeOnboarding, type BusinessHourRow } from "./actions";
+import { updateFamilyHours, updateBusinessHours, startStripeOnboarding, startCheckout, chooseStarterPlan, openBillingPortal, type BusinessHourRow, type BillingStatus } from "./actions";
+import { PLANS, type BillingInterval } from "@/lib/plans";
 
 export type FamilyHoursSettings = { enabled: boolean; start: string; end: string };
+
+function redirectTo(url: string) {
+  window.location.href = url;
+}
 
 // ─── Shared styles ────────────────────────────────────────────────────────────
 
@@ -144,7 +149,7 @@ function buildHourRows(initial: BusinessHourRow[]): HourRow[] {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export function SettingsClient({ initialFamilyHours, initialBusinessHours, initialStripeConnected, initialBookingUrl }: { initialFamilyHours: FamilyHoursSettings; initialBusinessHours: BusinessHourRow[]; initialStripeConnected: boolean; initialBookingUrl: string | null }) {
+export function SettingsClient({ initialFamilyHours, initialBusinessHours, initialStripeConnected, initialBookingUrl, initialBilling }: { initialFamilyHours: FamilyHoursSettings; initialBusinessHours: BusinessHourRow[]; initialStripeConnected: boolean; initialBookingUrl: string | null; initialBilling: BillingStatus | null }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab") as TabLabel | null;
@@ -164,6 +169,48 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
   const [taxInclusive, setTaxInclusive] = useState(false);
   const [connectingStripe, setConnectingStripe] = useState(false);
   const [stripeError, setStripeError]           = useState<string | null>(null);
+  const [billingInterval, setBillingInterval]   = useState<BillingInterval>(initialBilling?.billingInterval ?? "monthly");
+  const [pendingPlanKey, setPendingPlanKey]     = useState<string | null>(null);
+  const [billingError, setBillingError]         = useState<string | null>(null);
+  const [portalLoading, setPortalLoading]       = useState(false);
+
+  const currentPlan = PLANS.find(p => p.key === initialBilling?.plan) ?? PLANS[0];
+
+  const selectPlan = async (planKey: string, claimFounders: boolean) => {
+    setBillingError(null);
+    if (planKey === "starter") {
+      setPendingPlanKey(planKey);
+      const res = await chooseStarterPlan();
+      setPendingPlanKey(null);
+      if (res.error) setBillingError(res.error);
+      else router.refresh();
+      return;
+    }
+    if (planKey === "enterprise") {
+      redirectTo("mailto:sales@flatpurse.com?subject=Enterprise%20plan");
+      return;
+    }
+    setPendingPlanKey(planKey);
+    const res = await startCheckout({ planKey: planKey as "pro" | "pro_plus", interval: billingInterval, claimFounders });
+    if (res.error) {
+      setBillingError(res.error);
+      setPendingPlanKey(null);
+      return;
+    }
+    if (res.url) redirectTo(res.url);
+  };
+
+  const manageBilling = async () => {
+    setPortalLoading(true);
+    setBillingError(null);
+    const res = await openBillingPortal();
+    if (res.error) {
+      setBillingError(res.error);
+      setPortalLoading(false);
+      return;
+    }
+    if (res.url) window.location.href = res.url;
+  };
 
   const connectStripe = async () => {
     setConnectingStripe(true);
@@ -619,7 +666,7 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
       {/* ── Billing ── */}
       {tab === "Billing" && (
         <>
-          {/* Plan card */}
+          {/* Current plan */}
           <div style={{
             ...card,
             background: "linear-gradient(135deg, rgb(15,11,40), rgb(28,16,70))",
@@ -627,53 +674,88 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
           }}>
             <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
               <div>
-                <span style={{ fontSize: 10, fontWeight: 700, padding: "3px 9px", borderRadius: 20, background: "rgba(109,40,217,0.35)", color: "rgb(196,181,253)", letterSpacing: "0.06em", textTransform: "uppercase" }}>Pro plan</span>
+                <span style={{ fontSize: 10, fontWeight: 700, padding: "3px 9px", borderRadius: 20, background: "rgba(109,40,217,0.35)", color: "rgb(196,181,253)", letterSpacing: "0.06em", textTransform: "uppercase" }}>
+                  {currentPlan.label} plan{initialBilling?.isFounder ? " · Founder" : ""}
+                </span>
                 <p style={{ color: "rgb(250,250,250)", fontSize: 28, fontWeight: 800, margin: "12px 0 4px", letterSpacing: "-0.04em" }}>
-                  C$29<span style={{ fontSize: 14, fontWeight: 500, color: "rgba(255,255,255,0.45)" }}>/month</span>
+                  {currentPlan.monthlyPrice === null
+                    ? "Custom"
+                    : currentPlan.monthlyPrice === 0
+                    ? "Free"
+                    : <>C${initialBilling?.billingInterval === "annual" ? currentPlan.annualPrice : currentPlan.monthlyPrice}<span style={{ fontSize: 14, fontWeight: 500, color: "rgba(255,255,255,0.45)" }}>/{initialBilling?.billingInterval === "annual" ? "year" : "month"}</span></>}
                 </p>
-                <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, margin: 0 }}>Renews Jul 17, 2026</p>
+                <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, margin: 0 }}>
+                  {initialBilling?.subscriptionStatus ? `Status: ${initialBilling.subscriptionStatus}` : "No active subscription"}
+                </p>
               </div>
               <Shield size={36} color="rgba(139,92,246,0.5)" strokeWidth={1.2} />
             </div>
-            <div style={{ display: "flex", gap: 10, marginTop: 18 }}>
-              <button style={{ padding: "9px 18px", borderRadius: 9, background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.6)", fontSize: 13, cursor: "pointer" }}>Manage plan</button>
-              <button style={{ padding: "9px 18px", borderRadius: 9, background: "linear-gradient(90deg, rgb(109,40,217), rgb(99,102,241))", border: "none", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Upgrade to Elite</button>
-            </div>
+            {initialBilling?.plan !== "starter" && (
+              <div style={{ display: "flex", gap: 10, marginTop: 18 }}>
+                <button onClick={manageBilling} disabled={portalLoading} style={{ padding: "9px 18px", borderRadius: 9, background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.6)", fontSize: 13, cursor: portalLoading ? "default" : "pointer", opacity: portalLoading ? 0.6 : 1 }}>
+                  {portalLoading ? "Opening…" : "Manage billing (invoices, card, cancel)"}
+                </button>
+              </div>
+            )}
           </div>
 
-          {/* Payment method */}
-          <div style={card}>
-            <p style={{ color: "var(--dtext)", fontSize: 14, fontWeight: 700, margin: "0 0 14px" }}>Payment method</p>
-            <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 16px", background: "var(--dw04)", border: "1px solid var(--dw08)", borderRadius: 12 }}>
-              <div style={{ width: 40, height: 26, borderRadius: 5, background: "linear-gradient(135deg, #1434CB, #0052CC)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <CreditCard size={14} color="white" strokeWidth={1.5} />
-              </div>
-              <div style={{ flex: 1 }}>
-                <p style={{ color: "var(--dtext)", fontSize: 13, fontWeight: 600, margin: "0 0 2px" }}>•••• •••• •••• 4242</p>
-                <p style={{ color: "var(--dw35)", fontSize: 11, margin: 0 }}>Expires 04/28</p>
-              </div>
-              <span style={{ fontSize: 10, fontWeight: 700, padding: "3px 9px", borderRadius: 20, background: "rgba(52,211,153,0.1)", color: "rgb(52,211,153)" }}>DEFAULT</span>
-            </div>
-            <button style={{ marginTop: 12, padding: "9px 18px", borderRadius: 9, background: "var(--dw05)", border: "1px solid var(--dw09)", color: "var(--dw5)", fontSize: 13, cursor: "pointer" }}>
-              + Add payment method
-            </button>
-          </div>
+          {billingError && (
+            <p style={{ color: "rgb(248,113,113)", fontSize: 12.5, margin: 0 }}>{billingError}</p>
+          )}
 
-          {/* Invoices */}
-          <div style={card}>
-            <p style={{ color: "var(--dtext)", fontSize: 14, fontWeight: 700, margin: "0 0 14px" }}>Recent invoices</p>
-            {[
-              { date: "Jun 17, 2026", amount: "C$29.00" },
-              { date: "May 17, 2026", amount: "C$29.00" },
-              { date: "Apr 17, 2026", amount: "C$29.00" },
-            ].map((inv, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0", borderBottom: i < 2 ? "1px solid var(--dw05)" : "none" }}>
-                <span style={{ color: "var(--dw5)", fontSize: 13 }}>{inv.date}</span>
-                <span style={{ color: "var(--dtext)", fontSize: 13, fontWeight: 600 }}>{inv.amount}</span>
-                <span style={{ fontSize: 10, fontWeight: 700, padding: "3px 9px", borderRadius: 20, background: "rgba(52,211,153,0.1)", color: "rgb(52,211,153)" }}>Paid</span>
-                <button style={{ fontSize: 12, color: "rgba(139,92,246,0.7)", background: "none", border: "none", cursor: "pointer" }}>Download</button>
+          {/* Founders banner */}
+          {initialBilling?.foundersEligible && (
+            <div style={{ background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.25)", borderRadius: 16, padding: "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
+              <div>
+                <p style={{ color: "rgb(251,191,36)", fontSize: 13.5, fontWeight: 700, margin: "0 0 2px" }}>Founders Beta — {initialBilling.foundersSpotsRemaining} spots left</p>
+                <p style={{ color: "var(--dw45)", fontSize: 12.5, margin: 0 }}>40% off your first 12 months on Pro or Pro+, then 25% off forever. Applies automatically at checkout.</p>
               </div>
+            </div>
+          )}
+
+          {/* Billing interval toggle */}
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            {(["monthly", "annual"] as BillingInterval[]).map(iv => (
+              <button key={iv} onClick={() => setBillingInterval(iv)} style={{
+                padding: "7px 16px", borderRadius: 20, cursor: "pointer", fontSize: 12.5, fontWeight: 700,
+                border: `1px solid ${billingInterval === iv ? "rgba(139,92,246,0.4)" : "var(--dw08)"}`,
+                background: billingInterval === iv ? "rgba(109,40,217,0.15)" : "var(--dw03)",
+                color: billingInterval === iv ? "rgb(210,196,254)" : "var(--dw4)",
+              }}>
+                {iv === "monthly" ? "Monthly" : "Annual (2 months free)"}
+              </button>
             ))}
+          </div>
+
+          {/* Plan cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {PLANS.map(plan => {
+              const isCurrent = initialBilling?.plan === plan.key;
+              const price = plan.monthlyPrice === null ? "Custom" : plan.monthlyPrice === 0 ? "Free" : `C$${billingInterval === "annual" ? plan.annualPrice : plan.monthlyPrice}/${billingInterval === "annual" ? "yr" : "mo"}`;
+              return (
+                <div key={plan.key} style={{ ...card, border: `1px solid ${isCurrent ? plan.color : "var(--dw07)"}`, display: "flex", flexDirection: "column", gap: 10 }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: plan.color, letterSpacing: "0.06em", textTransform: "uppercase" }}>{plan.label}</span>
+                    {plan.badge && <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 20, background: plan.bg, color: plan.color }}>{plan.badge}</span>}
+                  </div>
+                  <p style={{ color: "var(--dtext)", fontSize: 20, fontWeight: 800, margin: 0 }}>{price}</p>
+                  <p style={{ color: "var(--dw35)", fontSize: 12, margin: 0 }}>{plan.perfectFor}</p>
+                  <button
+                    onClick={() => selectPlan(plan.key, Boolean(initialBilling?.foundersEligible))}
+                    disabled={isCurrent || pendingPlanKey === plan.key}
+                    style={{
+                      marginTop: 6, padding: "9px 16px", borderRadius: 9, fontSize: 12.5, fontWeight: 700,
+                      border: "none", cursor: isCurrent ? "default" : "pointer",
+                      background: isCurrent ? "var(--dw05)" : "rgb(109,40,217)",
+                      color: isCurrent ? "var(--dw35)" : "white",
+                      opacity: pendingPlanKey === plan.key ? 0.6 : 1,
+                    }}
+                  >
+                    {isCurrent ? "Current plan" : pendingPlanKey === plan.key ? "Redirecting…" : plan.key === "enterprise" ? "Contact sales" : "Choose plan"}
+                  </button>
+                </div>
+              );
+            })}
           </div>
         </>
       )}

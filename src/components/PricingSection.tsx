@@ -8,15 +8,30 @@ const BRAND_PURPLE = "#712AE2";
 
 const PLANS = [
   {
+    id: "starter",
+    label: "Starter",
+    badge: null,
+    originalPrice: null,
+    price: "Free",
+    priceSuffix: "forever",
+    subtitle: "No card required",
+    description: "Perfect for solo businesses getting started",
+    features: ["Dashboard", "Online Booking Page", "Payments", "1 Team Member", "Up to 30 bookings/mo"],
+    cta: "Start for free",
+    href: "/signup",
+    gradient: "radial-gradient(140% 60% at 50% 100%, rgb(109,40,217) 0%, rgb(76,29,149) 28%, rgb(30,10,60) 58%, rgba(9,9,11,0) 85%)",
+    isFounders: false,
+  },
+  {
     id: "pro",
     label: "Pro",
-    badge: null,
+    badge: "Most Popular",
     originalPrice: "C$59/mo",
     price: "C$35.40",
     priceSuffix: "/mo",
     subtitle: "Year 1 · then C$44.25/mo forever",
-    description: "Best for solo operators and growing salons",
-    features: ["Unlimited appts", "1 staff", "Booking page", "AutoPilot basic", "Tap to Pay"],
+    description: "Best for growing service businesses",
+    features: ["AI Front Desk", "AI Daily Brief", "Unlimited bookings", "Family Hours", "Up to 10 team members"],
     cta: "Get started with Pro",
     href: "/signup",
     gradient: "radial-gradient(140% 60% at 50% 100%, rgb(109,40,217) 0%, rgb(76,29,149) 28%, rgb(30,10,60) 58%, rgba(9,9,11,0) 85%)",
@@ -25,13 +40,13 @@ const PLANS = [
   {
     id: "pro-plus",
     label: "Pro+",
-    badge: "Most Popular",
-    originalPrice: "C$149/mo",
-    price: "C$89.40",
+    badge: null,
+    originalPrice: "C$119/mo",
+    price: "C$71.40",
     priceSuffix: "/mo",
-    subtitle: "Year 1 · then C$111.75/mo forever",
-    description: "Full power for multi-staff salons and studios",
-    features: ["Unlimited appts", "Full AutoPilot", "Client Intelligence", "SMS + Email", "Daily Brief"],
+    subtitle: "Year 1 · then C$89.25/mo forever",
+    description: "For businesses focused on growth",
+    features: ["Flow Coach™", "AI Autopilot", "Advanced Analytics", "Revenue Optimization", "Up to 25 team members"],
     cta: "Get started with Pro+",
     href: "/signup",
     gradient: "radial-gradient(140% 60% at 50% 100%, rgb(109,40,217) 0%, rgb(76,29,149) 28%, rgb(30,10,60) 58%, rgba(9,9,11,0) 85%)",
@@ -41,31 +56,16 @@ const PLANS = [
     id: "enterprise",
     label: "Enterprise",
     badge: null,
-    originalPrice: "C$274/mo",
-    price: "C$164.40",
-    priceSuffix: "/mo",
-    subtitle: "Year 1 · then C$205.50/mo forever",
-    description: "For large studios and multi-location shops",
-    features: ["Everything in Pro+", "Multi-location", "Custom integrations", "White-glove onboard", "SLA guarantee"],
-    cta: "Get started with Enterprise",
-    href: "/signup",
+    originalPrice: null,
+    price: "Custom",
+    priceSuffix: "",
+    subtitle: "Talk to sales",
+    description: "For multi-location businesses and larger orgs",
+    features: ["Everything in Pro+", "Unlimited locations", "Unlimited team members", "Dedicated CSM", "Enterprise security"],
+    cta: "Contact sales",
+    href: "mailto:sales@flatpurse.com?subject=Enterprise%20plan",
     gradient: "radial-gradient(140% 60% at 50% 100%, rgb(109,40,217) 0%, rgb(76,29,149) 28%, rgb(30,10,60) 58%, rgba(9,9,11,0) 85%)",
     isFounders: false,
-  },
-  {
-    id: "annual-founders",
-    label: "Annual Founders",
-    badge: "Best Deal",
-    originalPrice: "C$1,490/yr",
-    price: "C$894",
-    priceSuffix: "/yr",
-    subtitle: "Pro+ annual · C$74.50 effective monthly",
-    description: "Pro+ at half price — locked in forever. 50 spots only.",
-    features: ["Everything in Pro+", "Price locked forever", "Founding member badge", "Early access features", "50 spots remaining"],
-    cta: "Claim Annual Founders Rate",
-    href: "/signup",
-    gradient: "radial-gradient(140% 60% at 50% 100%, rgba(161,98,7,0.6) 0%, rgba(120,53,15,0.35) 40%, rgba(9,9,11,0) 75%)",
-    isFounders: true,
   },
 ];
 
@@ -133,7 +133,7 @@ export default function PricingSection() {
           margin: 0,
           maxWidth: 520,
         }}>
-          When beta ends, every member who enters a card gets 40% off for 12 months, then 25% off forever. No code required. No fine print. Here&apos;s what that looks like:
+          The first 40 businesses to join get 40% off Pro or Pro+ for 12 months, then 25% off forever. No code required. No fine print. Here&apos;s what that looks like:
         </p>
       </ScrollReveal>
 
@@ -225,12 +225,16 @@ export default function PricingSection() {
 
                 {/* Price */}
                 <div style={{ marginBottom: 4 }}>
-                  <span style={{
-                    fontSize: 11, color: "rgb(113,113,122)",
-                    textDecoration: "line-through", display: "block", marginBottom: 2,
-                  }}>
-                    {p.originalPrice}
-                  </span>
+                  {p.originalPrice ? (
+                    <span style={{
+                      fontSize: 11, color: "rgb(113,113,122)",
+                      textDecoration: "line-through", display: "block", marginBottom: 2,
+                    }}>
+                      {p.originalPrice}
+                    </span>
+                  ) : (
+                    <div style={{ height: 15, marginBottom: 2 }} />
+                  )}
                   <div style={{ display: "flex", alignItems: "baseline", gap: 2 }}>
                     <span style={{
                       fontSize: 32, fontWeight: 800, letterSpacing: "-0.04em", lineHeight: 1,
@@ -303,7 +307,7 @@ export default function PricingSection() {
           margin: "0 auto 28px",
           maxWidth: 480,
         }}>
-          Beta members are pre-qualified. The remaining 60 Founders spots open to the public on launch day.
+          Beta members are pre-qualified. Founders pricing is locked in for as long as your subscription stays active — cancel and you lose it for good.
         </p>
         <a href="/waitlist" style={{
           display: "inline-flex", alignItems: "center", gap: 8,

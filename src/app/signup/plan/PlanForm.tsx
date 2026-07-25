@@ -3,58 +3,26 @@
 import { useState } from "react";
 import { StepProgress } from "@/components/StepProgress";
 import { useTheme } from "@/lib/theme-context";
+import { PLANS as REAL_PLANS } from "@/lib/plans";
 import { choosePlan } from "./actions";
 
 const easing = "cubic-bezier(0.16, 1, 0.3, 1)";
 
-const PLANS = [
-  {
-    id: "starter",
-    label: "Starter",
-    badge: null,
-    price: "$0",
-    description: "Ideal for solo operators and small salons",
-    features: ["50 appts/mo", "1 staff", "Booking page", "AutoPilot basic", "Tap to Pay"],
-    cta: "Start for Free",
-  },
-  {
-    id: "pro",
-    label: "Pro",
-    badge: "Popular",
-    price: "C$49",
-    description: "Best for growing salons and studios",
-    features: ["Unlimited appts", "Full AutoPilot", "Client Intelligence", "SMS + Email", "Daily Brief"],
-    cta: "Continue with Pro",
-  },
-  {
-    id: "unlimited",
-    label: "Unlimited",
-    badge: null,
-    price: "C$274",
-    description: "For large studios and multi-location shops",
-    features: ["Everything in Pro+", "Multi-location", "Custom integrations", "White-glove onboard", "SLA guarantee"],
-    cta: "Continue with Unlimited",
-  },
-  {
-    id: "founders",
-    label: "Founders",
-    badge: "Limited",
-    price: "C$29",
-    description: "Pro at half price — locked in forever. 50 spots only.",
-    features: ["Everything in Pro", "Price locked forever", "Founding member badge", "Early access features", "50 spots remaining"],
-    cta: "Continue with Founders",
-  },
-];
+const PLANS = REAL_PLANS.map(p => ({
+  id: p.key,
+  label: p.label,
+  badge: p.badge ?? null,
+  price: p.monthlyPrice === null ? "Custom" : p.monthlyPrice === 0 ? "$0" : `C$${p.monthlyPrice}`,
+  priceSuffix: p.monthlyPrice === null ? "" : "/month",
+  description: p.perfectFor,
+  features: p.features.slice(0, 5),
+  cta: p.key === "enterprise" ? "Continue with Enterprise" : `Continue with ${p.label}`,
+}));
 
 // The selected-card treatment (gradient wash, glow, checkmark, CTA) needs real
 // per-theme values, not just color swaps — a dark radial gradient designed to
 // fade into a near-black page reads as a dirty smudge on a light one.
-function selectedGradient(isDark: boolean, isFounders: boolean) {
-  if (isFounders) {
-    return isDark
-      ? "radial-gradient(140% 60% at 50% 100%, rgba(161,98,7,0.6) 0%, rgba(120,53,15,0.35) 40%, rgba(9,9,11,0) 75%)"
-      : "radial-gradient(140% 60% at 50% 100%, rgba(251,191,36,0.2) 0%, rgba(251,191,36,0.07) 45%, rgba(251,191,36,0) 80%)";
-  }
+function selectedGradient(isDark: boolean) {
   return isDark
     ? "radial-gradient(140% 60% at 50% 100%, rgb(109,40,217) 0%, rgb(76,29,149) 28%, rgb(30,10,60) 58%, rgba(9,9,11,0) 85%)"
     : "radial-gradient(140% 60% at 50% 100%, rgba(139,92,246,0.16) 0%, rgba(139,92,246,0.06) 45%, rgba(139,92,246,0) 80%)";
@@ -78,7 +46,7 @@ function CheckIcon({ active, isDark }: { active: boolean; isDark: boolean }) {
   );
 }
 
-export function PlanForm({ error }: { error?: string }) {
+export function PlanForm({ error, foundersSpotsRemaining }: { error?: string; foundersSpotsRemaining: number }) {
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const [selected, setSelected] = useState("starter");
@@ -93,7 +61,7 @@ export function PlanForm({ error }: { error?: string }) {
         style={{
           color: "var(--auth-text-sub)",
           fontSize: 14,
-          marginBottom: 32,
+          marginBottom: foundersSpotsRemaining > 0 ? 16 : 32,
           lineHeight: 1.6,
           marginTop: 8,
           animation: `0.5s ${easing} 60ms 1 normal both running fp-fade-up`,
@@ -101,6 +69,26 @@ export function PlanForm({ error }: { error?: string }) {
       >
         Start free and upgrade anytime.
       </p>
+
+      {foundersSpotsRemaining > 0 && (
+        <div
+          style={{
+            background: "rgba(251,191,36,0.08)",
+            border: "1px solid rgba(251,191,36,0.25)",
+            borderRadius: 8,
+            padding: "12px 16px",
+            marginBottom: 24,
+            animation: `0.5s ${easing} 40ms 1 normal both running fp-fade-up`,
+          }}
+        >
+          <p style={{ color: "rgb(217,161,10)", fontSize: 13, fontWeight: 700, margin: "0 0 2px" }}>
+            Founders Beta — {foundersSpotsRemaining} spot{foundersSpotsRemaining === 1 ? "" : "s"} left
+          </p>
+          <p style={{ color: "var(--auth-text-sub)", fontSize: 12.5, margin: 0, lineHeight: 1.5 }}>
+            Pick Pro or Pro+ and get 40% off your first 12 months, then 25% off forever — applied automatically when you set up billing.
+          </p>
+        </div>
+      )}
 
       {error && (
         <p style={{ background: "rgb(70,10,10)", color: "rgb(252,165,165)", borderRadius: 8, padding: "10px 14px", fontSize: 13, marginBottom: 20 }}>
@@ -123,29 +111,16 @@ export function PlanForm({ error }: { error?: string }) {
           {PLANS.map((p, idx) => {
             const isSelected = selected === p.id;
             const isHovered = hovered === p.id;
-            const isFounders = p.id === "founders";
             const delay = 80 + idx * 70;
 
             const hoverShadow = isDark
-              ? (isFounders
-                ? "0 0 0 1px rgba(249,115,22,0.7), 0 0 18px 4px rgba(234,88,12,0.55), 0 0 60px 10px rgba(234,88,12,0.25)"
-                : "0 0 0 1px rgba(139,92,246,0.7), 0 0 18px 4px rgba(109,40,217,0.55), 0 0 60px 10px rgba(109,40,217,0.25)")
-              : (isFounders
-                ? "0 0 0 1px rgba(234,88,12,0.5), 0 2px 10px rgba(234,88,12,0.12)"
-                : "0 0 0 1px rgba(109,40,217,0.5), 0 2px 10px rgba(109,40,217,0.12)");
+              ? "0 0 0 1px rgba(139,92,246,0.7), 0 0 18px 4px rgba(109,40,217,0.55), 0 0 60px 10px rgba(109,40,217,0.25)"
+              : "0 0 0 1px rgba(109,40,217,0.5), 0 2px 10px rgba(109,40,217,0.12)";
             const selectedShadow = isDark
-              ? (isFounders
-                ? "0 0 0 1px rgba(249,115,22,0.9), 0 0 24px 6px rgba(234,88,12,0.65), 0 0 80px 16px rgba(234,88,12,0.3)"
-                : "0 0 0 1px rgba(139,92,246,0.9), 0 0 24px 6px rgba(109,40,217,0.65), 0 0 80px 16px rgba(109,40,217,0.3)")
-              : (isFounders
-                ? "0 0 0 1.5px rgba(234,88,12,0.9), 0 4px 16px rgba(234,88,12,0.18)"
-                : "0 0 0 1.5px rgba(109,40,217,0.9), 0 4px 16px rgba(109,40,217,0.18)");
-            const hoverBorder = isFounders
-              ? "1px solid rgba(249,115,22,0.65)"
-              : "1px solid rgba(139,92,246,0.65)";
-            const selectedBorder = isFounders
-              ? "1px solid rgba(249,115,22,0.9)"
-              : "1px solid rgba(139,92,246,0.9)";
+              ? "0 0 0 1px rgba(139,92,246,0.9), 0 0 24px 6px rgba(109,40,217,0.65), 0 0 80px 16px rgba(109,40,217,0.3)"
+              : "0 0 0 1.5px rgba(109,40,217,0.9), 0 4px 16px rgba(109,40,217,0.18)";
+            const hoverBorder = "1px solid rgba(139,92,246,0.65)";
+            const selectedBorder = "1px solid rgba(139,92,246,0.9)";
 
             return (
               <div
@@ -173,7 +148,7 @@ export function PlanForm({ error }: { error?: string }) {
                   style={{
                     position: "absolute",
                     inset: 0,
-                    background: selectedGradient(isDark, isFounders),
+                    background: selectedGradient(isDark),
                     opacity: isSelected ? 1 : isHovered ? 0.75 : 0,
                     transition: "opacity 0.25s",
                     pointerEvents: "none",
@@ -191,19 +166,15 @@ export function PlanForm({ error }: { error?: string }) {
                       width: 22,
                       height: 22,
                       borderRadius: "50%",
-                      background: isDark
-                        ? (isFounders ? "rgba(234,88,12,0.5)" : "rgba(109,40,217,0.5)")
-                        : (isFounders ? "rgb(234,88,12)" : "rgb(109,40,217)"),
-                      border: isDark
-                        ? (isFounders ? "1.5px solid rgba(249,115,22,0.8)" : "1.5px solid rgba(139,92,246,0.8)")
-                        : "none",
+                      background: isDark ? "rgba(109,40,217,0.5)" : "rgb(109,40,217)",
+                      border: isDark ? "1.5px solid rgba(139,92,246,0.8)" : "none",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
                     }}
                   >
                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none">
-                      <path d="M5 13l4 4L19 7" stroke={isDark ? (isFounders ? "#FED7AA" : "#C4B5FD") : "white"} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                      <path d="M5 13l4 4L19 7" stroke={isDark ? "#C4B5FD" : "white"} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   </div>
                 )}
@@ -261,16 +232,18 @@ export function PlanForm({ error }: { error?: string }) {
                     >
                       {p.price}
                     </span>
-                    <span
-                      style={{
-                        fontSize: 11,
-                        color: isSelected ? (isDark ? "rgba(196,181,253,0.55)" : "rgba(30,10,60,0.65)") : "var(--auth-text-sub)",
-                        marginLeft: 3,
-                        transition: "color 0.25s",
-                      }}
-                    >
-                      /month
-                    </span>
+                    {p.priceSuffix && (
+                      <span
+                        style={{
+                          fontSize: 11,
+                          color: isSelected ? (isDark ? "rgba(196,181,253,0.55)" : "rgba(30,10,60,0.65)") : "var(--auth-text-sub)",
+                          marginLeft: 3,
+                          transition: "color 0.25s",
+                        }}
+                      >
+                        {p.priceSuffix}
+                      </span>
+                    )}
                   </div>
 
                   {/* Description */}
@@ -323,13 +296,9 @@ export function PlanForm({ error }: { error?: string }) {
                       type="submit"
                       style={{
                         width: "100%",
-                        background: isDark
-                          ? (isFounders ? "rgba(234,88,12,0.45)" : "rgba(109,40,217,0.45)")
-                          : (isFounders ? "rgb(234,88,12)" : "rgb(109,40,217)"),
-                        border: isDark
-                          ? (isFounders ? "1px solid rgba(249,115,22,0.65)" : "1px solid rgba(139,92,246,0.65)")
-                          : "none",
-                        color: isDark ? (isFounders ? "rgb(254,215,170)" : "rgb(233,213,255)") : "white",
+                        background: isDark ? "rgba(109,40,217,0.45)" : "rgb(109,40,217)",
+                        border: isDark ? "1px solid rgba(139,92,246,0.65)" : "none",
+                        color: isDark ? "rgb(233,213,255)" : "white",
                         borderRadius: 8,
                         padding: "11px 0",
                         fontSize: 13,

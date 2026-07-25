@@ -3,8 +3,8 @@
 import { useMemo, useState } from "react";
 import { TrendingUp, TrendingDown, Users, ChevronDown } from "lucide-react";
 import type { OperationsData } from "./actions";
-import { computeStaffUtilization, type MetricsAppointment } from "@/lib/dashboard/metrics";
-import { deriveClients, computeRebookingRate, type ClientAppointment } from "@/lib/dashboard/clients";
+import { computeStaffUtilization, computeHealthScore, type MetricsAppointment } from "@/lib/dashboard/metrics";
+import { deriveClients, type ClientAppointment } from "@/lib/dashboard/clients";
 import { computeOpportunities } from "@/lib/dashboard/opportunities";
 
 const MODULES = ["Overview", "Revenue", "Team", "Clients", "AI", "Finance"] as const;
@@ -52,23 +52,13 @@ export function OperationsClient({ data }: { data: OperationsData }) {
   })), [data.appointments]);
 
   const monthStart = useMemo(() => new Date(now.getFullYear(), now.getMonth(), 1), [now]);
-  const lastMonthStart = useMemo(() => new Date(now.getFullYear(), now.getMonth() - 1, 1), [now]);
 
   const thisMonthAppts = useMemo(() => data.appointments.filter(a => {
     const t = new Date(a.starts_at);
     return t >= monthStart && t <= now;
   }), [data.appointments, monthStart, now]);
 
-  const lastMonthAppts = useMemo(() => data.appointments.filter(a => {
-    const t = new Date(a.starts_at);
-    return t >= lastMonthStart && t < monthStart;
-  }), [data.appointments, lastMonthStart, monthStart]);
-
   const thisMonthRevenue = thisMonthAppts.filter(a => a.status === "completed").reduce((s, a) => s + Number(a.price), 0);
-  const lastMonthRevenue = lastMonthAppts.filter(a => a.status === "completed").reduce((s, a) => s + Number(a.price), 0);
-  const revenueGrowthPct = lastMonthRevenue > 0
-    ? Math.round(((thisMonthRevenue - lastMonthRevenue) / lastMonthRevenue) * 100)
-    : thisMonthRevenue > 0 ? 100 : 0;
 
   const cancelledThisMonth = thisMonthAppts.filter(a => a.status === "cancelled");
   const cancellationRate = thisMonthAppts.length > 0 ? Math.round((cancelledThisMonth.length / thisMonthAppts.length) * 100) : 0;
@@ -82,17 +72,14 @@ export function OperationsClient({ data }: { data: OperationsData }) {
     }).length;
   }, [data.appointments, now]);
 
-  // No persisted staff schedule exists yet — capacity is an approximation, same as metrics.ts.
-  const bookedMinutesThisMonth = thisMonthAppts.filter(a => a.status !== "cancelled").reduce((s, a) => s + a.duration_minutes, 0);
-  const capacityPerDay = Math.max(data.staff.length, 1) * 480;
-  const daysElapsed = Math.max(1, now.getDate());
-  const fillRate = Math.min(100, Math.round((bookedMinutesThisMonth / (daysElapsed * capacityPerDay)) * 100));
-
   const allClients = useMemo(() => deriveClients(clientAppts, now), [clientAppts, now]);
-  const retention = computeRebookingRate(allClients);
-  const aiContribution = thisMonthRevenue > 0 ? Math.min(100, Math.round((data.autopilotRevenueThisMonth / thisMonthRevenue) * 100)) : 0;
-  const revenueGrowthScore = Math.max(0, Math.min(100, revenueGrowthPct + 50));
-  const operationsScore = Math.round((fillRate + retention + revenueGrowthScore + aiContribution) / 4);
+
+  // No persisted staff schedule exists yet — capacity is an approximation, same as metrics.ts.
+  const health = useMemo(
+    () => computeHealthScore(metricsAppts, clientAppts, data.staff.length, data.autopilotRevenueThisMonth, now),
+    [metricsAppts, clientAppts, data.staff.length, data.autopilotRevenueThisMonth, now],
+  );
+  const { score: operationsScore, fillRate, retention, revenueGrowthScore, aiContribution } = health;
 
   const opportunities = useMemo(() => computeOpportunities(clientAppts, now), [clientAppts, now]);
 

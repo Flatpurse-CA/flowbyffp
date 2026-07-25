@@ -6,7 +6,7 @@ import { useRouter, usePathname } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import {
   LayoutDashboard, CalendarDays, Users, Zap,
-  LayoutGrid, Users2, Settings,
+  LayoutGrid, Users2, Settings, Compass,
   LogOut, Bell, ChevronLeft, ChevronRight, ChevronDown,
   Sun, Moon, User as UserIcon, Search, MessageSquare, Sparkles,
   CalendarClock, UserRound, MoreHorizontal, type LucideIcon,
@@ -37,6 +37,7 @@ const NAV_TABS: NavTab[] = [
   { icon: Users2,          href: "/dashboard/team",         label: "Team",       badge: 0, ownerOnly: true  },
   { icon: Zap,             href: "/dashboard/autopilot",    label: "AutoPilot",  badge: 0, ownerOnly: true  },
   { icon: LayoutGrid,      href: "/dashboard/operations",   label: "Operations", badge: 0, ownerOnly: true  },
+  { icon: Compass,         href: "/dashboard/flow-coach",   label: "Flow Coach", badge: 0, ownerOnly: true  },
 ];
 
 const MOBILE_TABS = [

@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getShopContext } from "@/lib/dashboard/shop";
 import { getRequestOrigin } from "@/lib/requestOrigin";
-import { getBusinessHours, getStripeStatus } from "./actions";
+import { getBusinessHours, getStripeStatus, getBillingStatus } from "./actions";
 import { SettingsClient } from "./SettingsClient";
 
 export const dynamic = "force-dynamic";
@@ -30,10 +30,11 @@ export default async function SettingsPage() {
     end: (shop?.family_hours_end as string | undefined)?.slice(0, 5) ?? "20:00",
   };
 
-  const [initialBusinessHours, { connected: initialStripeConnected }, origin] = await Promise.all([
+  const [initialBusinessHours, { connected: initialStripeConnected }, origin, initialBilling] = await Promise.all([
     getBusinessHours(),
     getStripeStatus(),
     getRequestOrigin(),
+    getBillingStatus(),
   ]);
   const initialBookingUrl = shop?.handle ? `${origin}/book/${shop.handle}` : null;
 
@@ -44,6 +45,7 @@ export default async function SettingsPage() {
         initialBusinessHours={initialBusinessHours}
         initialStripeConnected={initialStripeConnected}
         initialBookingUrl={initialBookingUrl}
+        initialBilling={initialBilling}
       />
     </Suspense>
   );
