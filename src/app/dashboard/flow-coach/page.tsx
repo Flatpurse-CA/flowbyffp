@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { getShopContext } from "@/lib/dashboard/shop";
+import { logFeatureUsage } from "@/lib/featureUsage";
 import { getFlowCoachData, getShopPlan } from "./actions";
 import { FlowCoachClient, FlowCoachUpsell } from "./FlowCoachClient";
 
@@ -28,6 +29,8 @@ export default async function FlowCoachPage() {
   if (plan !== "pro_plus" && plan !== "enterprise") {
     return <FlowCoachUpsell />;
   }
+
+  await logFeatureUsage("flow_coach_viewed", ctx.shopId);
 
   const data = await getFlowCoachData();
   return <FlowCoachClient data={data} />;

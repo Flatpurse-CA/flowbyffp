@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { getShopContext } from "@/lib/dashboard/shop";
+import { logFeatureUsage } from "@/lib/featureUsage";
 import { getAutopilotState } from "./actions";
 import { AutoPilotClient } from "./AutoPilotClient";
 
@@ -23,6 +24,8 @@ export default async function AutoPilotPage() {
   }
 
   if (ctx.role !== "owner") redirect("/dashboard");
+
+  await logFeatureUsage("autopilot_viewed", ctx.shopId);
 
   const state = await getAutopilotState();
   return <AutoPilotClient state={state} />;
