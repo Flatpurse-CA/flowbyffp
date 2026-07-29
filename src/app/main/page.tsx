@@ -5,22 +5,14 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import LogoIntro from "@/components/LogoIntro";
 
+// Slides already have their heading/subtext baked into the artwork —
+// no text overlay needed on top of them.
 const SLIDES = [
-  {
-    src: "/make-up-artist-working-medium-shot.jpg",
-    heading: "Book any service, instantly.",
-    sub: "Clients book online 24/7 — no more back-and-forth texts.",
-  },
-  {
-    src: "/sd2.jpg",
-    heading: "AutoPilot fills your empty chairs.",
-    sub: "AI recovers lost revenue while you're off the clock. Zero commission.",
-  },
-  {
-    src: "/sd5.jpg",
-    heading: "Every client, remembered.",
-    sub: "Preferences, history, and reminders — handled automatically.",
-  },
+  { src: "/ca1.jpeg" },
+  { src: "/ca2.jpeg" },
+  { src: "/ca3.jpeg" },
+  { src: "/ca4.jpeg" },
+  { src: "/ca5.jpeg" },
 ];
 
 const AUTO_ADVANCE_MS = 4500;
@@ -73,8 +65,6 @@ export default function MainSplashPage() {
     touchStartX.current = null;
   };
 
-  const slide = SLIDES[index];
-
   return (
     <div style={{ position: "relative", height: "100dvh", width: "100%", overflow: "hidden", background: "#0a0a0a" }}>
       {/* Background image per slide */}
@@ -91,15 +81,8 @@ export default function MainSplashPage() {
         </div>
       ))}
 
-      {/* Dark gradient for text legibility, top-to-bottom — heavier through the
-          heading/subtext band (~28%-65%) so white text holds up over bright images */}
-      <div
-        style={{
-          position: "absolute", inset: 0, pointerEvents: "none",
-          background: "linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.2) 18%, rgba(0,0,0,0.5) 32%, rgba(0,0,0,0.6) 65%, rgba(0,0,0,0.88) 88%, rgba(0,0,0,0.97) 100%)",
-        }}
-      />
-      {/* Extra concentrated gradient behind the action buttons */}
+      {/* Extra concentrated gradient behind the action buttons — the slides
+          carry their own text/contrast, this is just for button legibility */}
       <div
         style={{
           position: "absolute", left: 0, right: 0, bottom: 0, height: 260, pointerEvents: "none",
@@ -131,36 +114,13 @@ export default function MainSplashPage() {
               onClick={() => goTo(i)}
               style={{
                 flex: 1, height: 3, borderRadius: 2, border: "none", padding: 0, cursor: "pointer",
-                background: i <= index ? "white" : "rgba(255,255,255,0.3)",
+                background: i <= index ? "rgba(15,5,40,0.85)" : "rgba(15,5,40,0.22)",
                 transition: "background 0.3s",
               }}
             />
           ))}
         </div>
-        <Image src="/group-starter.svg" alt="FlatPurse Flow" width={82} height={23} style={{ flexShrink: 0 }} />
-      </div>
-
-      {/* Heading */}
-      <div style={{ position: "absolute", left: 20, right: 20, top: "46%", zIndex: 2, pointerEvents: "none" }}>
-        <h1
-          key={slide.heading}
-          style={{
-            color: "white", fontSize: 34, fontWeight: 800, letterSpacing: "-0.03em",
-            lineHeight: 1.12, margin: "0 0 12px",
-            animation: "fp-fade-up 0.5s cubic-bezier(0.16,1,0.3,1) both",
-          }}
-        >
-          {slide.heading}
-        </h1>
-        <p
-          key={slide.sub}
-          style={{
-            color: "rgba(255,255,255,0.75)", fontSize: 15, lineHeight: 1.5, margin: 0, maxWidth: 320,
-            animation: "fp-fade-up 0.5s cubic-bezier(0.16,1,0.3,1) 60ms both",
-          }}
-        >
-          {slide.sub}
-        </p>
+        <Image src="/logo.svg" alt="FlatPurse Flow" width={82} height={28} style={{ flexShrink: 0 }} />
       </div>
 
       {/* Bottom actions — outside the tap/swipe zone entirely */}
