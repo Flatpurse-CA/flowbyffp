@@ -30,21 +30,15 @@ export default function CookieBanner() {
   if (!visible) return null;
 
   return (
-    <div style={{
+    <div className="cookie-banner" style={{
       position: "fixed",
-      bottom: 24,
       left: "50%",
       transform: "translateX(-50%)",
       zIndex: 9999,
-      width: "calc(100% - 40px)",
       maxWidth: 580,
       background: "#111",
       border: "1px solid rgba(255,255,255,0.1)",
       borderRadius: 16,
-      padding: "20px 24px",
-      display: "flex",
-      alignItems: "center",
-      gap: 20,
       boxShadow: "0 8px 40px rgba(0,0,0,0.6)",
     }}>
       <p style={{
@@ -59,7 +53,7 @@ export default function CookieBanner() {
           Privacy Policy
         </Link>
       </p>
-      <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
+      <div className="cookie-banner-actions">
         <button
           onClick={handleReject}
           style={{
