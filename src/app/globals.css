@@ -41,6 +41,30 @@
   0%, 100% { filter: drop-shadow(0 0 6px rgba(139,92,246,0.7)); }
   50%       { filter: drop-shadow(0 0 18px rgba(139,92,246,1)); }
 }
+@keyframes fp-logo-reveal {
+  0%   { opacity: 0; transform: scale(0.7); filter: drop-shadow(0 0 0 rgba(139,92,246,0)); }
+  55%  { opacity: 1; transform: scale(1.06); }
+  100% { opacity: 1; transform: scale(1); filter: drop-shadow(0 0 24px rgba(139,92,246,0.55)); }
+}
+
+/* Same purple top gradient as .auth-mobile-gradient, always visible (not media/theme gated) —
+   used on the app-load splash where the layout is inherently mobile-only. */
+.ffp-splash-gradient {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 58vh;
+  background: radial-gradient(
+    ellipse 130% 55% at 50% -5%,
+    rgb(88, 28, 218) 0%,
+    rgba(67, 10, 150, 0.85) 42%,
+    rgba(15, 5, 40, 0.45) 65%,
+    transparent 82%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
 
 /* ── Auth theme tokens (data-theme on <html>) ── */
 :root,

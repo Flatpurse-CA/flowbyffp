@@ -1,7 +1,8 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/lib/theme-context";
 import CookieBanner from "@/components/CookieBanner";
+import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -17,6 +18,18 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "FlatPurse Flow",
   description: "The AI-powered booking and client management platform built for salons and stylists.",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Flow",
+  },
+  icons: {
+    apple: "/icon-192.png",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#712AE2",
 };
 
 export default function RootLayout({
@@ -39,6 +52,7 @@ export default function RootLayout({
         />
         <ThemeProvider>{children}</ThemeProvider>
         <CookieBanner />
+        <ServiceWorkerRegister />
       </body>
     </html>
   );
