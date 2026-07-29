@@ -3,11 +3,12 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
-import { Eye, EyeOff, ArrowLeft } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { AuthImagePanel } from "@/components/AuthImagePanel";
 import { FlatPurseLogo } from "@/components/FlatPurseLogo";
+import { SubmitButton } from "@/components/SubmitButton";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { loginWithMagicLink, loginWithPassword } from "./actions";
+import { loginWithPassword } from "./actions";
 
 const easing = "cubic-bezier(0.16, 1, 0.3, 1)";
 const fadeUp = (delay: number) =>
@@ -24,8 +25,6 @@ export default function LoginPage() {
 function LoginForm() {
   const searchParams = useSearchParams();
   const error = searchParams.get("error");
-  const sent = searchParams.get("sent");
-  const [mode, setMode] = useState<"default" | "magic-link" | "magic-link-form">(sent ? "magic-link" : "default");
   const [showPassword, setShowPassword] = useState(false);
 
   return (
@@ -34,12 +33,12 @@ function LoginForm() {
       <div className="auth-mobile-gradient" />
 
       {/* Logo — mobile only, matches the signup page's mobile logo */}
-      <div className="absolute left-5 z-10 lg:hidden" style={{ top: "calc(env(safe-area-inset-top, 20px) + 20px)" }}>
+      <div className="absolute left-5 z-10 lg:hidden" style={{ top: "calc(max(env(safe-area-inset-top, 0px), 44px) + 20px)" }}>
         <FlatPurseLogo className="h-6 w-auto" />
       </div>
 
       {/* Theme toggle — padded below the iOS status bar/notch now that the page renders full-bleed */}
-      <div className="absolute right-5 z-10" style={{ top: "calc(env(safe-area-inset-top, 20px) + 20px)" }}>
+      <div className="absolute right-5 z-10" style={{ top: "calc(max(env(safe-area-inset-top, 0px), 44px) + 20px)" }}>
         <ThemeToggle />
       </div>
 
@@ -55,210 +54,84 @@ function LoginForm() {
             animation: `0.42s ${easing} 0s 1 normal both running fp-slide-in-r`,
           }}
         >
+          <h1 style={{
+            color: "var(--auth-text)", fontSize: 26, fontWeight: 700,
+            letterSpacing: "-0.025em", margin: 0, animation: fadeUp(30),
+          }}>
+            Welcome back
+          </h1>
+          <p style={{
+            color: "var(--auth-text-sub)", fontSize: 14, marginBottom: 32,
+            marginTop: 6, lineHeight: 1.6, animation: fadeUp(60),
+          }}>
+            Sign in to continue to your dashboard.
+          </p>
 
-          {mode === "magic-link" && sent ? (
-            /* ── Magic Link mode: link sent, waiting on the inbox ── */
-            <>
-              <div style={{ textAlign: "center", animation: fadeUp(0) }}>
-                <div
-                  style={{
-                    width: 56, height: 56, borderRadius: "50%", margin: "0 auto 20px",
-                    background: "rgba(109,40,217,0.12)", display: "flex", alignItems: "center", justifyContent: "center",
-                  }}
-                >
-                  <MailIcon />
-                </div>
-                <h1 style={{
-                  color: "var(--auth-text)", fontSize: 22, fontWeight: 700,
-                  letterSpacing: "-0.025em", margin: "0 0 8px",
-                }}>
-                  Check your email
-                </h1>
-                <p style={{ color: "var(--auth-text-sub)", fontSize: 14, lineHeight: 1.6, margin: "0 0 28px" }}>
-                  We sent a sign-in link to <strong style={{ color: "var(--auth-text)" }}>{sent}</strong>.
-                  Open it on this device to log in.
-                </p>
-              </div>
+          {error && (
+            <p style={{ background: "rgb(70,10,10)", color: "rgb(252,165,165)", borderRadius: 8, padding: "10px 14px", fontSize: 13, marginBottom: 20 }}>
+              {error}
+            </p>
+          )}
 
-              <a href="mailto:" style={{ ...primaryBtnStyle, textDecoration: "none", animation: fadeUp(40) }}>
-                Open Mail App
-              </a>
+          <form action={loginWithPassword} style={{ display: "flex", flexDirection: "column", animation: fadeUp(80) }}>
+            <div style={{ marginBottom: 18 }}>
+              <label style={labelStyle}>Email</label>
+              <input
+                name="email"
+                type="email"
+                required
+                placeholder="you@example.com"
+                autoComplete="email"
+                style={inputStyle}
+              />
+            </div>
 
-              <button
-                type="button"
-                onClick={() => setMode("magic-link-form")}
-                style={{
-                  display: "block", width: "100%", textAlign: "center",
-                  background: "none", border: "none", cursor: "pointer",
-                  color: "var(--auth-text-sub)", fontSize: 13, marginTop: 18,
-                  animation: fadeUp(60),
-                }}
-              >
-                Use a different email
-              </button>
-            </>
-          ) : mode === "magic-link" || mode === "magic-link-form" ? (
-            /* ── Magic Link mode: enter email ── */
-            <>
-              <button
-                type="button"
-                onClick={() => setMode("default")}
-                style={{
-                  display: "flex", alignItems: "center", gap: 6,
-                  background: "none", border: "none", cursor: "pointer",
-                  color: "var(--auth-text-sub)", fontSize: 13, padding: 0, marginBottom: 28,
-                  animation: fadeUp(0),
-                }}
-              >
-                <ArrowLeft size={14} /> Back
-              </button>
-
-              <h1 style={{
-                color: "var(--auth-text)", fontSize: 26, fontWeight: 700,
-                letterSpacing: "-0.025em", margin: 0, animation: fadeUp(30),
-              }}>
-                Magic Link
-              </h1>
-              <p style={{
-                color: "var(--auth-text-sub)", fontSize: 14, marginBottom: 32,
-                marginTop: 6, lineHeight: 1.6, animation: fadeUp(60),
-              }}>
-                Enter your email and we&apos;ll send you a sign-in link.
-              </p>
-
-              {error && (
-                <p style={{ background: "rgb(70,10,10)", color: "rgb(252,165,165)", borderRadius: 8, padding: "10px 14px", fontSize: 13, marginBottom: 20 }}>
-                  {error}
-                </p>
-              )}
-
-              <form action={loginWithMagicLink} style={{ display: "flex", flexDirection: "column", gap: 14, animation: fadeUp(100) }}>
-                <div>
-                  <label style={labelStyle}>Email</label>
-                  <input
-                    name="email"
-                    type="email"
-                    required
-                    placeholder="you@example.com"
-                    autoComplete="email"
-                    style={inputStyle}
-                  />
-                </div>
-                <button type="submit" style={primaryBtnStyle}>
-                  Send Magic Link
-                </button>
-              </form>
-            </>
-          ) : (
-            /* ── Default mode ── */
-            <>
-              <h1 style={{
-                color: "var(--auth-text)", fontSize: 26, fontWeight: 700,
-                letterSpacing: "-0.025em", margin: 0, animation: fadeUp(30),
-              }}>
-                Welcome back
-              </h1>
-              <p style={{
-                color: "var(--auth-text-sub)", fontSize: 14, marginBottom: 32,
-                marginTop: 6, lineHeight: 1.6, animation: fadeUp(60),
-              }}>
-                Sign in to continue to your dashboard.
-              </p>
-
-              {error && (
-                <p style={{ background: "rgb(70,10,10)", color: "rgb(252,165,165)", borderRadius: 8, padding: "10px 14px", fontSize: 13, marginBottom: 20 }}>
-                  {error}
-                </p>
-              )}
-
-              {/* Magic Link */}
-              <div style={{ animation: fadeUp(80) }}>
+            <div style={{ marginBottom: 8 }}>
+              <label style={labelStyle}>Password</label>
+              <div style={{ position: "relative" }}>
+                <input
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  required
+                  placeholder="Enter your password"
+                  autoComplete="current-password"
+                  style={{ ...inputStyle, paddingRight: 44 }}
+                />
                 <button
                   type="button"
-                  onClick={() => setMode("magic-link")}
+                  tabIndex={-1}
+                  onClick={() => setShowPassword((v) => !v)}
                   style={{
-                    width: "100%", display: "flex", alignItems: "center", justifyContent: "center",
-                    gap: 7, background: "transparent", border: "1px solid var(--auth-input-border)",
-                    borderRadius: 10, padding: "12px 10px", color: "var(--auth-text)",
-                    fontSize: 13, fontWeight: 500, cursor: "pointer",
+                    position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)",
+                    background: "none", border: "none", cursor: "pointer",
+                    color: "var(--auth-text-sub)", display: "flex", alignItems: "center", padding: 4,
                   }}
                 >
-                  <MagicLinkIcon /> Magic Link
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
+            </div>
 
-              {/* Or divider */}
-              <div style={{
-                display: "flex", alignItems: "center", gap: 12, margin: "24px 0",
-                animation: fadeUp(140),
-              }}>
-                <div style={{ flex: 1, height: 1, background: "var(--auth-input-border)" }} />
-                <span style={{ color: "var(--auth-text-sub)", fontSize: 13 }}>Or</span>
-                <div style={{ flex: 1, height: 1, background: "var(--auth-input-border)" }} />
-              </div>
+            <div style={{ textAlign: "right", marginBottom: 20 }}>
+              <Link href="/forgot-password" style={{ fontSize: 12, color: "var(--auth-text-sub)", textDecoration: "none" }}>
+                Forgot password?
+              </Link>
+            </div>
 
-              {/* Email + password form */}
-              <form action={loginWithPassword} style={{ display: "flex", flexDirection: "column", animation: fadeUp(170) }}>
-                <div style={{ marginBottom: 18 }}>
-                  <label style={labelStyle}>Email</label>
-                  <input
-                    name="email"
-                    type="email"
-                    required
-                    placeholder="you@example.com"
-                    autoComplete="email"
-                    style={inputStyle}
-                  />
-                </div>
+            <SubmitButton style={primaryBtnStyle} pendingText="Signing in…">
+              Sign in
+            </SubmitButton>
+          </form>
 
-                <div style={{ marginBottom: 8 }}>
-                  <label style={labelStyle}>Password</label>
-                  <div style={{ position: "relative" }}>
-                    <input
-                      name="password"
-                      type={showPassword ? "text" : "password"}
-                      required
-                      placeholder="Enter your password"
-                      autoComplete="current-password"
-                      style={{ ...inputStyle, paddingRight: 44 }}
-                    />
-                    <button
-                      type="button"
-                      tabIndex={-1}
-                      onClick={() => setShowPassword((v) => !v)}
-                      style={{
-                        position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)",
-                        background: "none", border: "none", cursor: "pointer",
-                        color: "var(--auth-text-sub)", display: "flex", alignItems: "center", padding: 4,
-                      }}
-                    >
-                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                    </button>
-                  </div>
-                </div>
-
-                <div style={{ textAlign: "right", marginBottom: 20 }}>
-                  <Link href="/forgot-password" style={{ fontSize: 12, color: "var(--auth-text-sub)", textDecoration: "none" }}>
-                    Forgot password?
-                  </Link>
-                </div>
-
-                <button type="submit" style={primaryBtnStyle}>
-                  Sign in
-                </button>
-              </form>
-
-              <p style={{
-                color: "var(--auth-text-sub)", fontSize: 13, textAlign: "center",
-                marginTop: 20, animation: fadeUp(260),
-              }}>
-                Don&apos;t have an account?{" "}
-                <Link href="/signup" style={{ color: "rgb(107,99,232)", fontWeight: 600, textDecoration: "none" }}>
-                  Sign up
-                </Link>
-              </p>
-            </>
-          )}
+          <p style={{
+            color: "var(--auth-text-sub)", fontSize: 13, textAlign: "center",
+            marginTop: 20, animation: fadeUp(260),
+          }}>
+            Don&apos;t have an account?{" "}
+            <Link href="/signup" style={{ color: "rgb(107,99,232)", fontWeight: 600, textDecoration: "none" }}>
+              Sign up
+            </Link>
+          </p>
         </div>
       </div>
     </div>
@@ -302,21 +175,3 @@ const primaryBtnStyle: React.CSSProperties = {
   justifyContent: "center",
   gap: 8,
 };
-
-function MagicLinkIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M15 4V2m0 18v-2M8 12H2m18 0h-2M5.636 5.636l1.414 1.414m9.9 9.9 1.414 1.414M5.636 18.364l1.414-1.414M18.364 5.636l-1.414 1.414" />
-      <circle cx="15" cy="12" r="3" />
-    </svg>
-  );
-}
-
-function MailIcon() {
-  return (
-    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgb(109,40,217)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="2" y="4" width="20" height="16" rx="2" />
-      <path d="m22 6-10 7L2 6" />
-    </svg>
-  );
-}

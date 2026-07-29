@@ -4,6 +4,7 @@ import { useSearchParams } from "next/navigation";
 import { useState, Suspense } from "react";
 import { Eye, EyeOff, Shield } from "lucide-react";
 import { AuthImagePanel } from "@/components/AuthImagePanel";
+import { SubmitButton } from "@/components/SubmitButton";
 import { adminLogin } from "./actions";
 
 const easing = "cubic-bezier(0.16, 1, 0.3, 1)";
@@ -132,9 +133,9 @@ function Form() {
               </div>
             </div>
 
-            <button type="submit" style={primaryBtnStyle}>
+            <SubmitButton style={primaryBtnStyle} pendingText="Signing in…">
               Sign in to Admin
-            </button>
+            </SubmitButton>
           </form>
         </div>
       </div>

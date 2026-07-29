@@ -103,7 +103,7 @@ export default function MainSplashPage() {
       <div
         style={{
           position: "absolute", top: 0, left: 0, right: 0, zIndex: 2,
-          padding: "calc(env(safe-area-inset-top, 20px) + 12px) 20px 0",
+          padding: "calc(max(env(safe-area-inset-top, 0px), 44px) + 12px) 20px 0",
           display: "flex", alignItems: "center", gap: 12,
           pointerEvents: "none",
         }}

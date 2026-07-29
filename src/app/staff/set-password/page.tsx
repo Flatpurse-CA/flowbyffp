@@ -3,6 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
+import { SubmitButton } from "@/components/SubmitButton";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { setStaffPassword } from "./actions";
 
@@ -21,7 +22,7 @@ function SetPasswordForm() {
 
   return (
     <div style={{ display: "flex", minHeight: "100vh", alignItems: "center", justifyContent: "center", background: "var(--auth-bg)", padding: "0 24px", position: "relative" }}>
-      <div className="absolute right-5" style={{ top: "calc(env(safe-area-inset-top, 20px) + 20px)" }}>
+      <div className="absolute right-5" style={{ top: "calc(max(env(safe-area-inset-top, 0px), 44px) + 20px)" }}>
         <ThemeToggle />
       </div>
 
@@ -67,9 +68,9 @@ function SetPasswordForm() {
             </div>
           </div>
 
-          <button type="submit" style={primaryBtnStyle}>
+          <SubmitButton style={primaryBtnStyle} pendingText="Setting password…">
             Set password &amp; continue
-          </button>
+          </SubmitButton>
         </form>
       </div>
     </div>

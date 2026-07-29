@@ -33,7 +33,7 @@ export default function ResetPasswordPage() {
   return (
     <div style={{ display: "flex", height: "100vh", overflow: "hidden", background: "var(--auth-bg)", position: "relative" }}>
       <div className="auth-mobile-gradient" />
-      <div className="absolute right-5 z-10 lg:hidden" style={{ top: "calc(env(safe-area-inset-top, 20px) + 20px)" }}>
+      <div className="absolute right-5 z-10 lg:hidden" style={{ top: "calc(max(env(safe-area-inset-top, 0px), 44px) + 20px)" }}>
         <ThemeToggle />
       </div>
 

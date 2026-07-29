@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { StepProgress } from "@/components/StepProgress";
+import { SubmitButton } from "@/components/SubmitButton";
 import { useTheme } from "@/lib/theme-context";
 import { PLANS as REAL_PLANS } from "@/lib/plans";
 import { choosePlan } from "./actions";
@@ -292,8 +293,8 @@ export function PlanForm({ error, foundersSpotsRemaining }: { error?: string; fo
 
                   {/* CTA inside selected card */}
                   {isSelected && (
-                    <button
-                      type="submit"
+                    <SubmitButton
+                      pendingText="Saving…"
                       style={{
                         width: "100%",
                         background: isDark ? "rgba(109,40,217,0.45)" : "rgb(109,40,217)",
@@ -312,7 +313,7 @@ export function PlanForm({ error, foundersSpotsRemaining }: { error?: string; fo
                       }}
                     >
                       {plan.cta}
-                    </button>
+                    </SubmitButton>
                   )}
                 </div>
               </div>

@@ -17,7 +17,7 @@ export function OnboardingShell({ children }: { children: React.ReactNode }) {
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          padding: "calc(env(safe-area-inset-top, 0px) + 14px) 24px 14px",
+          padding: "calc(max(env(safe-area-inset-top, 0px), 44px) + 14px) 24px 14px",
           animation: "0.4s cubic-bezier(0.16,1,0.3,1) 0ms 1 normal both running fp-fade-in",
         }}
       >

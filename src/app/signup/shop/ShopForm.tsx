@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { StepProgress } from "@/components/StepProgress";
+import { SubmitButton } from "@/components/SubmitButton";
 import { setupShop } from "./actions";
 
 const BUSINESS_TYPES = [
@@ -159,8 +160,8 @@ export function ShopForm({ error }: { error?: string }) {
             background: "linear-gradient(180deg, transparent 0%, var(--auth-bg) 45%)",
           }}
         >
-          <button
-            type="submit"
+          <SubmitButton
+            pendingText="Saving…"
             style={{
               width: "100%",
               maxWidth: 480,
@@ -180,7 +181,7 @@ export function ShopForm({ error }: { error?: string }) {
             }}
           >
             Next Step <ArrowRight />
-          </button>
+          </SubmitButton>
         </div>
       </form>
     </div>

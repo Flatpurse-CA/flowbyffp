@@ -6,6 +6,7 @@ import { Suspense, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { AuthImagePanel } from "@/components/AuthImagePanel";
 import { FlatPurseLogo } from "@/components/FlatPurseLogo";
+import { SubmitButton } from "@/components/SubmitButton";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { createAccount } from "./actions";
 
@@ -33,12 +34,12 @@ function SignupStep1() {
       <div className="auth-mobile-gradient" />
 
       {/* Logo — mobile only, padded below the iOS status bar/notch */}
-      <div className="absolute left-5 z-10 lg:hidden" style={{ top: "calc(env(safe-area-inset-top, 20px) + 20px)" }}>
+      <div className="absolute left-5 z-10 lg:hidden" style={{ top: "calc(max(env(safe-area-inset-top, 0px), 44px) + 20px)" }}>
         <FlatPurseLogo className="h-6 w-auto" />
       </div>
 
       {/* Theme toggle */}
-      <div className="absolute right-5 z-10" style={{ top: "calc(env(safe-area-inset-top, 20px) + 20px)" }}>
+      <div className="absolute right-5 z-10" style={{ top: "calc(max(env(safe-area-inset-top, 0px), 44px) + 20px)" }}>
         <ThemeToggle />
       </div>
 
@@ -170,9 +171,9 @@ function SignupStep1() {
 
             {/* CTA */}
             <div style={{ animation: fadeUp(320) }}>
-              <button
-                type="submit"
+              <SubmitButton
                 onClick={() => setIsExiting(true)}
+                pendingText="Creating account…"
                 style={{
                   width: "100%",
                   background: "var(--auth-btn-bg)",
@@ -190,7 +191,7 @@ function SignupStep1() {
                 }}
               >
                 Next Step <ArrowRight />
-              </button>
+              </SubmitButton>
             </div>
           </form>
 
