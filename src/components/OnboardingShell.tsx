@@ -11,13 +11,13 @@ export function OnboardingShell({ children }: { children: React.ReactNode }) {
         flexDirection: "column",
       }}
     >
-      {/* Top bar */}
+      {/* Top bar — padded below the iOS status bar / notch so it's never hidden under it */}
       <div
         style={{
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          padding: "14px 24px",
+          padding: "calc(env(safe-area-inset-top, 0px) + 14px) 24px 14px",
           animation: "0.4s cubic-bezier(0.16,1,0.3,1) 0ms 1 normal both running fp-fade-in",
         }}
       >
@@ -31,7 +31,9 @@ export function OnboardingShell({ children }: { children: React.ReactNode }) {
         <ThemeToggle />
       </div>
 
-      {/* Centered content — animates in like it's expanding from the right half */}
+      {/* Centered content — fade only (no transform): a transform left behind by
+          fill-mode "both" would turn this into a containing block and break any
+          position:fixed element nested inside it (e.g. a fixed bottom CTA) */}
       <div
         style={{
           flex: 1,
@@ -40,7 +42,7 @@ export function OnboardingShell({ children }: { children: React.ReactNode }) {
           alignItems: "center",
           justifyContent: "center",
           padding: "32px 16px 64px",
-          animation: "0.55s cubic-bezier(0.16,1,0.3,1) 0ms 1 normal both running fp-fade-up",
+          animation: "0.55s cubic-bezier(0.16,1,0.3,1) 0ms 1 normal both running fp-fade-in",
         }}
       >
         {children}

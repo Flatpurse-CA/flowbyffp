@@ -43,7 +43,8 @@ const inputStyle: React.CSSProperties = {
   borderRadius: 8,
   padding: "11px 12px",
   color: "var(--auth-text)",
-  fontSize: 14,
+  // 16px minimum — anything smaller makes iOS Safari zoom the whole page in on focus
+  fontSize: 16,
   outline: "none",
   transition: "border-color 0.15s",
   boxSizing: "border-box",
@@ -66,7 +67,7 @@ export function ShopForm({ error }: { error?: string }) {
         </p>
       )}
 
-      <form action={setupShop} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+      <form action={setupShop} style={{ display: "flex", flexDirection: "column", gap: 14, paddingBottom: 90 }}>
 
         {/* Shop Name */}
         <div style={{ animation: fadeUp(60) }}>
@@ -143,24 +144,39 @@ export function ShopForm({ error }: { error?: string }) {
           </div>
         </div>
 
-        {/* CTA */}
-        <div style={{ animation: fadeUp(160), marginTop: 4 }}>
+        {/* CTA — fixed to the bottom of the viewport so it's always reachable
+            without scrolling, like a native app's action bar */}
+        <div
+          style={{
+            position: "fixed",
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 20,
+            display: "flex",
+            justifyContent: "center",
+            padding: "16px 16px calc(env(safe-area-inset-bottom, 16px) + 16px)",
+            background: "linear-gradient(180deg, transparent 0%, var(--auth-bg) 45%)",
+          }}
+        >
           <button
             type="submit"
             style={{
               width: "100%",
+              maxWidth: 480,
               background: "var(--auth-btn-bg)",
               color: "var(--auth-btn-text)",
               border: "none",
               borderRadius: 10,
               padding: "13px 0",
-              fontSize: 14,
+              fontSize: 15,
               fontWeight: 600,
               cursor: "pointer",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               gap: 8,
+              boxShadow: "0 8px 28px rgba(0,0,0,0.25)",
             }}
           >
             Next Step <ArrowRight />
