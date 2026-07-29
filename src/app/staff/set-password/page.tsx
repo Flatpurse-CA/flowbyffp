@@ -21,7 +21,7 @@ function SetPasswordForm() {
 
   return (
     <div style={{ display: "flex", minHeight: "100vh", alignItems: "center", justifyContent: "center", background: "var(--auth-bg)", padding: "0 24px", position: "relative" }}>
-      <div className="absolute right-5 top-5">
+      <div className="absolute right-5" style={{ top: "calc(env(safe-area-inset-top, 20px) + 20px)" }}>
         <ThemeToggle />
       </div>
 
@@ -91,7 +91,8 @@ const inputStyle: React.CSSProperties = {
   borderRadius: 10,
   padding: "13px 14px",
   color: "var(--auth-text)",
-  fontSize: 15,
+  // 16px minimum — anything smaller makes iOS Safari zoom the page in on focus
+  fontSize: 16,
   outline: "none",
   transition: "border-color 0.15s",
   boxSizing: "border-box",

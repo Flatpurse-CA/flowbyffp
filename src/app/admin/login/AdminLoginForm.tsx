@@ -157,7 +157,8 @@ const inputStyle: React.CSSProperties = {
   borderRadius: 10,
   padding: "13px 14px",
   color: "var(--auth-text)",
-  fontSize: 15,
+  // 16px minimum — anything smaller makes iOS Safari zoom the page in on focus
+  fontSize: 16,
   outline: "none",
   transition: "border-color 0.15s",
   boxSizing: "border-box",

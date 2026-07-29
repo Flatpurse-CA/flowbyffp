@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getRequestOrigin } from "@/lib/requestOrigin";
-import { sendPasswordResetEmail } from "@/lib/resend";
+import { sendMagicLinkEmail, sendPasswordResetEmail } from "@/lib/resend";
 
 export async function loginWithPassword(formData: FormData) {
   const email = formData.get("email") as string;
@@ -21,17 +21,27 @@ export async function loginWithPassword(formData: FormData) {
 }
 
 export async function loginWithMagicLink(formData: FormData) {
-  const email = formData.get("email") as string;
+  const email = (formData.get("email") as string).trim();
   const origin = await getRequestOrigin();
 
-  const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithOtp({
+  // Same pattern as password resets / staff invites / signup OTP: generate the
+  // link ourselves and send it through Resend, rather than Supabase's own mailer
+  // (no custom SMTP configured for this project, capped at 2 emails/hour).
+  const admin = createAdminClient();
+  const { data: linkData, error: linkError } = await admin.auth.admin.generateLink({
+    type: "magiclink",
     email,
-    options: { emailRedirectTo: `${origin}/auth/confirm?next=/dashboard` },
   });
 
-  if (error) {
-    redirect(`/login?error=${encodeURIComponent(error.message)}`);
+  if (linkError || !linkData) {
+    redirect(`/login?error=${encodeURIComponent(linkError?.message ?? "Couldn't send login link")}`);
+  }
+
+  const magicLinkUrl = `${origin}/auth/confirm?token_hash=${linkData.properties.hashed_token}&type=magiclink&next=${encodeURIComponent("/dashboard")}`;
+
+  const { error: sendError } = await sendMagicLinkEmail(email, { magicLinkUrl });
+  if (sendError) {
+    redirect(`/login?error=${encodeURIComponent(sendError.message)}`);
   }
 
   redirect(`/login?sent=${encodeURIComponent(email)}`);

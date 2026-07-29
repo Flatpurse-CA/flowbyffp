@@ -33,7 +33,7 @@ export default function ResetPasswordPage() {
   return (
     <div style={{ display: "flex", height: "100vh", overflow: "hidden", background: "var(--auth-bg)", position: "relative" }}>
       <div className="auth-mobile-gradient" />
-      <div className="absolute right-5 top-5 z-10 lg:hidden">
+      <div className="absolute right-5 z-10 lg:hidden" style={{ top: "calc(env(safe-area-inset-top, 20px) + 20px)" }}>
         <ThemeToggle />
       </div>
 
@@ -122,7 +122,8 @@ const inputStyle: React.CSSProperties = {
   borderRadius: 10,
   padding: "13px 14px",
   color: "var(--auth-text)",
-  fontSize: 15,
+  // 16px minimum — anything smaller makes iOS Safari zoom the page in on focus
+  fontSize: 16,
   outline: "none",
   transition: "border-color 0.15s",
   boxSizing: "border-box",

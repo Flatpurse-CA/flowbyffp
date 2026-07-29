@@ -30,6 +30,10 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: "#712AE2",
+  // Lets content actually extend under the iOS status bar/notch instead of being
+  // letterboxed by it — without this, every env(safe-area-inset-*) below evaluates
+  // to 0 and backgrounds/gradients get a hard edge instead of flowing full-bleed.
+  viewportFit: "cover",
 };
 
 export default function RootLayout({

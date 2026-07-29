@@ -160,7 +160,7 @@ function BookingLinkStep({
               value={handle}
               onChange={(e) => onHandleChange(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))}
               placeholder="yourhandle"
-              style={{ flex: 1, padding: "13px 14px 13px 2px", background: "none", border: "none", outline: "none", color: "white", fontSize: 15, fontWeight: 700 }}
+              style={{ flex: 1, padding: "13px 14px 13px 2px", background: "none", border: "none", outline: "none", color: "white", fontSize: 16, fontWeight: 700 }}
             />
           </div>
           <button
@@ -266,7 +266,7 @@ function ServicesStep({
             border: "1.5px solid rgba(255,255,255,0.1)",
             background: "rgba(255,255,255,0.04)",
             outline: "none",
-            fontSize: 14,
+            fontSize: 16,
             color: "white",
           }}
         />
@@ -288,7 +288,7 @@ function ServicesStep({
             value={price}
             onChange={(e) => setPrice(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleAdd()}
-            style={{ flex: 1, padding: "13px 10px 13px 2px", background: "none", border: "none", outline: "none", color: "white", fontSize: 14, fontWeight: 700, width: "100%" }}
+            style={{ flex: 1, padding: "13px 10px 13px 2px", background: "none", border: "none", outline: "none", color: "white", fontSize: 16, fontWeight: 700, width: "100%" }}
           />
         </div>
         <button
@@ -361,7 +361,7 @@ function ServicesStep({
                   type="number"
                   value={svc.price}
                   onChange={(e) => onPriceChange(svc.id, Number(e.target.value))}
-                  style={{ width: 50, padding: "5px 8px 5px 2px", background: "none", border: "none", outline: "none", color: "white", fontSize: 14, fontWeight: 700 }}
+                  style={{ width: 54, padding: "5px 8px 5px 2px", background: "none", border: "none", outline: "none", color: "white", fontSize: 16, fontWeight: 700 }}
                 />
               </div>
               <button
@@ -513,7 +513,7 @@ function TeamStep({
             border: "1.5px dashed rgba(139,92,246,0.3)",
             background: "rgba(255,255,255,0.025)",
             outline: "none",
-            fontSize: 14,
+            fontSize: 16,
             color: "white",
           }}
         />

@@ -32,8 +32,8 @@ function LoginForm() {
       {/* Mobile purple gradient — only visible on small screens in dark mode (CSS controls this) */}
       <div className="auth-mobile-gradient" />
 
-      {/* Theme toggle */}
-      <div className="absolute right-5 top-5 z-10">
+      {/* Theme toggle — padded below the iOS status bar/notch now that the page renders full-bleed */}
+      <div className="absolute right-5 z-10" style={{ top: "calc(env(safe-area-inset-top, 20px) + 20px)" }}>
         <ThemeToggle />
       </div>
 
@@ -238,7 +238,8 @@ const inputStyle: React.CSSProperties = {
   borderRadius: 10,
   padding: "13px 14px",
   color: "var(--auth-text)",
-  fontSize: 15,
+  // 16px minimum — anything smaller makes iOS Safari zoom the page in on focus
+  fontSize: 16,
   outline: "none",
   transition: "border-color 0.15s",
   boxSizing: "border-box",

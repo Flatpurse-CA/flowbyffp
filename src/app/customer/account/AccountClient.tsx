@@ -130,7 +130,7 @@ export function AccountClient({ customerName, bookings, dateOfBirth }: { custome
             onChange={e => { setBirthday(e.target.value); setBirthdaySaved(false); }}
             style={{
               padding: "8px 10px", borderRadius: 8, border: "1.5px solid var(--cust-input-border)",
-              background: "var(--cust-input-bg)", color: "var(--cust-text)", fontSize: 13, outline: "none", fontFamily: "inherit",
+              background: "var(--cust-input-bg)", color: "var(--cust-text)", fontSize: 16, outline: "none", fontFamily: "inherit",
             }}
           />
           <button

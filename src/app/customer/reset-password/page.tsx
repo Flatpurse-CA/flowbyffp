@@ -65,6 +65,6 @@ export default function ResetPasswordPage() {
 const inputStyle: React.CSSProperties = {
   width: "100%", padding: "11px 13px", borderRadius: 10,
   border: "1.5px solid var(--cust-input-border)", background: "var(--cust-input-bg)",
-  color: "var(--cust-text)", fontSize: 14, outline: "none",
+  color: "var(--cust-text)", fontSize: 16, outline: "none",
   boxSizing: "border-box", fontFamily: "inherit",
 };
