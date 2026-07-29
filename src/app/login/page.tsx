@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { AuthImagePanel } from "@/components/AuthImagePanel";
+import { FlatPurseLogo } from "@/components/FlatPurseLogo";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { loginWithMagicLink, loginWithPassword } from "./actions";
 
@@ -24,13 +25,18 @@ function LoginForm() {
   const searchParams = useSearchParams();
   const error = searchParams.get("error");
   const sent = searchParams.get("sent");
-  const [mode, setMode] = useState<"default" | "magic-link">("default");
+  const [mode, setMode] = useState<"default" | "magic-link" | "magic-link-form">(sent ? "magic-link" : "default");
   const [showPassword, setShowPassword] = useState(false);
 
   return (
     <div style={{ display: "flex", height: "100vh", overflow: "hidden", background: "var(--auth-bg)", position: "relative" }}>
       {/* Mobile purple gradient — only visible on small screens in dark mode (CSS controls this) */}
       <div className="auth-mobile-gradient" />
+
+      {/* Logo — mobile only, matches the signup page's mobile logo */}
+      <div className="absolute left-5 z-10 lg:hidden" style={{ top: "calc(env(safe-area-inset-top, 20px) + 20px)" }}>
+        <FlatPurseLogo className="h-6 w-auto" />
+      </div>
 
       {/* Theme toggle — padded below the iOS status bar/notch now that the page renders full-bleed */}
       <div className="absolute right-5 z-10" style={{ top: "calc(env(safe-area-inset-top, 20px) + 20px)" }}>
@@ -50,8 +56,49 @@ function LoginForm() {
           }}
         >
 
-          {mode === "magic-link" ? (
-            /* ── Magic Link mode ── */
+          {mode === "magic-link" && sent ? (
+            /* ── Magic Link mode: link sent, waiting on the inbox ── */
+            <>
+              <div style={{ textAlign: "center", animation: fadeUp(0) }}>
+                <div
+                  style={{
+                    width: 56, height: 56, borderRadius: "50%", margin: "0 auto 20px",
+                    background: "rgba(109,40,217,0.12)", display: "flex", alignItems: "center", justifyContent: "center",
+                  }}
+                >
+                  <MailIcon />
+                </div>
+                <h1 style={{
+                  color: "var(--auth-text)", fontSize: 22, fontWeight: 700,
+                  letterSpacing: "-0.025em", margin: "0 0 8px",
+                }}>
+                  Check your email
+                </h1>
+                <p style={{ color: "var(--auth-text-sub)", fontSize: 14, lineHeight: 1.6, margin: "0 0 28px" }}>
+                  We sent a sign-in link to <strong style={{ color: "var(--auth-text)" }}>{sent}</strong>.
+                  Open it on this device to log in.
+                </p>
+              </div>
+
+              <a href="mailto:" style={{ ...primaryBtnStyle, textDecoration: "none", animation: fadeUp(40) }}>
+                Open Mail App
+              </a>
+
+              <button
+                type="button"
+                onClick={() => setMode("magic-link-form")}
+                style={{
+                  display: "block", width: "100%", textAlign: "center",
+                  background: "none", border: "none", cursor: "pointer",
+                  color: "var(--auth-text-sub)", fontSize: 13, marginTop: 18,
+                  animation: fadeUp(60),
+                }}
+              >
+                Use a different email
+              </button>
+            </>
+          ) : mode === "magic-link" || mode === "magic-link-form" ? (
+            /* ── Magic Link mode: enter email ── */
             <>
               <button
                 type="button"
@@ -82,11 +129,6 @@ function LoginForm() {
               {error && (
                 <p style={{ background: "rgb(70,10,10)", color: "rgb(252,165,165)", borderRadius: 8, padding: "10px 14px", fontSize: 13, marginBottom: 20 }}>
                   {error}
-                </p>
-              )}
-              {sent && (
-                <p style={{ background: "rgb(20,20,23)", color: "rgb(212,212,216)", border: "1px solid rgb(39,39,42)", borderRadius: 8, padding: "10px 14px", fontSize: 13, marginBottom: 20 }}>
-                  Link sent to <strong style={{ color: "rgb(250,250,250)" }}>{sent}</strong> — check your inbox.
                 </p>
               )}
 
@@ -266,6 +308,15 @@ function MagicLinkIcon() {
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
       <path d="M15 4V2m0 18v-2M8 12H2m18 0h-2M5.636 5.636l1.414 1.414m9.9 9.9 1.414 1.414M5.636 18.364l1.414-1.414M18.364 5.636l-1.414 1.414" />
       <circle cx="15" cy="12" r="3" />
+    </svg>
+  );
+}
+
+function MailIcon() {
+  return (
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgb(109,40,217)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2" y="4" width="20" height="16" rx="2" />
+      <path d="m22 6-10 7L2 6" />
     </svg>
   );
 }

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { FlatPurseLogo } from "@/components/FlatPurseLogo";
 import LogoIntro from "@/components/LogoIntro";
 
 // Slides already have their heading/subtext baked into the artwork —
@@ -120,7 +121,9 @@ export default function MainSplashPage() {
             />
           ))}
         </div>
-        <Image src="/logo.svg" alt="FlatPurse Flow" width={82} height={28} style={{ flexShrink: 0 }} />
+        {/* Slides are always light, so the logo is pinned to a dark navy rather
+            than following the (dark-background-oriented) --auth-text variable */}
+        <FlatPurseLogo className="h-6 w-auto" style={{ color: "rgb(15,5,40)", flexShrink: 0 }} />
       </div>
 
       {/* Bottom actions — outside the tap/swipe zone entirely */}
