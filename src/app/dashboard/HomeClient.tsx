@@ -195,37 +195,40 @@ function ScheduleRow({ row, isUpNext }: { row: AppointmentRow; isUpNext: boolean
 function EmptyState() {
   const { dark } = useDashboardTheme();
   const card = cardStyle(dark);
+  const primaryText = dark ? "rgb(250,250,250)" : "rgb(12,12,20)";
+  const labelColor = dark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.43)";
+
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+      {/* Compact AutoPilot balance card — same visual language as the populated
+          hero (OwnerPopulated below), just zeroed out until the first booking */}
       <div style={{
-        ...card,
         background: dark
-          ? "linear-gradient(135deg, rgba(16,185,129,0.1) 0%, rgba(52,211,153,0.04) 100%)"
-          : "linear-gradient(135deg, rgba(16,185,129,0.09) 0%, rgba(52,211,153,0.03) 100%)",
-        border: "1px solid rgba(52,211,153,0.2)",
-        padding: "32px 28px",
-        textAlign: "center",
+          ? "linear-gradient(135deg, rgba(88,28,218,0.4) 0%, rgba(109,40,217,0.18) 50%, rgba(16,185,129,0.08) 100%)"
+          : "linear-gradient(135deg, rgba(88,28,218,0.16) 0%, rgba(109,40,217,0.08) 50%, rgba(16,185,129,0.05) 100%)",
+        border: "1px solid rgba(139,92,246,0.3)",
+        borderRadius: 20, padding: "20px 24px",
+        position: "relative", overflow: "hidden",
       }}>
-        <div style={{ display: "flex", justifyContent: "center", marginBottom: 18 }}>
-          <div style={{
-            width: 56, height: 56, borderRadius: "50%",
-            background: "rgba(52,211,153,0.1)",
-            border: "1px solid rgba(52,211,153,0.25)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-          }}>
-            <PulseRing size={14} />
+        <div style={{ position: "absolute", top: -40, right: -40, width: 160, height: 160, borderRadius: "50%", background: "rgba(139,92,246,0.15)", filter: "blur(50px)", pointerEvents: "none" }} />
+        <div style={{ position: "relative" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+            <PulseRing size={7} />
+            <span style={{ color: "rgb(52,211,153)", fontSize: 10.5, fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase" }}>
+              AutoPilot is watching
+            </span>
           </div>
+          <div style={{ display: "flex", alignItems: "baseline", gap: 10, flexWrap: "wrap" }}>
+            <p style={{ color: primaryText, fontSize: 32, fontWeight: 800, margin: 0, letterSpacing: "-0.04em", lineHeight: 1 }}>C$0</p>
+            <p style={{ color: labelColor, fontSize: 12.5, margin: 0 }}>recovered so far</p>
+          </div>
+          <p style={{ color: labelColor, fontSize: 12.5, margin: "6px 0 0", maxWidth: 340, lineHeight: 1.5 }}>
+            Starts recovering revenue automatically the moment your first booking comes in.
+          </p>
         </div>
-        <p style={{ color: dark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.48)", fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", margin: "0 0 8px" }}>
-          AUTOPILOT IS WATCHING
-        </p>
-        <h1 style={{ color: dark ? "rgb(250,250,250)" : "rgb(12,12,20)", fontSize: 30, fontWeight: 800, margin: "0 0 10px", letterSpacing: "-0.03em" }}>
-          Ready to earn for you
-        </h1>
-        <p style={{ color: dark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.48)", fontSize: 14, margin: 0, lineHeight: 1.6, maxWidth: 400, marginInline: "auto" }}>
-          Complete your setup and AutoPilot starts recovering revenue the moment your first booking comes in.
-        </p>
       </div>
+
+      <p style={{ color: primaryText, fontSize: 13, fontWeight: 700, margin: "2px 0 -4px" }}>Complete your setup</p>
 
       {[
         { icon: CalendarDays, iconColor: "rgb(167,139,250)", iconBg: "rgba(139,92,246,0.12)", title: "Add today's bookings", sub: "Enter your first appointment to see the schedule come alive.", cta: "Add booking", href: "/dashboard/appointments" },
