@@ -162,10 +162,10 @@ export default function MainSplashPage() {
           onClick={() => router.push("/login")}
           style={{
             width: "100%", padding: "16px", borderRadius: 14,
-            border: "1px solid rgba(255,255,255,0.25)",
-            background: "rgba(255,255,255,0.06)", color: "white",
+            border: "none",
+            background: "white", color: "rgb(15,5,40)",
             fontSize: 15.5, fontWeight: 700, cursor: "pointer",
-            backdropFilter: "blur(6px)",
+            boxShadow: "0 8px 28px rgba(0,0,0,0.15)",
           }}
         >
           Log in
