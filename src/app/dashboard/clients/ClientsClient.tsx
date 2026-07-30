@@ -198,7 +198,7 @@ function ClientProfile({ client, appointments, engaged, onClose }: {
               <button key={t} onClick={() => setTab(t)} style={{
                 padding: "10px 16px", border: "none", background: "transparent", cursor: "pointer",
                 fontSize: 12.5, fontWeight: tab === t ? 700 : 500,
-                color: tab === t ? "rgb(210,196,254)" : "var(--dw35)",
+                color: tab === t ? "rgb(139,92,246)" : "var(--dw35)",
                 borderBottom: tab === t ? "2px solid rgb(139,92,246)" : "2px solid transparent",
                 whiteSpace: "nowrap", transition: "color 0.15s",
               }}>
@@ -386,9 +386,9 @@ export function ClientsClient({ clients, appointments, engagedNames }: {
           {FILTER_CHIPS.map(f => (
             <button key={f} onClick={() => setFilter(f)} style={{
               padding: "7px 14px", borderRadius: 20, flexShrink: 0,
-              border: `1px solid ${filter === f ? "rgba(139,92,246,0.5)" : "var(--dw08)"}`,
-              background: filter === f ? "rgba(109,40,217,0.2)" : "var(--dw03)",
-              color: filter === f ? "rgb(210,196,254)" : "var(--dw4)",
+              border: filter === f ? "none" : "1px solid var(--dw08)",
+              background: filter === f ? "rgb(109,40,217)" : "var(--dw03)",
+              color: filter === f ? "white" : "var(--dw4)",
               fontSize: 12.5, fontWeight: filter === f ? 700 : 500, cursor: "pointer",
             }}>
               {f}
