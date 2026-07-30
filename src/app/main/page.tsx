@@ -35,6 +35,21 @@ export default function MainSplashPage() {
     }, AUTO_ADVANCE_MS);
   };
 
+  // 100dvh is unreliable in a standalone iOS PWA — it can paint against the
+  // wrong viewport size and never repaint, leaving a gap at the bottom below
+  // the buttons. window.innerHeight tracks the real visible screen instead.
+  const [viewportHeight, setViewportHeight] = useState<number | null>(null);
+  useEffect(() => {
+    const updateHeight = () => setViewportHeight(window.innerHeight);
+    updateHeight();
+    window.addEventListener("resize", updateHeight);
+    window.addEventListener("orientationchange", updateHeight);
+    return () => {
+      window.removeEventListener("resize", updateHeight);
+      window.removeEventListener("orientationchange", updateHeight);
+    };
+  }, []);
+
   useEffect(() => {
     resetTimer();
     return () => {
@@ -67,7 +82,7 @@ export default function MainSplashPage() {
   };
 
   return (
-    <div style={{ position: "relative", height: "100dvh", width: "100%", overflow: "hidden", background: "#0a0a0a" }}>
+    <div style={{ position: "relative", height: viewportHeight ? `${viewportHeight}px` : "100dvh", width: "100%", overflow: "hidden", background: "#0a0a0a" }}>
       {/* Background image per slide */}
       {SLIDES.map((s, i) => (
         <div
