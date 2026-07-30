@@ -374,15 +374,18 @@ export function ClientsClient({ clients, appointments, engagedNames }: {
       </div>
 
       {/* Toolbar */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, background: "var(--dw04)", border: "1px solid var(--dw07)", borderRadius: 10, padding: "8px 12px", width: 240, flex: "1 1 200px", maxWidth: 320 }}>
+      <div className="clients-toolbar" style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+        <div className="clients-search" style={{ display: "flex", alignItems: "center", gap: 8, background: "var(--dw04)", border: "1px solid var(--dw07)", borderRadius: 10, padding: "8px 12px", width: 240, flex: "1 1 200px", maxWidth: 320 }}>
           <Search size={13} color="var(--dw3)" />
           <input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search clients…" style={{ background: "none", border: "none", outline: "none", color: "var(--dtext)", fontSize: 12.5, flex: 1, minWidth: 0 }} />
         </div>
-        <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+        <div
+          className="clients-filter-chips"
+          style={{ display: "flex", gap: 6, flexWrap: "nowrap", overflowX: "auto", WebkitOverflowScrolling: "touch", scrollbarWidth: "none" }}
+        >
           {FILTER_CHIPS.map(f => (
             <button key={f} onClick={() => setFilter(f)} style={{
-              padding: "7px 14px", borderRadius: 20,
+              padding: "7px 14px", borderRadius: 20, flexShrink: 0,
               border: `1px solid ${filter === f ? "rgba(139,92,246,0.5)" : "var(--dw08)"}`,
               background: filter === f ? "rgba(109,40,217,0.2)" : "var(--dw03)",
               color: filter === f ? "rgb(210,196,254)" : "var(--dw4)",

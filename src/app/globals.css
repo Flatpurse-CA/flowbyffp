@@ -398,6 +398,16 @@ body {
   .clients-kpi-grid {
     grid-template-columns: repeat(2, 1fr) !important;
   }
+  .clients-search {
+    flex-basis: 100% !important;
+    max-width: none !important;
+  }
+  .clients-filter-chips {
+    flex-basis: 100% !important;
+  }
+  .clients-filter-chips::-webkit-scrollbar {
+    display: none;
+  }
   .clients-table-wrap {
     display: none !important;
   }
