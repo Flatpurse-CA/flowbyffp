@@ -601,7 +601,7 @@ function DashboardShellInner({ children, user, role, staffName, unreadCount }: {
         className="mobile-flow-coach-bubble"
         style={{
           display: "none",
-          position: "fixed", right: 16, bottom: 88, zIndex: 101,
+          position: "fixed", right: 16, bottom: "calc(88px + env(safe-area-inset-bottom, 0px))", zIndex: 101,
           width: 48, height: 48, borderRadius: "50%",
           alignItems: "center", justifyContent: "center",
           background: "linear-gradient(135deg, rgb(167,139,250), rgb(109,40,217))",
@@ -617,13 +617,14 @@ function DashboardShellInner({ children, user, role, staffName, unreadCount }: {
       <nav style={{
         display: "none",
         position: "fixed", bottom: 0, left: 0, right: 0,
-        height: 72,
+        height: "calc(72px + env(safe-area-inset-bottom, 0px))",
         background: dark ? "rgb(12,12,16)" : "rgb(255,255,255)",
         borderTop: `1px solid ${T.border}`,
         zIndex: 100,
         alignItems: "flex-start",
         justifyContent: "space-around",
         paddingTop: 10,
+        paddingBottom: "env(safe-area-inset-bottom, 0px)",
         overflow: "visible",
       }}
         className="mobile-bottom-nav"

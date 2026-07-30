@@ -363,7 +363,10 @@ body {
     display: none !important;
   }
   main.dashboard-main {
-    padding: 16px !important;
+    /* Bottom padding clears the fixed bottom nav (72px tall) plus the home-indicator
+       safe area — a flat 16px here was hiding the last bit of content behind the nav. */
+    padding: 16px 16px calc(90px + env(safe-area-inset-bottom, 0px)) 16px !important;
+    -webkit-overflow-scrolling: touch;
   }
   .schedule-row {
     gap: 8px !important;
