@@ -104,15 +104,6 @@ export default function MainSplashPage() {
         </div>
       ))}
 
-      {/* Extra concentrated gradient behind the action buttons — the slides
-          carry their own text/contrast, this is just for button legibility */}
-      <div
-        style={{
-          position: "absolute", left: 0, right: 0, bottom: 0, height: 260, pointerEvents: "none",
-          background: "linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.85) 55%, rgba(0,0,0,0.97) 100%)",
-        }}
-      />
-
       {/* Tap / swipe zone — covers everything ABOVE the button area only */}
       <div
         style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: ACTION_ZONE_HEIGHT, zIndex: 1 }}
