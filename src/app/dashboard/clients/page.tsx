@@ -18,5 +18,5 @@ export default async function ClientsPage() {
 
   const clients = deriveClients(appointments, now);
 
-  return <ClientsClient clients={clients} appointments={appointments} engagedNames={engagedNames} />;
+  return <ClientsClient clients={clients} engagedNames={engagedNames} />;
 }
