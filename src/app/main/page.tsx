@@ -139,10 +139,12 @@ export default function MainSplashPage() {
         <FlatPurseLogo className="h-6 w-auto" style={{ color: "rgb(15,5,40)", flexShrink: 0 }} />
       </div>
 
-      {/* Bottom actions — outside the tap/swipe zone entirely */}
+      {/* Bottom actions — fixed to the real viewport (not the container) so it
+          always sits at the true bottom edge regardless of any mismatch between
+          the container's computed height and the actual visible screen */}
       <div
         style={{
-          position: "absolute", left: 0, right: 0, bottom: 0, zIndex: 3,
+          position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 3,
           padding: "0 20px calc(env(safe-area-inset-bottom, 20px) + 20px)",
           display: "flex", flexDirection: "column", gap: 10,
         }}
