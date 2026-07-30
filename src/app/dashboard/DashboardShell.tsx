@@ -484,38 +484,26 @@ function DashboardShellInner({ children, user, role, staffName, unreadCount }: {
               <span style={hdBadge}>5</span>
             </div>
 
-            {/* Theme + Avatar pill */}
-            <div style={{
-              display: "flex", alignItems: "center",
-              background: T.iconBtn,
-              border: `1px solid ${T.iconBtnBorder}`,
-              borderRadius: 12,
-              height: 38,
-            }}>
-              <button
-                onClick={toggle}
-                title={dark ? "Switch to light" : "Switch to dark"}
-                style={{
-                  width: 38, height: 38,
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  background: "transparent", border: "none",
-                  borderRight: `1px solid ${T.iconBtnBorder}`,
-                  color: T.iconColor, cursor: "pointer",
-                  borderRadius: "12px 0 0 12px",
-                }}
-              >
-                {dark ? <Sun size={15} strokeWidth={1.6} /> : <Moon size={15} strokeWidth={1.6} />}
-              </button>
+            {/* Theme toggle — its own button, matching the other header icons */}
+            <button
+              onClick={toggle}
+              title={dark ? "Switch to light" : "Switch to dark"}
+              style={headerIconBtn}
+            >
+              {dark ? <Sun size={15} strokeWidth={1.6} /> : <Moon size={15} strokeWidth={1.6} />}
+            </button>
 
-              <div ref={dropdownRef} style={{ position: "relative" }}>
+            {/* Avatar + dropdown — its own pill, separate from the toggle */}
+            <div ref={dropdownRef} style={{ position: "relative" }}>
                 <button
                   onClick={() => setDropdown(v => !v)}
                   style={{
-                    width: 56, height: 38,
-                    display: "flex", alignItems: "center", justifyContent: "center", gap: 4,
-                    background: "transparent", border: "none",
-                    cursor: "pointer", padding: "0 8px 0 0",
-                    borderRadius: "0 12px 12px 0",
+                    height: 38,
+                    display: "flex", alignItems: "center", justifyContent: "center", gap: 5,
+                    background: T.iconBtn,
+                    border: `1px solid ${T.iconBtnBorder}`,
+                    cursor: "pointer", padding: "0 10px 0 4px",
+                    borderRadius: 12,
                   }}
                 >
                   <div style={{
@@ -582,7 +570,6 @@ function DashboardShellInner({ children, user, role, staffName, unreadCount }: {
                   </div>
                 )}
               </div>
-            </div>
           </div>
         </header>
 
