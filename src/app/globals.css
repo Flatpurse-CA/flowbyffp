@@ -332,6 +332,9 @@ body {
   .mobile-bottom-nav {
     display: flex !important;
   }
+  .mobile-flow-coach-bubble {
+    display: flex !important;
+  }
   aside {
     display: none !important;
   }

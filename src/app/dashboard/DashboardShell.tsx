@@ -42,11 +42,12 @@ const NAV_TABS: NavTab[] = [
 
 const MOBILE_TABS = [
   { icon: LayoutDashboard, href: "/dashboard",              label: "Home" },
-  { icon: CalendarDays,    href: "/dashboard/appointments", label: "Bookings" },
   { icon: Users,           href: "/dashboard/clients",      label: "Clients" },
+  { icon: CalendarDays,    href: "/dashboard/appointments", label: "Bookings", circle: true },
+  { icon: Zap,             href: "/dashboard/autopilot",    label: "AutoPilot" },
   { icon: MoreHorizontal,  href: "/dashboard/more",         label: "More" },
 ];
-const MOBILE_PRIMARY_HREFS = ["/dashboard", "/dashboard/appointments", "/dashboard/clients"];
+const MOBILE_PRIMARY_HREFS = ["/dashboard", "/dashboard/clients", "/dashboard/appointments", "/dashboard/autopilot"];
 
 function isActive(href: string, pathname: string) {
   return href === "/dashboard" ? pathname === "/dashboard" : pathname.startsWith(href);
@@ -591,6 +592,25 @@ function DashboardShellInner({ children, user, role, staffName, unreadCount }: {
       {/* ══════════════════════════════════════
           MOBILE BOTTOM NAV
           ══════════════════════════════════════ */}
+      {/* Flow Coach — floating bubble hovering above the bar, mobile only */}
+      <Link
+        href="/dashboard/flow-coach"
+        className="mobile-flow-coach-bubble"
+        style={{
+          display: "none",
+          position: "fixed", right: 16, bottom: 88, zIndex: 101,
+          width: 48, height: 48, borderRadius: "50%",
+          alignItems: "center", justifyContent: "center",
+          background: "linear-gradient(135deg, rgb(167,139,250), rgb(109,40,217))",
+          boxShadow: "0 8px 20px rgba(109,40,217,0.5)",
+          border: isActive("/dashboard/flow-coach", pathname) ? "2px solid white" : "none",
+          textDecoration: "none",
+        }}
+        aria-label="Flow Coach"
+      >
+        <Compass size={20} color="white" strokeWidth={2.1} />
+      </Link>
+
       <nav style={{
         display: "none",
         position: "fixed", bottom: 0, left: 0, right: 0,
@@ -601,14 +621,38 @@ function DashboardShellInner({ children, user, role, staffName, unreadCount }: {
         alignItems: "flex-start",
         justifyContent: "space-around",
         paddingTop: 10,
+        overflow: "visible",
       }}
         className="mobile-bottom-nav"
       >
-        {MOBILE_TABS.map(({ icon: Icon, href, label }) => {
+        {MOBILE_TABS.map(({ icon: Icon, href, label, circle }) => {
           const active = href === "/dashboard/more"
             ? !MOBILE_PRIMARY_HREFS.some(h => isActive(h, pathname))
             : isActive(href, pathname);
           const badge = href === "/dashboard/more" ? unreadCount : 0;
+
+          if (circle) {
+            return (
+              <Link key={href} href={href} style={{
+                display: "flex", flexDirection: "column", alignItems: "center", gap: 4,
+                textDecoration: "none", position: "relative", marginTop: -28,
+              }}>
+                <div style={{
+                  width: 52, height: 52, borderRadius: "50%",
+                  background: "linear-gradient(135deg, rgb(167,139,250), rgb(109,40,217))",
+                  border: `4px solid ${dark ? "rgb(12,12,16)" : "rgb(255,255,255)"}`,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  boxShadow: "0 6px 18px rgba(109,40,217,0.45)",
+                }}>
+                  <Icon size={24} color="white" strokeWidth={2.2} />
+                </div>
+                <span style={{ fontSize: 10, fontWeight: active ? 700 : 500, color: active ? PURPLE : T.textMuted }}>
+                  {label}
+                </span>
+              </Link>
+            );
+          }
+
           return (
             <Link key={href} href={href} style={{
               display: "flex", flexDirection: "column", alignItems: "center", gap: 4,
