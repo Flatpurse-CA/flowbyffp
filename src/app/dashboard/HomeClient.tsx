@@ -274,57 +274,46 @@ function OwnerPopulated(props: OwnerProps) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
 
-      {/* Hero: AutoPilot */}
+      {/* Hero: AutoPilot — bold solid fill, no gradient */}
       <div style={{
-        background: dark
-          ? "linear-gradient(135deg, rgba(88,28,218,0.4) 0%, rgba(109,40,217,0.18) 50%, rgba(16,185,129,0.08) 100%)"
-          : "linear-gradient(135deg, rgba(88,28,218,0.16) 0%, rgba(109,40,217,0.08) 50%, rgba(16,185,129,0.05) 100%)",
-        border: "1px solid rgba(139,92,246,0.3)",
-        borderRadius: 20, padding: "28px 32px",
-        position: "relative", overflow: "hidden",
+        background: "rgb(109,40,217)",
+        borderRadius: 20, padding: "22px 24px",
+        position: "relative",
       }}>
-        <div style={{ position: "absolute", top: -40, right: -40, width: 200, height: 200, borderRadius: "50%", background: "rgba(139,92,246,0.15)", filter: "blur(50px)", pointerEvents: "none" }} />
+        <Link href="/dashboard/autopilot" title="Open AutoPilot" style={{
+          position: "absolute", top: 18, right: 18,
+          width: 34, height: 34, borderRadius: "50%", flexShrink: 0,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          background: "rgba(255,255,255,0.14)",
+          color: "white", textDecoration: "none",
+        }}>
+          <ChevronRight size={17} strokeWidth={2.5} />
+        </Link>
 
-        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", position: "relative", flexWrap: "wrap", gap: 16 }}>
-          <div>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-              <PulseRing size={8} />
-              <span style={{ color: "rgb(52,211,153)", fontSize: 11, fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase" }}>
-                AUTOPILOT IS ON
-              </span>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+          <PulseRing size={8} />
+          <span style={{ color: "rgb(180,246,214)", fontSize: 11, fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase" }}>
+            AutoPilot is on
+          </span>
+        </div>
+        <p style={{ color: "rgba(255,255,255,0.68)", fontSize: 12, fontWeight: 600, margin: "0 0 4px", letterSpacing: "0.03em" }}>
+          RECOVERED THIS MONTH
+        </p>
+        <p style={{ color: "white", fontSize: 46, fontWeight: 800, margin: "0 0 20px", letterSpacing: "-0.04em", lineHeight: 1 }}>
+          C$<AnimCount target={Math.round(autopilot.totals.revenue)} />
+        </p>
+
+        <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
+          {[
+            { label: "Today", value: fmtPrice(todayAutopilotRevenue) },
+            { label: "Slots filled", value: String(autopilot.flowStats.filler.count) },
+            { label: "No-shows saved", value: String(autopilot.flowStats.noshow.count) },
+          ].map(s => (
+            <div key={s.label}>
+              <p style={{ color: "white", fontSize: 18, fontWeight: 800, margin: "0 0 2px", letterSpacing: "-0.03em" }}>{s.value}</p>
+              <p style={{ color: "rgba(255,255,255,0.6)", fontSize: 11, margin: 0 }}>{s.label}</p>
             </div>
-            <p style={{ color: dark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.58)", fontSize: 12, fontWeight: 600, margin: "0 0 4px", letterSpacing: "0.03em" }}>
-              RECOVERED THIS MONTH
-            </p>
-            <p style={{ color: primaryText, fontSize: 46, fontWeight: 800, margin: "0 0 20px", letterSpacing: "-0.04em", lineHeight: 1 }}>
-              C$<AnimCount target={Math.round(autopilot.totals.revenue)} />
-            </p>
-
-            <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
-              {[
-                { label: "Today", value: fmtPrice(todayAutopilotRevenue) },
-                { label: "Slots filled", value: String(autopilot.flowStats.filler.count) },
-                { label: "No-shows saved", value: String(autopilot.flowStats.noshow.count) },
-              ].map(s => (
-                <div key={s.label}>
-                  <p style={{ color: primaryText, fontSize: 18, fontWeight: 800, margin: "0 0 2px", letterSpacing: "-0.03em" }}>{s.value}</p>
-                  <p style={{ color: dark ? "rgba(255,255,255,0.38)" : "rgba(0,0,0,0.46)", fontSize: 11, margin: 0 }}>{s.label}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <Link href="/dashboard/autopilot" style={{
-            display: "flex", alignItems: "center", gap: 8,
-            padding: "12px 20px", borderRadius: 12, flexShrink: 0,
-            background: "rgb(52,211,153)", border: "none",
-            color: "rgb(5,40,20)", fontSize: 13, fontWeight: 800,
-            cursor: "pointer", letterSpacing: "-0.01em", textDecoration: "none",
-            boxShadow: "0 4px 20px rgba(52,211,153,0.3)",
-          }}>
-            Open AutoPilot
-            <ChevronRight size={15} strokeWidth={2.5} />
-          </Link>
+          ))}
         </div>
       </div>
 
