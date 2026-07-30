@@ -228,20 +228,22 @@ function EmptyState() {
       ].map(row => {
         const Icon = row.icon;
         return (
-          <div key={row.title} style={{ ...card, padding: "18px 20px", display: "flex", alignItems: "center", gap: 16 }}>
-            <div style={{ width: 42, height: 42, borderRadius: 12, flexShrink: 0, background: row.fill, display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <Icon size={20} color="white" strokeWidth={1.8} />
-            </div>
-            <div style={{ flex: 1 }}>
-              <p style={{ color: dark ? "rgb(250,250,250)" : "rgb(12,12,20)", fontSize: 14, fontWeight: 700, margin: "0 0 2px" }}>{row.title}</p>
-              <p style={{ color: dark ? "rgba(255,255,255,0.38)" : "rgba(0,0,0,0.46)", fontSize: 12.5, margin: 0 }}>{row.sub}</p>
+          <div key={row.title} style={{ ...card, padding: "18px 20px", display: "flex", flexDirection: "column", gap: 14 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+              <div style={{ width: 42, height: 42, borderRadius: 12, flexShrink: 0, background: row.fill, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <Icon size={20} color="white" strokeWidth={1.8} />
+              </div>
+              <div style={{ flex: 1 }}>
+                <p style={{ color: dark ? "rgb(250,250,250)" : "rgb(12,12,20)", fontSize: 14, fontWeight: 700, margin: "0 0 2px" }}>{row.title}</p>
+                <p style={{ color: dark ? "rgba(255,255,255,0.38)" : "rgba(0,0,0,0.46)", fontSize: 12.5, margin: 0, lineHeight: 1.5 }}>{row.sub}</p>
+              </div>
             </div>
             <Link href={row.href} style={{
-              display: "flex", alignItems: "center", gap: 6,
-              padding: "9px 16px", borderRadius: 10,
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+              width: "100%", padding: "11px 16px", borderRadius: 10,
               background: row.fill,
               border: "none",
-              color: "white", fontSize: 12.5, fontWeight: 700,
+              color: "white", fontSize: 13, fontWeight: 700,
               textDecoration: "none", whiteSpace: "nowrap",
             }}>
               <Plus size={13} strokeWidth={2.5} /> {row.cta}
