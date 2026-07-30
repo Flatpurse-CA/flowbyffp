@@ -196,50 +196,41 @@ function EmptyState() {
   const { dark } = useDashboardTheme();
   const card = cardStyle(dark);
   const primaryText = dark ? "rgb(250,250,250)" : "rgb(12,12,20)";
-  const labelColor = dark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.43)";
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-      {/* Compact AutoPilot balance card — same visual language as the populated
-          hero (OwnerPopulated below), just zeroed out until the first booking */}
+      {/* Compact AutoPilot balance card — bold solid fill, no gradient */}
       <div style={{
-        background: dark
-          ? "linear-gradient(135deg, rgba(88,28,218,0.4) 0%, rgba(109,40,217,0.18) 50%, rgba(16,185,129,0.08) 100%)"
-          : "linear-gradient(135deg, rgba(88,28,218,0.16) 0%, rgba(109,40,217,0.08) 50%, rgba(16,185,129,0.05) 100%)",
-        border: "1px solid rgba(139,92,246,0.3)",
+        background: "rgb(109,40,217)",
         borderRadius: 20, padding: "20px 24px",
-        position: "relative", overflow: "hidden",
       }}>
-        <div style={{ position: "absolute", top: -40, right: -40, width: 160, height: 160, borderRadius: "50%", background: "rgba(139,92,246,0.15)", filter: "blur(50px)", pointerEvents: "none" }} />
-        <div style={{ position: "relative" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-            <PulseRing size={7} />
-            <span style={{ color: "rgb(52,211,153)", fontSize: 10.5, fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase" }}>
-              AutoPilot is watching
-            </span>
-          </div>
-          <div style={{ display: "flex", alignItems: "baseline", gap: 10, flexWrap: "wrap" }}>
-            <p style={{ color: primaryText, fontSize: 32, fontWeight: 800, margin: 0, letterSpacing: "-0.04em", lineHeight: 1 }}>C$0</p>
-            <p style={{ color: labelColor, fontSize: 12.5, margin: 0 }}>recovered so far</p>
-          </div>
-          <p style={{ color: labelColor, fontSize: 12.5, margin: "6px 0 0", maxWidth: 340, lineHeight: 1.5 }}>
-            Starts recovering revenue automatically the moment your first booking comes in.
-          </p>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+          <PulseRing color="rgb(52,211,153)" size={7} />
+          <span style={{ color: "rgb(180,246,214)", fontSize: 10.5, fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase" }}>
+            AutoPilot is watching
+          </span>
         </div>
+        <div style={{ display: "flex", alignItems: "baseline", gap: 10, flexWrap: "wrap" }}>
+          <p style={{ color: "white", fontSize: 32, fontWeight: 800, margin: 0, letterSpacing: "-0.04em", lineHeight: 1 }}>C$0</p>
+          <p style={{ color: "rgba(255,255,255,0.68)", fontSize: 12.5, margin: 0 }}>recovered so far</p>
+        </div>
+        <p style={{ color: "rgba(255,255,255,0.68)", fontSize: 12.5, margin: "6px 0 0", maxWidth: 340, lineHeight: 1.5 }}>
+          Starts recovering revenue automatically the moment your first booking comes in.
+        </p>
       </div>
 
       <p style={{ color: primaryText, fontSize: 13, fontWeight: 700, margin: "2px 0 -4px" }}>Complete your setup</p>
 
       {[
-        { icon: CalendarDays, iconColor: "rgb(167,139,250)", iconBg: "rgba(139,92,246,0.12)", title: "Add today's bookings", sub: "Enter your first appointment to see the schedule come alive.", cta: "Add booking", href: "/dashboard/appointments" },
-        { icon: Users2,       iconColor: "rgb(96,165,250)",  iconBg: "rgba(59,130,246,0.12)", title: "Add your team",        sub: "Each staff member gets their own calendar column.",        cta: "Add team member", href: "/dashboard/team" },
-        { icon: Heart,        iconColor: "rgb(248,113,113)", iconBg: "rgba(239,68,68,0.1)",   title: "Set Family Hours",     sub: "Protect your personal time. AutoPilot respects it.",       cta: "Set hours", href: "/dashboard/settings" },
+        { icon: CalendarDays, fill: "rgb(139,92,246)", title: "Add today's bookings", sub: "Enter your first appointment to see the schedule come alive.", cta: "Add booking", href: "/dashboard/appointments" },
+        { icon: Users2,       fill: "rgb(59,130,246)",  title: "Add your team",        sub: "Each staff member gets their own calendar column.",        cta: "Add team member", href: "/dashboard/team" },
+        { icon: Heart,        fill: "rgb(239,68,68)",   title: "Set Family Hours",     sub: "Protect your personal time. AutoPilot respects it.",       cta: "Set hours", href: "/dashboard/settings" },
       ].map(row => {
         const Icon = row.icon;
         return (
           <div key={row.title} style={{ ...card, padding: "18px 20px", display: "flex", alignItems: "center", gap: 16 }}>
-            <div style={{ width: 42, height: 42, borderRadius: 12, flexShrink: 0, background: row.iconBg, display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <Icon size={20} color={row.iconColor} strokeWidth={1.7} />
+            <div style={{ width: 42, height: 42, borderRadius: 12, flexShrink: 0, background: row.fill, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <Icon size={20} color="white" strokeWidth={1.8} />
             </div>
             <div style={{ flex: 1 }}>
               <p style={{ color: dark ? "rgb(250,250,250)" : "rgb(12,12,20)", fontSize: 14, fontWeight: 700, margin: "0 0 2px" }}>{row.title}</p>
@@ -248,9 +239,9 @@ function EmptyState() {
             <Link href={row.href} style={{
               display: "flex", alignItems: "center", gap: 6,
               padding: "9px 16px", borderRadius: 10,
-              background: dark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.05)",
-              border: dark ? "1px solid rgba(255,255,255,0.1)" : "1px solid rgba(0,0,0,0.12)",
-              color: dark ? "rgb(250,250,250)" : "rgb(12,12,20)", fontSize: 12.5, fontWeight: 700,
+              background: row.fill,
+              border: "none",
+              color: "white", fontSize: 12.5, fontWeight: 700,
               textDecoration: "none", whiteSpace: "nowrap",
             }}>
               <Plus size={13} strokeWidth={2.5} /> {row.cta}
