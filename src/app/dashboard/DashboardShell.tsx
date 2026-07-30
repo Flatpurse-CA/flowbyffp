@@ -382,7 +382,10 @@ function DashboardShellInner({ children, user, role, staffName, unreadCount }: {
       {/* ══════════════════════════════════════
           RIGHT SIDE
           ══════════════════════════════════════ */}
-      <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", height: "100vh", overflow: "hidden" }}>
+      {/* 100dvh, not 100vh — on mobile Safari, 100vh assumes the browser chrome is
+          fully collapsed, so the header renders above the actual visible viewport
+          until the address bar collapses on scroll ("pull down to see it") */}
+      <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", height: "100dvh", overflow: "hidden" }}>
 
         {/* Top header */}
         <header className="dashboard-header" style={{

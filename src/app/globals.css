@@ -347,7 +347,7 @@ body {
   .dashboard-header {
     flex-wrap: wrap;
     height: auto !important;
-    padding: 12px 16px !important;
+    padding: calc(max(env(safe-area-inset-top, 0px), 44px) + 12px) 16px 12px !important;
     row-gap: 10px;
   }
   .header-search {
