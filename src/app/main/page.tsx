@@ -35,16 +35,23 @@ export default function MainSplashPage() {
     }, AUTO_ADVANCE_MS);
   };
 
-  // 100dvh is unreliable in a standalone iOS PWA — it can paint against the
-  // wrong viewport size and never repaint, leaving a gap at the bottom below
-  // the buttons. window.innerHeight tracks the real visible screen instead.
+  // Both 100dvh and window.innerHeight are unreliable here — iOS Safari doesn't
+  // consistently keep either one synced to the actual visible area as its chrome
+  // shows/hides, leaving a gap of the page's own background below the buttons.
+  // window.visualViewport is the API made specifically for this: it reports the
+  // real currently-visible viewport and fires its own resize event when it changes.
   const [viewportHeight, setViewportHeight] = useState<number | null>(null);
   useEffect(() => {
-    const updateHeight = () => setViewportHeight(window.innerHeight);
+    const vv = window.visualViewport;
+    const updateHeight = () => setViewportHeight(vv ? vv.height : window.innerHeight);
     updateHeight();
+    vv?.addEventListener("resize", updateHeight);
+    vv?.addEventListener("scroll", updateHeight);
     window.addEventListener("resize", updateHeight);
     window.addEventListener("orientationchange", updateHeight);
     return () => {
+      vv?.removeEventListener("resize", updateHeight);
+      vv?.removeEventListener("scroll", updateHeight);
       window.removeEventListener("resize", updateHeight);
       window.removeEventListener("orientationchange", updateHeight);
     };
