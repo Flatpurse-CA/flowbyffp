@@ -19,7 +19,9 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ k
   ]);
 
   const clients = deriveClients(appointments, now);
-  const client = clients.find(c => c.key === key);
+  // This Next.js version does not auto-decode dynamic segment params — a key
+  // like "+1 555-010-0199" arrives as the still-encoded "%2B1%20555-010-0199".
+  const client = clients.find(c => c.key === decodeURIComponent(key));
   if (!client) redirect("/dashboard/clients");
 
   const engaged = new Set(engagedNames).has(client.name.trim().toLowerCase());
