@@ -41,6 +41,10 @@
   0%, 100% { filter: drop-shadow(0 0 6px rgba(139,92,246,0.7)); }
   50%       { filter: drop-shadow(0 0 18px rgba(139,92,246,1)); }
 }
+@keyframes fp-skeleton-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.5; }
+}
 @keyframes fp-logo-reveal {
   0%   { opacity: 0; transform: scale(0.7); filter: drop-shadow(0 0 0 rgba(139,92,246,0)); }
   55%  { opacity: 1; transform: scale(1.06); }
