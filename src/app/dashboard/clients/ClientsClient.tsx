@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Plus, Search, Zap, ChevronRight } from "lucide-react";
 import { type DerivedClient, type ClientTag } from "@/lib/dashboard/clients";
+import { tint } from "@/lib/color";
 
 const CHURN_DOT: Record<string, string> = {
   "Churn risk": "rgb(248,113,113)",
@@ -159,7 +160,7 @@ export function ClientsClient({ clients, engagedNames }: {
                   <td style={{ padding: "13px 18px" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
                       <div style={{ position: "relative", flexShrink: 0 }}>
-                        <div style={{ width: 36, height: 36, borderRadius: "50%", background: `${color}18`, border: `1.5px solid ${color}33`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 800, color }}>
+                        <div style={{ width: 36, height: 36, borderRadius: "50%", background: tint(color, 0.09), border: `1.5px solid ${tint(color, 0.2)}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 800, color }}>
                           {initialsFor(c.name)}
                         </div>
                         <span style={{ position: "absolute", bottom: 0, right: 0, width: 9, height: 9, borderRadius: "50%", background: c.tag ? (CHURN_DOT[c.tag] ?? CHURN_DOT_DEFAULT) : CHURN_DOT_DEFAULT, border: "1.5px solid var(--dring)" }} />
@@ -207,7 +208,7 @@ export function ClientsClient({ clients, engagedNames }: {
           return (
             <div key={c.key} onClick={() => router.push(`/dashboard/clients/${encodeURIComponent(c.key)}`)} style={{ ...card, padding: "14px 16px", display: "flex", alignItems: "center", gap: 12, cursor: "pointer" }}>
               <div style={{ position: "relative", flexShrink: 0 }}>
-                <div style={{ width: 40, height: 40, borderRadius: "50%", background: `${color}18`, border: `1.5px solid ${color}33`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 800, color }}>
+                <div style={{ width: 40, height: 40, borderRadius: "50%", background: tint(color, 0.09), border: `1.5px solid ${tint(color, 0.2)}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 800, color }}>
                   {initialsFor(c.name)}
                 </div>
                 <span style={{ position: "absolute", bottom: 0, right: 0, width: 10, height: 10, borderRadius: "50%", background: c.tag ? (CHURN_DOT[c.tag] ?? CHURN_DOT_DEFAULT) : CHURN_DOT_DEFAULT, border: "1.5px solid var(--dring)" }} />

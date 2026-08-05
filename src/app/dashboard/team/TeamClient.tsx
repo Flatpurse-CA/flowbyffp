@@ -7,6 +7,7 @@ import type { StaffRow } from "./actions";
 import { inviteStaff, resendInvite, archiveStaff } from "./actions";
 import type { AppointmentRow } from "../appointments/actions";
 import { computeStaffUtilization, computeRebookTrend, type MetricsAppointment } from "@/lib/dashboard/metrics";
+import { tint } from "@/lib/color";
 
 const PERIODS = ["This week", "This month", "90 days"] as const;
 type Period = typeof PERIODS[number];
@@ -262,8 +263,8 @@ export function TeamClient({ staff, appointments }: { staff: StaffRow[]; appoint
               {/* Avatar */}
               <div style={{
                 width: 44, height: 44, borderRadius: 12,
-                background: `${row.color}22`,
-                border: `1.5px solid ${row.color}44`,
+                background: tint(row.color, 0.13),
+                border: `1.5px solid ${tint(row.color, 0.27)}`,
                 display: "flex", alignItems: "center", justifyContent: "center",
                 fontSize: 16, fontWeight: 800, color: row.color, flexShrink: 0,
               }}>
@@ -372,8 +373,8 @@ export function TeamClient({ staff, appointments }: { staff: StaffRow[]; appoint
             <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 16 }}>
               <div style={{
                 width: 52, height: 52, borderRadius: 14,
-                background: `${selectedRow.color}22`,
-                border: `1.5px solid ${selectedRow.color}55`,
+                background: tint(selectedRow.color, 0.13),
+                border: `1.5px solid ${tint(selectedRow.color, 0.33)}`,
                 display: "flex", alignItems: "center", justifyContent: "center",
                 fontSize: 20, fontWeight: 800, color: selectedRow.color,
               }}>

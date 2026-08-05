@@ -10,6 +10,7 @@ import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-
 import { getAvailableSlots, createPublicBooking, createPaymentIntent } from "./actions";
 import { customerLogin, customerSignup } from "../../customer/actions";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { tint } from "@/lib/color";
 
 const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
   ? loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
@@ -196,7 +197,7 @@ export function BookingClient({ shop, services, staff, businessHours, initialCus
     <div style={{ minHeight: "100vh", background: "var(--cust-bg)", fontFamily: "DM Sans, system-ui, sans-serif" }}>
 
       {/* Cover — full-bleed edge to edge */}
-      <div style={{ position: "relative", height: 200, overflow: "hidden", background: "linear-gradient(135deg, rgb(30,10,80) 0%, rgb(88,28,218) 50%, rgb(109,40,217) 100%)" }}>
+      <div style={{ position: "relative", height: 200, overflow: "hidden", background: "rgb(88,28,218)" }}>
         <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.25)" }} />
         <div style={{ position: "absolute", top: 16, right: 20, display: "flex", alignItems: "center", gap: 10 }}>
           <div style={{ borderRadius: "50%", background: "rgba(255,255,255,0.12)", backdropFilter: "blur(4px)" }}>
@@ -218,7 +219,7 @@ export function BookingClient({ shop, services, staff, businessHours, initialCus
       <div style={{ position: "relative", zIndex: 1, maxWidth: 680, margin: "0 auto", padding: "0 24px", textAlign: "center" }}>
         <div style={{
           width: 96, height: 96, borderRadius: "50%", margin: "-48px auto 0",
-          background: "linear-gradient(135deg, rgb(88,28,218), rgb(139,92,246))",
+          background: "rgb(109,40,217)",
           border: "4px solid var(--cust-bg)", boxShadow: "0 2px 10px rgba(0,0,0,0.15)",
           display: "flex", alignItems: "center", justifyContent: "center",
           color: "white", fontSize: 30, fontWeight: 800,
@@ -320,7 +321,7 @@ export function BookingClient({ shop, services, staff, businessHours, initialCus
           <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
             {staff.map(s => (
               <div key={s.id} style={{ flex: "1 1 200px", display: "flex", alignItems: "center", gap: 12, background: "var(--cust-card-bg)", border: "1px solid var(--cust-card-border)", borderRadius: 16, padding: "14px 16px" }}>
-                <div style={{ width: 48, height: 48, borderRadius: "50%", background: `${s.color}22`, border: `1.5px solid ${s.color}44`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, fontWeight: 800, color: s.color, flexShrink: 0 }}>
+                <div style={{ width: 48, height: 48, borderRadius: "50%", background: tint(s.color, 0.13), border: `1.5px solid ${tint(s.color, 0.27)}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, fontWeight: 800, color: s.color, flexShrink: 0 }}>
                   {s.full_name.split(" ").map(p => p[0]).join("").slice(0, 2).toUpperCase()}
                 </div>
                 <div style={{ minWidth: 0 }}>
@@ -440,7 +441,7 @@ function DateTimeStep({ service, staff, dayRows, staffId, setStaffId, date, setD
                 padding: "12px 14px", borderRadius: 14, border: `1.5px solid ${staffId === s.id ? ACCENT : "var(--cust-input-border)"}`,
                 background: staffId === s.id ? "rgba(109,40,217,0.06)" : "white", cursor: "pointer", flex: 1, minWidth: 70,
               }}>
-                <div style={{ width: 38, height: 38, borderRadius: "50%", background: staffId === s.id ? `${s.color}22` : "var(--cust-fill)", border: `1.5px solid ${staffId === s.id ? s.color : "transparent"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: s.id === "any" ? 16 : 13, fontWeight: 800, color: staffId === s.id ? s.color : "var(--cust-text-sub)" }}>
+                <div style={{ width: 38, height: 38, borderRadius: "50%", background: staffId === s.id ? tint(s.color, 0.13) : "var(--cust-fill)", border: `1.5px solid ${staffId === s.id ? s.color : "transparent"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: s.id === "any" ? 16 : 13, fontWeight: 800, color: staffId === s.id ? s.color : "var(--cust-text-sub)" }}>
                   {s.initials}
                 </div>
                 <span style={{ color: staffId === s.id ? ACCENT : "var(--cust-text)", fontSize: 11.5, fontWeight: staffId === s.id ? 700 : 500 }}>{s.name}</span>

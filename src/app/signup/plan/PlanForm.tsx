@@ -20,13 +20,11 @@ const PLANS = REAL_PLANS.map(p => ({
   cta: p.key === "enterprise" ? "Continue with Enterprise" : `Continue with ${p.label}`,
 }));
 
-// The selected-card treatment (gradient wash, glow, checkmark, CTA) needs real
-// per-theme values, not just color swaps — a dark radial gradient designed to
-// fade into a near-black page reads as a dirty smudge on a light one.
-function selectedGradient(isDark: boolean) {
-  return isDark
-    ? "radial-gradient(140% 60% at 50% 100%, rgb(109,40,217) 0%, rgb(76,29,149) 28%, rgb(30,10,60) 58%, rgba(9,9,11,0) 85%)"
-    : "radial-gradient(140% 60% at 50% 100%, rgba(139,92,246,0.16) 0%, rgba(139,92,246,0.06) 45%, rgba(139,92,246,0) 80%)";
+// The selected-card treatment (fill, glow, checkmark, CTA) needs real per-theme
+// values, not just color swaps — a saturated purple designed to sit on a
+// near-black page reads as a dirty smudge on a light one.
+function selectedFill(isDark: boolean) {
+  return isDark ? "rgb(45,20,102)" : "rgba(139,92,246,0.1)";
 }
 
 function CheckIcon({ active, isDark }: { active: boolean; isDark: boolean }) {
@@ -144,12 +142,12 @@ export function PlanForm({ error, foundersSpotsRemaining }: { error?: string; fo
                   animation: `0.5s ${easing} ${delay}ms 1 normal both running fp-fade-up`,
                 }}
               >
-                {/* Gradient overlay */}
+                {/* Selected/hover fill overlay */}
                 <div
                   style={{
                     position: "absolute",
                     inset: 0,
-                    background: selectedGradient(isDark),
+                    background: selectedFill(isDark),
                     opacity: isSelected ? 1 : isHovered ? 0.75 : 0,
                     transition: "opacity 0.25s",
                     pointerEvents: "none",

@@ -118,7 +118,7 @@ function BookingLinkStep({
         style={{
           padding: "18px 20px",
           borderRadius: 16,
-          background: "linear-gradient(135deg, rgb(16,12,48), rgb(26,16,68))",
+          background: "rgb(21,14,58)",
           border: "1px solid rgba(139,92,246,0.22)",
         }}
       >
@@ -638,7 +638,7 @@ function CompleteScreen({
           width: 68,
           height: 68,
           borderRadius: 34,
-          background: "linear-gradient(135deg, rgb(22,197,94), rgb(15,128,60))",
+          background: "rgb(22,163,74)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",

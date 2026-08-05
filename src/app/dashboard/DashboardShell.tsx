@@ -591,7 +591,7 @@ function DashboardShellInner({ children, user, role, staffName, unreadCount }: {
           position: "fixed", right: 16, bottom: "calc(88px + env(safe-area-inset-bottom, 0px))", zIndex: 101,
           width: 48, height: 48, borderRadius: "50%",
           alignItems: "center", justifyContent: "center",
-          background: "linear-gradient(135deg, rgb(167,139,250), rgb(109,40,217))",
+          background: "rgb(109,40,217)",
           boxShadow: "0 8px 20px rgba(109,40,217,0.5)",
           border: isActive("/dashboard/flow-coach", pathname) ? "2px solid white" : "none",
           textDecoration: "none",
@@ -630,7 +630,7 @@ function DashboardShellInner({ children, user, role, staffName, unreadCount }: {
               }}>
                 <div style={{
                   width: 52, height: 52, borderRadius: "50%",
-                  background: "linear-gradient(135deg, rgb(167,139,250), rgb(109,40,217))",
+                  background: "rgb(109,40,217)",
                   border: `4px solid ${dark ? "rgb(12,12,16)" : "rgb(255,255,255)"}`,
                   display: "flex", alignItems: "center", justifyContent: "center",
                   boxShadow: "0 6px 18px rgba(109,40,217,0.45)",

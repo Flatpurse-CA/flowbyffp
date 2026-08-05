@@ -669,7 +669,7 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
           {/* Current plan */}
           <div style={{
             ...card,
-            background: "linear-gradient(135deg, rgb(15,11,40), rgb(28,16,70))",
+            background: "rgb(23,14,58)",
             border: "1px solid rgba(139,92,246,0.25)",
           }}>
             <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>

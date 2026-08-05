@@ -127,7 +127,7 @@ export function AutoPilotClient({ state }: { state: AutopilotState }) {
 
       {/* Hero */}
       <div style={{
-        background: "linear-gradient(135deg, rgba(109,40,217,0.3) 0%, rgba(88,28,218,0.12) 100%)",
+        background: "rgba(109,40,217,0.22)",
         border: "1px solid rgba(139,92,246,0.25)", borderRadius: 20, padding: "28px 32px",
         display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 20,
       }}>

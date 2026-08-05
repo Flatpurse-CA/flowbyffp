@@ -11,6 +11,7 @@ import {
 import type { AppointmentRow, AppointmentStatus } from "./actions";
 import { createAppointment, rescheduleAppointment, cancelAppointment, completeAppointment, confirmAppointment } from "./actions";
 import type { StaffRow } from "../team/actions";
+import { tint } from "@/lib/color";
 
 // ─── Timezone-aware formatting (shop is Edmonton-based) ───────────────────────
 
@@ -194,29 +195,35 @@ function NewBookingOverlay({ onClose, onCreated, staff, selfStaffId }: { onClose
   const depositNum = deposit ? priceNum * 0.25 : 0;
 
   return (
-    <div style={{
+    <div className="apt-modal-overlay" style={{
       position: "fixed", inset: 0, zIndex: 300,
       background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)",
       display: "flex", alignItems: "center", justifyContent: "center",
     }} onClick={onClose}>
-      <div style={{
+      <div className="apt-sheet" style={{
         background: "var(--dm1)", border: "1px solid var(--dw1)",
         borderRadius: 22, width: "100%", maxWidth: 860, maxHeight: "88vh",
         margin: 20, boxShadow: "0 24px 80px rgba(0,0,0,0.7)",
-        display: "flex", overflow: "hidden",
+        display: "flex", flexDirection: "column", overflow: "hidden",
       }} onClick={e => e.stopPropagation()}>
 
-        {/* Form */}
-        <div style={{ flex: 1, minWidth: 0, padding: "26px 28px", overflowY: "auto" }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 22 }}>
+        {/* Header — spans the sheet so it stays put while the form scrolls */}
+        <div className="apt-sheet-header" style={{ flexShrink: 0, padding: "22px 28px 16px", borderBottom: "1px solid var(--dw06)" }}>
+          <div className="apt-sheet-grabber" />
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <h2 style={{ color: "var(--dtext)", fontSize: 18, fontWeight: 800, margin: 0, letterSpacing: "-0.02em" }}>
               New Booking
             </h2>
-            <button onClick={onClose} style={{ background: "var(--dw06)", border: "none", borderRadius: 8, width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "var(--dw5)" }}>
-              <X size={16} />
+            <button onClick={onClose} aria-label="Close" style={{ background: "var(--dw06)", border: "none", borderRadius: 9, width: 34, height: 34, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "var(--dw5)", flexShrink: 0 }}>
+              <X size={17} />
             </button>
           </div>
+        </div>
 
+        <div className="nb-body" style={{ display: "flex", flex: 1, minHeight: 0 }}>
+
+        {/* Form */}
+        <div className="nb-form" style={{ flex: 1, minWidth: 0, padding: "22px 28px 26px", overflowY: "auto", WebkitOverflowScrolling: "touch" }}>
           <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
             <div>
               <label style={sectionLabel}>Client</label>
@@ -227,7 +234,7 @@ function NewBookingOverlay({ onClose, onCreated, staff, selfStaffId }: { onClose
               <label style={sectionLabel}>Service</label>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, marginBottom: 10 }}>
                 {SERVICES.map(s => (
-                  <button key={s} onClick={() => setSelectedService(s)} style={{
+                  <button key={s} className="apt-choice" onClick={() => setSelectedService(s)} style={{
                     padding: "9px 12px", borderRadius: 10, border: `1px solid ${selectedService === s ? "rgba(139,92,246,0.5)" : "var(--dw07)"}`,
                     background: selectedService === s ? "rgba(109,40,217,0.15)" : "var(--dw02)",
                     color: selectedService === s ? "rgb(210,196,254)" : "var(--dw6)",
@@ -254,7 +261,7 @@ function NewBookingOverlay({ onClose, onCreated, staff, selfStaffId }: { onClose
                 <label style={sectionLabel}>Stylist</label>
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                   {staff.map(s => (
-                    <button key={s.id} onClick={() => setSelectedStaffId(s.id)} style={{
+                    <button key={s.id} className="apt-choice" onClick={() => setSelectedStaffId(s.id)} style={{
                       padding: "9px 16px", borderRadius: 10,
                       border: `1px solid ${selectedStaffId === s.id ? "rgba(139,92,246,0.5)" : "var(--dw07)"}`,
                       background: selectedStaffId === s.id ? "rgba(109,40,217,0.15)" : "var(--dw02)",
@@ -273,7 +280,7 @@ function NewBookingOverlay({ onClose, onCreated, staff, selfStaffId }: { onClose
               <input type="date" value={selectedDate} onChange={e => setSelectedDate(e.target.value)} style={{ ...inputStyle, colorScheme: "dark", marginBottom: 10 }} />
               <div className="apt-time-grid-6" style={{ display: "grid", gridTemplateColumns: "repeat(6,1fr)", gap: 6 }}>
                 {TIMES.map(t => (
-                  <button key={t} onClick={() => setSelectedTime(t)} style={{
+                  <button key={t} className="apt-choice" onClick={() => setSelectedTime(t)} style={{
                     padding: "8px 4px", borderRadius: 9,
                     border: `1px solid ${selectedTime === t ? "rgba(139,92,246,0.5)" : "var(--dw07)"}`,
                     background: selectedTime === t ? "rgba(109,40,217,0.15)" : "var(--dw02)",
@@ -318,58 +325,71 @@ function NewBookingOverlay({ onClose, onCreated, staff, selfStaffId }: { onClose
           </div>
         </div>
 
-        {/* Live summary panel */}
-        <div style={{
+        {/* Live summary panel — sidebar on desktop, sticky action bar on mobile */}
+        <div className="nb-summary" style={{
           width: 280, flexShrink: 0, background: "var(--dw02)",
-          borderLeft: "1px solid var(--dw08)", padding: "26px 22px",
+          borderLeft: "1px solid var(--dw08)", padding: "22px",
           display: "flex", flexDirection: "column",
         }}>
-          <p style={{ color: "var(--dw4)", fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", margin: "0 0 16px" }}>
-            Summary
-          </p>
+          <div className="nb-summary-desktop" style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0 }}>
+            <p style={{ color: "var(--dw4)", fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", margin: "0 0 16px" }}>
+              Summary
+            </p>
 
-          <div style={{
-            width: 44, height: 44, borderRadius: 12, background: "rgba(139,92,246,0.15)", border: "1px solid rgba(139,92,246,0.3)",
-            display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 800, color: "rgb(167,139,250)", marginBottom: 14,
-          }}>
-            {clientQ.trim() ? initialsFor(clientQ) : "?"}
-          </div>
-
-          <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 18 }}>
-            {summaryRows.map(row => (
-              <div key={row.label}>
-                <p style={{ color: "var(--dw3)", fontSize: 10.5, fontWeight: 600, letterSpacing: "0.04em", textTransform: "uppercase", margin: "0 0 2px" }}>{row.label}</p>
-                <p style={{ color: "var(--dtext)", fontSize: 13.5, fontWeight: 600, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{row.value}</p>
-              </div>
-            ))}
-          </div>
-
-          <div style={{ background: "var(--dw03)", border: "1px solid var(--dw08)", borderRadius: 12, padding: "12px 14px", marginBottom: "auto" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: deposit ? 6 : 0 }}>
-              <span style={{ color: "var(--dw4)", fontSize: 12 }}>Price</span>
-              <span style={{ color: "var(--dtext)", fontSize: 13, fontWeight: 700 }}>{fmtPrice(priceNum)}</span>
+            <div style={{
+              width: 44, height: 44, borderRadius: 12, background: "rgba(139,92,246,0.15)", border: "1px solid rgba(139,92,246,0.3)",
+              display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 800, color: "rgb(167,139,250)", marginBottom: 14,
+            }}>
+              {clientQ.trim() ? initialsFor(clientQ) : "?"}
             </div>
-            {deposit && (
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span style={{ color: "var(--dw4)", fontSize: 12 }}>Deposit due</span>
-                <span style={{ color: "rgb(167,139,250)", fontSize: 13, fontWeight: 700 }}>{fmtPrice(depositNum)}</span>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 18 }}>
+              {summaryRows.map(row => (
+                <div key={row.label}>
+                  <p style={{ color: "var(--dw3)", fontSize: 10.5, fontWeight: 600, letterSpacing: "0.04em", textTransform: "uppercase", margin: "0 0 2px" }}>{row.label}</p>
+                  <p style={{ color: "var(--dtext)", fontSize: 13.5, fontWeight: 600, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{row.value}</p>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ background: "var(--dw03)", border: "1px solid var(--dw08)", borderRadius: 12, padding: "12px 14px", marginBottom: "auto" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: deposit ? 6 : 0 }}>
+                <span style={{ color: "var(--dw4)", fontSize: 12 }}>Price</span>
+                <span style={{ color: "var(--dtext)", fontSize: 13, fontWeight: 700 }}>{fmtPrice(priceNum)}</span>
               </div>
-            )}
+              {deposit && (
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <span style={{ color: "var(--dw4)", fontSize: 12 }}>Deposit due</span>
+                  <span style={{ color: "rgb(167,139,250)", fontSize: 13, fontWeight: 700 }}>{fmtPrice(depositNum)}</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Mobile-only condensed recap — the full form is right above it */}
+          <div className="nb-summary-mobile" style={{ display: "none", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 10 }}>
+            <p style={{ color: "var(--dw45)", fontSize: 12.5, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              {selectedService || "Pick a service"}{selectedTime ? ` · ${selectedTime}` : ""}
+            </p>
+            <p style={{ color: "var(--dtext)", fontSize: 14, fontWeight: 800, margin: 0, flexShrink: 0 }}>
+              {fmtPrice(priceNum)}{deposit ? <span style={{ color: "rgb(167,139,250)", fontSize: 11.5, fontWeight: 700 }}> · {fmtPrice(depositNum)} dep</span> : null}
+            </p>
           </div>
 
           {error && (
             <p style={{ color: "rgb(248,113,113)", fontSize: 12, margin: "16px 0 0" }}>{error}</p>
           )}
 
-          <button disabled={!canBook || submitting} onClick={handleBook} style={{
-            marginTop: 16, padding: "13px", borderRadius: 12, border: "none",
+          <button disabled={!canBook || submitting} onClick={handleBook} className="nb-book-btn" style={{
+            marginTop: 16, padding: "14px", borderRadius: 12, border: "none",
             background: canBook ? "rgb(52,211,153)" : "var(--dw08)",
             color: canBook ? "rgb(5,40,20)" : "var(--dw3)",
-            fontSize: 13.5, fontWeight: 800, cursor: canBook && !submitting ? "pointer" : "default",
+            fontSize: 14, fontWeight: 800, cursor: canBook && !submitting ? "pointer" : "default",
             opacity: submitting ? 0.7 : 1,
           }}>
             {submitting ? "Booking…" : "Book appointment"}
           </button>
+        </div>
         </div>
       </div>
     </div>
@@ -416,17 +436,19 @@ function CloseOutModal({ appt, onClose, onCompleted }: { appt: ApptRecord; onClo
   };
 
   return (
-    <div style={{
+    <div className="apt-modal-overlay" style={{
       position: "fixed", inset: 0, zIndex: 320,
       background: "rgba(0,0,0,0.75)", backdropFilter: "blur(6px)",
       display: "flex", alignItems: "center", justifyContent: "center",
     }} onClick={stage === "select" ? onClose : undefined}>
-      <div style={{
+      <div className="apt-sheet apt-sheet-scroll" style={{
         background: "var(--dm1)", border: "1px solid var(--dw1)",
         borderRadius: 22, width: "100%", maxWidth: 440,
         padding: "26px 26px 24px", margin: 20,
         boxShadow: "0 24px 80px rgba(0,0,0,0.7)",
       }} onClick={e => e.stopPropagation()}>
+
+        <div className="apt-sheet-grabber" />
 
         {stage === "success" ? (
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", padding: "12px 0 4px", animation: "fp-success-pop 0.5s cubic-bezier(0.2,0.8,0.2,1)" }}>
@@ -685,12 +707,12 @@ function AppointmentDetail({ appt, onClose, onCloseOut, onChanged }: { appt: App
   };
 
   return (
-    <div style={{
+    <div className="apt-modal-overlay" style={{
       position: "fixed", inset: 0, zIndex: 310,
       background: "rgba(0,0,0,0.75)", backdropFilter: "blur(6px)",
       display: "flex", alignItems: "center", justifyContent: "center",
     }} onClick={onClose}>
-      <div style={{
+      <div className="apt-sheet" style={{
         background: "var(--dm2)", border: "1px solid var(--dw1)",
         borderRadius: 24, width: "100%", maxWidth: 480,
         maxHeight: "90vh", display: "flex", flexDirection: "column",
@@ -699,10 +721,11 @@ function AppointmentDetail({ appt, onClose, onCloseOut, onChanged }: { appt: App
       }} onClick={e => e.stopPropagation()}>
 
         {/* Header */}
-        <div style={{ padding: "22px 22px 0", flexShrink: 0 }}>
+        <div className="apt-sheet-header" style={{ padding: "22px 22px 0", flexShrink: 0 }}>
+          <div className="apt-sheet-grabber" />
           <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 16 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <div style={{ width: 46, height: 46, borderRadius: "50%", background: `${appt.color}22`, border: `1.5px solid ${appt.color}44`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, fontWeight: 800, color: avatarColor, flexShrink: 0 }}>
+              <div style={{ width: 46, height: 46, borderRadius: "50%", background: tint(appt.color, 0.13), border: `1.5px solid ${tint(appt.color, 0.27)}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, fontWeight: 800, color: avatarColor, flexShrink: 0 }}>
                 {appt.initials}
               </div>
               <div>
@@ -834,7 +857,7 @@ function AppointmentDetail({ appt, onClose, onCloseOut, onChanged }: { appt: App
 
         {/* Footer actions */}
         {!isDone && (
-          <div style={{ padding: "16px 22px 22px", flexShrink: 0, borderTop: "1px solid var(--dw06)", display: "flex", flexDirection: "column", gap: 10 }}>
+          <div className="apt-sheet-footer" style={{ padding: "16px 22px 22px", flexShrink: 0, borderTop: "1px solid var(--dw06)", display: "flex", flexDirection: "column", gap: 10 }}>
             {status === "pending" && (
               <button disabled={busy} onClick={doConfirm} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "13px", borderRadius: 13, border: "none", background: "rgb(109,40,217)", color: "white", fontSize: 13.5, fontWeight: 800, cursor: busy ? "default" : "pointer", opacity: busy ? 0.6 : 1 }}>
                 {busy ? "Confirming…" : "Confirm booking"}
@@ -854,7 +877,7 @@ function AppointmentDetail({ appt, onClose, onCloseOut, onChanged }: { appt: App
           </div>
         )}
         {status === "cancelled" && (
-          <div style={{ padding: "16px 22px 22px", flexShrink: 0, borderTop: "1px solid var(--dw06)" }}>
+          <div className="apt-sheet-footer" style={{ padding: "16px 22px 22px", flexShrink: 0, borderTop: "1px solid var(--dw06)" }}>
             <p style={{ color: "var(--dw3)", fontSize: 12, textAlign: "center", margin: 0 }}>This appointment has been cancelled.</p>
           </div>
         )}
@@ -880,21 +903,21 @@ function DayView({ appts, bookingUrl, onNewBooking, onSelect }: {
       <BookingLinkCard bookingUrl={bookingUrl} />
 
       {/* Today summary banner */}
-      <div style={{
-        display: "flex", alignItems: "center", justifyContent: "space-between",
+      <div className="bookings-day-banner" style={{
+        display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12,
         background: "rgba(139,92,246,0.08)", border: "1px solid rgba(139,92,246,0.22)",
         borderRadius: 14, padding: "12px 18px",
       }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <Zap size={16} color="rgb(167,139,250)" strokeWidth={1.8} />
+        <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
+          <Zap size={16} color="rgb(167,139,250)" strokeWidth={1.8} style={{ flexShrink: 0 }} />
           <span style={{ color: "rgb(210,196,254)", fontSize: 13.5, fontWeight: 700 }}>
             {todayAppts.length} booked today
           </span>
-          <span style={{ color: "var(--dw35)", fontSize: 13 }}>— {openCount} open slot{openCount === 1 ? "" : "s"}</span>
+          <span style={{ color: "var(--dw35)", fontSize: 13 }}>· {openCount} open slot{openCount === 1 ? "" : "s"}</span>
         </div>
-        <button onClick={onNewBooking} style={{
-          display: "flex", alignItems: "center", gap: 6,
-          padding: "8px 16px", borderRadius: 10,
+        <button className="bookings-day-banner-btn" onClick={onNewBooking} style={{
+          display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+          padding: "9px 16px", borderRadius: 10, flexShrink: 0,
           background: "rgb(109,40,217)", border: "none",
           color: "white", fontSize: 12.5, fontWeight: 700, cursor: "pointer",
         }}>
@@ -927,7 +950,7 @@ function DayView({ appts, bookingUrl, onNewBooking, onSelect }: {
               minHeight: 56,
             }}>
               {/* Time label */}
-              <div style={{
+              <div className="rail-time" style={{
                 width: 72, flexShrink: 0, padding: "16px 0 16px 20px",
                 display: "flex", alignItems: "flex-start",
               }}>
@@ -935,26 +958,26 @@ function DayView({ appts, bookingUrl, onNewBooking, onSelect }: {
               </div>
 
               {/* Slot content */}
-              <div style={{ flex: 1, padding: "8px 16px 8px 8px", display: "flex", alignItems: "center" }}>
+              <div className="rail-slot" style={{ flex: 1, minWidth: 0, padding: "8px 16px 8px 8px", display: "flex", alignItems: "center" }}>
                 {booking ? (
                   <div onClick={() => onSelect(booking)} style={{
-                    flex: 1, padding: "10px 14px", borderRadius: 12,
-                    background: `${booking.color}12`,
-                    border: `1px solid ${booking.color}30`,
+                    flex: 1, minWidth: 0, padding: "10px 14px", borderRadius: 12,
+                    background: tint(booking.color, 0.07),
+                    border: `1px solid ${tint(booking.color, 0.19)}`,
                     display: "flex", alignItems: "center", gap: 12, cursor: "pointer",
                   }}>
                     <div style={{
                       width: 32, height: 32, borderRadius: "50%", flexShrink: 0,
-                      background: `${booking.color}22`, border: `1.5px solid ${booking.color}44`,
+                      background: tint(booking.color, 0.13), border: `1.5px solid ${tint(booking.color, 0.27)}`,
                       display: "flex", alignItems: "center", justifyContent: "center",
                       fontSize: 10, fontWeight: 800, color: booking.color,
                     }}>{booking.initials}</div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ color: "var(--dtext)", fontSize: 13, fontWeight: 700, margin: "0 0 2px" }}>{booking.name}</p>
-                      <p style={{ color: "var(--dw38)", fontSize: 11.5, margin: 0 }}>{booking.service} · {booking.stylist}</p>
+                      <p style={{ color: "var(--dtext)", fontSize: 13, fontWeight: 700, margin: "0 0 2px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{booking.name}</p>
+                      <p style={{ color: "var(--dw38)", fontSize: 11.5, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{booking.service} · {booking.stylist}</p>
                     </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                      <span style={{
+                    <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+                      <span className="rail-status-badge" style={{
                         fontSize: 10, fontWeight: 700, padding: "3px 9px", borderRadius: 20,
                         color: STATUS_STYLE[booking.status].color,
                         background: STATUS_STYLE[booking.status].bg,
@@ -1040,15 +1063,15 @@ function WeekView({ appts }: { appts: ApptRecord[] }) {
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
 
       {/* Summary tiles */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14 }}>
+      <div className="bookings-week-tiles" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14 }}>
         {[
           { label: "Week total", value: fmtPrice(weekTotal), sub: `${activeDays} active day${activeDays === 1 ? "" : "s"}` },
           { label: "Avg / day",  value: fmtPrice(weekTotal / 7), sub: "across the week" },
           { label: "Appointments", value: String(totalAppts), sub: "booked this week" },
         ].map(t => (
-          <div key={t.label} style={{ ...card, padding: "16px 18px" }}>
+          <div key={t.label} className="bookings-week-tile" style={{ ...card, padding: "16px 18px" }}>
             <p style={{ color: "var(--dw35)", fontSize: 10, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 6px" }}>{t.label}</p>
-            <p style={{ color: "var(--dtext)", fontSize: 24, fontWeight: 800, margin: "0 0 3px", letterSpacing: "-0.03em" }}>{t.value}</p>
+            <p className="bookings-week-tile-value" style={{ color: "var(--dtext)", fontSize: 24, fontWeight: 800, margin: "0 0 3px", letterSpacing: "-0.03em" }}>{t.value}</p>
             <p style={{ color: "var(--dw35)", fontSize: 11.5, margin: 0 }}>{t.sub}</p>
           </div>
         ))}
@@ -1056,7 +1079,7 @@ function WeekView({ appts }: { appts: ApptRecord[] }) {
 
       {/* 7-day columns */}
       <div style={{ ...card, padding: "20px", overflowX: "auto" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 10, minWidth: 560 }}>
+        <div className="bookings-week-grid" style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 10, minWidth: 560 }}>
           {weekDays.map((day) => (
             <div key={day.label} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
               {/* Day header */}
@@ -1130,19 +1153,22 @@ function ListView({ appts, onSelect }: { appts: ApptRecord[]; onSelect: (appt: A
                   padding: "13px 18px", cursor: "pointer",
                   borderBottom: i < bookings.length - 1 ? "1px solid var(--dw04)" : "none",
                 }}>
-                  <div style={{ width: 34, height: 34, borderRadius: "50%", background: `${b.color}22`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 800, color: b.color, flexShrink: 0 }}>
+                  <div style={{ width: 34, height: 34, borderRadius: "50%", background: tint(b.color, 0.13), display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 800, color: b.color, flexShrink: 0 }}>
                     {b.initials}
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ color: "var(--dtext)", fontSize: 13, fontWeight: 700, margin: "0 0 2px" }}>{b.name}</p>
-                    <p style={{ color: "var(--dw35)", fontSize: 12, margin: 0 }}>{b.service} · {b.stylist}</p>
+                    <p style={{ color: "var(--dtext)", fontSize: 13, fontWeight: 700, margin: "0 0 2px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{b.name}</p>
+                    <p style={{ color: "var(--dw35)", fontSize: 12, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{b.service} · {b.stylist}</p>
                   </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--dw4)", fontSize: 12, flexShrink: 0 }}>
-                    <Clock size={11} />
-                    {b.time}
+                  {/* Right column: stacks under nothing on desktop, right-aligned column on mobile */}
+                  <div className="bookings-list-meta" style={{ display: "flex", alignItems: "center", gap: 14, flexShrink: 0 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--dw4)", fontSize: 12 }}>
+                      <Clock size={11} />
+                      {b.time}
+                    </div>
+                    <span style={{ fontSize: 10, fontWeight: 700, padding: "3px 9px", borderRadius: 20, color: s.color, background: s.bg, whiteSpace: "nowrap" }}>{s.label}</span>
+                    <span style={{ color: "rgb(52,211,153)", fontSize: 13, fontWeight: 700, minWidth: 52, textAlign: "right" }}>{b.price}</span>
                   </div>
-                  <span style={{ fontSize: 10, fontWeight: 700, padding: "3px 9px", borderRadius: 20, color: s.color, background: s.bg, whiteSpace: "nowrap" }}>{s.label}</span>
-                  <span style={{ color: "rgb(52,211,153)", fontSize: 13, fontWeight: 700, minWidth: 52, textAlign: "right" }}>{b.price}</span>
                 </div>
               );
             })}
@@ -1191,7 +1217,7 @@ function BookingLinkCard({ bookingUrl }: { bookingUrl: string | null }) {
           </div>
         </a>
 
-        <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
+        <div className="bookings-link-actions" style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
           <a href={smsHref} title="Share via SMS" style={{
             width: 32, height: 32, borderRadius: 8, border: "1px solid var(--dw08)",
             background: "var(--dw04)", display: "flex", alignItems: "center", justifyContent: "center",
@@ -1272,10 +1298,10 @@ export function AppointmentsClient({ initialAppointments, bookingUrl, staff, sel
         </div>
         <div className="bookings-header-controls" style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
           {/* View switcher */}
-          <div style={{ display: "flex", gap: 2, background: "var(--dw04)", border: "1px solid var(--dw07)", borderRadius: 11, padding: 3 }}>
+          <div className="bookings-view-switch" style={{ display: "flex", gap: 2, background: "var(--dw04)", border: "1px solid var(--dw07)", borderRadius: 11, padding: 3 }}>
             {VIEWS.map(v => (
               <button key={v} onClick={() => setView(v)} style={{
-                padding: "6px 16px", borderRadius: 8, border: "none", cursor: "pointer",
+                padding: "8px 16px", borderRadius: 8, border: "none", cursor: "pointer",
                 fontSize: 12.5, fontWeight: view === v ? 700 : 500,
                 background: view === v ? "rgba(109,40,217,0.45)" : "transparent",
                 color: view === v ? "rgb(210,196,254)" : "var(--dw4)",

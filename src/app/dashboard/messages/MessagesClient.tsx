@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Send, MessageSquare, ChevronLeft } from "lucide-react";
 import type { ConversationSummary, MessageRow } from "./actions";
 import { getOrCreateConversation, listMessages, sendMessage, markConversationRead } from "./actions";
+import { tint } from "@/lib/color";
 
 function initialsFor(name: string) {
   return name.trim().split(/\s+/).map(w => w[0]?.toUpperCase() ?? "").slice(0, 2).join("") || "?";
@@ -99,7 +100,7 @@ export function MessagesClient({ role, conversations, initialConversationId, ini
           )}
           {role === "owner" && selected && (
             <div style={{
-              width: 34, height: 34, borderRadius: 10, background: `${selected.staffColor}22`, border: `1.5px solid ${selected.staffColor}44`,
+              width: 34, height: 34, borderRadius: 10, background: tint(selected.staffColor, 0.13), border: `1.5px solid ${tint(selected.staffColor, 0.27)}`,
               display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 800, color: selected.staffColor, flexShrink: 0,
             }}>
               {initialsFor(selected.staffName)}
@@ -204,7 +205,7 @@ export function MessagesClient({ role, conversations, initialConversationId, ini
                 }}
               >
                 <div style={{
-                  width: 36, height: 36, borderRadius: 10, background: `${c.staffColor}22`, border: `1.5px solid ${c.staffColor}44`,
+                  width: 36, height: 36, borderRadius: 10, background: tint(c.staffColor, 0.13), border: `1.5px solid ${tint(c.staffColor, 0.27)}`,
                   display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 800, color: c.staffColor, flexShrink: 0,
                 }}>
                   {initialsFor(c.staffName)}

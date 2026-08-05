@@ -147,7 +147,7 @@ export default function ReportsPage() {
                   <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 12 }}>C${s.revenue.toLocaleString()}</span>
                 </div>
                 <div style={{ height: 5, borderRadius: 3, background: "rgba(255,255,255,0.06)" }}>
-                  <div style={{ height: "100%", width: `${s.pct}%`, borderRadius: 3, background: "linear-gradient(90deg, rgb(109,40,217), rgb(139,92,246))", transition: "width 0.6s" }} />
+                  <div style={{ height: "100%", width: `${s.pct}%`, borderRadius: 3, background: "rgb(109,40,217)", transition: "width 0.6s" }} />
                 </div>
               </div>
             ))}
@@ -166,7 +166,7 @@ export default function ReportsPage() {
         </div>
 
         {/* AutoPilot ROI */}
-        <div style={{ ...card, background: "linear-gradient(135deg, rgb(15,11,40) 0%, rgb(28,16,70) 100%)", border: "1px solid rgba(139,92,246,0.2)" }}>
+        <div style={{ ...card, background: "rgb(23,14,58)", border: "1px solid rgba(139,92,246,0.2)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 18 }}>
             <Zap size={16} strokeWidth={2} color="rgb(167,139,250)" />
             <p style={{ color: "rgb(250,250,250)", fontSize: 14, fontWeight: 700, margin: 0 }}>AutoPilot impact</p>

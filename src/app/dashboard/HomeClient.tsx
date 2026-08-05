@@ -10,6 +10,7 @@ import type { AppointmentRow, AppointmentStatus } from "./appointments/actions";
 import type { AutopilotState } from "./autopilot/actions";
 import type { NeedsYouCard } from "./daily-brief/actions";
 import { useDashboardTheme } from "./theme-context";
+import { tint } from "@/lib/color";
 
 // ─── Animated counter ─────────────────────────────────────────────────────────
 function AnimCount({ target, prefix = "", suffix = "", duration = 1400 }: {
@@ -171,7 +172,7 @@ function ScheduleRow({ row, isUpNext }: { row: AppointmentRow; isUpNext: boolean
       </div>
       <div className="schedule-row-avatar" style={{
         width: 34, height: 34, borderRadius: "50%", flexShrink: 0,
-        background: color + "22", border: `1.5px solid ${color}44`,
+        background: tint(color, 0.13), border: `1.5px solid ${tint(color, 0.27)}`,
         display: "flex", alignItems: "center", justifyContent: "center",
         fontSize: 11, fontWeight: 800, color,
       }}>

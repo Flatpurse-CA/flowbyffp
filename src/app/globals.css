@@ -388,12 +388,72 @@ body {
   .bookings-header-controls {
     width: 100%;
   }
+  .bookings-view-switch {
+    flex: 1 1 100% !important;
+  }
+  .bookings-view-switch > button {
+    flex: 1 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
   .bookings-search {
     flex: 1 1 140px !important;
     width: auto !important;
   }
+  /* Search and the primary CTA share a row — three stacked full-width controls
+     pushed the actual schedule below the fold. */
   .bookings-new-btn {
-    flex-basis: 100% !important;
+    flex: 0 0 auto !important;
+    padding: 12px 16px !important;
+  }
+  /* Booking-link card: link on its own line, share buttons below it */
+  .bookings-link-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+  /* Day view: the banner is a stat line only. Its CTA was the third identical
+     "add a booking" button on one screen — the header and the rail keep theirs. */
+  .bookings-day-banner {
+    padding: 12px 14px !important;
+  }
+  .bookings-day-banner-btn {
+    display: none !important;
+  }
+  /* Day view time rail: reclaim the horizontal space the hour gutter was eating */
+  .rail-time {
+    width: 52px !important;
+    padding-left: 12px !important;
+  }
+  .rail-slot {
+    padding-right: 12px !important;
+  }
+  .rail-status-badge {
+    display: none !important;
+  }
+  /* Week view: 2 up, with the third tile spanning the full row */
+  .bookings-week-tiles {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+  .bookings-week-tiles > .bookings-week-tile:last-child {
+    grid-column: span 2;
+  }
+  .bookings-week-tile-value {
+    font-size: 20px !important;
+  }
+  /* The 7-day strip fits the width instead of demanding a sideways scroll */
+  .bookings-week-grid {
+    min-width: 0 !important;
+    gap: 4px !important;
+  }
+  .bookings-week-grid p {
+    font-size: 10px !important;
+  }
+  /* List view: time / status / price stack to the right of the client */
+  .bookings-list-meta {
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    gap: 4px !important;
   }
   .clients-kpi-grid {
     grid-template-columns: repeat(2, 1fr) !important;
@@ -459,6 +519,92 @@ body {
   .signup-plan-grid {
     grid-template-columns: 1fr !important;
   }
+
+  /* ── Dialogs become bottom sheets ──
+     The desktop treatment (centred card, 20px margin, side-by-side columns) left
+     the New Booking form squeezed into half a phone screen. On mobile these
+     dock to the bottom edge, fill the width, and scroll internally. */
+  .apt-modal-overlay {
+    align-items: flex-end !important;
+    padding: 0 !important;
+  }
+  .apt-sheet {
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+    max-height: 92dvh !important;
+    border-radius: 20px 20px 0 0 !important;
+    border-bottom: none !important;
+    animation: fp-sheet-up 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .apt-sheet-scroll {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 8px 18px calc(24px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+  .apt-sheet-header {
+    padding-left: 18px !important;
+    padding-right: 18px !important;
+    padding-top: 8px !important;
+  }
+  .apt-sheet-footer {
+    padding: 14px 18px calc(18px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+  /* Drag-affordance bar — desktop hides it, mobile shows it */
+  .apt-sheet-grabber {
+    display: block !important;
+    width: 38px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--dw12);
+    margin: 0 auto 14px;
+  }
+
+  /* New Booking: form over a docked action bar, not a squeezed sidebar */
+  .nb-body {
+    flex-direction: column !important;
+  }
+  .nb-form {
+    padding: 18px 18px 20px !important;
+    flex: 1 1 auto !important;
+    min-height: 0;
+  }
+  .nb-summary {
+    width: 100% !important;
+    border-left: none !important;
+    border-top: 1px solid var(--dw08) !important;
+    padding: 12px 18px calc(14px + env(safe-area-inset-bottom, 0px)) !important;
+    flex-shrink: 0 !important;
+    background: var(--dm1) !important;
+  }
+  .nb-summary-desktop {
+    display: none !important;
+  }
+  .nb-summary-mobile {
+    display: flex !important;
+  }
+  .nb-book-btn {
+    margin-top: 0 !important;
+  }
+  /* Comfortable tap targets on the option pills */
+  .apt-choice {
+    min-height: 42px;
+  }
+  /* iOS zooms the viewport when a focused input is under 16px */
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
+
+.apt-sheet-grabber {
+  display: none;
+}
+
+@keyframes fp-sheet-up {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
 }
 
 @keyframes ping {

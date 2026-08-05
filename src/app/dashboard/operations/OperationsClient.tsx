@@ -6,6 +6,7 @@ import type { OperationsData } from "./actions";
 import { computeStaffUtilization, computeHealthScore, type MetricsAppointment } from "@/lib/dashboard/metrics";
 import { deriveClients, type ClientAppointment } from "@/lib/dashboard/clients";
 import { computeOpportunities } from "@/lib/dashboard/opportunities";
+import { tint } from "@/lib/color";
 
 const MODULES = ["Overview", "Revenue", "Team", "Clients", "AI", "Finance"] as const;
 type Module = typeof MODULES[number];
@@ -187,7 +188,7 @@ function Overview({ operationsScore, fillRate, retention, revenueGrowthScore, ai
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {opportunities.map(o => (
             <div key={o.tag} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", background: "var(--dw02)", borderRadius: 10 }}>
-              <span style={{ fontSize: 9, fontWeight: 800, color: o.color, background: `${o.color}18`, padding: "3px 8px", borderRadius: 20, whiteSpace: "nowrap", letterSpacing: "0.06em" }}>{o.tag}</span>
+              <span style={{ fontSize: 9, fontWeight: 800, color: o.color, background: tint(o.color, 0.09), padding: "3px 8px", borderRadius: 20, whiteSpace: "nowrap", letterSpacing: "0.06em" }}>{o.tag}</span>
               <span style={{ color: "var(--dw6)", fontSize: 13, flex: 1 }}>{o.text}</span>
               {o.impact && <span style={{ color: "rgb(52,211,153)", fontSize: 12, fontWeight: 700, whiteSpace: "nowrap" }}>{o.impact}</span>}
             </div>
@@ -305,7 +306,7 @@ function TeamModule({ staff, metricsAppts, monthStart, now }: {
           {rows.map(r => (
             <div key={r.id} style={{ display: "flex", alignItems: "center", gap: 14 }}>
               <div style={{
-                width: 34, height: 34, borderRadius: 10, background: `${r.color}22`, border: `1.5px solid ${r.color}44`,
+                width: 34, height: 34, borderRadius: 10, background: tint(r.color, 0.13), border: `1.5px solid ${tint(r.color, 0.27)}`,
                 display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 800, color: r.color, flexShrink: 0,
               }}>
                 {r.full_name.split(" ").map(w => w[0]).slice(0, 2).join("")}
@@ -433,7 +434,7 @@ function AIModule({ opportunities }: { opportunities: ReturnType<typeof computeO
               width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "16px 18px",
               background: "none", border: "none", cursor: "pointer", textAlign: "left",
             }}>
-              <span style={{ fontSize: 9, fontWeight: 800, color: o.color, background: `${o.color}18`, padding: "3px 8px", borderRadius: 20, whiteSpace: "nowrap", letterSpacing: "0.06em" }}>{o.tag}</span>
+              <span style={{ fontSize: 9, fontWeight: 800, color: o.color, background: tint(o.color, 0.09), padding: "3px 8px", borderRadius: 20, whiteSpace: "nowrap", letterSpacing: "0.06em" }}>{o.tag}</span>
               <span style={{ color: "var(--dw7)", fontSize: 13, flex: 1 }}>{o.text}</span>
               {o.impact && <span style={{ color: "rgb(52,211,153)", fontSize: 12, fontWeight: 700 }}>{o.impact}</span>}
               <ChevronDown size={15} color="var(--dw3)" style={{ transform: isOpen ? "rotate(180deg)" : "none", transition: "transform 0.15s" }} />
