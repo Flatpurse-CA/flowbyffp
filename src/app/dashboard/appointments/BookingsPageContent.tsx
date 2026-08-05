@@ -11,10 +11,10 @@ export async function BookingsPageContent({ statusFilter }: { statusFilter?: Boo
   if (!ctx) {
     return (
       <div style={{ maxWidth: 460, margin: "100px auto 0", textAlign: "center" }}>
-        <h1 style={{ color: "rgb(250,250,250)", fontSize: 19, fontWeight: 800, margin: "0 0 10px", letterSpacing: "-0.02em" }}>
+        <h1 style={{ color: "var(--dtext)", fontSize: 19, fontWeight: 800, margin: "0 0 10px", letterSpacing: "-0.02em" }}>
           Finish setting up your shop
         </h1>
-        <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 13.5, lineHeight: 1.6, margin: 0 }}>
+        <p style={{ color: "var(--dw45)", fontSize: 13.5, lineHeight: 1.6, margin: 0 }}>
           We couldn&apos;t find a shop linked to your account yet. Complete onboarding to start taking real bookings.
         </p>
       </div>

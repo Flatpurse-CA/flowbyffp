@@ -393,7 +393,7 @@ export function TeamClient({ staff, appointments }: { staff: StaffRow[]; appoint
                   flex: 1, padding: "5px 0", borderRadius: 7, border: "none", cursor: "pointer",
                   fontSize: 11, fontWeight: period === p ? 700 : 500,
                   background: period === p ? "rgba(139,92,246,0.35)" : "transparent",
-                  color: period === p ? "rgb(210,196,254)" : "var(--dw35)",
+                  color: period === p ? "var(--dpurple-text)" : "var(--dw35)",
                 }}>
                   {p}
                 </button>

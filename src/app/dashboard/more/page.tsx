@@ -12,8 +12,8 @@ export const dynamic = "force-dynamic";
 export const fetchCache = "force-no-store";
 
 const card: React.CSSProperties = {
-  background: "rgba(255,255,255,0.03)",
-  border: "1px solid rgba(255,255,255,0.07)",
+  background: "var(--dw03)",
+  border: "1px solid var(--dw07)",
   borderRadius: 16,
   overflow: "hidden",
 };
@@ -29,11 +29,11 @@ function Row({ icon: Icon, label, sub, href, badge, danger, formAction }: {
         background: danger ? "rgba(239,68,68,0.1)" : "rgba(139,92,246,0.14)",
         display: "flex", alignItems: "center", justifyContent: "center",
       }}>
-        <Icon size={17} strokeWidth={1.8} color={danger ? "rgb(248,113,113)" : "rgb(200,180,255)"} />
+        <Icon size={17} strokeWidth={1.8} color={danger ? "rgb(248,113,113)" : "var(--dpurple-text)"} />
       </div>
       <div style={{ flex: 1, textAlign: "left" }}>
-        <div style={{ fontSize: 14, fontWeight: 600, color: danger ? "rgb(248,113,113)" : "rgb(240,240,248)" }}>{label}</div>
-        {sub && <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", marginTop: 1 }}>{sub}</div>}
+        <div style={{ fontSize: 14, fontWeight: 600, color: danger ? "rgb(248,113,113)" : "var(--dtext2)" }}>{label}</div>
+        {sub && <div style={{ fontSize: 12, color: "var(--dw4)", marginTop: 1 }}>{sub}</div>}
       </div>
       {badge != null && badge > 0 && (
         <span style={{
@@ -42,7 +42,7 @@ function Row({ icon: Icon, label, sub, href, badge, danger, formAction }: {
           display: "flex", alignItems: "center", justifyContent: "center",
         }}>{badge > 9 ? "9+" : badge}</span>
       )}
-      {!danger && <ChevronRight size={16} color="rgba(255,255,255,0.2)" />}
+      {!danger && <ChevronRight size={16} color="var(--dw2)" />}
     </div>
   );
 
@@ -58,7 +58,7 @@ function Row({ icon: Icon, label, sub, href, badge, danger, formAction }: {
   return <Link href={href!} style={{ textDecoration: "none", display: "block" }}>{inner}</Link>;
 }
 
-const Divider = () => <div style={{ height: 1, background: "rgba(255,255,255,0.06)" }} />;
+const Divider = () => <div style={{ height: 1, background: "var(--dw06)" }} />;
 
 export default async function MorePage() {
   const ctx = await getShopContext();
@@ -68,12 +68,12 @@ export default async function MorePage() {
 
   return (
     <div style={{ maxWidth: 560 }}>
-      <h1 style={{ fontSize: 22, fontWeight: 800, color: "rgb(240,240,248)", letterSpacing: "-0.02em", margin: "0 0 4px" }}>More</h1>
-      <p style={{ fontSize: 13.5, color: "rgba(255,255,255,0.4)", margin: "0 0 24px" }}>Everything else, in one place.</p>
+      <h1 style={{ fontSize: 22, fontWeight: 800, color: "var(--dtext2)", letterSpacing: "-0.02em", margin: "0 0 4px" }}>More</h1>
+      <p style={{ fontSize: 13.5, color: "var(--dw4)", margin: "0 0 24px" }}>Everything else, in one place.</p>
 
       {ctx.role === "owner" && (
         <>
-          <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(255,255,255,0.25)", margin: "0 0 8px" }}>
+          <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--dw25)", margin: "0 0 8px" }}>
             Workspace
           </p>
           <div style={{ ...card, marginBottom: 20 }}>
@@ -90,7 +90,7 @@ export default async function MorePage() {
         </>
       )}
 
-      <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(255,255,255,0.25)", margin: "0 0 8px" }}>
+      <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--dw25)", margin: "0 0 8px" }}>
         Account
       </p>
       <div style={{ ...card, marginBottom: 20 }}>

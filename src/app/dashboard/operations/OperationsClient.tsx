@@ -97,7 +97,7 @@ export function OperationsClient({ data }: { data: OperationsData }) {
           <button key={m} onClick={() => setMod(m)} style={{
             padding: "10px 18px", border: "none", background: "transparent", cursor: "pointer",
             fontSize: 13, fontWeight: mod === m ? 700 : 500,
-            color: mod === m ? "rgb(210,196,254)" : "var(--dw4)",
+            color: mod === m ? "var(--dpurple-text)" : "var(--dw4)",
             borderBottom: mod === m ? "2px solid rgb(139,92,246)" : "2px solid transparent",
             transition: "color 0.15s, border-color 0.15s",
             whiteSpace: "nowrap",

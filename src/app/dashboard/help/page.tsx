@@ -52,24 +52,24 @@ export default function HelpPage() {
     (f) => query === "" || f.q.toLowerCase().includes(query.toLowerCase()) || f.a.toLowerCase().includes(query.toLowerCase())
   );
 
-  const card: React.CSSProperties = { background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 16 };
+  const card: React.CSSProperties = { background: "var(--dw025)", border: "1px solid var(--dw07)", borderRadius: 16 };
 
   return (
     <div style={{ maxWidth: 760, margin: "0 auto", display: "flex", flexDirection: "column", gap: 28 }}>
 
       {/* Header */}
       <div style={{ textAlign: "center", padding: "10px 0 0" }}>
-        <h1 style={{ color: "rgb(250,250,250)", fontSize: 26, fontWeight: 800, margin: "0 0 8px", letterSpacing: "-0.035em" }}>How can we help?</h1>
-        <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 14, margin: "0 0 22px" }}>Search the FAQ or browse common questions below</p>
+        <h1 style={{ color: "var(--dtext)", fontSize: 26, fontWeight: 800, margin: "0 0 8px", letterSpacing: "-0.035em" }}>How can we help?</h1>
+        <p style={{ color: "var(--dw35)", fontSize: 14, margin: "0 0 22px" }}>Search the FAQ or browse common questions below</p>
 
         {/* Search */}
-        <div style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 13, padding: "11px 16px", maxWidth: 500, margin: "0 auto" }}>
-          <Search size={16} color="rgba(255,255,255,0.3)" />
+        <div style={{ display: "flex", alignItems: "center", gap: 10, background: "var(--dw05)", border: "1px solid var(--dw09)", borderRadius: 13, padding: "11px 16px", maxWidth: 500, margin: "0 auto" }}>
+          <Search size={16} color="var(--dw3)" />
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search for an answer…"
-            style={{ flex: 1, background: "none", border: "none", outline: "none", color: "rgb(250,250,250)", fontSize: 14 }}
+            style={{ flex: 1, background: "none", border: "none", outline: "none", color: "var(--dtext)", fontSize: 14 }}
           />
         </div>
       </div>
@@ -84,38 +84,38 @@ export default function HelpPage() {
             <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(109,40,217,0.18)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 12 }}>
               <Icon size={16} strokeWidth={1.8} color="rgb(167,139,250)" />
             </div>
-            <p style={{ color: "rgb(250,250,250)", fontSize: 13.5, fontWeight: 700, margin: "0 0 4px" }}>{title}</p>
-            <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 12, margin: 0 }}>{desc}</p>
+            <p style={{ color: "var(--dtext)", fontSize: 13.5, fontWeight: 700, margin: "0 0 4px" }}>{title}</p>
+            <p style={{ color: "var(--dw35)", fontSize: 12, margin: 0 }}>{desc}</p>
           </button>
         ))}
       </div>
 
       {/* FAQ accordion */}
       <div>
-        <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", margin: "0 0 12px" }}>
+        <p style={{ color: "var(--dw35)", fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", margin: "0 0 12px" }}>
           {query ? `${filtered.length} result${filtered.length !== 1 ? "s" : ""}` : "Frequently asked questions"}
         </p>
 
         <div style={{ ...card, overflow: "hidden" }}>
           {filtered.length === 0 ? (
-            <div style={{ padding: "48px 24px", textAlign: "center", color: "rgba(255,255,255,0.25)", fontSize: 13 }}>
+            <div style={{ padding: "48px 24px", textAlign: "center", color: "var(--dw25)", fontSize: 13 }}>
               No results for &quot;{query}&quot;
             </div>
           ) : filtered.map((f, i) => (
-            <div key={i} style={{ borderBottom: i < filtered.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
+            <div key={i} style={{ borderBottom: i < filtered.length - 1 ? "1px solid var(--dw05)" : "none" }}>
               <button
                 onClick={() => setOpen(open === i ? null : i)}
                 style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "17px 22px", background: "none", border: "none", cursor: "pointer", textAlign: "left" }}
               >
-                <span style={{ color: open === i ? "rgb(210,196,254)" : "rgb(250,250,250)", fontSize: 14, fontWeight: 600, lineHeight: 1.4, paddingRight: 20 }}>{f.q}</span>
+                <span style={{ color: open === i ? "var(--dpurple-text)" : "var(--dtext)", fontSize: 14, fontWeight: 600, lineHeight: 1.4, paddingRight: 20 }}>{f.q}</span>
                 {open === i
                   ? <ChevronUp size={16} color="rgba(167,139,250,0.7)" style={{ flexShrink: 0 }} />
-                  : <ChevronDown size={16} color="rgba(255,255,255,0.3)" style={{ flexShrink: 0 }} />
+                  : <ChevronDown size={16} color="var(--dw3)" style={{ flexShrink: 0 }} />
                 }
               </button>
               {open === i && (
                 <div style={{ padding: "0 22px 18px" }}>
-                  <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 13.5, lineHeight: 1.7, margin: 0 }}>{f.a}</p>
+                  <p style={{ color: "var(--dw5)", fontSize: 13.5, lineHeight: 1.7, margin: 0 }}>{f.a}</p>
                 </div>
               )}
             </div>
@@ -129,8 +129,8 @@ export default function HelpPage() {
           <MessageCircle size={22} strokeWidth={1.6} color="rgb(167,139,250)" />
         </div>
         <div style={{ flex: 1 }}>
-          <p style={{ color: "rgb(250,250,250)", fontSize: 14, fontWeight: 700, margin: "0 0 3px" }}>Still need help?</p>
-          <p style={{ color: "rgba(255,255,255,0.38)", fontSize: 13, margin: 0 }}>Our team typically replies within a few hours</p>
+          <p style={{ color: "var(--dtext)", fontSize: 14, fontWeight: 700, margin: "0 0 3px" }}>Still need help?</p>
+          <p style={{ color: "var(--dw38)", fontSize: 13, margin: 0 }}>Our team typically replies within a few hours</p>
         </div>
         <button style={{ padding: "10px 20px", borderRadius: 10, background: "rgb(109,40,217)", border: "none", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}>
           Message support

@@ -17,8 +17,8 @@ function dayLabel(iso: string) {
 }
 
 const card: React.CSSProperties = {
-  background: "rgba(255,255,255,0.025)",
-  border: "1px solid rgba(255,255,255,0.07)",
+  background: "var(--dw025)",
+  border: "1px solid var(--dw07)",
   borderRadius: 16,
 };
 
@@ -92,9 +92,9 @@ export function MessagesClient({ role, conversations, initialConversationId, ini
   const thread = (
     <div className={selectedStaffId ? "messages-thread-panel messages-thread-active" : "messages-thread-panel"} style={{ ...card, flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
       {(role === "staff" || selected) && (
-        <div style={{ padding: "16px 20px", borderBottom: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", gap: 12 }}>
+        <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--dw07)", display: "flex", alignItems: "center", gap: 12 }}>
           {role === "owner" && selected && (
-            <button className="messages-back-btn" onClick={() => setSelectedStaffId(null)} style={{ display: "none", background: "none", border: "none", padding: 0, cursor: "pointer", color: "rgba(255,255,255,0.5)", flexShrink: 0 }}>
+            <button className="messages-back-btn" onClick={() => setSelectedStaffId(null)} style={{ display: "none", background: "none", border: "none", padding: 0, cursor: "pointer", color: "var(--dw5)", flexShrink: 0 }}>
               <ChevronLeft size={20} />
             </button>
           )}
@@ -106,7 +106,7 @@ export function MessagesClient({ role, conversations, initialConversationId, ini
               {initialsFor(selected.staffName)}
             </div>
           )}
-          <p style={{ color: "rgb(250,250,250)", fontSize: 14, fontWeight: 700, margin: 0 }}>
+          <p style={{ color: "var(--dtext)", fontSize: 14, fontWeight: 700, margin: 0 }}>
             {role === "owner" ? selected?.staffName : "Your shop owner"}
           </p>
         </div>
@@ -114,11 +114,11 @@ export function MessagesClient({ role, conversations, initialConversationId, ini
 
       <div ref={scrollRef} style={{ flex: 1, overflowY: "auto", padding: "18px 20px", display: "flex", flexDirection: "column", gap: 10, minHeight: 0 }}>
         {loadingThread ? (
-          <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 13, textAlign: "center", margin: "auto" }}>Loading…</p>
+          <p style={{ color: "var(--dw3)", fontSize: 13, textAlign: "center", margin: "auto" }}>Loading…</p>
         ) : messages.length === 0 ? (
           <div style={{ margin: "auto", textAlign: "center" }}>
-            <MessageSquare size={24} color="rgba(255,255,255,0.15)" style={{ marginBottom: 10 }} />
-            <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 13, margin: 0 }}>No messages yet. Say hello.</p>
+            <MessageSquare size={24} color="var(--dw15)" style={{ marginBottom: 10 }} />
+            <p style={{ color: "var(--dw3)", fontSize: 13, margin: 0 }}>No messages yet. Say hello.</p>
           </div>
         ) : messages.map((m, i) => {
           const mine = m.senderId === currentUserId;
@@ -127,13 +127,13 @@ export function MessagesClient({ role, conversations, initialConversationId, ini
           return (
             <div key={m.id}>
               {showDay && (
-                <p style={{ textAlign: "center", color: "rgba(255,255,255,0.25)", fontSize: 11, margin: "8px 0" }}>{dayLabel(m.createdAt)}</p>
+                <p style={{ textAlign: "center", color: "var(--dw25)", fontSize: 11, margin: "8px 0" }}>{dayLabel(m.createdAt)}</p>
               )}
               <div style={{ display: "flex", justifyContent: mine ? "flex-end" : "flex-start" }}>
                 <div style={{
                   maxWidth: "70%", padding: "9px 13px", borderRadius: mine ? "14px 14px 4px 14px" : "14px 14px 14px 4px",
-                  background: mine ? "rgb(109,40,217)" : "rgba(255,255,255,0.06)",
-                  color: mine ? "white" : "rgba(255,255,255,0.85)",
+                  background: mine ? "rgb(109,40,217)" : "var(--dw06)",
+                  color: mine ? "white" : "var(--dw85)",
                   fontSize: 13.5, lineHeight: 1.5,
                 }}>
                   {m.body}
@@ -145,7 +145,7 @@ export function MessagesClient({ role, conversations, initialConversationId, ini
         })}
       </div>
 
-      <div style={{ padding: "14px 20px", borderTop: "1px solid rgba(255,255,255,0.07)", display: "flex", gap: 10 }}>
+      <div style={{ padding: "14px 20px", borderTop: "1px solid var(--dw07)", display: "flex", gap: 10 }}>
         <input
           value={draft}
           onChange={e => setDraft(e.target.value)}
@@ -153,8 +153,8 @@ export function MessagesClient({ role, conversations, initialConversationId, ini
           placeholder={conversationId ? "Type a message…" : "Select a conversation"}
           disabled={!conversationId}
           style={{
-            flex: 1, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)",
-            borderRadius: 10, padding: "10px 14px", color: "rgb(250,250,250)", fontSize: 13.5, outline: "none",
+            flex: 1, background: "var(--dw05)", border: "1px solid var(--dw1)",
+            borderRadius: 10, padding: "10px 14px", color: "var(--dtext)", fontSize: 13.5, outline: "none",
           }}
         />
         <button onClick={handleSend} disabled={!draft.trim() || !conversationId || sending} style={{
@@ -171,7 +171,7 @@ export function MessagesClient({ role, conversations, initialConversationId, ini
   if (role === "staff") {
     return (
       <div style={{ maxWidth: 720, margin: "0 auto", height: "calc(100vh - 160px)", display: "flex", flexDirection: "column" }}>
-        <h1 style={{ color: "rgb(250,250,250)", fontSize: 22, fontWeight: 800, margin: "0 0 16px", letterSpacing: "-0.03em" }}>Messages</h1>
+        <h1 style={{ color: "var(--dtext)", fontSize: 22, fontWeight: 800, margin: "0 0 16px", letterSpacing: "-0.03em" }}>Messages</h1>
         {thread}
       </div>
     );
@@ -179,13 +179,13 @@ export function MessagesClient({ role, conversations, initialConversationId, ini
 
   return (
     <div style={{ maxWidth: 1280, margin: "0 auto", height: "calc(100vh - 160px)", display: "flex", flexDirection: "column" }}>
-      <h1 style={{ color: "rgb(250,250,250)", fontSize: 22, fontWeight: 800, margin: "0 0 16px", letterSpacing: "-0.03em" }}>Messages</h1>
+      <h1 style={{ color: "var(--dtext)", fontSize: 22, fontWeight: 800, margin: "0 0 16px", letterSpacing: "-0.03em" }}>Messages</h1>
 
       {conversations.length === 0 ? (
         <div style={{ ...card, flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
           <div style={{ textAlign: "center", maxWidth: 320 }}>
-            <MessageSquare size={24} color="rgba(255,255,255,0.15)" style={{ marginBottom: 10 }} />
-            <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 13, margin: 0 }}>
+            <MessageSquare size={24} color="var(--dw15)" style={{ marginBottom: 10 }} />
+            <p style={{ color: "var(--dw35)", fontSize: 13, margin: 0 }}>
               Invite a team member from the Team page to start messaging with them.
             </p>
           </div>
@@ -211,8 +211,8 @@ export function MessagesClient({ role, conversations, initialConversationId, ini
                   {initialsFor(c.staffName)}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ color: "rgb(250,250,250)", fontSize: 13, fontWeight: 600, margin: "0 0 2px" }}>{c.staffName}</p>
-                  <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 11.5, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  <p style={{ color: "var(--dtext)", fontSize: 13, fontWeight: 600, margin: "0 0 2px" }}>{c.staffName}</p>
+                  <p style={{ color: "var(--dw35)", fontSize: 11.5, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                     {c.lastMessage ?? "No messages yet"}
                   </p>
                 </div>

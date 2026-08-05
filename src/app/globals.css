@@ -146,6 +146,7 @@
   --dw09:  rgba(255,255,255,0.09);
   --dw1:   rgba(255,255,255,0.1);
   --dw12:  rgba(255,255,255,0.12);
+  --dw15:  rgba(255,255,255,0.15);
   --dw2:   rgba(255,255,255,0.2);
   --dw22:  rgba(255,255,255,0.22);
   --dw25:  rgba(255,255,255,0.25);
@@ -161,6 +162,14 @@
   --dw65:  rgba(255,255,255,0.65);
   --dw7:   rgba(255,255,255,0.7);
   --dw75:  rgba(255,255,255,0.75);
+  --dw85:  rgba(255,255,255,0.85);
+
+  /* Purple accent text/icons (selected pills, labels, badge icons) — light
+     enough to pop on a near-black surface, but the same value on a light
+     surface has ~1.1:1 contrast and reads as blank. Darkened for light mode
+     down to the app's own solid brand purple, which is already proven
+     legible on white (it's the primary button fill). */
+  --dpurple-text: rgb(196,181,253);
 }
 
 [data-portal-theme="light"] {
@@ -183,6 +192,7 @@
   --dw09:  rgba(0,0,0,0.11);
   --dw1:   rgba(0,0,0,0.12);
   --dw12:  rgba(0,0,0,0.18);
+  --dw15:  rgba(0,0,0,0.22);
   --dw2:   rgba(0,0,0,0.28);
   --dw22:  rgba(0,0,0,0.3);
   --dw25:  rgba(0,0,0,0.33);
@@ -198,6 +208,9 @@
   --dw65:  rgba(0,0,0,0.65);
   --dw7:   rgba(0,0,0,0.68);
   --dw75:  rgba(0,0,0,0.7);
+  --dw85:  rgba(0,0,0,0.74);
+
+  --dpurple-text: rgb(109,40,217);
 }
 
 @theme inline {

@@ -285,7 +285,7 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
               borderRadius: 10, border: `1px solid ${tab === label ? "rgba(139,92,246,0.4)" : "var(--dw08)"}`,
               cursor: "pointer", fontSize: 12.5, fontWeight: tab === label ? 700 : 500,
               background: tab === label ? "rgba(109,40,217,0.15)" : "var(--dw03)",
-              color: tab === label ? "rgb(210,196,254)" : "var(--dw4)",
+              color: tab === label ? "var(--dpurple-text)" : "var(--dw4)",
               transition: "all 0.15s",
             }}
           >
@@ -448,7 +448,7 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
           <div style={{ background: "rgba(139,92,246,0.06)", border: "1px solid rgba(139,92,246,0.18)", borderRadius: 16, padding: "22px 24px" }}>
             <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 14 }}>
               <div>
-                <p style={{ color: "rgb(210,196,254)", fontSize: 14, fontWeight: 700, margin: "0 0 4px" }}>Family hours</p>
+                <p style={{ color: "var(--dpurple-text)", fontSize: 14, fontWeight: 700, margin: "0 0 4px" }}>Family hours</p>
                 <p style={{ color: "var(--dw4)", fontSize: 12.5, margin: 0 }}>Block a window each evening — AutoPilot won&apos;t book clients during this time.</p>
               </div>
               <button onClick={() => setFamilyOn(v => !v)} style={{
@@ -556,7 +556,7 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
           <div style={{ background: "rgba(139,92,246,0.06)", border: "1px solid rgba(139,92,246,0.18)", borderRadius: 16, padding: "18px 22px", display: "flex", alignItems: "center", gap: 14 }}>
             <Zap size={20} color="rgb(167,139,250)" strokeWidth={2} />
             <div>
-              <p style={{ color: "rgb(210,196,254)", fontSize: 13.5, fontWeight: 700, margin: "0 0 2px" }}>AutoPilot is active</p>
+              <p style={{ color: "var(--dpurple-text)", fontSize: 13.5, fontWeight: 700, margin: "0 0 2px" }}>AutoPilot is active</p>
               <p style={{ color: "var(--dw38)", fontSize: 12.5, margin: 0 }}>Configure each flow below — changes take effect immediately.</p>
             </div>
           </div>
@@ -720,7 +720,7 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
                 padding: "7px 16px", borderRadius: 20, cursor: "pointer", fontSize: 12.5, fontWeight: 700,
                 border: `1px solid ${billingInterval === iv ? "rgba(139,92,246,0.4)" : "var(--dw08)"}`,
                 background: billingInterval === iv ? "rgba(109,40,217,0.15)" : "var(--dw03)",
-                color: billingInterval === iv ? "rgb(210,196,254)" : "var(--dw4)",
+                color: billingInterval === iv ? "var(--dpurple-text)" : "var(--dw4)",
               }}>
                 {iv === "monthly" ? "Monthly" : "Annual (2 months free)"}
               </button>

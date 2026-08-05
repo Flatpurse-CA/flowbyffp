@@ -38,7 +38,7 @@ function Card({ c }: { c: FlowCoachCard }) {
 
       {c.recommendation && (
         <div style={{ background: "rgba(139,92,246,0.08)", border: "1px solid rgba(139,92,246,0.18)", borderRadius: 10, padding: "10px 12px" }}>
-          <p style={{ color: "rgb(210,196,254)", fontSize: 12, lineHeight: 1.5, margin: 0 }}>
+          <p style={{ color: "var(--dpurple-text)", fontSize: 12, lineHeight: 1.5, margin: 0 }}>
             <span style={{ fontWeight: 700 }}>Recommendation: </span>{c.recommendation}
           </p>
         </div>
@@ -103,7 +103,7 @@ export function FlowCoachClient({ data }: { data: FlowCoachData | null }) {
           {healthCard.diagnosis && <p style={{ color: "var(--dw5)", fontSize: 13, lineHeight: 1.6, margin: 0 }}>{healthCard.diagnosis}</p>}
           {healthCard.recommendation && (
             <div style={{ background: "rgba(139,92,246,0.08)", border: "1px solid rgba(139,92,246,0.18)", borderRadius: 10, padding: "10px 12px" }}>
-              <p style={{ color: "rgb(210,196,254)", fontSize: 12.5, lineHeight: 1.5, margin: 0 }}>
+              <p style={{ color: "var(--dpurple-text)", fontSize: 12.5, lineHeight: 1.5, margin: 0 }}>
                 <span style={{ fontWeight: 700 }}>Recommendation: </span>{healthCard.recommendation}
               </p>
             </div>

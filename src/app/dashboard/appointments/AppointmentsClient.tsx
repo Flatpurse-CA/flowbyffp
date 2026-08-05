@@ -237,7 +237,7 @@ function NewBookingOverlay({ onClose, onCreated, staff, selfStaffId }: { onClose
                   <button key={s} className="apt-choice" onClick={() => setSelectedService(s)} style={{
                     padding: "9px 12px", borderRadius: 10, border: `1px solid ${selectedService === s ? "rgba(139,92,246,0.5)" : "var(--dw07)"}`,
                     background: selectedService === s ? "rgba(109,40,217,0.15)" : "var(--dw02)",
-                    color: selectedService === s ? "rgb(210,196,254)" : "var(--dw6)",
+                    color: selectedService === s ? "var(--dpurple-text)" : "var(--dw6)",
                     fontSize: 12.5, fontWeight: selectedService === s ? 700 : 400, cursor: "pointer", textAlign: "left",
                   }}>
                     {s}
@@ -265,7 +265,7 @@ function NewBookingOverlay({ onClose, onCreated, staff, selfStaffId }: { onClose
                       padding: "9px 16px", borderRadius: 10,
                       border: `1px solid ${selectedStaffId === s.id ? "rgba(139,92,246,0.5)" : "var(--dw07)"}`,
                       background: selectedStaffId === s.id ? "rgba(109,40,217,0.15)" : "var(--dw02)",
-                      color: selectedStaffId === s.id ? "rgb(210,196,254)" : "var(--dw5)",
+                      color: selectedStaffId === s.id ? "var(--dpurple-text)" : "var(--dw5)",
                       fontSize: 12.5, fontWeight: selectedStaffId === s.id ? 700 : 400, cursor: "pointer",
                     }}>
                       {s.full_name.split(" ")[0]}
@@ -284,7 +284,7 @@ function NewBookingOverlay({ onClose, onCreated, staff, selfStaffId }: { onClose
                     padding: "8px 4px", borderRadius: 9,
                     border: `1px solid ${selectedTime === t ? "rgba(139,92,246,0.5)" : "var(--dw07)"}`,
                     background: selectedTime === t ? "rgba(109,40,217,0.15)" : "var(--dw02)",
-                    color: selectedTime === t ? "rgb(210,196,254)" : "var(--dw5)",
+                    color: selectedTime === t ? "var(--dpurple-text)" : "var(--dw5)",
                     fontSize: 11, fontWeight: selectedTime === t ? 700 : 400, cursor: "pointer",
                   }}>
                     {t}
@@ -508,7 +508,7 @@ function CloseOutModal({ appt, onClose, onCompleted }: { appt: ApptRecord; onClo
                         padding: "9px 4px", borderRadius: 10,
                         border: `1px solid ${gratuityPct === p ? "rgba(139,92,246,0.5)" : "var(--dw07)"}`,
                         background: gratuityPct === p ? "rgba(109,40,217,0.15)" : "var(--dw02)",
-                        color: gratuityPct === p ? "rgb(210,196,254)" : "var(--dw5)",
+                        color: gratuityPct === p ? "var(--dpurple-text)" : "var(--dw5)",
                         fontSize: 12.5, fontWeight: gratuityPct === p ? 700 : 400, cursor: "pointer",
                       }}>
                         {p === 0 ? "No tip" : `${p}%`}
@@ -518,7 +518,7 @@ function CloseOutModal({ appt, onClose, onCompleted }: { appt: ApptRecord; onClo
                       padding: "9px 4px", borderRadius: 10,
                       border: `1px solid ${gratuityPct === "custom" ? "rgba(139,92,246,0.5)" : "var(--dw07)"}`,
                       background: gratuityPct === "custom" ? "rgba(109,40,217,0.15)" : "var(--dw02)",
-                      color: gratuityPct === "custom" ? "rgb(210,196,254)" : "var(--dw5)",
+                      color: gratuityPct === "custom" ? "var(--dpurple-text)" : "var(--dw5)",
                       fontSize: 12.5, fontWeight: gratuityPct === "custom" ? 700 : 400, cursor: "pointer",
                     }}>
                       Custom
@@ -571,7 +571,7 @@ function CloseOutModal({ appt, onClose, onCompleted }: { appt: ApptRecord; onClo
                       }}>
                         <m.Icon size={17} color={method === m.id ? "rgb(167,139,250)" : "var(--dw5)"} strokeWidth={1.7} />
                         <div>
-                          <p style={{ color: method === m.id ? "rgb(210,196,254)" : "var(--dtext)", fontSize: 12.5, fontWeight: 700, margin: "0 0 1px" }}>{m.label}</p>
+                          <p style={{ color: method === m.id ? "var(--dpurple-text)" : "var(--dtext)", fontSize: 12.5, fontWeight: 700, margin: "0 0 1px" }}>{m.label}</p>
                           <p style={{ color: "var(--dw3)", fontSize: 10.5, margin: 0 }}>{m.sub}</p>
                         </div>
                       </button>
@@ -591,7 +591,7 @@ function CloseOutModal({ appt, onClose, onCompleted }: { appt: ApptRecord; onClo
                         flex: 1, padding: "8px 6px", borderRadius: 9,
                         border: `1px solid ${linkChannel === c.id ? "rgba(139,92,246,0.5)" : "var(--dw07)"}`,
                         background: linkChannel === c.id ? "rgba(109,40,217,0.15)" : "var(--dw02)",
-                        color: linkChannel === c.id ? "rgb(210,196,254)" : "var(--dw5)",
+                        color: linkChannel === c.id ? "var(--dpurple-text)" : "var(--dw5)",
                         fontSize: 12, fontWeight: linkChannel === c.id ? 700 : 400, cursor: "pointer",
                       }}>
                         {c.label}
@@ -813,7 +813,7 @@ function AppointmentDetail({ appt, onClose, onCloseOut, onChanged }: { appt: App
                     padding: "8px 4px", borderRadius: 9,
                     border: `1px solid ${newTime === t ? "rgba(139,92,246,0.5)" : "var(--dw07)"}`,
                     background: newTime === t ? "rgba(109,40,217,0.15)" : "var(--dw02)",
-                    color: newTime === t ? "rgb(210,196,254)" : "var(--dw5)",
+                    color: newTime === t ? "var(--dpurple-text)" : "var(--dw5)",
                     fontSize: 11.5, fontWeight: newTime === t ? 700 : 400, cursor: "pointer",
                   }}>
                     {t}
@@ -910,7 +910,7 @@ function DayView({ appts, bookingUrl, onNewBooking, onSelect }: {
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
           <Zap size={16} color="rgb(167,139,250)" strokeWidth={1.8} style={{ flexShrink: 0 }} />
-          <span style={{ color: "rgb(210,196,254)", fontSize: 13.5, fontWeight: 700 }}>
+          <span style={{ color: "var(--dpurple-text)", fontSize: 13.5, fontWeight: 700 }}>
             {todayAppts.length} booked today
           </span>
           <span style={{ color: "var(--dw35)", fontSize: 13 }}>· {openCount} open slot{openCount === 1 ? "" : "s"}</span>
@@ -1213,7 +1213,7 @@ function BookingLinkCard({ bookingUrl }: { bookingUrl: string | null }) {
           </div>
           <div style={{ minWidth: 0 }}>
             <p style={{ color: "var(--dw35)", fontSize: 10, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 2px" }}>Your booking link · tap to preview</p>
-            <p style={{ color: "rgb(210,196,254)", fontSize: 13.5, fontWeight: 600, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{displayText}</p>
+            <p style={{ color: "var(--dpurple-text)", fontSize: 13.5, fontWeight: 600, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{displayText}</p>
           </div>
         </a>
 
@@ -1304,7 +1304,7 @@ export function AppointmentsClient({ initialAppointments, bookingUrl, staff, sel
                 padding: "8px 16px", borderRadius: 8, border: "none", cursor: "pointer",
                 fontSize: 12.5, fontWeight: view === v ? 700 : 500,
                 background: view === v ? "rgba(109,40,217,0.45)" : "transparent",
-                color: view === v ? "rgb(210,196,254)" : "var(--dw4)",
+                color: view === v ? "var(--dpurple-text)" : "var(--dw4)",
                 transition: "all 0.15s",
               }}>
                 {v}

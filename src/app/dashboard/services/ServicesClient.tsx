@@ -41,7 +41,7 @@ function formatMinutes(mins: number): string {
   return `${h}h ${m}m`;
 }
 
-const card: React.CSSProperties = { background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 16 };
+const card: React.CSSProperties = { background: "var(--dw025)", border: "1px solid var(--dw07)", borderRadius: 16 };
 
 export function ServicesClient({ services }: { services: ServiceRow[] }) {
   const router = useRouter();
@@ -118,8 +118,8 @@ export function ServicesClient({ services }: { services: ServiceRow[] }) {
 
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", rowGap: 12 }}>
         <div>
-          <h1 style={{ color: "rgb(250,250,250)", fontSize: 22, fontWeight: 800, margin: "0 0 3px", letterSpacing: "-0.03em" }}>Services</h1>
-          <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 13, margin: 0 }}>{services.length} service{services.length === 1 ? "" : "s"} · {services.filter(s => s.active).length} active</p>
+          <h1 style={{ color: "var(--dtext)", fontSize: 22, fontWeight: 800, margin: "0 0 3px", letterSpacing: "-0.03em" }}>Services</h1>
+          <p style={{ color: "var(--dw35)", fontSize: 13, margin: 0 }}>{services.length} service{services.length === 1 ? "" : "s"} · {services.filter(s => s.active).length} active</p>
         </div>
         <button onClick={() => setAdding(true)} style={{ display: "flex", alignItems: "center", gap: 7, padding: "10px 18px", borderRadius: 11, background: "rgb(109,40,217)", border: "none", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
           <Plus size={15} strokeWidth={2.5} />
@@ -135,7 +135,7 @@ export function ServicesClient({ services }: { services: ServiceRow[] }) {
 
       {adding && (
         <div style={{ ...card, padding: "20px 22px" }}>
-          <p style={{ color: "rgb(250,250,250)", fontSize: 14, fontWeight: 700, margin: "0 0 16px" }}>New service</p>
+          <p style={{ color: "var(--dtext)", fontSize: 14, fontWeight: 700, margin: "0 0 16px" }}>New service</p>
           <div className="services-add-grid" style={{ display: "grid", gridTemplateColumns: "1fr 120px 120px 140px", gap: 10, marginBottom: 14 }}>
             {[
               { label: "Service name", value: newName, set: setNewName, ph: "e.g. Silk Press" },
@@ -143,13 +143,13 @@ export function ServicesClient({ services }: { services: ServiceRow[] }) {
               { label: "Duration",     value: newDur,   set: setNewDur,   ph: "1h 30m" },
             ].map(({ label, value, set, ph }) => (
               <div key={label}>
-                <label style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, display: "block", marginBottom: 5 }}>{label}</label>
-                <input value={value} onChange={(e) => set(e.target.value)} placeholder={ph} style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 9, padding: "8px 11px", color: "rgb(250,250,250)", fontSize: 13, outline: "none", boxSizing: "border-box" }} />
+                <label style={{ color: "var(--dw4)", fontSize: 11, display: "block", marginBottom: 5 }}>{label}</label>
+                <input value={value} onChange={(e) => set(e.target.value)} placeholder={ph} style={{ width: "100%", background: "var(--dw05)", border: "1px solid var(--dw1)", borderRadius: 9, padding: "8px 11px", color: "var(--dtext)", fontSize: 13, outline: "none", boxSizing: "border-box" }} />
               </div>
             ))}
             <div>
-              <label style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, display: "block", marginBottom: 5 }}>Category</label>
-              <input list="category-suggestions" value={newCat} onChange={(e) => setNewCat(e.target.value)} style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 9, padding: "8px 11px", color: "rgb(250,250,250)", fontSize: 13, outline: "none", boxSizing: "border-box" }} />
+              <label style={{ color: "var(--dw4)", fontSize: 11, display: "block", marginBottom: 5 }}>Category</label>
+              <input list="category-suggestions" value={newCat} onChange={(e) => setNewCat(e.target.value)} style={{ width: "100%", background: "var(--dw05)", border: "1px solid var(--dw1)", borderRadius: 9, padding: "8px 11px", color: "var(--dtext)", fontSize: 13, outline: "none", boxSizing: "border-box" }} />
               <datalist id="category-suggestions">
                 {CATEGORY_SUGGESTIONS.map((c) => <option key={c} value={c} />)}
               </datalist>
@@ -159,34 +159,34 @@ export function ServicesClient({ services }: { services: ServiceRow[] }) {
             <button onClick={addService} disabled={saving} style={{ padding: "8px 20px", borderRadius: 9, background: "rgb(109,40,217)", border: "none", color: "white", fontSize: 13, fontWeight: 700, cursor: saving ? "default" : "pointer", opacity: saving ? 0.6 : 1 }}>
               {saving ? "Adding…" : "Add"}
             </button>
-            <button onClick={() => setAdding(false)} style={{ padding: "8px 16px", borderRadius: 9, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.5)", fontSize: 13, cursor: "pointer" }}>Cancel</button>
+            <button onClick={() => setAdding(false)} style={{ padding: "8px 16px", borderRadius: 9, background: "var(--dw06)", border: "1px solid var(--dw1)", color: "var(--dw5)", fontSize: 13, cursor: "pointer" }}>Cancel</button>
           </div>
         </div>
       )}
 
       <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-        <div style={{ display: "flex", gap: 2, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 11, padding: 3, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: 2, background: "var(--dw04)", border: "1px solid var(--dw07)", borderRadius: 11, padding: 3, flexWrap: "wrap" }}>
           {CATEGORIES.map((c) => (
-            <button key={c} onClick={() => setCat(c)} style={{ padding: "6px 14px", borderRadius: 8, border: "none", cursor: "pointer", fontSize: 12, fontWeight: cat === c ? 700 : 500, background: cat === c ? "rgba(109,40,217,0.45)" : "transparent", color: cat === c ? "rgb(210,196,254)" : "rgba(255,255,255,0.4)", transition: "all 0.15s" }}>
+            <button key={c} onClick={() => setCat(c)} style={{ padding: "6px 14px", borderRadius: 8, border: "none", cursor: "pointer", fontSize: 12, fontWeight: cat === c ? 700 : 500, background: cat === c ? "rgba(109,40,217,0.45)" : "transparent", color: cat === c ? "var(--dpurple-text)" : "var(--dw4)", transition: "all 0.15s" }}>
               {c}
             </button>
           ))}
         </div>
         <div style={{ flex: 1 }} />
-        <div style={{ display: "flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10, padding: "8px 12px", width: 220, flex: "0 1 220px" }}>
-          <Search size={13} color="rgba(255,255,255,0.3)" />
-          <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search services…" style={{ background: "none", border: "none", outline: "none", color: "rgb(250,250,250)", fontSize: 12.5, flex: 1, minWidth: 0 }} />
+        <div style={{ display: "flex", alignItems: "center", gap: 8, background: "var(--dw04)", border: "1px solid var(--dw07)", borderRadius: 10, padding: "8px 12px", width: 220, flex: "0 1 220px" }}>
+          <Search size={13} color="var(--dw3)" />
+          <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search services…" style={{ background: "none", border: "none", outline: "none", color: "var(--dtext)", fontSize: 12.5, flex: 1, minWidth: 0 }} />
         </div>
       </div>
 
       {services.length === 0 ? (
-        <div style={{ ...card, padding: "50px 20px", textAlign: "center", color: "rgba(255,255,255,0.3)", fontSize: 13.5 }}>
+        <div style={{ ...card, padding: "50px 20px", textAlign: "center", color: "var(--dw3)", fontSize: 13.5 }}>
           No services yet — add your first one to start building your booking page.
         </div>
       ) : cat === "All" ? (
         Object.entries(grouped).map(([category, list]) => (
           <div key={category}>
-            <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", margin: "0 0 10px" }}>{category}</p>
+            <p style={{ color: "var(--dw35)", fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", margin: "0 0 10px" }}>{category}</p>
             <ServiceTable rows={list} onToggle={handleToggle} onRemove={handleRemove} />
           </div>
         ))
@@ -200,33 +200,33 @@ export function ServicesClient({ services }: { services: ServiceRow[] }) {
 function ServiceTable({ rows, onToggle, onRemove }: { rows: ServiceRow[]; onToggle: (s: ServiceRow) => void; onRemove: (id: string) => void }) {
   return (
     <>
-      <div className="services-table-wrap" style={{ background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 14, overflow: "hidden", marginBottom: 16 }}>
+      <div className="services-table-wrap" style={{ background: "var(--dw025)", border: "1px solid var(--dw07)", borderRadius: 14, overflow: "hidden", marginBottom: 16 }}>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
         <tbody>
           {rows.map((s, i) => {
             const cat = s.category || "Other";
             const c = colorForCategory(cat);
             return (
-              <tr key={s.id} style={{ borderBottom: i < rows.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none", opacity: s.active ? 1 : 0.45 }}>
+              <tr key={s.id} style={{ borderBottom: i < rows.length - 1 ? "1px solid var(--dw04)" : "none", opacity: s.active ? 1 : 0.45 }}>
                 <td style={{ padding: "14px 18px", width: 36 }}>
                   <button
                     onClick={() => onToggle(s)}
                     style={{
                       width: 36, height: 20, borderRadius: 10, border: "none", cursor: "pointer", position: "relative", transition: "background 0.2s",
-                      background: s.active ? "rgb(109,40,217)" : "rgba(255,255,255,0.12)",
+                      background: s.active ? "rgb(109,40,217)" : "var(--dw12)",
                     }}
                   >
                     <span style={{ position: "absolute", top: 3, left: s.active ? 18 : 3, width: 14, height: 14, borderRadius: "50%", background: "white", transition: "left 0.2s" }} />
                   </button>
                 </td>
-                <td style={{ padding: "14px 8px", color: "rgb(250,250,250)", fontSize: 13.5, fontWeight: 600 }}>{s.name}</td>
+                <td style={{ padding: "14px 8px", color: "var(--dtext)", fontSize: 13.5, fontWeight: 600 }}>{s.name}</td>
                 <td style={{ padding: "14px 8px" }}>
                   <span style={{ fontSize: 11, fontWeight: 600, padding: "3px 9px", borderRadius: 20, background: c.bg, color: c.text }}>
                     {cat}
                   </span>
                 </td>
-                <td style={{ padding: "14px 8px", color: "rgba(255,255,255,0.4)", fontSize: 12.5 }}>{formatMinutes(s.duration_minutes)}</td>
-                <td style={{ padding: "14px 18px", color: "rgb(250,250,250)", fontSize: 14, fontWeight: 800, letterSpacing: "-0.02em" }}>C${s.price}</td>
+                <td style={{ padding: "14px 8px", color: "var(--dw4)", fontSize: 12.5 }}>{formatMinutes(s.duration_minutes)}</td>
+                <td style={{ padding: "14px 18px", color: "var(--dtext)", fontSize: 14, fontWeight: 800, letterSpacing: "-0.02em" }}>C${s.price}</td>
                 <td style={{ padding: "14px 18px", textAlign: "right" }}>
                   <button onClick={() => onRemove(s.id)} style={{ background: "none", border: "none", color: "rgba(239,68,68,0.5)", cursor: "pointer", padding: 5, borderRadius: 7 }}><Trash2 size={13} /></button>
                 </td>
@@ -242,24 +242,24 @@ function ServiceTable({ rows, onToggle, onRemove }: { rows: ServiceRow[]; onTogg
           const cat = s.category || "Other";
           const c = colorForCategory(cat);
           return (
-            <div key={s.id} style={{ background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 14, padding: "14px 16px", opacity: s.active ? 1 : 0.45 }}>
+            <div key={s.id} style={{ background: "var(--dw025)", border: "1px solid var(--dw07)", borderRadius: 14, padding: "14px 16px", opacity: s.active ? 1 : 0.45 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
                 <button
                   onClick={() => onToggle(s)}
                   style={{
                     width: 36, height: 20, borderRadius: 10, border: "none", cursor: "pointer", position: "relative", transition: "background 0.2s", flexShrink: 0,
-                    background: s.active ? "rgb(109,40,217)" : "rgba(255,255,255,0.12)",
+                    background: s.active ? "rgb(109,40,217)" : "var(--dw12)",
                   }}
                 >
                   <span style={{ position: "absolute", top: 3, left: s.active ? 18 : 3, width: 14, height: 14, borderRadius: "50%", background: "white", transition: "left 0.2s" }} />
                 </button>
-                <span style={{ color: "rgb(250,250,250)", fontSize: 13.5, fontWeight: 600, flex: 1, minWidth: 0 }}>{s.name}</span>
+                <span style={{ color: "var(--dtext)", fontSize: 13.5, fontWeight: 600, flex: 1, minWidth: 0 }}>{s.name}</span>
                 <button onClick={() => onRemove(s.id)} style={{ background: "none", border: "none", color: "rgba(239,68,68,0.5)", cursor: "pointer", padding: 5, borderRadius: 7, flexShrink: 0 }}><Trash2 size={13} /></button>
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                 <span style={{ fontSize: 11, fontWeight: 600, padding: "3px 9px", borderRadius: 20, background: c.bg, color: c.text }}>{cat}</span>
-                <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 12.5 }}>{formatMinutes(s.duration_minutes)}</span>
-                <span style={{ color: "rgb(250,250,250)", fontSize: 14, fontWeight: 800, letterSpacing: "-0.02em", marginLeft: "auto" }}>C${s.price}</span>
+                <span style={{ color: "var(--dw4)", fontSize: 12.5 }}>{formatMinutes(s.duration_minutes)}</span>
+                <span style={{ color: "var(--dtext)", fontSize: 14, fontWeight: 800, letterSpacing: "-0.02em", marginLeft: "auto" }}>C${s.price}</span>
               </div>
             </div>
           );

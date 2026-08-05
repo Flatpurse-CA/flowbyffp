@@ -9,17 +9,17 @@ function fmtPrice(n: number) {
 }
 
 const card: React.CSSProperties = {
-  background: "rgba(255,255,255,0.025)",
-  border: "1px solid rgba(255,255,255,0.07)",
+  background: "var(--dw025)",
+  border: "1px solid var(--dw07)",
   borderRadius: 16,
   padding: 20,
 };
 
 function Metric({ label, value }: { label: string; value: string }) {
   return (
-    <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "12px 14px" }}>
-      <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 10, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", margin: "0 0 4px" }}>{label}</p>
-      <p style={{ color: "rgb(250,250,250)", fontSize: 18, fontWeight: 800, margin: 0, letterSpacing: "-0.03em" }}>{value}</p>
+    <div style={{ background: "var(--dw03)", border: "1px solid var(--dw07)", borderRadius: 12, padding: "12px 14px" }}>
+      <p style={{ color: "var(--dw35)", fontSize: 10, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", margin: "0 0 4px" }}>{label}</p>
+      <p style={{ color: "var(--dtext)", fontSize: 18, fontWeight: 800, margin: 0, letterSpacing: "-0.03em" }}>{value}</p>
     </div>
   );
 }
@@ -44,16 +44,16 @@ export function DailyBriefClient({ data }: { data: DailyBriefData }) {
   return (
     <div style={{ maxWidth: 640, margin: "0 auto", display: "flex", flexDirection: "column", gap: 18 }}>
       <div>
-        <h1 style={{ color: "rgb(250,250,250)", fontSize: 22, fontWeight: 800, margin: "0 0 6px", letterSpacing: "-0.03em" }}>
+        <h1 style={{ color: "var(--dtext)", fontSize: 22, fontWeight: 800, margin: "0 0 6px", letterSpacing: "-0.03em" }}>
           {greeting}
         </h1>
-        <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, margin: 0, lineHeight: 1.6 }}>{data.summary}</p>
+        <p style={{ color: "var(--dw5)", fontSize: 14, margin: 0, lineHeight: 1.6 }}>{data.summary}</p>
       </div>
 
       {/* Needs you */}
       {data.needsYou.length > 0 && (
         <div>
-          <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 10px" }}>Needs you</p>
+          <p style={{ color: "var(--dw4)", fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 10px" }}>Needs you</p>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {data.needsYou.map(item => {
               const Icon = KIND_ICON[item.kind];
@@ -66,7 +66,7 @@ export function DailyBriefClient({ data }: { data: DailyBriefData }) {
                   <div style={{ width: 34, height: 34, borderRadius: 10, background: "rgba(239,68,68,0.12)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                     <Icon size={16} color="rgb(248,113,113)" strokeWidth={2} />
                   </div>
-                  <span style={{ color: "rgba(255,255,255,0.75)", fontSize: 13.5, flex: 1 }}>{item.text}</span>
+                  <span style={{ color: "var(--dw75)", fontSize: 13.5, flex: 1 }}>{item.text}</span>
                 </Link>
               );
             })}
@@ -76,7 +76,7 @@ export function DailyBriefClient({ data }: { data: DailyBriefData }) {
 
       {/* Yesterday */}
       <div style={card}>
-        <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 14px" }}>Yesterday</p>
+        <p style={{ color: "var(--dw4)", fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 14px" }}>Yesterday</p>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
           <Metric label="Revenue" value={fmtPrice(data.yesterday.revenue)} />
           <Metric label="Bookings" value={String(data.yesterday.bookings)} />
@@ -87,7 +87,7 @@ export function DailyBriefClient({ data }: { data: DailyBriefData }) {
 
       {/* Today */}
       <div style={card}>
-        <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 14px" }}>Today</p>
+        <p style={{ color: "var(--dw4)", fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 14px" }}>Today</p>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
           <Metric label="Bookings" value={String(data.today.bookingsCount)} />
           <Metric label="Revenue scheduled" value={fmtPrice(data.today.revenueScheduled)} />
@@ -105,12 +105,12 @@ export function DailyBriefClient({ data }: { data: DailyBriefData }) {
           <Heart size={18} color="rgb(167,139,250)" strokeWidth={2} />
         </div>
         <div>
-          <p style={{ color: "rgb(210,196,254)", fontSize: 14, fontWeight: 700, margin: "0 0 2px" }}>
+          <p style={{ color: "var(--dpurple-text)", fontSize: 14, fontWeight: 700, margin: "0 0 2px" }}>
             {data.familyHoursEnabled
               ? `Family Hours — ${data.familyHoursStreak}-day streak`
               : "Family Hours is off"}
           </p>
-          <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, margin: 0 }}>
+          <p style={{ color: "var(--dw4)", fontSize: 12, margin: 0 }}>
             {data.familyHoursEnabled
               ? "No bookings landed in your protected window yesterday. Keep it up."
               : "Turn it on in Settings → Hours to protect your evenings."}
@@ -119,7 +119,7 @@ export function DailyBriefClient({ data }: { data: DailyBriefData }) {
       </div>
 
       {data.needsYou.length === 0 && (
-        <p style={{ color: "rgba(255,255,255,0.25)", fontSize: 12.5, textAlign: "center", margin: 0 }}>
+        <p style={{ color: "var(--dw25)", fontSize: 12.5, textAlign: "center", margin: 0 }}>
           <MessageSquare size={12} style={{ verticalAlign: "-2px", marginRight: 4 }} />
           Nothing needs your attention right now.
         </p>
