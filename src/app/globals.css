@@ -332,6 +332,18 @@ body {
   }
 }
 
+/* CSS Grid tracks default to a minimum size based on their content — a `1fr`
+   column will not actually shrink below an unwrapped (white-space: nowrap)
+   line of text inside it, no matter how narrow the track "should" be. That
+   silently blew out .home-stat-grid's right-hand column on mobile (forced
+   wide by one card's ellipsis-truncated text) and pushed the whole row past
+   the viewport edge. `min-width: 0` on the grid items is the standard fix —
+   it only kicks in when a track would otherwise overflow, so it's safe to
+   apply at every width, not just the mobile breakpoint. */
+.home-stat-grid > a {
+  min-width: 0;
+}
+
 @media (max-width: 768px) {
   .mobile-bottom-nav {
     display: flex !important;
@@ -492,6 +504,24 @@ body {
   }
   .ops-kpi-grid {
     grid-template-columns: repeat(2, 1fr) !important;
+  }
+  /* Reports had no mobile treatment at all: a 4-col KPI grid, a fixed 340px
+     chart column, and a 2-col chart row all held their desktop widths and
+     ran off the right edge of the screen. */
+  .reports-period-switch {
+    flex: 1 1 100%;
+  }
+  .reports-period-switch > button {
+    flex: 1;
+  }
+  .reports-kpi-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .reports-charts-row {
+    grid-template-columns: 1fr !important;
+  }
+  .reports-bottom-row {
+    grid-template-columns: 1fr !important;
   }
   .autopilot-sidebar-grid {
     grid-template-columns: 1fr !important;

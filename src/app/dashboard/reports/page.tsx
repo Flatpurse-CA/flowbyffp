@@ -83,12 +83,12 @@ export default function ReportsPage() {
     <div style={{ maxWidth: 1280, margin: "0 auto", display: "flex", flexDirection: "column", gap: 22 }}>
 
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+      <div className="reports-header" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", rowGap: 12 }}>
         <div>
           <h1 style={{ color: "rgb(250,250,250)", fontSize: 22, fontWeight: 800, margin: "0 0 3px", letterSpacing: "-0.03em" }}>Reports</h1>
           <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 13, margin: 0 }}>Jul 2025 – Jun 2026</p>
         </div>
-        <div style={{ display: "flex", gap: 2, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10, padding: 3 }}>
+        <div className="reports-period-switch" style={{ display: "flex", gap: 2, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10, padding: 3 }}>
           {["30 days", "6 months", "12 months"].map((p, i) => (
             <button key={p} style={{ padding: "6px 14px", borderRadius: 7, border: "none", cursor: "pointer", fontSize: 12, fontWeight: i === 2 ? 700 : 400, background: i === 2 ? "rgba(109,40,217,0.4)" : "transparent", color: i === 2 ? "rgb(210,196,254)" : "rgba(255,255,255,0.38)" }}>
               {p}
@@ -98,7 +98,7 @@ export default function ReportsPage() {
       </div>
 
       {/* KPI row */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14 }}>
+      <div className="reports-kpi-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14 }}>
         {[
           { label: "Total revenue",      value: `C$${(totalRevenue).toLocaleString()}`, change: "+18%", up: true,  Icon: DollarSign, c: "rgb(52,211,153)",  bg: "rgba(16,185,129,0.15)" },
           { label: "Total bookings",     value: MONTHLY_BOOKINGS.reduce((a,b)=>a+b,0).toString(), change: "+22%", up: true,  Icon: CalendarDays, c: "rgb(139,92,246)", bg: "rgba(109,40,217,0.15)" },
@@ -122,7 +122,7 @@ export default function ReportsPage() {
       </div>
 
       {/* Charts row */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: 14 }}>
+      <div className="reports-charts-row" style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: 14 }}>
 
         {/* Revenue chart */}
         <div style={card}>
@@ -156,7 +156,7 @@ export default function ReportsPage() {
       </div>
 
       {/* Bookings + AutoPilot row */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+      <div className="reports-bottom-row" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
 
         {/* Bookings bar chart */}
         <div style={card}>
