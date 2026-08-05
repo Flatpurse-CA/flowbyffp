@@ -1,5 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
-import { getShopContext } from "@/lib/dashboard/shop";
+import { getShopContext, getAuthUser } from "@/lib/dashboard/shop";
 import { listConversations, listMessages, getOrCreateConversation } from "./actions";
 import { MessagesClient } from "./MessagesClient";
 
@@ -22,9 +21,8 @@ export default async function MessagesPage() {
     );
   }
 
-  const supabase = await createClient();
-  const { data: userData } = await supabase.auth.getUser();
-  const currentUserId = userData.user?.id ?? "";
+  const user = await getAuthUser();
+  const currentUserId = user?.id ?? "";
 
   if (ctx.role === "owner") {
     const conversations = await listConversations();

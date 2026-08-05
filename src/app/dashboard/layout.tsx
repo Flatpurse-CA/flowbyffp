@@ -1,13 +1,11 @@
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
-import { getShopContext } from "@/lib/dashboard/shop";
+import { getAuthUser, getShopContext } from "@/lib/dashboard/shop";
 import { getUnreadCount } from "./messages/actions";
 import { DashboardShell } from "./DashboardShell";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const supabase = await createClient();
-  const { data, error } = await supabase.auth.getUser();
-  if (error || !data.user) redirect("/login");
+  const user = await getAuthUser();
+  if (!user) redirect("/login");
 
   const ctx = await getShopContext();
 
@@ -28,5 +26,5 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   const unreadCount = await getUnreadCount();
 
-  return <DashboardShell user={data.user} role={ctx.role} staffName={ctx.staffName} unreadCount={unreadCount}>{children}</DashboardShell>;
+  return <DashboardShell user={user} role={ctx.role} staffName={ctx.staffName} unreadCount={unreadCount}>{children}</DashboardShell>;
 }

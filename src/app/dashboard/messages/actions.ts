@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireShop, getShopContext } from "@/lib/dashboard/shop";
+import { requireShop, getShopContext, getAuthUser } from "@/lib/dashboard/shop";
 
 export type ConversationSummary = {
   id: string;
@@ -57,8 +57,8 @@ export async function listConversations(): Promise<ConversationSummary[]> {
   if (!ctx || ctx.role !== "owner") return [];
 
   const { supabase, shopId } = await requireShop();
-  const { data: userData } = await supabase.auth.getUser();
-  const myId = userData.user?.id;
+  const user = await getAuthUser();
+  const myId = user?.id;
 
   const { data: staffRows } = await supabase
     .from("staff")
@@ -129,13 +129,13 @@ export async function listMessages(conversationId: string): Promise<MessageRow[]
 
 export async function sendMessage(conversationId: string, body: string) {
   const { supabase } = await requireShop();
-  const { data: userData } = await supabase.auth.getUser();
-  if (!userData.user) throw new Error("Not authenticated");
+  const user = await getAuthUser();
+  if (!user) throw new Error("Not authenticated");
   if (!body.trim()) throw new Error("Message can't be empty");
 
   const { error } = await supabase
     .from("messages")
-    .insert({ conversation_id: conversationId, sender_id: userData.user.id, body: body.trim() });
+    .insert({ conversation_id: conversationId, sender_id: user.id, body: body.trim() });
 
   if (error) throw new Error(error.message);
   revalidatePath("/dashboard/messages");
@@ -143,14 +143,14 @@ export async function sendMessage(conversationId: string, body: string) {
 
 export async function markConversationRead(conversationId: string) {
   const { supabase } = await requireShop();
-  const { data: userData } = await supabase.auth.getUser();
-  if (!userData.user) return;
+  const user = await getAuthUser();
+  if (!user) return;
 
   await supabase
     .from("messages")
     .update({ read_at: new Date().toISOString() })
     .eq("conversation_id", conversationId)
-    .neq("sender_id", userData.user.id)
+    .neq("sender_id", user.id)
     .is("read_at", null);
 
   revalidatePath("/dashboard/messages");
@@ -161,13 +161,13 @@ export async function getUnreadCount(): Promise<number> {
   if (!ctx) return 0;
 
   const { supabase } = await requireShop();
-  const { data: userData } = await supabase.auth.getUser();
-  if (!userData.user) return 0;
+  const user = await getAuthUser();
+  if (!user) return 0;
 
   const { count } = await supabase
     .from("messages")
     .select("id", { count: "exact", head: true })
-    .neq("sender_id", userData.user.id)
+    .neq("sender_id", user.id)
     .is("read_at", null);
 
   return count ?? 0;

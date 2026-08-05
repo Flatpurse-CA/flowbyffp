@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getShopContext } from "@/lib/dashboard/shop";
+import { getShopContext, getAuthUser } from "@/lib/dashboard/shop";
 import { getRequestOrigin } from "@/lib/requestOrigin";
 import { getBusinessHours, getStripeStatus, getBillingStatus } from "./actions";
 import { SettingsClient } from "./SettingsClient";
@@ -14,13 +14,13 @@ export default async function SettingsPage() {
   if (ctx && ctx.role !== "owner") redirect("/dashboard");
 
   const supabase = await createClient();
-  const { data: userData } = await supabase.auth.getUser();
+  const user = await getAuthUser();
 
-  const { data: shop } = userData.user
+  const { data: shop } = user
     ? await supabase
         .from("shops")
         .select("family_hours_enabled, family_hours_start, family_hours_end, handle")
-        .eq("owner_id", userData.user.id)
+        .eq("owner_id", user.id)
         .maybeSingle()
     : { data: null };
 
