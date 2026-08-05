@@ -97,7 +97,7 @@ const STATUS_STYLE: Record<string, { label: string; color: string; bg: string; b
 };
 
 const card: React.CSSProperties = {
-  background: "var(--dw025)",
+  background: "var(--dsurface1)",
   border: "1px solid var(--dw07)",
   borderRadius: 16,
   overflow: "hidden",
@@ -147,7 +147,7 @@ function NewBookingOverlay({ onClose, onCreated, staff, selfStaffId }: { onClose
   const [error, setError] = useState<string | null>(null);
 
   const inputStyle: React.CSSProperties = {
-    width: "100%", background: "var(--dw05)", border: "1px solid var(--dw1)",
+    width: "100%", background: "var(--dsurface3)", border: "1px solid var(--dw1)",
     borderRadius: 10, padding: "10px 13px", color: "var(--dtext)", fontSize: 13.5,
     outline: "none", boxSizing: "border-box",
   };
@@ -214,7 +214,7 @@ function NewBookingOverlay({ onClose, onCreated, staff, selfStaffId }: { onClose
             <h2 style={{ color: "var(--dtext)", fontSize: 18, fontWeight: 800, margin: 0, letterSpacing: "-0.02em" }}>
               New Booking
             </h2>
-            <button onClick={onClose} aria-label="Close" style={{ background: "var(--dw06)", border: "none", borderRadius: 9, width: 34, height: 34, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "var(--dw5)", flexShrink: 0 }}>
+            <button onClick={onClose} aria-label="Close" style={{ background: "var(--dsurface3)", border: "none", borderRadius: 9, width: 34, height: 34, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "var(--dw5)", flexShrink: 0 }}>
               <X size={17} />
             </button>
           </div>
@@ -303,7 +303,7 @@ function NewBookingOverlay({ onClose, onCreated, staff, selfStaffId }: { onClose
                 { label: "Require deposit", sub: "Marks 25% as paid upfront", value: deposit, set: setDeposit },
                 { label: "Send SMS confirmation", sub: "Text the client when booked", value: sms, set: setSms },
               ].map(t => (
-                <div key={t.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 14px", background: "var(--dw03)", borderRadius: 10, border: "1px solid var(--dw07)" }}>
+                <div key={t.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 14px", background: "var(--dsurface2)", borderRadius: 10, border: "1px solid var(--dw07)" }}>
                   <div>
                     <p style={{ color: "var(--dtext)", fontSize: 13, fontWeight: 600, margin: "0 0 2px" }}>{t.label}</p>
                     <p style={{ color: "var(--dw35)", fontSize: 11.5, margin: 0 }}>{t.sub}</p>
@@ -327,7 +327,7 @@ function NewBookingOverlay({ onClose, onCreated, staff, selfStaffId }: { onClose
 
         {/* Live summary panel — sidebar on desktop, sticky action bar on mobile */}
         <div className="nb-summary" style={{
-          width: 280, flexShrink: 0, background: "var(--dw02)",
+          width: 280, flexShrink: 0, background: "var(--dsurface1)",
           borderLeft: "1px solid var(--dw08)", padding: "22px",
           display: "flex", flexDirection: "column",
         }}>
@@ -352,7 +352,7 @@ function NewBookingOverlay({ onClose, onCreated, staff, selfStaffId }: { onClose
               ))}
             </div>
 
-            <div style={{ background: "var(--dw03)", border: "1px solid var(--dw08)", borderRadius: 12, padding: "12px 14px", marginBottom: "auto" }}>
+            <div style={{ background: "var(--dsurface2)", border: "1px solid var(--dw08)", borderRadius: 12, padding: "12px 14px", marginBottom: "auto" }}>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: deposit ? 6 : 0 }}>
                 <span style={{ color: "var(--dw4)", fontSize: 12 }}>Price</span>
                 <span style={{ color: "var(--dtext)", fontSize: 13, fontWeight: 700 }}>{fmtPrice(priceNum)}</span>
@@ -430,7 +430,7 @@ function CloseOutModal({ appt, onClose, onCompleted }: { appt: ApptRecord; onClo
   };
 
   const inputStyle: React.CSSProperties = {
-    width: "100%", background: "var(--dw05)", border: "1px solid var(--dw1)",
+    width: "100%", background: "var(--dsurface3)", border: "1px solid var(--dw1)",
     borderRadius: 10, padding: "10px 13px", color: "var(--dtext)", fontSize: 13.5,
     outline: "none", boxSizing: "border-box",
   };
@@ -478,7 +478,7 @@ function CloseOutModal({ appt, onClose, onCompleted }: { appt: ApptRecord; onClo
                 <h2 style={{ color: "var(--dtext)", fontSize: 17, fontWeight: 800, margin: "0 0 2px", letterSpacing: "-0.02em" }}>Close out</h2>
                 <p style={{ color: "var(--dw35)", fontSize: 12.5, margin: 0 }}>{appt.name} · {appt.service}</p>
               </div>
-              <button onClick={onClose} disabled={stage === "processing"} style={{ background: "var(--dw06)", border: "none", borderRadius: 8, width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", cursor: stage === "processing" ? "default" : "pointer", color: "var(--dw5)" }}>
+              <button onClick={onClose} disabled={stage === "processing"} style={{ background: "var(--dsurface3)", border: "none", borderRadius: 8, width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", cursor: stage === "processing" ? "default" : "pointer", color: "var(--dw5)" }}>
                 <X size={16} />
               </button>
             </div>
@@ -530,7 +530,7 @@ function CloseOutModal({ appt, onClose, onCompleted }: { appt: ApptRecord; onClo
                 </div>
 
                 {/* Total breakdown */}
-                <div style={{ background: "var(--dw03)", border: "1px solid var(--dw08)", borderRadius: 14, padding: "14px 16px", marginBottom: 18, display: "flex", flexDirection: "column", gap: 7 }}>
+                <div style={{ background: "var(--dsurface2)", border: "1px solid var(--dw08)", borderRadius: 14, padding: "14px 16px", marginBottom: 18, display: "flex", flexDirection: "column", gap: 7 }}>
                   <div style={{ display: "flex", justifyContent: "space-between" }}>
                     <span style={{ color: "var(--dw4)", fontSize: 12.5 }}>Service</span>
                     <span style={{ color: "var(--dw7)", fontSize: 12.5 }}>{appt.price}</span>
@@ -545,7 +545,7 @@ function CloseOutModal({ appt, onClose, onCompleted }: { appt: ApptRecord; onClo
                     <span style={{ color: "var(--dw4)", fontSize: 12.5 }}>Gratuity</span>
                     <span style={{ color: "var(--dw7)", fontSize: 12.5 }}>{fmtMoney(tipAmount)}</span>
                   </div>
-                  <div style={{ height: 1, background: "var(--dw07)", margin: "3px 0" }} />
+                  <div style={{ height: 1, background: "var(--dsurface3)", margin: "3px 0" }} />
                   <div style={{ display: "flex", justifyContent: "space-between" }}>
                     <span style={{ color: "var(--dtext)", fontSize: 14, fontWeight: 700 }}>Total due</span>
                     <span style={{ color: "rgb(52,211,153)", fontSize: 16, fontWeight: 800 }}>{fmtMoney(total)}</span>
@@ -601,7 +601,7 @@ function CloseOutModal({ appt, onClose, onCompleted }: { appt: ApptRecord; onClo
                 )}
 
                 {/* Receipt SMS toggle */}
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 14px", background: "var(--dw03)", borderRadius: 10, border: "1px solid var(--dw07)", marginBottom: 20 }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 14px", background: "var(--dsurface2)", borderRadius: 10, border: "1px solid var(--dw07)", marginBottom: 20 }}>
                   <div>
                     <p style={{ color: "var(--dtext)", fontSize: 13, fontWeight: 600, margin: "0 0 2px" }}>Text receipt to client</p>
                     <p style={{ color: "var(--dw35)", fontSize: 11.5, margin: 0 }}>{appt.phone || "No phone on file"}</p>
@@ -655,7 +655,7 @@ function AppointmentDetail({ appt, onClose, onCloseOut, onChanged }: { appt: App
   const s = STATUS_STYLE[status];
 
   const inputStyle: React.CSSProperties = {
-    width: "100%", background: "var(--dw05)", border: "1px solid var(--dw1)",
+    width: "100%", background: "var(--dsurface3)", border: "1px solid var(--dw1)",
     borderRadius: 10, padding: "10px 13px", color: "var(--dtext)", fontSize: 13.5,
     outline: "none", boxSizing: "border-box", colorScheme: "dark",
   };
@@ -733,7 +733,7 @@ function AppointmentDetail({ appt, onClose, onCloseOut, onChanged }: { appt: App
                 <p style={{ color: "var(--dw4)", fontSize: 12.5, margin: 0 }}>{appt.dateLabel} · {appt.time}</p>
               </div>
             </div>
-            <button onClick={onClose} style={{ background: "var(--dw06)", border: "none", borderRadius: 8, width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "var(--dw45)", flexShrink: 0 }}>
+            <button onClick={onClose} style={{ background: "var(--dsurface3)", border: "none", borderRadius: 8, width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "var(--dw45)", flexShrink: 0 }}>
               <X size={16} />
             </button>
           </div>
@@ -763,10 +763,10 @@ function AppointmentDetail({ appt, onClose, onCloseOut, onChanged }: { appt: App
                 <p style={{ color: "var(--dw35)", fontSize: 12, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{appt.email || "No email on file"}</p>
               </div>
               <div style={{ display: "flex", gap: 6 }}>
-                <button style={{ width: 32, height: 32, borderRadius: 8, border: "1px solid var(--dw08)", background: "var(--dw04)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "rgb(52,211,153)" }}>
+                <button style={{ width: 32, height: 32, borderRadius: 8, border: "1px solid var(--dw08)", background: "var(--dsurface2)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "rgb(52,211,153)" }}>
                   <MessageSquare size={14} strokeWidth={1.8} />
                 </button>
-                <button style={{ width: 32, height: 32, borderRadius: 8, border: "1px solid var(--dw08)", background: "var(--dw04)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "rgb(96,165,250)" }}>
+                <button style={{ width: 32, height: 32, borderRadius: 8, border: "1px solid var(--dw08)", background: "var(--dsurface2)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "rgb(96,165,250)" }}>
                   <Phone size={14} strokeWidth={1.8} />
                 </button>
               </div>
@@ -822,7 +822,7 @@ function AppointmentDetail({ appt, onClose, onCloseOut, onChanged }: { appt: App
               </div>
               {error && <p style={{ color: "rgb(248,113,113)", fontSize: 12, margin: 0 }}>{error}</p>}
               <div style={{ display: "flex", gap: 8 }}>
-                <button onClick={() => setRescheduling(false)} style={{ flex: 1, padding: "10px", borderRadius: 10, border: "1px solid var(--dw1)", background: "var(--dw04)", color: "var(--dw6)", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>
+                <button onClick={() => setRescheduling(false)} style={{ flex: 1, padding: "10px", borderRadius: 10, border: "1px solid var(--dw1)", background: "var(--dsurface2)", color: "var(--dw6)", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>
                   Cancel
                 </button>
                 <button
@@ -844,7 +844,7 @@ function AppointmentDetail({ appt, onClose, onCloseOut, onChanged }: { appt: App
               </p>
               {error && <p style={{ color: "rgb(248,113,113)", fontSize: 12, margin: 0 }}>{error}</p>}
               <div style={{ display: "flex", gap: 8 }}>
-                <button onClick={() => setConfirmCancel(false)} style={{ flex: 1, padding: "9px", borderRadius: 9, border: "1px solid var(--dw1)", background: "var(--dw04)", color: "var(--dw6)", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+                <button onClick={() => setConfirmCancel(false)} style={{ flex: 1, padding: "9px", borderRadius: 9, border: "1px solid var(--dw1)", background: "var(--dsurface2)", color: "var(--dw6)", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
                   Never mind
                 </button>
                 <button disabled={busy} onClick={doCancel} style={{ flex: 1, padding: "9px", borderRadius: 9, border: "none", background: "rgb(239,68,68)", color: "white", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
@@ -864,7 +864,7 @@ function AppointmentDetail({ appt, onClose, onCloseOut, onChanged }: { appt: App
               </button>
             )}
             <div style={{ display: "flex", gap: 8 }}>
-              <button onClick={() => setRescheduling(v => !v)} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "11px", borderRadius: 11, border: "1px solid var(--dw1)", background: "var(--dw04)", color: "var(--dw65)", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>
+              <button onClick={() => setRescheduling(v => !v)} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "11px", borderRadius: 11, border: "1px solid var(--dw1)", background: "var(--dsurface2)", color: "var(--dw65)", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>
                 <Pencil size={13} strokeWidth={2} /> Reschedule
               </button>
               <button onClick={() => setConfirmCancel(v => !v)} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "11px", borderRadius: 11, border: "1px solid rgba(239,68,68,0.2)", background: "rgba(239,68,68,0.06)", color: "rgb(248,113,113)", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>
@@ -1220,14 +1220,14 @@ function BookingLinkCard({ bookingUrl }: { bookingUrl: string | null }) {
         <div className="bookings-link-actions" style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
           <a href={smsHref} title="Share via SMS" style={{
             width: 32, height: 32, borderRadius: 8, border: "1px solid var(--dw08)",
-            background: "var(--dw04)", display: "flex", alignItems: "center", justifyContent: "center",
+            background: "var(--dsurface2)", display: "flex", alignItems: "center", justifyContent: "center",
             cursor: "pointer", color: "rgb(52,211,153)", textDecoration: "none",
           }}>
             <MessageSquare size={14} strokeWidth={1.8} />
           </a>
           <a href={emailHref} title="Share via email" style={{
             width: 32, height: 32, borderRadius: 8, border: "1px solid var(--dw08)",
-            background: "var(--dw04)", display: "flex", alignItems: "center", justifyContent: "center",
+            background: "var(--dsurface2)", display: "flex", alignItems: "center", justifyContent: "center",
             cursor: "pointer", color: "rgb(96,165,250)", textDecoration: "none",
           }}>
             <Mail size={14} strokeWidth={1.8} />
@@ -1298,7 +1298,7 @@ export function AppointmentsClient({ initialAppointments, bookingUrl, staff, sel
         </div>
         <div className="bookings-header-controls" style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
           {/* View switcher */}
-          <div className="bookings-view-switch" style={{ display: "flex", gap: 2, background: "var(--dw04)", border: "1px solid var(--dw07)", borderRadius: 11, padding: 3 }}>
+          <div className="bookings-view-switch" style={{ display: "flex", gap: 2, background: "var(--dsurface2)", border: "1px solid var(--dw07)", borderRadius: 11, padding: 3 }}>
             {VIEWS.map(v => (
               <button key={v} onClick={() => setView(v)} style={{
                 padding: "8px 16px", borderRadius: 8, border: "none", cursor: "pointer",
@@ -1313,7 +1313,7 @@ export function AppointmentsClient({ initialAppointments, bookingUrl, staff, sel
           </div>
 
           {/* Search */}
-          <div className="bookings-search" style={{ display: "flex", alignItems: "center", gap: 8, background: "var(--dw04)", border: "1px solid var(--dw07)", borderRadius: 10, padding: "8px 12px", width: 200 }}>
+          <div className="bookings-search" style={{ display: "flex", alignItems: "center", gap: 8, background: "var(--dsurface2)", border: "1px solid var(--dw07)", borderRadius: 10, padding: "8px 12px", width: 200 }}>
             <Search size={13} color="var(--dw3)" />
             <input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search…" style={{ background: "none", border: "none", outline: "none", color: "var(--dtext)", fontSize: 12.5, flex: 1, minWidth: 0 }} />
           </div>

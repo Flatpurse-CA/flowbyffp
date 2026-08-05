@@ -211,7 +211,7 @@ function NotifCard({ n, onDismiss }: { n: Notif; onDismiss: (id: number) => void
   return (
     <div style={{
       position: "relative",
-      background: n.read ? "var(--dw02)" : isNeeds ? "rgba(248,113,113,0.04)" : "rgba(139,92,246,0.04)",
+      background: n.read ? "var(--dsurface1)" : isNeeds ? "rgba(248,113,113,0.04)" : "rgba(139,92,246,0.04)",
       border: `1px solid ${n.read ? "var(--dw06)" : isNeeds ? "rgba(239,68,68,0.18)" : "rgba(139,92,246,0.18)"}`,
       borderRadius: 16,
       padding: "16px 18px",
@@ -248,7 +248,7 @@ function NotifCard({ n, onDismiss }: { n: Notif; onDismiss: (id: number) => void
           {/* Meta chips */}
           <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: n.action ? 12 : 0 }}>
             {n.client && (
-              <span style={{ fontSize: 11, fontWeight: 600, padding: "2px 9px", borderRadius: 20, color: "var(--dw4)", background: "var(--dw06)" }}>
+              <span style={{ fontSize: 11, fontWeight: 600, padding: "2px 9px", borderRadius: 20, color: "var(--dw4)", background: "var(--dsurface3)" }}>
                 {n.client}
               </span>
             )}
@@ -274,7 +274,7 @@ function NotifCard({ n, onDismiss }: { n: Notif; onDismiss: (id: number) => void
               {n.action2 && (
                 <button onClick={() => onDismiss(n.id)} style={{
                   padding: "7px 14px", borderRadius: 9,
-                  background: "var(--dw04)", border: "1px solid var(--dw07)",
+                  background: "var(--dsurface2)", border: "1px solid var(--dw07)",
                   color: "var(--dw35)", fontSize: 12.5, cursor: "pointer",
                 }}>
                   {n.action2.label}
@@ -334,7 +334,7 @@ export default function NotificationsPage() {
 
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
           {totalUnread > 0 && (
-            <button onClick={markAll} style={{ padding: "8px 14px", borderRadius: 9, background: "var(--dw05)", border: "1px solid var(--dw09)", color: "var(--dw45)", fontSize: 12.5, cursor: "pointer" }}>
+            <button onClick={markAll} style={{ padding: "8px 14px", borderRadius: 9, background: "var(--dsurface3)", border: "1px solid var(--dw09)", color: "var(--dw45)", fontSize: 12.5, cursor: "pointer" }}>
               Mark all read
             </button>
           )}

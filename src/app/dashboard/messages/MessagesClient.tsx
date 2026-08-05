@@ -17,7 +17,7 @@ function dayLabel(iso: string) {
 }
 
 const card: React.CSSProperties = {
-  background: "var(--dw025)",
+  background: "var(--dsurface1)",
   border: "1px solid var(--dw07)",
   borderRadius: 16,
 };
@@ -153,7 +153,7 @@ export function MessagesClient({ role, conversations, initialConversationId, ini
           placeholder={conversationId ? "Type a message…" : "Select a conversation"}
           disabled={!conversationId}
           style={{
-            flex: 1, background: "var(--dw05)", border: "1px solid var(--dw1)",
+            flex: 1, background: "var(--dsurface3)", border: "1px solid var(--dw1)",
             borderRadius: 10, padding: "10px 14px", color: "var(--dtext)", fontSize: 13.5, outline: "none",
           }}
         />

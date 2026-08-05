@@ -5,7 +5,7 @@ import Link from "next/link";
 import type { FlowCoachData, FlowCoachCard } from "@/lib/dashboard/flowCoach";
 
 const card: React.CSSProperties = {
-  background: "var(--dw025)",
+  background: "var(--dsurface1)",
   border: "1px solid var(--dw07)",
   borderRadius: 16,
   padding: 20,
@@ -24,7 +24,7 @@ function Card({ c }: { c: FlowCoachCard }) {
           <p style={{ color: "var(--dw3)", fontSize: 11.5, margin: 0 }}>{c.eyebrow}</p>
         </div>
         {!c.available && (
-          <span style={{ fontSize: 9.5, fontWeight: 700, padding: "3px 8px", borderRadius: 20, background: "var(--dw05)", color: "var(--dw35)", whiteSpace: "nowrap" }}>
+          <span style={{ fontSize: 9.5, fontWeight: 700, padding: "3px 8px", borderRadius: 20, background: "var(--dsurface3)", color: "var(--dw35)", whiteSpace: "nowrap" }}>
             Coming soon
           </span>
         )}

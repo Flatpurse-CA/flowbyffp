@@ -24,7 +24,7 @@ const TAG_STYLE: Record<NonNullable<ClientTag>, { color: string; bg: string }> =
 const FILTER_CHIPS: Array<"All" | NonNullable<ClientTag>> = ["All", "VIP", "Loyal", "New", "Overdue", "Churn risk"];
 
 const card: React.CSSProperties = {
-  background: "var(--dw025)",
+  background: "var(--dsurface1)",
   border: "1px solid var(--dw07)",
   borderRadius: 16,
 };
@@ -110,7 +110,7 @@ export function ClientsClient({ clients, engagedNames }: {
 
       {/* Toolbar */}
       <div className="clients-toolbar" style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-        <div className="clients-search" style={{ display: "flex", alignItems: "center", gap: 8, background: "var(--dw04)", border: "1px solid var(--dw07)", borderRadius: 10, padding: "8px 12px", width: 240, flex: "1 1 200px", maxWidth: 320 }}>
+        <div className="clients-search" style={{ display: "flex", alignItems: "center", gap: 8, background: "var(--dsurface2)", border: "1px solid var(--dw07)", borderRadius: 10, padding: "8px 12px", width: 240, flex: "1 1 200px", maxWidth: 320 }}>
           <Search size={13} color="var(--dw3)" />
           <input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search clients…" style={{ background: "none", border: "none", outline: "none", color: "var(--dtext)", fontSize: 12.5, flex: 1, minWidth: 0 }} />
         </div>
@@ -138,7 +138,7 @@ export function ClientsClient({ clients, engagedNames }: {
           <thead>
             <tr>
               {["Client", "Tag", "Visits · LTV · Last visit", "Avg spend", "AutoPilot", ""].map((h, i) => (
-                <th key={i} style={{ padding: "11px 18px", textAlign: "left", color: "var(--dw25)", fontSize: 10.5, fontWeight: 600, letterSpacing: "0.05em", textTransform: "uppercase", background: "var(--dw015)", borderBottom: "1px solid var(--dw05)", whiteSpace: "nowrap" }}>
+                <th key={i} style={{ padding: "11px 18px", textAlign: "left", color: "var(--dw25)", fontSize: 10.5, fontWeight: 600, letterSpacing: "0.05em", textTransform: "uppercase", background: "var(--dsurface1)", borderBottom: "1px solid var(--dw05)", whiteSpace: "nowrap" }}>
                   {h}
                 </th>
               ))}
@@ -185,7 +185,7 @@ export function ClientsClient({ clients, engagedNames }: {
                   <td style={{ padding: "13px 18px" }}>
                     {engaged
                       ? <span style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 10, fontWeight: 700, padding: "3px 9px", borderRadius: 20, color: "rgb(167,139,250)", background: "rgba(109,40,217,0.12)", width: "fit-content" }}><Zap size={9} strokeWidth={2.5} /> ON</span>
-                      : <span style={{ fontSize: 10, fontWeight: 700, padding: "3px 9px", borderRadius: 20, color: "var(--dw2)", background: "var(--dw04)" }}>OFF</span>}
+                      : <span style={{ fontSize: 10, fontWeight: 700, padding: "3px 9px", borderRadius: 20, color: "var(--dw2)", background: "var(--dsurface2)" }}>OFF</span>}
                   </td>
                   <td style={{ padding: "13px 18px" }}>
                     <ChevronRight size={14} color="var(--dw2)" />

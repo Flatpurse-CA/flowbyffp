@@ -90,7 +90,7 @@ export function AutoPilotClient({ state }: { state: AutopilotState }) {
             return (
               <div key={flow.id} style={{
                 display: "flex", alignItems: "center", gap: 14,
-                background: "var(--dw025)", border: "1px solid var(--dw07)",
+                background: "var(--dsurface1)", border: "1px solid var(--dw07)",
                 borderRadius: 14, padding: "16px 18px",
               }}>
                 <div style={{
@@ -106,7 +106,7 @@ export function AutoPilotClient({ state }: { state: AutopilotState }) {
                 </div>
                 <span style={{
                   fontSize: 10, fontWeight: 700, color: "var(--dw25)",
-                  background: "var(--dw05)", padding: "4px 10px", borderRadius: 20,
+                  background: "var(--dsurface3)", padding: "4px 10px", borderRadius: 20,
                   border: "1px solid var(--dw08)",
                 }}>
                   Paused
@@ -170,7 +170,7 @@ export function AutoPilotClient({ state }: { state: AutopilotState }) {
             return (
               <div key={flow.id} style={{
                 display: "flex", alignItems: "center", gap: 14,
-                background: "var(--dw025)", border: "1px solid var(--dw07)",
+                background: "var(--dsurface1)", border: "1px solid var(--dw07)",
                 borderRadius: 14, padding: "16px 18px",
               }}>
                 <div style={{ width: 38, height: 38, borderRadius: 10, background: flow.bg, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -193,7 +193,7 @@ export function AutoPilotClient({ state }: { state: AutopilotState }) {
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
         {/* AI Front Desk today */}
         <div style={{
-          background: "var(--dw025)", border: "1px solid var(--dw07)",
+          background: "var(--dsurface1)", border: "1px solid var(--dw07)",
           borderRadius: 16, padding: 18, display: "flex", flexDirection: "column", gap: 12,
         }}>
           <span style={{ color: "var(--dw5)", fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" }}>AI Front Desk today</span>
@@ -211,7 +211,7 @@ export function AutoPilotClient({ state }: { state: AutopilotState }) {
 
         {/* Live feed */}
         <div style={{
-          background: "var(--dw025)", border: "1px solid var(--dw07)",
+          background: "var(--dsurface1)", border: "1px solid var(--dw07)",
           borderRadius: 16, padding: 20, display: "flex", flexDirection: "column", gap: 14,
           height: "fit-content",
         }}>

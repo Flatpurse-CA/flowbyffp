@@ -20,7 +20,7 @@ function redirectTo(url: string) {
 // ─── Shared styles ────────────────────────────────────────────────────────────
 
 const card: React.CSSProperties = {
-  background: "var(--dw025)",
+  background: "var(--dsurface1)",
   border: "1px solid var(--dw07)",
   borderRadius: 16,
   padding: "22px 24px",
@@ -48,7 +48,7 @@ function Field({ label, value, type = "text", readOnly, placeholder, half }: {
         readOnly={readOnly}
         placeholder={placeholder}
         style={{
-          width: "100%", background: readOnly ? "var(--dw02)" : "var(--dw05)",
+          width: "100%", background: readOnly ? "var(--dsurface1)" : "var(--dsurface3)",
           border: `1px solid ${readOnly ? "var(--dw05)" : "var(--dw09)"}`,
           borderRadius: 10, padding: "10px 13px",
           color: readOnly ? "var(--dw3)" : "var(--dtext)",
@@ -82,7 +82,7 @@ function Toggle({ label, sub, on }: { label: string; sub: string; on: boolean })
 function SaveBar() {
   return (
     <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
-      <button style={{ padding: "10px 20px", borderRadius: 10, background: "var(--dw05)", border: "1px solid var(--dw09)", color: "var(--dw45)", fontSize: 13, cursor: "pointer" }}>Discard</button>
+      <button style={{ padding: "10px 20px", borderRadius: 10, background: "var(--dsurface3)", border: "1px solid var(--dw09)", color: "var(--dw45)", fontSize: 13, cursor: "pointer" }}>Discard</button>
       <button style={{ padding: "10px 24px", borderRadius: 10, background: "rgb(109,40,217)", border: "none", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Save changes</button>
     </div>
   );
@@ -311,7 +311,7 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
                 <textarea
                   defaultValue="Toronto-based luxury hair studio specialising in colour, silk press, and protective styles."
                   rows={3}
-                  style={{ width: "100%", background: "var(--dw05)", border: "1px solid var(--dw09)", borderRadius: 10, padding: "10px 13px", color: "var(--dtext)", fontSize: 13, outline: "none", resize: "vertical", boxSizing: "border-box", fontFamily: "inherit", lineHeight: 1.5 }}
+                  style={{ width: "100%", background: "var(--dsurface3)", border: "1px solid var(--dw09)", borderRadius: 10, padding: "10px 13px", color: "var(--dtext)", fontSize: 13, outline: "none", resize: "vertical", boxSizing: "border-box", fontFamily: "inherit", lineHeight: 1.5 }}
                 />
               </div>
               <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
@@ -327,14 +327,14 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
             <p style={{ color: "var(--dw4)", fontSize: 13, margin: "0 0 14px" }}>Share this with clients so they can self-book anytime.</p>
             {bookingLinkDisplay ? (
               <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                <div style={{ flex: "1 1 200px", display: "flex", alignItems: "center", gap: 8, background: "var(--dw04)", border: "1px solid var(--dw08)", borderRadius: 10, padding: "10px 13px", minWidth: 0 }}>
+                <div style={{ flex: "1 1 200px", display: "flex", alignItems: "center", gap: 8, background: "var(--dsurface2)", border: "1px solid var(--dw08)", borderRadius: 10, padding: "10px 13px", minWidth: 0 }}>
                   <Link2 size={13} color="var(--dw3)" style={{ flexShrink: 0 }} />
                   <span style={{ color: "var(--dw5)", fontSize: 13, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{bookingLinkDisplay}</span>
                 </div>
                 <a href={initialBookingUrl!} target="_blank" rel="noopener noreferrer" style={{
                   display: "flex", alignItems: "center", gap: 6, padding: "10px 16px",
                   borderRadius: 10, fontSize: 13, whiteSpace: "nowrap", textDecoration: "none",
-                  background: "var(--dw06)", border: "1px solid var(--dw1)", color: "var(--dw65)",
+                  background: "var(--dsurface3)", border: "1px solid var(--dw1)", color: "var(--dw65)",
                 }}>
                   Preview
                 </a>
@@ -432,9 +432,9 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
 
                   {row.open ? (
                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                      <input type="time" value={row.start} onChange={e => setHours(h => h.map((r, ri) => ri === i ? { ...r, start: e.target.value } : r))} style={{ background: "var(--dw05)", border: "1px solid var(--dw09)", borderRadius: 9, padding: "6px 10px", color: "var(--dtext)", fontSize: 12.5, outline: "none" }} />
+                      <input type="time" value={row.start} onChange={e => setHours(h => h.map((r, ri) => ri === i ? { ...r, start: e.target.value } : r))} style={{ background: "var(--dsurface3)", border: "1px solid var(--dw09)", borderRadius: 9, padding: "6px 10px", color: "var(--dtext)", fontSize: 12.5, outline: "none" }} />
                       <span style={{ color: "var(--dw3)", fontSize: 12 }}>to</span>
-                      <input type="time" value={row.end} onChange={e => setHours(h => h.map((r, ri) => ri === i ? { ...r, end: e.target.value } : r))} style={{ background: "var(--dw05)", border: "1px solid var(--dw09)", borderRadius: 9, padding: "6px 10px", color: "var(--dtext)", fontSize: 12.5, outline: "none" }} />
+                      <input type="time" value={row.end} onChange={e => setHours(h => h.map((r, ri) => ri === i ? { ...r, end: e.target.value } : r))} style={{ background: "var(--dsurface3)", border: "1px solid var(--dw09)", borderRadius: 9, padding: "6px 10px", color: "var(--dtext)", fontSize: 12.5, outline: "none" }} />
                     </div>
                   ) : (
                     <span style={{ color: "var(--dw22)", fontSize: 13, fontStyle: "italic" }}>Closed</span>
@@ -462,9 +462,9 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
             {familyOn && (
               <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
                 <span style={{ color: "var(--dw45)", fontSize: 13 }}>Block every evening from</span>
-                <input type="time" value={familyStart} onChange={e => setFamilyStart(e.target.value)} style={{ background: "var(--dw07)", border: "1px solid rgba(139,92,246,0.25)", borderRadius: 9, padding: "7px 12px", color: "var(--dtext)", fontSize: 13, outline: "none" }} />
+                <input type="time" value={familyStart} onChange={e => setFamilyStart(e.target.value)} style={{ background: "var(--dsurface3)", border: "1px solid rgba(139,92,246,0.25)", borderRadius: 9, padding: "7px 12px", color: "var(--dtext)", fontSize: 13, outline: "none" }} />
                 <span style={{ color: "var(--dw3)", fontSize: 13 }}>to</span>
-                <input type="time" value={familyEnd} onChange={e => setFamilyEnd(e.target.value)} style={{ background: "var(--dw07)", border: "1px solid rgba(139,92,246,0.25)", borderRadius: 9, padding: "7px 12px", color: "var(--dtext)", fontSize: 13, outline: "none" }} />
+                <input type="time" value={familyEnd} onChange={e => setFamilyEnd(e.target.value)} style={{ background: "var(--dsurface3)", border: "1px solid rgba(139,92,246,0.25)", borderRadius: 9, padding: "7px 12px", color: "var(--dtext)", fontSize: 13, outline: "none" }} />
                 <span style={{ fontSize: 11, padding: "3px 10px", borderRadius: 20, background: "rgba(139,92,246,0.15)", color: "rgb(167,139,250)", fontWeight: 700 }}>Protected</span>
               </div>
             )}
@@ -505,7 +505,7 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
                   <input
                     type="number" value={taxRate} min="0" max="30" step="0.1"
                     onChange={e => setTaxRate(e.target.value)}
-                    style={{ width: 100, background: "var(--dw05)", border: "1px solid var(--dw09)", borderRadius: 10, padding: "10px 13px", color: "var(--dtext)", fontSize: 15, fontWeight: 700, outline: "none" }}
+                    style={{ width: 100, background: "var(--dsurface3)", border: "1px solid var(--dw09)", borderRadius: 10, padding: "10px 13px", color: "var(--dtext)", fontSize: 15, fontWeight: 700, outline: "none" }}
                   />
                   <span style={{ color: "var(--dw3)", fontSize: 13 }}>%  (Ontario HST = 13%)</span>
                 </div>
@@ -583,7 +583,7 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
                     </div>
 
                     <div style={{ textAlign: "right", marginRight: 10 }}>
-                      <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 20, color: "var(--dw3)", background: "var(--dw05)" }}>
+                      <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 20, color: "var(--dw3)", background: "var(--dsurface3)" }}>
                         {fl.channel}
                       </span>
                       <p style={{ color: "var(--dw22)", fontSize: 11, margin: "3px 0 0", whiteSpace: "nowrap" }}>{fl.delay}</p>
@@ -591,7 +591,7 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
 
                     <button
                       onClick={() => setExpandedFlow(expandedFlow === fl.key ? null : fl.key)}
-                      style={{ background: "var(--dw04)", border: "1px solid var(--dw07)", borderRadius: 8, width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}
+                      style={{ background: "var(--dsurface2)", border: "1px solid var(--dw07)", borderRadius: 8, width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}
                     >
                       {expandedFlow === fl.key ? <ChevronUp size={13} color="var(--dw4)" /> : <ChevronDown size={13} color="var(--dw4)" />}
                     </button>
@@ -599,7 +599,7 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
 
                   {/* Expanded editor */}
                   {expandedFlow === fl.key && (
-                    <div style={{ background: "var(--dw02)", border: "1px solid var(--dw06)", borderRadius: 12, padding: "16px 18px", marginBottom: 14, display: "flex", flexDirection: "column", gap: 14 }}>
+                    <div style={{ background: "var(--dsurface1)", border: "1px solid var(--dw06)", borderRadius: 12, padding: "16px 18px", marginBottom: 14, display: "flex", flexDirection: "column", gap: 14 }}>
                       <div>
                         <label style={{ color: "var(--dw38)", fontSize: 11.5, fontWeight: 600, display: "block", marginBottom: 6, letterSpacing: "0.03em", textTransform: "uppercase" }}>Message template</label>
                         <textarea
@@ -612,14 +612,14 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
                             fl.key === "lastminute" ? "Hi {{first_name}}! We just had a cancellation at {{time}} today — interested? Tap to grab the slot: {{booking_link}}" :
                             "Hi! I'm the AI assistant for {{business_name}}. I can help you book, reschedule, or answer questions. What can I do for you?"
                           }
-                          style={{ width: "100%", background: "var(--dw04)", border: "1px solid var(--dw08)", borderRadius: 10, padding: "10px 13px", color: "var(--dw75)", fontSize: 12.5, outline: "none", resize: "vertical", boxSizing: "border-box", fontFamily: "inherit", lineHeight: 1.6 }}
+                          style={{ width: "100%", background: "var(--dsurface2)", border: "1px solid var(--dw08)", borderRadius: 10, padding: "10px 13px", color: "var(--dw75)", fontSize: 12.5, outline: "none", resize: "vertical", boxSizing: "border-box", fontFamily: "inherit", lineHeight: 1.6 }}
                         />
                         <p style={{ color: "var(--dw2)", fontSize: 11, margin: "5px 0 0" }}>Variables: {"{{first_name}}"} · {"{{days_since}}"} · {"{{booking_link}}"} · {"{{time}}"} · {"{{business_name}}"}</p>
                       </div>
                       <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
                         <div style={{ flex: 1 }}>
                           <label style={{ color: "var(--dw38)", fontSize: 11.5, fontWeight: 600, display: "block", marginBottom: 6, letterSpacing: "0.03em", textTransform: "uppercase" }}>Channel</label>
-                          <select defaultValue={fl.channel} style={{ width: "100%", background: "var(--dw05)", border: "1px solid var(--dw09)", borderRadius: 9, padding: "9px 12px", color: "var(--dtext)", fontSize: 13, outline: "none", cursor: "pointer" }}>
+                          <select defaultValue={fl.channel} style={{ width: "100%", background: "var(--dsurface3)", border: "1px solid var(--dw09)", borderRadius: 9, padding: "9px 12px", color: "var(--dtext)", fontSize: 13, outline: "none", cursor: "pointer" }}>
                             <option value="SMS">SMS</option>
                             <option value="Email">Email</option>
                             <option value="Both">SMS + Email</option>
@@ -627,7 +627,7 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
                         </div>
                         <div style={{ flex: 1 }}>
                           <label style={{ color: "var(--dw38)", fontSize: 11.5, fontWeight: 600, display: "block", marginBottom: 6, letterSpacing: "0.03em", textTransform: "uppercase" }}>Timing</label>
-                          <input defaultValue={fl.delay} style={{ width: "100%", background: "var(--dw05)", border: "1px solid var(--dw09)", borderRadius: 9, padding: "9px 12px", color: "var(--dtext)", fontSize: 13, outline: "none", boxSizing: "border-box" }} />
+                          <input defaultValue={fl.delay} style={{ width: "100%", background: "var(--dsurface3)", border: "1px solid var(--dw09)", borderRadius: 9, padding: "9px 12px", color: "var(--dtext)", fontSize: 13, outline: "none", boxSizing: "border-box" }} />
                         </div>
                       </div>
                       <div style={{ display: "flex", justifyContent: "flex-end" }}>
@@ -746,7 +746,7 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
                     style={{
                       marginTop: 6, padding: "9px 16px", borderRadius: 9, fontSize: 12.5, fontWeight: 700,
                       border: "none", cursor: isCurrent ? "default" : "pointer",
-                      background: isCurrent ? "var(--dw05)" : "rgb(109,40,217)",
+                      background: isCurrent ? "var(--dsurface3)" : "rgb(109,40,217)",
                       color: isCurrent ? "var(--dw35)" : "white",
                       opacity: pendingPlanKey === plan.key ? 0.6 : 1,
                     }}

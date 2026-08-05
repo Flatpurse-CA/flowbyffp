@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 export const fetchCache = "force-no-store";
 
 const card: React.CSSProperties = {
-  background: "var(--dw03)",
+  background: "var(--dsurface2)",
   border: "1px solid var(--dw07)",
   borderRadius: 16,
   overflow: "hidden",
@@ -58,7 +58,7 @@ function Row({ icon: Icon, label, sub, href, badge, danger, formAction }: {
   return <Link href={href!} style={{ textDecoration: "none", display: "block" }}>{inner}</Link>;
 }
 
-const Divider = () => <div style={{ height: 1, background: "var(--dw06)" }} />;
+const Divider = () => <div style={{ height: 1, background: "var(--dsurface3)" }} />;
 
 export default async function MorePage() {
   const ctx = await getShopContext();

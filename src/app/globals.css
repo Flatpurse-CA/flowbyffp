@@ -134,6 +134,17 @@
   --dm3: rgb(20,20,26);
   --dring: rgb(10,10,12);
 
+  /* Card/panel/input FILLS, as opposed to --dwXX below which is the
+     text-opacity and border scale. A translucent black wash over an
+     already-light page (the old approach: reusing --dwXX for both jobs)
+     stacks into flat gray-on-gray with no surface to visually pop — this
+     gives every nested layer an actual lightness step up, the way a white
+     card on a light gray page reads as "clean" instead of "muddy". Dark
+     mode keeps the original translucent-white-wash look unchanged. */
+  --dsurface1: rgba(255,255,255,0.02);
+  --dsurface2: rgba(255,255,255,0.035);
+  --dsurface3: rgba(255,255,255,0.055);
+
   --dw015: rgba(255,255,255,0.015);
   --dw02:  rgba(255,255,255,0.02);
   --dw025: rgba(255,255,255,0.025);
@@ -179,6 +190,10 @@
   --dm2: rgb(255,255,255);
   --dm3: rgb(255,255,255);
   --dring: rgb(246,246,250);
+
+  --dsurface1: rgb(255,255,255);
+  --dsurface2: rgb(250,250,252);
+  --dsurface3: rgb(243,243,247);
 
   --dw015: rgba(0,0,0,0.035);
   --dw02:  rgba(0,0,0,0.04);

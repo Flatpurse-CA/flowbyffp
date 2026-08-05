@@ -2,7 +2,7 @@ const block = (h: number, w: string | number = "100%"): React.CSSProperties => (
   height: h,
   width: w,
   borderRadius: 12,
-  background: "var(--dw05)",
+  background: "var(--dsurface3)",
   animation: "fp-skeleton-pulse 1.3s ease-in-out infinite",
 });
 

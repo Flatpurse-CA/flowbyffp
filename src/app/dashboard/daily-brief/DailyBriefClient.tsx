@@ -9,7 +9,7 @@ function fmtPrice(n: number) {
 }
 
 const card: React.CSSProperties = {
-  background: "var(--dw025)",
+  background: "var(--dsurface1)",
   border: "1px solid var(--dw07)",
   borderRadius: 16,
   padding: 20,
@@ -17,7 +17,7 @@ const card: React.CSSProperties = {
 
 function Metric({ label, value }: { label: string; value: string }) {
   return (
-    <div style={{ background: "var(--dw03)", border: "1px solid var(--dw07)", borderRadius: 12, padding: "12px 14px" }}>
+    <div style={{ background: "var(--dsurface2)", border: "1px solid var(--dw07)", borderRadius: 12, padding: "12px 14px" }}>
       <p style={{ color: "var(--dw35)", fontSize: 10, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", margin: "0 0 4px" }}>{label}</p>
       <p style={{ color: "var(--dtext)", fontSize: 18, fontWeight: 800, margin: 0, letterSpacing: "-0.03em" }}>{value}</p>
     </div>

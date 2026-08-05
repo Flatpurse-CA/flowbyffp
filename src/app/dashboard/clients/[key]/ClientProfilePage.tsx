@@ -31,7 +31,7 @@ const STATUS_LABEL: Record<AppointmentStatus, { label: string; color: string; bg
 };
 
 const card: React.CSSProperties = {
-  background: "var(--dw025)",
+  background: "var(--dsurface1)",
   border: "1px solid var(--dw07)",
   borderRadius: 16,
 };
@@ -161,15 +161,15 @@ export function ClientProfilePage({ client, appointments, engaged }: {
 
       <div style={{
         display: "grid", gridTemplateColumns: "repeat(4,1fr)",
-        background: "var(--dw03)", border: "1px solid var(--dw06)",
+        background: "var(--dsurface2)", border: "1px solid var(--dw06)",
         borderRadius: 14, padding: "14px 16px", marginBottom: 16, gap: 8,
       }}>
         {statItem("Visits", String(client.visits))}
-        <div style={{ width: 1, background: "var(--dw06)" }} />
+        <div style={{ width: 1, background: "var(--dsurface3)" }} />
         {statItem("LTV", fmtPrice(client.ltv), "rgb(52,211,153)")}
-        <div style={{ width: 1, background: "var(--dw06)" }} />
+        <div style={{ width: 1, background: "var(--dsurface3)" }} />
         {statItem("Avg spend", fmtPrice(avgSpend))}
-        <div style={{ width: 1, background: "var(--dw06)" }} />
+        <div style={{ width: 1, background: "var(--dsurface3)" }} />
         {statItem("Last visit", fmtDaysAgo(client.daysSinceLastVisit))}
       </div>
 

@@ -20,7 +20,7 @@ function fmtPrice(n: number) {
 }
 
 const card: React.CSSProperties = {
-  background: "var(--dw025)",
+  background: "var(--dsurface1)",
   border: "1px solid var(--dw07)",
   borderRadius: 16,
   padding: 20,
@@ -168,7 +168,7 @@ function Overview({ operationsScore, fillRate, retention, revenueGrowthScore, ai
                 <span style={{ color: "var(--dw5)", fontSize: 12 }}>{m.label}</span>
                 <span style={{ color: "var(--dtext)", fontSize: 12, fontWeight: 700 }}>{m.value}%</span>
               </div>
-              <div style={{ height: 5, background: "var(--dw06)", borderRadius: 3 }}>
+              <div style={{ height: 5, background: "var(--dsurface3)", borderRadius: 3 }}>
                 <div style={{ height: "100%", width: `${m.value}%`, borderRadius: 3, background: m.value > 80 ? "rgb(52,211,153)" : m.value > 60 ? "rgb(251,191,36)" : "rgb(248,113,113)", transition: "width 0.5s ease" }} />
               </div>
             </div>
@@ -187,7 +187,7 @@ function Overview({ operationsScore, fillRate, retention, revenueGrowthScore, ai
         <p style={{ color: "var(--dw4)", fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 14px" }}>Top AI opportunities</p>
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {opportunities.map(o => (
-            <div key={o.tag} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", background: "var(--dw02)", borderRadius: 10 }}>
+            <div key={o.tag} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", background: "var(--dsurface1)", borderRadius: 10 }}>
               <span style={{ fontSize: 9, fontWeight: 800, color: o.color, background: tint(o.color, 0.09), padding: "3px 8px", borderRadius: 20, whiteSpace: "nowrap", letterSpacing: "0.06em" }}>{o.tag}</span>
               <span style={{ color: "var(--dw6)", fontSize: 13, flex: 1 }}>{o.text}</span>
               {o.impact && <span style={{ color: "rgb(52,211,153)", fontSize: 12, fontWeight: 700, whiteSpace: "nowrap" }}>{o.impact}</span>}
@@ -274,7 +274,7 @@ function Revenue({ appointments, now, thisMonthRevenue, autopilotRevenue, missed
             {services.map(s => (
               <div key={s.name} style={{ display: "flex", alignItems: "center", gap: 12 }}>
                 <span style={{ color: "var(--dw6)", fontSize: 13, width: 150, flexShrink: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.name}</span>
-                <div style={{ flex: 1, height: 6, background: "var(--dw06)", borderRadius: 3 }}>
+                <div style={{ flex: 1, height: 6, background: "var(--dsurface3)", borderRadius: 3 }}>
                   <div style={{ height: "100%", width: `${(s.revenue / maxServiceRevenue) * 100}%`, borderRadius: 3, background: "rgb(139,92,246)" }} />
                 </div>
                 <span style={{ color: "rgb(52,211,153)", fontSize: 12, fontWeight: 700, width: 72, textAlign: "right", flexShrink: 0 }}>{fmtPrice(s.revenue)}</span>
@@ -312,7 +312,7 @@ function TeamModule({ staff, metricsAppts, monthStart, now }: {
                 {r.full_name.split(" ").map(w => w[0]).slice(0, 2).join("")}
               </div>
               <span style={{ color: "var(--dtext)", fontSize: 13, fontWeight: 600, width: 140, flexShrink: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.full_name}</span>
-              <div style={{ flex: 1, height: 6, background: "var(--dw06)", borderRadius: 3 }}>
+              <div style={{ flex: 1, height: 6, background: "var(--dsurface3)", borderRadius: 3 }}>
                 <div style={{ height: "100%", width: `${r.utilizationPct}%`, borderRadius: 3, background: r.utilizationPct > 85 ? "rgb(52,211,153)" : r.utilizationPct > 65 ? "rgb(251,191,36)" : "rgb(248,113,113)" }} />
               </div>
               <span style={{ color: "var(--dw5)", fontSize: 12, width: 44, textAlign: "right", flexShrink: 0 }}>{r.utilizationPct}%</span>
@@ -472,7 +472,7 @@ function Finance() {
           {["GST34 Report", "Accountant Summary", "Itemised Transactions"].map(label => (
             <button key={label} disabled style={{
               padding: "9px 16px", borderRadius: 10, border: "1px solid var(--dw1)",
-              background: "var(--dw04)", color: "var(--dw4)",
+              background: "var(--dsurface2)", color: "var(--dw4)",
               fontSize: 12, fontWeight: 600, cursor: "not-allowed",
             }}>
               {label}
@@ -488,7 +488,7 @@ function Finance() {
 function Placeholder({ icon, title, desc }: { icon: React.ReactNode; title: string; desc: string }) {
   return (
     <div style={{ textAlign: "center", padding: "80px 20px" }}>
-      <div style={{ width: 64, height: 64, borderRadius: 20, background: "var(--dw05)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 18px" }}>{icon}</div>
+      <div style={{ width: 64, height: 64, borderRadius: 20, background: "var(--dsurface3)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 18px" }}>{icon}</div>
       <h3 style={{ color: "var(--dtext)", fontSize: 18, fontWeight: 800, margin: "0 0 8px" }}>{title}</h3>
       <p style={{ color: "var(--dw35)", fontSize: 14, maxWidth: 380, margin: "0 auto" }}>{desc}</p>
     </div>

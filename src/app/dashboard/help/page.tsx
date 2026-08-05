@@ -52,7 +52,7 @@ export default function HelpPage() {
     (f) => query === "" || f.q.toLowerCase().includes(query.toLowerCase()) || f.a.toLowerCase().includes(query.toLowerCase())
   );
 
-  const card: React.CSSProperties = { background: "var(--dw025)", border: "1px solid var(--dw07)", borderRadius: 16 };
+  const card: React.CSSProperties = { background: "var(--dsurface1)", border: "1px solid var(--dw07)", borderRadius: 16 };
 
   return (
     <div style={{ maxWidth: 760, margin: "0 auto", display: "flex", flexDirection: "column", gap: 28 }}>
@@ -63,7 +63,7 @@ export default function HelpPage() {
         <p style={{ color: "var(--dw35)", fontSize: 14, margin: "0 0 22px" }}>Search the FAQ or browse common questions below</p>
 
         {/* Search */}
-        <div style={{ display: "flex", alignItems: "center", gap: 10, background: "var(--dw05)", border: "1px solid var(--dw09)", borderRadius: 13, padding: "11px 16px", maxWidth: 500, margin: "0 auto" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, background: "var(--dsurface3)", border: "1px solid var(--dw09)", borderRadius: 13, padding: "11px 16px", maxWidth: 500, margin: "0 auto" }}>
           <Search size={16} color="var(--dw3)" />
           <input
             value={query}

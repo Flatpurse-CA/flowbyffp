@@ -7,17 +7,21 @@ function LineChart({ data, labels, color }: { data: number[]; labels: string[]; 
   const min = 0; const max = Math.max(...data) * 1.1;
   const pts = data.map((v, i) => `${(i / (data.length - 1)) * W},${H - ((v - min) / (max - min)) * H}`).join(" ");
   const area = `0,${H} ` + pts + ` ${W},${H}`;
+  // `rgb(52,211,153)` has unescaped parens/commas, which break the `url(#...)`
+  // fragment reference below (browser reads it as closing early) and the
+  // fill silently falls back to SVG's default black — sanitize into a valid id.
+  const gradId = `grad-${color.replace(/[^a-zA-Z0-9]/g, "")}`;
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
       <svg viewBox={`0 0 100 60`} preserveAspectRatio="none" style={{ width: "100%", height: 120 }}>
         <defs>
-          <linearGradient id={`grad-${color}`} x1="0" y1="0" x2="0" y2="1">
+          <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor={color} stopOpacity="0.25" />
             <stop offset="100%" stopColor={color} stopOpacity="0" />
           </linearGradient>
         </defs>
-        <polygon points={area} fill={`url(#grad-${color})`} />
+        <polygon points={area} fill={`url(#${gradId})`} />
         <polyline points={pts} stroke={color} strokeWidth="1.8" fill="none" strokeLinecap="round" strokeLinejoin="round" />
         {data.map((v, i) => (
           <circle key={i} cx={(i / (data.length - 1)) * W} cy={H - ((v - min) / (max - min)) * H} r="1.2" fill={color} />
@@ -73,7 +77,7 @@ export default function ReportsPage() {
   const totalRevenue = MONTHLY_REVENUE.reduce((a, b) => a + b, 0);
 
   const card: React.CSSProperties = {
-    background: "var(--dw025)",
+    background: "var(--dsurface1)",
     border: "1px solid var(--dw07)",
     borderRadius: 16,
     padding: "20px 22px",
@@ -88,7 +92,7 @@ export default function ReportsPage() {
           <h1 style={{ color: "var(--dtext)", fontSize: 22, fontWeight: 800, margin: "0 0 3px", letterSpacing: "-0.03em" }}>Reports</h1>
           <p style={{ color: "var(--dw35)", fontSize: 13, margin: 0 }}>Jul 2025 – Jun 2026</p>
         </div>
-        <div className="reports-period-switch" style={{ display: "flex", gap: 2, background: "var(--dw04)", border: "1px solid var(--dw07)", borderRadius: 10, padding: 3 }}>
+        <div className="reports-period-switch" style={{ display: "flex", gap: 2, background: "var(--dsurface2)", border: "1px solid var(--dw07)", borderRadius: 10, padding: 3 }}>
           {["30 days", "6 months", "12 months"].map((p, i) => (
             <button key={p} style={{ padding: "6px 14px", borderRadius: 7, border: "none", cursor: "pointer", fontSize: 12, fontWeight: i === 2 ? 700 : 400, background: i === 2 ? "rgba(109,40,217,0.4)" : "transparent", color: i === 2 ? "var(--dpurple-text)" : "var(--dw38)" }}>
               {p}
@@ -146,7 +150,7 @@ export default function ReportsPage() {
                   <span style={{ color: "var(--dtext)", fontSize: 13, fontWeight: 600 }}>{s.name}</span>
                   <span style={{ color: "var(--dw4)", fontSize: 12 }}>C${s.revenue.toLocaleString()}</span>
                 </div>
-                <div style={{ height: 5, borderRadius: 3, background: "var(--dw06)" }}>
+                <div style={{ height: 5, borderRadius: 3, background: "var(--dsurface3)" }}>
                   <div style={{ height: "100%", width: `${s.pct}%`, borderRadius: 3, background: "rgb(109,40,217)", transition: "width 0.6s" }} />
                 </div>
               </div>
