@@ -6,17 +6,29 @@ import { getStripePriceId, type BillingInterval } from "@/lib/plans";
 
 export async function POST(req: Request) {
   const signature = req.headers.get("stripe-signature");
-  const secret = process.env.STRIPE_WEBHOOK_SECRET;
-  if (!signature || !secret) {
+  // Two separate Stripe webhook endpoints point at this route — one for platform
+  // events (STRIPE_WEBHOOK_SECRET) and one with "Listen to events on Connected
+  // accounts" enabled (STRIPE_CONNECT_WEBHOOK_SECRET) — each has its own signing
+  // secret, so a signature only verifies against one of them.
+  const secrets = [process.env.STRIPE_WEBHOOK_SECRET, process.env.STRIPE_CONNECT_WEBHOOK_SECRET].filter(
+    (s): s is string => Boolean(s),
+  );
+  if (!signature || secrets.length === 0) {
     return NextResponse.json({ error: "Webhook not configured" }, { status: 400 });
   }
 
   const body = await req.text();
 
-  let event: Stripe.Event;
-  try {
-    event = stripe().webhooks.constructEvent(body, signature, secret);
-  } catch {
+  let event: Stripe.Event | undefined;
+  for (const secret of secrets) {
+    try {
+      event = stripe().webhooks.constructEvent(body, signature, secret);
+      break;
+    } catch {
+      continue;
+    }
+  }
+  if (!event) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
 

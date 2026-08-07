@@ -7,8 +7,9 @@ import {
 } from "lucide-react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
-import { getAvailableSlots, createPublicBooking, createPaymentIntent } from "./actions";
+import { getAvailableSlots, createPublicBooking, createPaymentIntent, payWithSavedCard } from "./actions";
 import { customerLogin, customerSignup } from "../../customer/actions";
+import { listMyPaymentMethods, type SavedCard } from "../../customer/account/actions";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { tint } from "@/lib/color";
 
@@ -99,8 +100,10 @@ export function BookingClient({ shop, services, staff, businessHours, initialCus
 }) {
   const [showFlow, setShowFlow]     = useState(false);
   const [step, setStep]             = useState<"datetime" | "account" | "confirm" | "pay" | "done">("datetime");
-  const [paymentClientSecret, setPaymentClientSecret] = useState<string | null>(null);
-  const [paymentError, setPaymentError]               = useState<string | null>(null);
+  const [appointmentId, setAppointmentId] = useState<string | null>(null);
+  const [savedCards, setSavedCards] = useState<SavedCard[]>([]);
+  const [initialClientSecret, setInitialClientSecret] = useState<string | null>(null);
+  const [payError, setPayError] = useState<string | null>(null);
   const [catFilter, setCatFilter]   = useState("All");
   const [activeTab, setActiveTab]   = useState<"services" | "team" | "hours">("services");
   const [service, setService]       = useState<Service | null>(null);
@@ -163,10 +166,15 @@ export function BookingClient({ shop, services, staff, businessHours, initialCus
     if (res.error) { setBookingError(res.error); setBooking(false); return; }
 
     if (shop.stripeConnected && res.appointmentId) {
-      const pi = await createPaymentIntent({ appointmentId: res.appointmentId, depositOnly: false });
+      setAppointmentId(res.appointmentId);
+      const cards = await listMyPaymentMethods();
+      setSavedCards(cards);
+      if (cards.length === 0) {
+        const pi = await createPaymentIntent({ appointmentId: res.appointmentId, depositOnly: false });
+        if (pi.clientSecret) setInitialClientSecret(pi.clientSecret);
+        else setPayError(pi.error ?? "Couldn't start payment");
+      }
       setBooking(false);
-      if (pi.error || !pi.clientSecret) { setPaymentError(pi.error ?? "Couldn't start payment"); setStep("pay"); return; }
-      setPaymentClientSecret(pi.clientSecret);
       setStep("pay");
       return;
     }
@@ -391,8 +399,10 @@ export function BookingClient({ shop, services, staff, businessHours, initialCus
             {step === "pay" && (
               <PayStep
                 service={service}
-                clientSecret={paymentClientSecret}
-                error={paymentError}
+                appointmentId={appointmentId}
+                savedCards={savedCards}
+                initialClientSecret={initialClientSecret}
+                initialError={payError}
                 onBack={() => setStep("confirm")}
                 onPaid={() => setStep("done")}
               />
@@ -635,10 +645,48 @@ function ConfirmStep({ service, staffName, time, customer, notes, setNotes, erro
 
 // ─── Step: pay ───────────────────────────────────────────────────────────────────
 
-function PayStep({ service, clientSecret, error, onBack, onPaid }: {
-  service: Service; clientSecret: string | null; error: string | null;
+function PayStep({ service, appointmentId, savedCards, initialClientSecret, initialError, onBack, onPaid }: {
+  service: Service; appointmentId: string | null; savedCards: SavedCard[];
+  initialClientSecret: string | null; initialError: string | null;
   onBack: () => void; onPaid: () => void;
 }) {
+  const [mode, setMode] = useState<"select" | "new">(savedCards.length ? "select" : "new");
+  const [clientSecret, setClientSecret] = useState<string | null>(initialClientSecret);
+  const [loadingIntent, setLoadingIntent] = useState(false);
+  const [payingId, setPayingId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(initialError);
+
+  const startNewCard = async () => {
+    setMode("new");
+    setError(null);
+    if (clientSecret || !appointmentId) return;
+    setLoadingIntent(true);
+    const pi = await createPaymentIntent({ appointmentId, depositOnly: false });
+    setLoadingIntent(false);
+    if (pi.error || !pi.clientSecret) { setError(pi.error ?? "Couldn't start payment"); return; }
+    setClientSecret(pi.clientSecret);
+  };
+
+  const payWithCard = async (paymentMethodId: string) => {
+    if (!appointmentId) return;
+    setPayingId(paymentMethodId);
+    setError(null);
+    const res = await payWithSavedCard({ appointmentId, paymentMethodId, depositOnly: false });
+    if (res.success) { onPaid(); return; }
+    if (res.requiresActionClientSecret) {
+      const stripeJs = await stripePromise;
+      if (!stripeJs) { setPayingId(null); setError("Payments aren't configured on this deployment."); return; }
+      const { error: confirmError, paymentIntent } = await stripeJs.confirmCardPayment(res.requiresActionClientSecret);
+      setPayingId(null);
+      if (confirmError) { setError(confirmError.message ?? "Payment failed"); return; }
+      if (paymentIntent && (paymentIntent.status === "succeeded" || paymentIntent.status === "processing")) { onPaid(); return; }
+      setError("Payment could not be completed");
+      return;
+    }
+    setPayingId(null);
+    setError(res.error ?? "Payment failed");
+  };
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
       <button onClick={onBack} style={{ background: "none", border: "none", display: "flex", alignItems: "center", gap: 6, color: ACCENT, fontSize: 13, fontWeight: 700, cursor: "pointer", padding: 0 }}>
@@ -655,17 +703,37 @@ function PayStep({ service, clientSecret, error, onBack, onPaid }: {
         </div>
       )}
 
-      {!error && !clientSecret && (
+      {mode === "select" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {savedCards.map(c => (
+            <button key={c.id} onClick={() => payWithCard(c.id)} disabled={payingId !== null} style={{
+              display: "flex", alignItems: "center", gap: 10, padding: "14px 16px", borderRadius: 14,
+              border: `1.5px solid ${c.isDefault ? ACCENT : "var(--cust-input-border)"}`, background: "var(--cust-card-bg)",
+              color: "var(--cust-text)", fontSize: 14, fontWeight: 700, cursor: payingId ? "default" : "pointer", textAlign: "left",
+              opacity: payingId && payingId !== c.id ? 0.5 : 1,
+            }}>
+              <Lock size={15} color={ACCENT} />
+              <span style={{ flex: 1, textTransform: "capitalize" }}>{c.brand} •••• {c.last4}</span>
+              <span style={{ fontSize: 12.5, color: ACCENT }}>{payingId === c.id ? "Processing…" : "Pay now"}</span>
+            </button>
+          ))}
+          <button onClick={startNewCard} style={{ background: "none", border: "none", color: "var(--cust-text-sub)", fontSize: 12.5, fontWeight: 600, cursor: "pointer", padding: "4px 0", textAlign: "left" }}>
+            Use a different card
+          </button>
+        </div>
+      )}
+
+      {mode === "new" && loadingIntent && (
         <p style={{ color: "var(--cust-text-faint)", fontSize: 13 }}>Setting up payment…</p>
       )}
 
-      {!error && clientSecret && stripePromise && (
+      {mode === "new" && !loadingIntent && clientSecret && stripePromise && (
         <Elements stripe={stripePromise} options={{ clientSecret }}>
           <PayForm onPaid={onPaid} />
         </Elements>
       )}
 
-      {!error && clientSecret && !stripePromise && (
+      {mode === "new" && !loadingIntent && clientSecret && !stripePromise && (
         <div style={{ padding: "10px 13px", borderRadius: 10, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", color: "rgb(185,28,28)", fontSize: 12.5 }}>
           Payments aren&apos;t configured on this deployment (missing publishable key). Your booking was still created.
         </div>

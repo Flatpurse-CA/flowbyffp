@@ -5,6 +5,7 @@ import { getCustomerContext } from "@/lib/dashboard/customer";
 import { shopWallTimeToUTC } from "@/lib/dashboard/familyHours";
 import { sendBookingConfirmationEmail } from "@/lib/resend";
 import { stripe } from "@/lib/stripe";
+import { ensureStripeCustomerId } from "@/lib/stripeCustomer";
 import { attributeAutopilotRevenue } from "@/lib/dashboard/autopilotAttribution";
 
 const SLOT_INTERVAL_MINUTES = 30;
@@ -185,6 +186,8 @@ export async function createPaymentIntent(input: {
     .maybeSingle();
   if (!shop?.stripe_connected || !shop.stripe_account_id) return { error: "This shop isn't set up for online payments" };
 
+  const stripeCustomerId = await ensureStripeCustomerId(admin, ctx.customerId, ctx.email, ctx.fullName);
+
   const fullAmount = Number(appt.price);
   const amount = input.depositOnly ? Math.ceil(fullAmount * 0.2 * 100) / 100 : fullAmount;
 
@@ -192,6 +195,10 @@ export async function createPaymentIntent(input: {
     const intent = await stripe().paymentIntents.create({
       amount: Math.round(amount * 100),
       currency: "cad",
+      customer: stripeCustomerId,
+      // Saves the card to the customer's account (surfaces in "Payment methods" and
+      // as a quick-pay option on their next booking) without requiring a checkbox.
+      setup_future_usage: "off_session",
       transfer_data: { destination: shop.stripe_account_id },
       metadata: { appointment_id: appt.id },
       automatic_payment_methods: { enabled: true },
@@ -199,5 +206,58 @@ export async function createPaymentIntent(input: {
     return { clientSecret: intent.client_secret ?? undefined, amount };
   } catch (e) {
     return { error: e instanceof Error ? e.message : "Couldn't start payment" };
+  }
+}
+
+export async function payWithSavedCard(input: {
+  appointmentId: string; paymentMethodId: string; depositOnly: boolean;
+}): Promise<{ success?: boolean; requiresActionClientSecret?: string; error?: string }> {
+  const ctx = await getCustomerContext();
+  if (!ctx) return { error: "You need to be signed in to pay" };
+
+  const admin = createAdminClient();
+
+  const { data: appt } = await admin
+    .from("appointments")
+    .select("id, shop_id, customer_id, price")
+    .eq("id", input.appointmentId)
+    .maybeSingle();
+  if (!appt || appt.customer_id !== ctx.customerId) return { error: "Booking not found" };
+
+  const { data: shop } = await admin
+    .from("shops")
+    .select("stripe_account_id, stripe_connected")
+    .eq("id", appt.shop_id)
+    .maybeSingle();
+  if (!shop?.stripe_connected || !shop.stripe_account_id) return { error: "This shop isn't set up for online payments" };
+
+  const { data: customerRow } = await admin.from("customers").select("stripe_customer_id").eq("id", ctx.customerId).maybeSingle();
+  const stripeCustomerId = customerRow?.stripe_customer_id as string | undefined;
+  if (!stripeCustomerId) return { error: "No saved card found" };
+
+  const pm = await stripe().paymentMethods.retrieve(input.paymentMethodId);
+  if (pm.customer !== stripeCustomerId) return { error: "This card doesn't belong to you" };
+
+  const fullAmount = Number(appt.price);
+  const amount = input.depositOnly ? Math.ceil(fullAmount * 0.2 * 100) / 100 : fullAmount;
+
+  try {
+    await stripe().paymentIntents.create({
+      amount: Math.round(amount * 100),
+      currency: "cad",
+      customer: stripeCustomerId,
+      payment_method: input.paymentMethodId,
+      off_session: true,
+      confirm: true,
+      transfer_data: { destination: shop.stripe_account_id },
+      metadata: { appointment_id: appt.id },
+    });
+    return { success: true };
+  } catch (e) {
+    const stripeErr = e as { payment_intent?: { client_secret?: string | null }; message?: string };
+    if (stripeErr.payment_intent?.client_secret) {
+      return { requiresActionClientSecret: stripeErr.payment_intent.client_secret };
+    }
+    return { error: stripeErr.message ?? "Payment failed" };
   }
 }

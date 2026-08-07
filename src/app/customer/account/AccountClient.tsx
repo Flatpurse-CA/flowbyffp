@@ -4,9 +4,10 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Calendar, Clock, X, LogOut, Gift } from "lucide-react";
 import type { AppointmentRow, AppointmentStatus } from "@/app/dashboard/appointments/actions";
-import { cancelMyBooking, updateBirthday } from "./actions";
+import { cancelMyBooking, updateBirthday, type SavedCard } from "./actions";
 import { customerLogout } from "../actions";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { PaymentMethodsSection } from "./PaymentMethodsSection";
 
 const STATUS_LABEL: Record<AppointmentStatus, { label: string; color: string; bg: string }> = {
   completed: { label: "Completed", color: "var(--cust-text-sub)", bg: "var(--cust-card-border)" },
@@ -26,7 +27,7 @@ function fmtPrice(n: number) {
 
 const card: React.CSSProperties = { background: "var(--cust-card-bg)", border: "1px solid var(--cust-card-border)", borderRadius: 16, boxShadow: "var(--cust-shadow)" };
 
-export function AccountClient({ customerName, bookings, dateOfBirth }: { customerName: string; bookings: AppointmentRow[]; dateOfBirth: string | null }) {
+export function AccountClient({ customerName, bookings, dateOfBirth, cards }: { customerName: string; bookings: AppointmentRow[]; dateOfBirth: string | null; cards: SavedCard[] }) {
   const router = useRouter();
   const [, startTransition] = useTransition();
   const [cancellingId, setCancellingId] = useState<string | null>(null);
@@ -115,6 +116,8 @@ export function AccountClient({ customerName, bookings, dateOfBirth }: { custome
             {error}
           </div>
         )}
+
+        <PaymentMethodsSection cards={cards} />
 
         <div style={{ ...card, padding: "14px 18px", display: "flex", alignItems: "center", gap: 14, marginBottom: 24, flexWrap: "wrap" }}>
           <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(109,40,217,0.08)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
