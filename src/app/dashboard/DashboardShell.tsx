@@ -96,7 +96,7 @@ function SidebarNav({ open, pathname, T, tabs }: { open: boolean; pathname: stri
             </Link>
 
             {open && active && subTabs && (
-              <div style={{ display: "flex", flexDirection: "column", gap: 1, margin: "2px 0 4px", paddingLeft: 16 }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 4, margin: "4px 0 8px", paddingLeft: 16 }}>
                 {subTabs.map(sub => {
                   const subActive = pathname === sub.href;
                   return (
@@ -105,9 +105,8 @@ function SidebarNav({ open, pathname, T, tabs }: { open: boolean; pathname: stri
                       href={sub.href}
                       style={{
                         display: "flex", alignItems: "center",
-                        padding: "7px 12px",
+                        padding: "8px 12px",
                         borderRadius: 8,
-                        borderLeft: `2px solid ${subActive ? T.activeText : T.border2}`,
                         color: subActive ? T.activeText : T.textDim,
                         fontSize: 12.5, fontWeight: subActive ? 600 : 400,
                         textDecoration: "none",
