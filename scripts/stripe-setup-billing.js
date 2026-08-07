@@ -22,12 +22,12 @@ if (!key) {
 const stripe = new Stripe(key);
 
 const PLAN_PRODUCTS = [
-  { planKey: "pro", name: "FlatPurse Flow — Pro", monthly: 59, annual: 590 },
-  { planKey: "pro_plus", name: "FlatPurse Flow — Pro+", monthly: 119, annual: 1190 },
+  { planKey: "pro", name: "FlatPurse Flow — Pro", monthly: 59, annual: 588 },
+  { planKey: "pro_plus", name: "FlatPurse Flow — Pro+", monthly: 199, annual: 1980 },
 ];
 
 const FOUNDERS_COUPONS = [
-  { id: "founders-40-off", percent_off: 40, name: "Founders Beta — 40% off (first 12 months)" },
+  { id: "founders-40-off", percent_off: 40, name: "Founders Beta — 40% off (12 months)" },
   { id: "founders-25-off", percent_off: 25, name: "Founders Beta — 25% off (forever)" },
 ];
 

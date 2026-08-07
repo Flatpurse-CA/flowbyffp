@@ -9,7 +9,7 @@ import {
   ChevronDown, ChevronUp,
 } from "lucide-react";
 import { updateFamilyHours, updateBusinessHours, startStripeOnboarding, startCheckout, chooseStarterPlan, openBillingPortal, type BusinessHourRow, type BillingStatus } from "./actions";
-import { PLANS, type BillingInterval } from "@/lib/plans";
+import { PLANS, NO_MARKETPLACE_FEE_NOTE, type BillingInterval } from "@/lib/plans";
 
 export type FamilyHoursSettings = { enabled: boolean; start: string; end: string };
 
@@ -679,11 +679,16 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
                 </span>
                 <p style={{ color: "rgb(250,250,250)", fontSize: 28, fontWeight: 800, margin: "12px 0 4px", letterSpacing: "-0.04em" }}>
                   {currentPlan.monthlyPrice === null
-                    ? "Custom"
+                    ? currentPlan.priceLabel
                     : currentPlan.monthlyPrice === 0
                     ? "Free"
                     : <>C${initialBilling?.billingInterval === "annual" ? currentPlan.annualPrice : currentPlan.monthlyPrice}<span style={{ fontSize: 14, fontWeight: 500, color: "rgba(255,255,255,0.45)" }}>/{initialBilling?.billingInterval === "annual" ? "year" : "month"}</span></>}
                 </p>
+                {initialBilling?.billingInterval === "annual" && currentPlan.annualMonthlyEquivalent != null && (
+                  <p style={{ color: "rgba(196,181,253,0.6)", fontSize: 12, margin: "0 0 4px" }}>
+                    ≈ C${currentPlan.annualMonthlyEquivalent}/mo{currentPlan.annualSavingsLabel ? ` · ${currentPlan.annualSavingsLabel}` : ""}
+                  </p>
+                )}
                 <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, margin: 0 }}>
                   {initialBilling?.subscriptionStatus ? `Status: ${initialBilling.subscriptionStatus}` : "No active subscription"}
                 </p>
@@ -722,7 +727,7 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
                 background: billingInterval === iv ? "rgba(109,40,217,0.15)" : "var(--dw03)",
                 color: billingInterval === iv ? "var(--dpurple-text)" : "var(--dw4)",
               }}>
-                {iv === "monthly" ? "Monthly" : "Annual (2 months free)"}
+                {iv === "monthly" ? "Monthly" : "Annual"}
               </button>
             ))}
           </div>
@@ -731,7 +736,7 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {PLANS.map(plan => {
               const isCurrent = initialBilling?.plan === plan.key;
-              const price = plan.monthlyPrice === null ? "Custom" : plan.monthlyPrice === 0 ? "Free" : `C$${billingInterval === "annual" ? plan.annualPrice : plan.monthlyPrice}/${billingInterval === "annual" ? "yr" : "mo"}`;
+              const price = plan.monthlyPrice === null ? plan.priceLabel : plan.monthlyPrice === 0 ? "Free" : `C$${billingInterval === "annual" ? plan.annualPrice : plan.monthlyPrice}/${billingInterval === "annual" ? "yr" : "mo"}`;
               return (
                 <div key={plan.key} style={{ ...card, border: `1px solid ${isCurrent ? plan.color : "var(--dw07)"}`, display: "flex", flexDirection: "column", gap: 10 }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -739,7 +744,18 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
                     {plan.badge && <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 20, background: plan.bg, color: plan.color }}>{plan.badge}</span>}
                   </div>
                   <p style={{ color: "var(--dtext)", fontSize: 20, fontWeight: 800, margin: 0 }}>{price}</p>
+                  {billingInterval === "annual" && plan.annualMonthlyEquivalent != null && (
+                    <p style={{ color: "var(--dpurple-text)", fontSize: 11.5, margin: "-6px 0 0" }}>
+                      ≈ C${plan.annualMonthlyEquivalent}/mo{plan.annualSavingsLabel ? ` · ${plan.annualSavingsLabel}` : ""}
+                    </p>
+                  )}
                   <p style={{ color: "var(--dw35)", fontSize: 12, margin: 0 }}>{plan.perfectFor}</p>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 3, padding: "10px 0", borderTop: "1px solid var(--dw05)", borderBottom: "1px solid var(--dw05)" }}>
+                    <p style={{ color: "var(--dw4)", fontSize: 11.5, margin: 0 }}>Card fee: <span style={{ color: "var(--dw45)" }}>{plan.cardFee}</span></p>
+                    <p style={{ color: "var(--dw4)", fontSize: 11.5, margin: 0 }}>Interac: <span style={{ color: "var(--dw45)" }}>{plan.interacFee}</span></p>
+                    <p style={{ color: "var(--dw4)", fontSize: 11.5, margin: 0 }}>SMS included: <span style={{ color: "var(--dw45)" }}>{plan.smsIncluded}</span></p>
+                    <p style={{ color: "var(--dw4)", fontSize: 11.5, margin: 0 }}>Support: <span style={{ color: "var(--dw45)" }}>{plan.support}</span></p>
+                  </div>
                   <button
                     onClick={() => selectPlan(plan.key, Boolean(initialBilling?.foundersEligible))}
                     disabled={isCurrent || pendingPlanKey === plan.key}
@@ -757,6 +773,8 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
               );
             })}
           </div>
+
+          <p style={{ color: "var(--dw3)", fontSize: 11.5, textAlign: "center", margin: 0 }}>{NO_MARKETPLACE_FEE_NOTE}</p>
         </>
       )}
     </div>

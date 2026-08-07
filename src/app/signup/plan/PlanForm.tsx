@@ -276,7 +276,7 @@ export function PlanForm({ error, foundersSpotsRemaining }: { error?: string; fo
                         key={f}
                         style={{
                           display: "flex",
-                          alignItems: "center",
+                          alignItems: "flex-start",
                           gap: 7,
                           fontSize: 11.5,
                           color: isSelected ? (isDark ? "rgba(224,213,255,0.82)" : "rgba(30,10,60,0.85)") : "var(--auth-text-sub)",
@@ -284,7 +284,7 @@ export function PlanForm({ error, foundersSpotsRemaining }: { error?: string; fo
                           transition: "color 0.25s",
                         }}
                       >
-                        <CheckIcon active={isSelected} isDark={isDark} /> {f}
+                        <span style={{ marginTop: 1, flexShrink: 0 }}><CheckIcon active={isSelected} isDark={isDark} /></span> {f}
                       </li>
                     ))}
                   </ul>

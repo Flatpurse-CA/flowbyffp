@@ -25,7 +25,7 @@ We may add, modify, or remove features over time. We will not make material redu
     subsections: [
       {
         title: "3.1 Plans",
-        body: "FlatPurse Flow is offered in tiers, including a free Basic plan (limited to 50 appointments per month), Pro, Pro+, and Unlimited. Current pricing, features, and limits are described on flatpurse.com and may be updated from time to time.",
+        body: "FlatPurse Flow is offered in tiers, including a free Basic plan (limited to 50 appointments per month), Pro, Pro+, and Enterprise (custom, per-location pricing for multi-location businesses). Current pricing, features, and limits are described on flatpurse.com and may be updated from time to time.",
       },
       {
         title: "3.2 Founders Beta and Promotional Programs",

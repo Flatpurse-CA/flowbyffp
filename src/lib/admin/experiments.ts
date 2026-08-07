@@ -144,7 +144,7 @@ export function generateStrategicSummary(
 
   if (shops.length > 0) {
     const freePct = Math.round((shops.filter(s => s.plan === "starter").length / shops.length) * 100);
-    bullets.push(`${freePct}% of shops are still on the free Starter plan — the biggest lever for MRR growth is Starter-to-Pro conversion.`);
+    bullets.push(`${freePct}% of shops are still on the free Basic plan — the biggest lever for MRR growth is Basic-to-Pro conversion.`);
   }
 
   if (bullets.length === 0) bullets.push("Not enough data yet for a strategic read.");
