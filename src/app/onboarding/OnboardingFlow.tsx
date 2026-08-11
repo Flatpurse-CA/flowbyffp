@@ -179,7 +179,7 @@ function BookingLinkStep({
 
         {available === true && (
           <p style={{ color: "rgb(52,211,153)", fontSize: 12, fontWeight: 600, margin: "7px 0 0", display: "flex", alignItems: "center", gap: 6 }}>
-            <Check size={13} strokeWidth={2.5} color="rgb(52,211,153)" /> Available — this link is yours!
+            <Check size={13} strokeWidth={2.5} color="rgb(52,211,153)" /> Available: this link is yours!
           </p>
         )}
         {available === false && (

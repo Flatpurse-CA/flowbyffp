@@ -399,7 +399,7 @@ export default async function AdminOverviewPage() {
                           }}>
                             {entry.shop_type}
                           </span>
-                        ) : "—"}
+                        ) : "-"}
                       </td>
                       <td style={{ padding: "11px 20px", color: "rgba(255,255,255,0.28)", fontSize: 12 }}>{date}</td>
                     </tr>

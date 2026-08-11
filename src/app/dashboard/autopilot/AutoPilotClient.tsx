@@ -23,7 +23,7 @@ const FLOWS: { id: FlowKey; icon: typeof Zap; color: string; bg: string; name: s
   },
   {
     id: "reminders", icon: Clock, color: "rgb(52,211,153)", bg: "rgba(16,185,129,0.1)",
-    name: "Rebooking Reminders", desc: "Nudges clients at their usual rebook interval — before they go elsewhere.",
+    name: "Rebooking Reminders", desc: "Nudges clients at their usual rebook interval, before they go elsewhere.",
   },
   {
     id: "birthday", icon: Gift, color: "rgb(251,146,60)", bg: "rgba(249,115,22,0.1)",
@@ -66,7 +66,7 @@ export function AutoPilotClient({ state }: { state: AutopilotState }) {
             Your AI team is ready to work
           </h1>
           <p style={{ color: "var(--dw45)", fontSize: 15, margin: "0 0 28px", lineHeight: 1.6 }}>
-            Connect Stripe to activate AutoPilot. Once live, the AI runs all 6 revenue flows — 24 hours a day, without you lifting a finger.
+            Connect Stripe to activate AutoPilot. Once live, the AI runs all 6 revenue flows, 24 hours a day, without you lifting a finger.
           </p>
           <Link href="/dashboard/settings?tab=Payments" style={{
             display: "inline-flex", alignItems: "center", gap: 8,
@@ -149,7 +149,7 @@ export function AutoPilotClient({ state }: { state: AutopilotState }) {
           {[
             { label: "Actions", value: String(state.totals.actions) },
             { label: "Customers", value: String(state.totals.customers) },
-            { label: "Avg per action", value: avgPerAction > 0 ? fmtPrice(avgPerAction) : "—" },
+            { label: "Avg per action", value: avgPerAction > 0 ? fmtPrice(avgPerAction) : "-" },
           ].map(s => (
             <div key={s.label} style={{ textAlign: "center" }}>
               <p style={{ color: "var(--dtext)", fontSize: 24, fontWeight: 800, margin: "0 0 2px", letterSpacing: "-0.03em" }}>{s.value}</p>

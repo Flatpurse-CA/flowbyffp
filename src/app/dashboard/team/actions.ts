@@ -172,6 +172,43 @@ export async function inviteStaff(input: { fullName: string; role?: string; emai
   revalidatePath("/dashboard/operations");
 }
 
+export async function inviteExistingStaff(staffId: string, email: string) {
+  const ctx = await getShopContext();
+  if (!ctx || ctx.role !== "owner") throw new Error("Only the shop owner can invite team members");
+
+  const { supabase, shopId } = await requireShop();
+  const trimmedEmail = email.trim();
+
+  const { data: staff } = await supabase
+    .from("staff")
+    .select("id, email, invite_status")
+    .eq("id", staffId)
+    .eq("shop_id", shopId)
+    .maybeSingle();
+
+  if (!staff) throw new Error("Couldn't find that team member");
+  if (staff.email) throw new Error("This team member already has an email on file");
+
+  // Same duplicate check as inviteStaff — staff.user_id has a unique index,
+  // so this email might already be linked to a staff row elsewhere.
+  const { data: existingRows } = await supabase
+    .from("staff")
+    .select("id, shop_id, active")
+    .ilike("email", trimmedEmail);
+
+  const conflict = (existingRows ?? []).find(r => r.id !== staffId && r.active);
+  if (conflict) {
+    throw new Error(
+      conflict.shop_id === shopId
+        ? `${trimmedEmail} is already used by another active team member.`
+        : `${trimmedEmail} is already registered as staff at another shop.`,
+    );
+  }
+
+  await sendInvite(supabase, shopId, staffId, trimmedEmail);
+  revalidatePath("/dashboard/team");
+}
+
 export async function resendInvite(staffId: string) {
   const ctx = await getShopContext();
   if (!ctx || ctx.role !== "owner") throw new Error("Only the shop owner can resend invites");

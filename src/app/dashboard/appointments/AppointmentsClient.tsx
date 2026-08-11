@@ -66,7 +66,7 @@ function rowToAppt(row: AppointmentRow, now: Date): ApptRecord {
     initials: initialsFor(row.client_name),
     color: colorFor(row.id),
     service: row.service_name,
-    stylist: row.stylist_name || "—",
+    stylist: row.stylist_name || "-",
     price: fmtPrice(Number(row.price)),
     duration: row.duration_minutes,
     dateLabel: dateLabelFor(d, now),
@@ -178,18 +178,18 @@ function NewBookingOverlay({ onClose, onCreated, staff, selfStaffId }: { onClose
       onCreated();
       onClose();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Couldn't book that appointment — try again.");
+      setError(e instanceof Error ? e.message : "Couldn't book that appointment, try again.");
     } finally {
       setSubmitting(false);
     }
   };
 
   const summaryRows: { label: string; value: string }[] = [
-    { label: "Client", value: clientQ || "—" },
-    { label: "Service", value: selectedService || "—" },
-    { label: "Stylist", value: selectedStylist || "—" },
-    { label: "Date", value: selectedDate || "—" },
-    { label: "Time", value: selectedTime || "—" },
+    { label: "Client", value: clientQ || "-" },
+    { label: "Service", value: selectedService || "-" },
+    { label: "Stylist", value: selectedStylist || "-" },
+    { label: "Date", value: selectedDate || "-" },
+    { label: "Time", value: selectedTime || "-" },
   ];
   const priceNum = parseFloat(price) || 0;
   const depositNum = deposit ? priceNum * 0.25 : 0;
@@ -277,7 +277,7 @@ function NewBookingOverlay({ onClose, onCreated, staff, selfStaffId }: { onClose
 
             <div>
               <label style={sectionLabel}>Date &amp; time</label>
-              <input type="date" value={selectedDate} onChange={e => setSelectedDate(e.target.value)} style={{ ...inputStyle, colorScheme: "dark", marginBottom: 10 }} />
+              <input type="date" className="dash-date-input" value={selectedDate} onChange={e => setSelectedDate(e.target.value)} style={{ ...inputStyle, marginBottom: 10 }} />
               <div className="apt-time-grid-6" style={{ display: "grid", gridTemplateColumns: "repeat(6,1fr)", gap: 6 }}>
                 {TIMES.map(t => (
                   <button key={t} className="apt-choice" onClick={() => setSelectedTime(t)} style={{
@@ -423,7 +423,7 @@ function CloseOutModal({ appt, onClose, onCompleted }: { appt: ApptRecord; onClo
         await completeAppointment(appt.id, { tipAmount, paymentMethod: method ?? "cash", paidAmount: total });
         setStage("success");
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Couldn't record that payment — try again.");
+        setError(e instanceof Error ? e.message : "Couldn't record that payment, try again.");
         setStage("select");
       }
     }, method === "cash" ? 500 : 1400);
@@ -657,7 +657,7 @@ function AppointmentDetail({ appt, onClose, onCloseOut, onChanged }: { appt: App
   const inputStyle: React.CSSProperties = {
     width: "100%", background: "var(--dsurface3)", border: "1px solid var(--dw1)",
     borderRadius: 10, padding: "10px 13px", color: "var(--dtext)", fontSize: 13.5,
-    outline: "none", boxSizing: "border-box", colorScheme: "dark",
+    outline: "none", boxSizing: "border-box",
   };
 
   const avatarColor = appt.color;
@@ -671,7 +671,7 @@ function AppointmentDetail({ appt, onClose, onCloseOut, onChanged }: { appt: App
       onChanged();
       onClose();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Couldn't reschedule — try again.");
+      setError(e instanceof Error ? e.message : "Couldn't reschedule, try again.");
     } finally {
       setBusy(false);
     }
@@ -685,7 +685,7 @@ function AppointmentDetail({ appt, onClose, onCloseOut, onChanged }: { appt: App
       setStatus("confirmed");
       onChanged();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Couldn't confirm — try again.");
+      setError(e instanceof Error ? e.message : "Couldn't confirm, try again.");
     } finally {
       setBusy(false);
     }
@@ -700,7 +700,7 @@ function AppointmentDetail({ appt, onClose, onCloseOut, onChanged }: { appt: App
       setConfirmCancel(false);
       onChanged();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Couldn't cancel — try again.");
+      setError(e instanceof Error ? e.message : "Couldn't cancel, try again.");
     } finally {
       setBusy(false);
     }
@@ -806,7 +806,7 @@ function AppointmentDetail({ appt, onClose, onCloseOut, onChanged }: { appt: App
           {rescheduling && (
             <div style={{ ...card, padding: "14px 16px", display: "flex", flexDirection: "column", gap: 12 }}>
               <p style={{ color: "var(--dw35)", fontSize: 10, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", margin: 0 }}>Reschedule to</p>
-              <input type="date" value={newDate} onChange={e => setNewDate(e.target.value)} style={inputStyle} />
+              <input type="date" className="dash-date-input" value={newDate} onChange={e => setNewDate(e.target.value)} style={inputStyle} />
               <div className="apt-time-grid-4" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 6 }}>
                 {TIMES.map(t => (
                   <button key={t} onClick={() => setNewTime(t)} style={{
@@ -996,7 +996,7 @@ function DayView({ appts, bookingUrl, onNewBooking, onSelect }: {
                   }}>
                     <span style={{ fontSize: 14 }}>🏠</span>
                     <p style={{ color: "rgba(248,113,113,0.7)", fontSize: 12.5, fontWeight: 600, margin: 0 }}>
-                      Family Hours — bookings paused
+                      Family Hours: bookings paused
                     </p>
                   </div>
                 ) : (
@@ -1134,7 +1134,7 @@ function ListView({ appts, onSelect }: { appts: ApptRecord[]; onSelect: (appt: A
   if (upcoming.length === 0) {
     return (
       <div style={{ ...card, padding: "40px 20px", textAlign: "center" }}>
-        <p style={{ color: "var(--dw35)", fontSize: 13, margin: 0 }}>No appointments yet — add your first booking to see it here.</p>
+        <p style={{ color: "var(--dw35)", fontSize: 13, margin: 0 }}>No appointments yet, add your first booking to see it here.</p>
       </div>
     );
   }

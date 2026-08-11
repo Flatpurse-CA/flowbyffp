@@ -8,7 +8,7 @@ import {
   Wallet, Clock, Receipt, Zap,
   ChevronDown, ChevronUp,
 } from "lucide-react";
-import { updateFamilyHours, updateBusinessHours, startStripeOnboarding, startCheckout, chooseStarterPlan, openBillingPortal, type BusinessHourRow, type BillingStatus } from "./actions";
+import { updateFamilyHours, updateBusinessHours, startStripeOnboarding, startCheckout, chooseStarterPlan, openBillingPortal, setFrontdeskEnabled, type BusinessHourRow, type BillingStatus } from "./actions";
 import { PLANS, NO_MARKETPLACE_FEE_NOTE, type BillingInterval } from "@/lib/plans";
 
 export type FamilyHoursSettings = { enabled: boolean; start: string; end: string };
@@ -149,13 +149,14 @@ function buildHourRows(initial: BusinessHourRow[]): HourRow[] {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export function SettingsClient({ initialFamilyHours, initialBusinessHours, initialStripeConnected, initialBookingUrl, initialBilling }: { initialFamilyHours: FamilyHoursSettings; initialBusinessHours: BusinessHourRow[]; initialStripeConnected: boolean; initialBookingUrl: string | null; initialBilling: BillingStatus | null }) {
+export function SettingsClient({ initialFamilyHours, initialBusinessHours, initialStripeConnected, initialBookingUrl, initialBilling, initialFrontdeskEnabled }: { initialFamilyHours: FamilyHoursSettings; initialBusinessHours: BusinessHourRow[]; initialStripeConnected: boolean; initialBookingUrl: string | null; initialBilling: BillingStatus | null; initialFrontdeskEnabled: boolean }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab") as TabLabel | null;
   const [tab, setTab]         = useState<TabLabel>(tabParam && TABS.some(t => t.label === tabParam) ? tabParam : "Business");
   const [copied, setCopied]   = useState(false);
-  const [flows, setFlows]     = useState<Flow[]>(INITIAL_FLOWS);
+  const [flows, setFlows]     = useState<Flow[]>(() => INITIAL_FLOWS.map(f => f.key === "frontdesk" ? { ...f, enabled: initialFrontdeskEnabled } : f));
+  const [frontdeskSaving, setFrontdeskSaving] = useState(false);
   const [hours, setHours]     = useState<HourRow[]>(() => buildHourRows(initialBusinessHours));
   const [savingHours, setSavingHours] = useState(false);
   const [hoursSaved, setHoursSaved]   = useState(false);
@@ -259,8 +260,25 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const toggleFlow = (key: FlowKey) =>
+  // Only "frontdesk" is wired to a real backend flag today (shops.frontdesk_enabled,
+  // checked by the AI Front Desk engine before it auto-replies). The other five
+  // flows here (rebooking/noshow/winback/birthday/lastminute) run unconditionally
+  // for any Stripe-connected shop — their toggles are still cosmetic, a known
+  // pre-existing gap, not something this change tries to fix.
+  const toggleFlow = (key: FlowKey) => {
+    if (key === "frontdesk") {
+      const next = !flows.find(f => f.key === "frontdesk")?.enabled;
+      setFlows(f => f.map(fl => fl.key === key ? { ...fl, enabled: next } : fl));
+      setFrontdeskSaving(true);
+      setFrontdeskEnabled(next)
+        .then(res => {
+          if (res.error) setFlows(f => f.map(fl => fl.key === key ? { ...fl, enabled: !next } : fl));
+        })
+        .finally(() => setFrontdeskSaving(false));
+      return;
+    }
     setFlows(f => f.map(fl => fl.key === key ? { ...fl, enabled: !fl.enabled } : fl));
+  };
 
   const toggleHour = (idx: number) =>
     setHours(h => h.map((r, i) => i === idx ? { ...r, open: !r.open } : r));
@@ -351,7 +369,7 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
               </div>
             ) : (
               <p style={{ color: "rgba(248,113,113,0.8)", fontSize: 12.5, margin: 0 }}>
-                No handle set for your shop yet — contact support to get your booking page activated.
+                No handle set for your shop yet, contact support to get your booking page activated.
               </p>
             )}
           </div>
@@ -366,7 +384,7 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
           <div style={{ ...card, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14 }}>
             <div>
               <p style={{ color: "var(--dtext)", fontSize: 13.5, fontWeight: 700, margin: "0 0 2px" }}>Manage your services</p>
-              <p style={{ color: "var(--dw35)", fontSize: 12, margin: 0 }}>Add, price, and publish services from the Services page — that&apos;s what your booking page pulls from.</p>
+              <p style={{ color: "var(--dw35)", fontSize: 12, margin: 0 }}>Add, price, and publish services from the Services page: that&apos;s what your booking page pulls from.</p>
             </div>
             <Link href="/dashboard/services" style={{ display: "flex", alignItems: "center", gap: 6, padding: "9px 16px", borderRadius: 10, background: "rgb(109,40,217)", color: "white", fontSize: 12.5, fontWeight: 700, textDecoration: "none", whiteSpace: "nowrap", flexShrink: 0 }}>
               Go to Services
@@ -449,7 +467,7 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
             <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 14 }}>
               <div>
                 <p style={{ color: "var(--dpurple-text)", fontSize: 14, fontWeight: 700, margin: "0 0 4px" }}>Family hours</p>
-                <p style={{ color: "var(--dw4)", fontSize: 12.5, margin: 0 }}>Block a window each evening — AutoPilot won&apos;t book clients during this time.</p>
+                <p style={{ color: "var(--dw4)", fontSize: 12.5, margin: 0 }}>Block a window each evening, AutoPilot won&apos;t book clients during this time.</p>
               </div>
               <button onClick={() => setFamilyOn(v => !v)} style={{
                 width: 42, height: 24, borderRadius: 12, border: "none", cursor: "pointer", flexShrink: 0,
@@ -557,7 +575,7 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
             <Zap size={20} color="rgb(167,139,250)" strokeWidth={2} />
             <div>
               <p style={{ color: "var(--dpurple-text)", fontSize: 13.5, fontWeight: 700, margin: "0 0 2px" }}>AutoPilot is active</p>
-              <p style={{ color: "var(--dw38)", fontSize: 12.5, margin: 0 }}>Configure each flow below — changes take effect immediately.</p>
+              <p style={{ color: "var(--dw38)", fontSize: 12.5, margin: 0 }}>Configure each flow below, changes take effect immediately.</p>
             </div>
           </div>
 
@@ -569,11 +587,15 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
                   {/* Row */}
                   <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "15px 0" }}>
                     {/* Toggle */}
-                    <button onClick={() => toggleFlow(fl.key)} style={{
-                      width: 38, height: 22, borderRadius: 11, border: "none", cursor: "pointer", flexShrink: 0,
-                      background: fl.enabled ? "rgb(109,40,217)" : "var(--dw1)",
-                      position: "relative", transition: "background 0.2s",
-                    }}>
+                    <button
+                      onClick={() => toggleFlow(fl.key)}
+                      disabled={fl.key === "frontdesk" && frontdeskSaving}
+                      style={{
+                        width: 38, height: 22, borderRadius: 11, border: "none", cursor: "pointer", flexShrink: 0,
+                        background: fl.enabled ? "rgb(109,40,217)" : "var(--dw1)",
+                        position: "relative", transition: "background 0.2s",
+                        opacity: fl.key === "frontdesk" && frontdeskSaving ? 0.6 : 1,
+                      }}>
                       <span style={{ position: "absolute", top: 3, left: fl.enabled ? 18 : 3, width: 16, height: 16, borderRadius: "50%", background: "white", transition: "left 0.2s" }} />
                     </button>
 
@@ -606,10 +628,10 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
                           rows={3}
                           defaultValue={
                             fl.key === "rebooking"  ? "Hi {{first_name}}! It's been a while 💜 Ready to book your next appointment? Reply YES or tap: {{booking_link}}" :
-                            fl.key === "noshow"     ? "Hi {{first_name}}, we missed you today! Let's get you rebooked — tap here: {{booking_link}}" :
-                            fl.key === "winback"    ? "Hey {{first_name}} — it's been {{days_since}} days since we last saw you. We'd love to have you back! Book at: {{booking_link}}" :
-                            fl.key === "birthday"   ? "Happy birthday {{first_name}}! 🎂 Treat yourself — enjoy 15% off your next visit. Book at: {{booking_link}}" :
-                            fl.key === "lastminute" ? "Hi {{first_name}}! We just had a cancellation at {{time}} today — interested? Tap to grab the slot: {{booking_link}}" :
+                            fl.key === "noshow"     ? "Hi {{first_name}}, we missed you today! Let's get you rebooked, tap here: {{booking_link}}" :
+                            fl.key === "winback"    ? "Hey {{first_name}}, it's been {{days_since}} days since we last saw you. We'd love to have you back! Book at: {{booking_link}}" :
+                            fl.key === "birthday"   ? "Happy birthday {{first_name}}! 🎂 Treat yourself, enjoy 15% off your next visit. Book at: {{booking_link}}" :
+                            fl.key === "lastminute" ? "Hi {{first_name}}! We just had a cancellation at {{time}} today, interested? Tap to grab the slot: {{booking_link}}" :
                             "Hi! I'm the AI assistant for {{business_name}}. I can help you book, reschedule, or answer questions. What can I do for you?"
                           }
                           style={{ width: "100%", background: "var(--dsurface2)", border: "1px solid var(--dw08)", borderRadius: 10, padding: "10px 13px", color: "var(--dw75)", fontSize: 12.5, outline: "none", resize: "vertical", boxSizing: "border-box", fontFamily: "inherit", lineHeight: 1.6 }}
@@ -712,7 +734,7 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
           {initialBilling?.foundersEligible && (
             <div style={{ background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.25)", borderRadius: 16, padding: "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
               <div>
-                <p style={{ color: "rgb(251,191,36)", fontSize: 13.5, fontWeight: 700, margin: "0 0 2px" }}>Founders Beta — {initialBilling.foundersSpotsRemaining} spots left</p>
+                <p style={{ color: "rgb(251,191,36)", fontSize: 13.5, fontWeight: 700, margin: "0 0 2px" }}>Founders Beta: {initialBilling.foundersSpotsRemaining} spots left</p>
                 <p style={{ color: "var(--dw45)", fontSize: 12.5, margin: 0 }}>40% off your first 12 months on Pro or Pro+, then 25% off forever. Applies automatically at checkout.</p>
               </div>
             </div>

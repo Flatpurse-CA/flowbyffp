@@ -89,7 +89,7 @@ export default async function AdminExperimentsPage() {
       <div>
         <h1 style={{ color: "rgb(250,250,250)", fontSize: 22, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.03em" }}>Experiments</h1>
         <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 13, margin: 0 }}>
-          Real A/B tests backed by feature flags — variant split is deterministic, conversion is measured against actual completed bookings. No LLM involved; the cards below are templated summaries of real numbers.
+          Real A/B tests backed by feature flags: variant split is deterministic, conversion is measured against actual completed bookings. No LLM involved; the cards below are templated summaries of real numbers.
         </p>
       </div>
 
@@ -252,7 +252,7 @@ export default async function AdminExperimentsPage() {
                     {[
                       { label: e.variant_a_label, sub: `${results.variantA.exposed} shops`, value: `${results.variantA.ratePct}%` },
                       { label: e.variant_b_label, sub: `${results.variantB.exposed} shops`, value: `${results.variantB.ratePct}%` },
-                      { label: "Lift", sub: "B vs A", value: results.liftPct !== null ? `${results.liftPct > 0 ? "+" : ""}${results.liftPct}%` : "—" },
+                      { label: "Lift", sub: "B vs A", value: results.liftPct !== null ? `${results.liftPct > 0 ? "+" : ""}${results.liftPct}%` : "-" },
                       { label: "Significance", sub: results.zScore !== null ? `z=${results.zScore}` : "no data", value: results.significant ? "Significant" : "Not yet" },
                     ].map(m => (
                       <div key={m.label} style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 10, padding: "10px 12px" }}>

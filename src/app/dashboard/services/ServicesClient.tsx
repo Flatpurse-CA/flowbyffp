@@ -181,7 +181,7 @@ export function ServicesClient({ services }: { services: ServiceRow[] }) {
 
       {services.length === 0 ? (
         <div style={{ ...card, padding: "50px 20px", textAlign: "center", color: "var(--dw3)", fontSize: 13.5 }}>
-          No services yet — add your first one to start building your booking page.
+          No services yet, add your first one to start building your booking page.
         </div>
       ) : cat === "All" ? (
         Object.entries(grouped).map(([category, list]) => (

@@ -228,6 +228,17 @@
   --dpurple-text: rgb(109,40,217);
 }
 
+/* Native <input type="date"> calendar-icon/popup rendering — was hardcoded to
+   color-scheme: dark inline, which made the calendar icon render light-on-light
+   (invisible) once the light theme shipped. Ties it to the actual portal theme
+   instead, same as every other dashboard surface. */
+[data-portal-theme="dark"] .dash-date-input {
+  color-scheme: dark;
+}
+[data-portal-theme="light"] .dash-date-input {
+  color-scheme: light;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

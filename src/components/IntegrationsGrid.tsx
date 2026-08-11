@@ -66,11 +66,11 @@ const ITEMS = [
 ];
 
 const FAQS = [
-  { n: "01", q: "What is FlatPurse Flow?", a: "FlatPurse Flow is an AI-powered booking and revenue management platform built specifically for independent salons and barbershops. It handles your bookings, fills empty slots, wins back lapsed clients, and manages payments — all automatically." },
-  { n: "02", q: "How does AutoPilot work?", a: "AutoPilot is a set of six always-on AI flows that run in the background of your shop. It sends reminders, fills cancellations from your waitlist, messages clients who haven't visited in 30+ days, and answers booking DMs — without you lifting a finger." },
+  { n: "01", q: "What is FlatPurse Flow?", a: "FlatPurse Flow is an AI-powered booking and revenue management platform built specifically for independent salons and barbershops. It handles your bookings, fills empty slots, wins back lapsed clients, and manages payments, all automatically." },
+  { n: "02", q: "How does AutoPilot work?", a: "AutoPilot is a set of six always-on AI flows that run in the background of your shop. It sends reminders, fills cancellations from your waitlist, messages clients who haven't visited in 30+ days, and answers booking DMs, without you lifting a finger." },
   { n: "03", q: "Is there really zero commission?", a: "Yes. FlatPurse Flow never takes a percentage of your revenue. You pay a flat monthly subscription and keep everything you earn. The only fees are standard payment processing fees charged by Stripe." },
   { n: "04", q: "How long does setup take?", a: "Most shops are fully set up in under 15 minutes. You create your booking page, add your services and staff, connect payments, and AutoPilot handles the rest. No complicated onboarding required." },
-  { n: "05", q: "Can clients book directly from Instagram or WhatsApp?", a: "Yes. AutoPilot's AI Front Desk reads incoming DMs on Instagram and WhatsApp, responds to booking requests, and confirms appointments — all without you needing to reply manually." },
+  { n: "05", q: "Can clients book directly from Instagram or WhatsApp?", a: "Yes. AutoPilot's AI Front Desk reads incoming DMs on Instagram and WhatsApp, responds to booking requests, and confirms appointments, all without you needing to reply manually." },
   { n: "06", q: "What happens when a client no-shows or cancels?", a: "AutoPilot immediately pulls the next client from your waitlist, fills the slot, and sends them a payment link. You recover revenue that would otherwise be lost, with zero effort." },
   { n: "07", q: "Is my client data safe?", a: "Yes. All data is encrypted in transit and at rest. We never sell or share your client data with third parties. FlatPurse Flow is fully compliant with data protection regulations." },
   { n: "08", q: "Can I cancel or change my plan anytime?", a: "Absolutely. There are no contracts or lock-in periods. You can upgrade, downgrade, or cancel at any time. If you cancel, you keep access until the end of your billing period." },
@@ -103,7 +103,7 @@ export default function IntegrationsGrid() {
           fontSize: 16, color: "rgba(0,0,0,0.45)", lineHeight: 1.7,
           maxWidth: 460, margin: "0 auto",
         }}>
-          Everything works together out of the box — payments, messaging, calendar, and more.
+          Everything works together out of the box: payments, messaging, calendar, and more.
         </p>
       </div>
 

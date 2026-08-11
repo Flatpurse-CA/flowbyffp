@@ -146,7 +146,7 @@ export default function WhySection() {
           </h2>
           <p style={{ fontSize: 16, color: "rgba(255,255,255,0.45)", lineHeight: 1.7, margin: 0 }}>
             FlatPurse Flow brings your calendar, your clients, and your revenue
-            into one place — with AI running in the background 24/7.
+            into one place, with AI running in the background 24/7.
           </p>
         </div>
       </div>

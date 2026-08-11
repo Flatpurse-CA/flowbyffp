@@ -4,7 +4,7 @@ import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, TrendingDown, TrendingUp, AlertTriangle, MoreHorizontal, X } from "lucide-react";
 import type { StaffRow } from "./actions";
-import { inviteStaff, resendInvite, archiveStaff } from "./actions";
+import { inviteStaff, inviteExistingStaff, resendInvite, archiveStaff } from "./actions";
 import type { AppointmentRow } from "../appointments/actions";
 import { computeStaffUtilization, computeRebookTrend, type MetricsAppointment } from "@/lib/dashboard/metrics";
 import { tint } from "@/lib/color";
@@ -76,7 +76,7 @@ function AddStaffModal({ onClose, onCreated }: { onClose: () => void; onCreated:
       onCreated();
       onClose();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Couldn't send that invite — try again.");
+      setError(e instanceof Error ? e.message : "Couldn't send that invite, try again.");
     } finally {
       setSubmitting(false);
     }
@@ -130,6 +130,73 @@ function AddStaffModal({ onClose, onCreated }: { onClose: () => void; onCreated:
   );
 }
 
+function AddEmailModal({ staffId, staffName, onClose, onSent }: { staffId: string; staffName: string; onClose: () => void; onSent: () => void }) {
+  const [email, setEmail] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const inputStyle: React.CSSProperties = {
+    width: "100%", background: "var(--dsurface3)", border: "1px solid var(--dw1)",
+    borderRadius: 10, padding: "10px 13px", color: "var(--dtext)", fontSize: 13.5,
+    outline: "none", boxSizing: "border-box",
+  };
+
+  return (
+    <div style={{
+      position: "fixed", inset: 0, zIndex: 300,
+      background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)",
+      display: "flex", alignItems: "center", justifyContent: "center",
+    }} onClick={onClose}>
+      <div style={{
+        background: "var(--dm1)", border: "1px solid var(--dw1)",
+        borderRadius: 22, width: "100%", maxWidth: 420,
+        padding: "28px 28px 24px", margin: 20,
+        boxShadow: "0 24px 80px rgba(0,0,0,0.7)",
+      }} onClick={e => e.stopPropagation()}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
+          <h2 style={{ color: "var(--dtext)", fontSize: 18, fontWeight: 800, margin: 0, letterSpacing: "-0.02em" }}>
+            Add email for {staffName}
+          </h2>
+          <button onClick={onClose} style={{ background: "var(--dsurface3)", border: "none", borderRadius: 8, width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "var(--dw5)" }}>
+            <X size={16} />
+          </button>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <div>
+            <label style={{ color: "var(--dw4)", fontSize: 12, fontWeight: 500, display: "block", marginBottom: 7 }}>Email</label>
+            <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="them@example.com" style={inputStyle} />
+            <p style={{ color: "var(--dw3)", fontSize: 11, margin: "6px 0 0" }}>They&apos;ll get an email to set up their own login, scoped to their own bookings.</p>
+          </div>
+          {error && <p style={{ color: "rgb(248,113,113)", fontSize: 12.5, margin: 0 }}>{error}</p>}
+          <button
+            onClick={async () => {
+              if (!email.trim()) { setError("Email is required."); return; }
+              setError(null);
+              setSubmitting(true);
+              try {
+                await inviteExistingStaff(staffId, email.trim());
+                onSent();
+                onClose();
+              } catch (e) {
+                setError(e instanceof Error ? e.message : "Couldn't send that invite, try again.");
+              } finally {
+                setSubmitting(false);
+              }
+            }}
+            disabled={submitting}
+            style={{
+              padding: "12px 18px", borderRadius: 12, border: "none",
+              background: "rgb(109,40,217)", color: "white", fontSize: 14, fontWeight: 700,
+              cursor: submitting ? "default" : "pointer", opacity: submitting ? 0.6 : 1,
+            }}>
+            {submitting ? "Sending invite…" : "Send invite"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function TeamClient({ staff, appointments }: { staff: StaffRow[]; appointments: AppointmentRow[] }) {
   const router = useRouter();
   const [, startTransition] = useTransition();
@@ -137,6 +204,7 @@ export function TeamClient({ staff, appointments }: { staff: StaffRow[]; appoint
   const [period, setPeriod] = useState<Period>("This week");
   const [showAdd, setShowAdd] = useState(false);
   const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
+  const [addEmailFor, setAddEmailFor] = useState<StaffRow | null>(null);
 
   const refresh = () => startTransition(() => router.refresh());
   const now = useMemo(() => new Date(), []);
@@ -340,6 +408,14 @@ export function TeamClient({ staff, appointments }: { staff: StaffRow[]; appoint
                         Resend invite
                       </button>
                     )}
+                    {row.invite_status === "not_invited" && (
+                      <button onClick={() => { setMenuOpenId(null); setAddEmailFor(row); }} style={{
+                        display: "block", width: "100%", textAlign: "left", padding: "9px 14px",
+                        background: "none", border: "none", color: "var(--dw7)", fontSize: 12.5, cursor: "pointer",
+                      }}>
+                        Add email & invite
+                      </button>
+                    )}
                     <button onClick={() => handleArchive(row.id)} style={{
                       display: "block", width: "100%", textAlign: "left", padding: "9px 14px",
                       background: "none", border: "none", color: "rgb(248,113,113)", fontSize: 12.5, cursor: "pointer",
@@ -406,7 +482,7 @@ export function TeamClient({ staff, appointments }: { staff: StaffRow[]; appoint
                 { label: "Bookings", value: String(selectedRow.bookings), sub: pctDelta(selectedRow.bookings, selectedRow.prevBookings) },
                 { label: "Revenue", value: fmtPrice(selectedRow.revenue), sub: pctDelta(selectedRow.revenue, selectedRow.prevRevenue) },
                 { label: "Utilization", value: `${selectedRow.utilizationPct}%`, sub: "of available slots" },
-                { label: "Avg ticket", value: selectedRow.avgTicket > 0 ? fmtPrice(selectedRow.avgTicket) : "—", sub: "per completed visit" },
+                { label: "Avg ticket", value: selectedRow.avgTicket > 0 ? fmtPrice(selectedRow.avgTicket) : "-", sub: "per completed visit" },
               ].map(m => (
                 <div key={m.label} style={{
                   background: "var(--dsurface2)", border: "1px solid var(--dw07)",
@@ -459,6 +535,14 @@ export function TeamClient({ staff, appointments }: { staff: StaffRow[]; appoint
       )}
 
       {showAdd && <AddStaffModal onClose={() => setShowAdd(false)} onCreated={refresh} />}
+      {addEmailFor && (
+        <AddEmailModal
+          staffId={addEmailFor.id}
+          staffName={addEmailFor.full_name}
+          onClose={() => setAddEmailFor(null)}
+          onSent={refresh}
+        />
+      )}
     </div>
   );
 }

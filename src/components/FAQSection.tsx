@@ -9,12 +9,12 @@ const FAQS = [
   {
     n: "01",
     q: "What is FlatPurse Flow?",
-    a: "FlatPurse Flow is an AI-powered booking and revenue management platform built specifically for independent salons and barbershops. It handles your bookings, fills empty slots, wins back lapsed clients, and manages payments — all automatically.",
+    a: "FlatPurse Flow is an AI-powered booking and revenue management platform built specifically for independent salons and barbershops. It handles your bookings, fills empty slots, wins back lapsed clients, and manages payments, all automatically.",
   },
   {
     n: "02",
     q: "How does AutoPilot work?",
-    a: "AutoPilot is a set of six always-on AI flows that run in the background of your shop. It sends reminders, fills cancellations from your waitlist, messages clients who haven't visited in 30+ days, and answers booking DMs — without you lifting a finger.",
+    a: "AutoPilot is a set of six always-on AI flows that run in the background of your shop. It sends reminders, fills cancellations from your waitlist, messages clients who haven't visited in 30+ days, and answers booking DMs, without you lifting a finger.",
   },
   {
     n: "03",
@@ -29,7 +29,7 @@ const FAQS = [
   {
     n: "05",
     q: "Can clients book directly from Instagram or WhatsApp?",
-    a: "Yes. AutoPilot's AI Front Desk reads incoming DMs on Instagram and WhatsApp, responds to booking requests, and confirms appointments — all without you needing to reply manually.",
+    a: "Yes. AutoPilot's AI Front Desk reads incoming DMs on Instagram and WhatsApp, responds to booking requests, and confirms appointments, all without you needing to reply manually.",
   },
   {
     n: "06",

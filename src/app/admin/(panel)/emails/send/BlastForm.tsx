@@ -190,7 +190,7 @@ export function BlastForm({ sequences, totalSubs }: { sequences: Sequence[]; tot
         </div>
         <div style={{ padding: 24 }}>
           <p style={{ fontSize: 11, color: T.dim, margin: "0 0 4px" }}>From: FlatPurse Flow &lt;noreply@flatpurse.com&gt;</p>
-          <p style={{ fontSize: 11, color: T.dim, margin: "0 0 16px" }}>Subject: {resolvedSubject || "—"}</p>
+          <p style={{ fontSize: 11, color: T.dim, margin: "0 0 16px" }}>Subject: {resolvedSubject || "-"}</p>
           <div style={{
             background: "#fff", borderRadius: 10, padding: 24,
             color: "#111", fontSize: 14, lineHeight: 1.7,

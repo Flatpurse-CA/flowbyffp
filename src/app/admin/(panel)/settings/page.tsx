@@ -141,7 +141,7 @@ export default async function AdminSettingsPage() {
       <div style={card}>
         <SectionHeader Icon={Palette} title="Appearance" subtitle="Light and dark mode" />
         <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 13, margin: 0, lineHeight: 1.6 }}>
-          Toggle light/dark from the sun/moon icon in the header — it applies across the whole admin panel and is remembered on this device.
+          Toggle light/dark from the sun/moon icon in the header. It applies across the whole admin panel and is remembered on this device.
         </p>
       </div>
     </div>

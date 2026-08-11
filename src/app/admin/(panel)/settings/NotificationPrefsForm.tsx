@@ -58,7 +58,7 @@ export function NotificationPrefsForm() {
         </label>
       ))}
       <p style={{ color: "rgba(255,255,255,0.2)", fontSize: 11, margin: "6px 4px 0" }}>
-        Stored on this device only — controls what shows up in the notification bell.
+        Stored on this device only; controls what shows up in the notification bell.
       </p>
     </div>
   );

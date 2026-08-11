@@ -24,7 +24,7 @@ export default async function AdminUsersPage() {
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
     .map(u => ({
       id:        u.id,
-      email:     u.email ?? "—",
+      email:     u.email ?? "-",
       name:      profiles[u.id] ? `${profiles[u.id].first_name} ${profiles[u.id].last_name}` : null,
       shopName:  shops[u.id]?.name ?? null,
       plan:      shops[u.id]?.plan ?? null,
@@ -90,7 +90,7 @@ export default async function AdminUsersPage() {
 
                     {/* Shop */}
                     <td style={{ padding: "13px 18px", color: row.shopName ? "rgba(255,255,255,0.55)" : "rgba(255,255,255,0.18)", fontSize: 12.5 }}>
-                      {row.shopName ?? "—"}
+                      {row.shopName ?? "-"}
                     </td>
 
                     {/* Plan */}
@@ -98,13 +98,13 @@ export default async function AdminUsersPage() {
                       {row.plan ? (
                         <PlanSelect userId={row.id} plan={row.plan} />
                       ) : (
-                        <span style={{ color: "rgba(255,255,255,0.18)", fontSize: 12 }}>—</span>
+                        <span style={{ color: "rgba(255,255,255,0.18)", fontSize: 12 }}>-</span>
                       )}
                     </td>
 
                     {/* Revenue */}
                     <td style={{ padding: "13px 18px", color: row.revenue ? "rgba(255,255,255,0.55)" : "rgba(255,255,255,0.18)", fontSize: 12.5, fontWeight: 600, whiteSpace: "nowrap" }}>
-                      {row.revenue !== null ? formatCAD(row.revenue) : "—"}
+                      {row.revenue !== null ? formatCAD(row.revenue) : "-"}
                     </td>
 
                     {/* Joined */}

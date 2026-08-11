@@ -10,7 +10,7 @@ const FAQS = [
   },
   {
     q: "What does AutoPilot actually do?",
-    a: "AutoPilot runs AI-powered flows in the background: it sends reminders before appointments, follows up with clients who haven't booked in 30 days, fills last-minute gaps, and recovers no-shows — all without you lifting a finger.",
+    a: "AutoPilot runs AI-powered flows in the background: it sends reminders before appointments, follows up with clients who haven't booked in 30 days, fills last-minute gaps, and recovers no-shows, all without you lifting a finger.",
   },
   {
     q: "Can I add multiple team members / stylists?",
@@ -22,7 +22,7 @@ const FAQS = [
   },
   {
     q: "Can I customise the reminder messages AutoPilot sends?",
-    a: "Coming soon — custom message templates. Currently AutoPilot uses proven default copy that converts well. The upgrade to Elite unlocks fully custom templates.",
+    a: "Coming soon: custom message templates. Currently AutoPilot uses proven default copy that converts well. The upgrade to Elite unlocks fully custom templates.",
   },
   {
     q: "How does the no-show recovery flow work?",

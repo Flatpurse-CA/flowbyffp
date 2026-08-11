@@ -29,18 +29,18 @@ export function computeOpportunities(appointments: ClientAppointment[], now: Dat
   const winback: Opportunity = overdue.length > 0
     ? {
         tag: "WIN-BACK", color: "rgb(167,139,250)",
-        text: `${overdue.length} client${overdue.length === 1 ? "" : "s"} overdue for rebook — trigger 30-day flow`,
+        text: `${overdue.length} client${overdue.length === 1 ? "" : "s"} overdue for rebook: trigger 30-day flow`,
         impact: avgTicket > 0 ? `+${fmtPrice(overdue.length * avgTicket)}` : null,
         available: true,
       }
-    : { tag: "WIN-BACK", color: "rgb(167,139,250)", text: "No overdue clients right now — nice work.", impact: null, available: true };
+    : { tag: "WIN-BACK", color: "rgb(167,139,250)", text: "No overdue clients right now, nice work.", impact: null, available: true };
 
   const slowest = findSlowestWeekday(appointments, now);
 
   const slots: Opportunity = slowest
     ? {
         tag: "SLOTS", color: "rgb(52,211,153)",
-        text: `${WEEKDAYS[slowest.weekdayIndex]}s are your lowest-booked day over the last 4 weeks — consider a flash deal`,
+        text: `${WEEKDAYS[slowest.weekdayIndex]}s are your lowest-booked day over the last 4 weeks: consider a flash deal`,
         impact: avgTicket > 0 ? `+${fmtPrice(avgTicket)}/wk potential` : null,
         available: true,
       }
@@ -53,7 +53,7 @@ export function computeOpportunities(appointments: ClientAppointment[], now: Dat
   const cancellations: Opportunity = {
     tag: "CANCELLATIONS", color: "rgb(251,191,36)",
     text: cancelledThisRange.length > 0
-      ? `${cancellationRate}% cancellation rate — ${fmtPrice(missedRevenue)} in lost bookings this window`
+      ? `${cancellationRate}% cancellation rate: ${fmtPrice(missedRevenue)} in lost bookings this window`
       : "No cancellations in this window.",
     impact: missedRevenue > 0 ? `-${fmtPrice(missedRevenue)}` : null,
     available: true,
@@ -61,13 +61,13 @@ export function computeOpportunities(appointments: ClientAppointment[], now: Dat
 
   const pricing: Opportunity = {
     tag: "PRICING", color: "rgb(96,165,250)",
-    text: "Pricing benchmarks need a market-rate data source — not available yet.",
+    text: "Pricing benchmarks need a market-rate data source, not available yet.",
     impact: null, available: false,
   };
 
   const frontdesk: Opportunity = {
     tag: "FRONT DESK", color: "rgb(248,113,113)",
-    text: "AI Front Desk needs a messaging integration (e.g. Twilio) connected — not available yet.",
+    text: "AI Front Desk needs a messaging integration (e.g. Twilio) connected, not available yet.",
     impact: null, available: false,
   };
 

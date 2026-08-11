@@ -21,7 +21,7 @@ const TESTIMONIALS = [
     name: "Ade Williams",
     shop: "Williams Barbershop",
     type: "Barbershop",
-    quote: "No-shows dropped by 80% in the first month alone. I didn't change anything about how I run my shop — Flow just handled it.",
+    quote: "No-shows dropped by 80% in the first month alone. I didn't change anything about how I run my shop, Flow just handled it.",
     img: "/sd1.jpg",
     featured: true,
   },

@@ -91,7 +91,7 @@ export function DailyBriefClient({ data }: { data: DailyBriefData }) {
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
           <Metric label="Bookings" value={String(data.today.bookingsCount)} />
           <Metric label="Revenue scheduled" value={fmtPrice(data.today.revenueScheduled)} />
-          <Metric label="Next appointment" value={data.today.nextAppointmentTime ?? "—"} />
+          <Metric label="Next appointment" value={data.today.nextAppointmentTime ?? "-"} />
           <Metric label="Staff working" value={String(data.today.staffWorking)} />
         </div>
       </div>
@@ -107,7 +107,7 @@ export function DailyBriefClient({ data }: { data: DailyBriefData }) {
         <div>
           <p style={{ color: "var(--dpurple-text)", fontSize: 14, fontWeight: 700, margin: "0 0 2px" }}>
             {data.familyHoursEnabled
-              ? `Family Hours — ${data.familyHoursStreak}-day streak`
+              ? `Family Hours: ${data.familyHoursStreak}-day streak`
               : "Family Hours is off"}
           </p>
           <p style={{ color: "var(--dw4)", fontSize: 12, margin: 0 }}>

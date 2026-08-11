@@ -5,6 +5,7 @@ export type ClientAppointment = {
   client_name: string;
   client_phone: string | null;
   client_email: string | null;
+  customer_id?: string | null;
   starts_at: string;
   price: number;
   status: "confirmed" | "pending" | "deposit" | "completed" | "cancelled";
@@ -25,8 +26,13 @@ export type DerivedClient = {
   tag: ClientTag;
 };
 
+// customer_id (a real, stable account) takes priority over the free-text
+// contact fields — it's the only identity that's guaranteed not to drift
+// between visits (a client's phone/email captured at booking time can vary
+// or be left blank, but their account id never changes). Falls back to
+// phone/email/name only for walk-ins with no linked account.
 export function keyFor(a: ClientAppointment) {
-  return (a.client_phone || a.client_email || a.client_name).trim().toLowerCase();
+  return (a.customer_id || a.client_phone || a.client_email || a.client_name).trim().toLowerCase();
 }
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;

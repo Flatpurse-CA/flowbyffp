@@ -45,7 +45,7 @@ export const PLANS: Plan[] = [
     priceLabel: "Free Forever",
     features: [
       "Dashboard", "Calendar", "Bookings", "Clients", "Online Booking Page",
-      "Basic POS (single item/service checkout)", "Tap to Pay — no hardware required",
+      "Basic POS (single item/service checkout)", "Tap to Pay: no hardware required",
       "AI Front Desk & Daily Brief (pay-per-use credits: 10/$12, 25/$25, 50/$42)",
       "Business Setup", "Email Reminders", "1 Team Member", "Up to 50 bookings/month",
       "Community Support",
@@ -56,7 +56,7 @@ export const PLANS: Plan[] = [
     annualSavingsLabel: null,
     cardFee: "3.4% + $0.35",
     interacFee: "$0.15 flat",
-    smsIncluded: "None — pay-as-you-go",
+    smsIncluded: "None: pay-as-you-go",
     smsOverageRate: "$0.05/message",
     support: "Community",
     payoutSpeed: "Standard (2–3 days)",
@@ -77,7 +77,7 @@ export const PLANS: Plan[] = [
     features: [
       "Unlimited Bookings", "Full POS (multi-item checkout, inventory, commissions)",
       "Quick Charge terminal + Tap to Pay", "Website Builder",
-      "AI Front Desk — bundled, unlimited", "AI Daily Brief — bundled, unlimited",
+      "AI Front Desk: bundled, unlimited", "AI Daily Brief: bundled, unlimited",
       "Staff Commissions", "Basic Memberships", "500 SMS reminders/month",
       "Family Hours", "Advanced Permissions", "Up to 10 Team Members", "Standard Support",
     ],
@@ -106,8 +106,8 @@ export const PLANS: Plan[] = [
     priceLabel: "C$199/month or C$165/month billed annually",
     features: [
       "Everything in Pro",
-      "Flow Coach™ — exclusive AI business advisor",
-      "AI Autopilot — exclusive automated workflows",
+      "Flow Coach™: exclusive AI business advisor",
+      "AI Autopilot: exclusive automated workflows",
       "Advanced Memberships", "Multi-Location Support", "AI Marketing",
       "1,000 SMS reminders/month", "Priority Support",
       "Advanced Analytics Dashboard", "Revenue Optimization", "Priority AI Processing",
@@ -132,7 +132,7 @@ export const PLANS: Plan[] = [
     label: "Enterprise",
     tagline: "Scale Your Business",
     perfectFor: "Multi-location businesses and larger organizations.",
-    description: "Everything in Pro+, applied per location — with volume-discounted pricing and a dedicated SLA.",
+    description: "Everything in Pro+, applied per location, with volume-discounted pricing and a dedicated SLA.",
     monthlyPrice: null,
     annualPrice: null,
     priceLabel: "From $179/location/mo",
@@ -191,6 +191,6 @@ const STRIPE_PRICE_ENV: Record<"pro" | "pro_plus", Record<BillingInterval, strin
 export function getStripePriceId(key: "pro" | "pro_plus", interval: BillingInterval): string {
   const envName = STRIPE_PRICE_ENV[key][interval];
   const id = process.env[envName];
-  if (!id) throw new Error(`${envName} is not set — run scripts/stripe-setup-billing.ts and add the printed IDs to .env.local`);
+  if (!id) throw new Error(`${envName} is not set, run scripts/stripe-setup-billing.ts and add the printed IDs to .env.local`);
   return id;
 }

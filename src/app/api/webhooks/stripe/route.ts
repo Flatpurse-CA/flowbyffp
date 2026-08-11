@@ -62,7 +62,7 @@ export async function POST(req: Request) {
           // Spots ran out between checkout creation and completion — rare (40-spot beta).
           // The 40%-off coupon was already shown and applied at checkout, so we honor it
           // rather than silently repricing a subscription the customer already agreed to.
-          console.warn(`Founders spot claim missed for shop ${shopId} (checkout already showed the discount — honoring it)`);
+          console.warn(`Founders spot claim missed for shop ${shopId} (checkout already showed the discount, honoring it)`);
         }
 
         const priceId = getStripePriceId(planKey, interval);

@@ -123,7 +123,7 @@ export async function createPublicBooking(input: {
       const aEnd = aStart + (a.duration_minutes as number) * 60000;
       return aStart < slotEnd && aEnd > slotStart;
     });
-    if (clash) return { error: "That slot was just booked by someone else — pick another time" };
+    if (clash) return { error: "That slot was just booked by someone else, pick another time" };
   }
 
   const { data: inserted, error } = await admin

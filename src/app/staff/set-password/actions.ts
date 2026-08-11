@@ -13,7 +13,7 @@ export async function setStaffPassword(formData: FormData) {
   const supabase = await createClient();
   const { data: userData } = await supabase.auth.getUser();
   if (!userData.user) {
-    redirect(`/login?error=${encodeURIComponent("Your invite link has expired — ask your shop owner to resend it")}`);
+    redirect(`/login?error=${encodeURIComponent("Your invite link has expired, ask your shop owner to resend it")}`);
   }
 
   const { error } = await supabase.auth.updateUser({ password });

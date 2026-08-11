@@ -20,7 +20,7 @@ const SECTIONS = [
       },
       {
         title: "2.2 Performance and Analytics Cookies",
-        body: "These cookies collect information about how visitors use our Service — for example, which pages are visited most often and whether users receive error messages from certain pages. All information collected by these cookies is aggregated and anonymised. We use Google Analytics 4 for this purpose.",
+        body: "These cookies collect information about how visitors use our Service, for example, which pages are visited most often and whether users receive error messages from certain pages. All information collected by these cookies is aggregated and anonymised. We use Google Analytics 4 for this purpose.",
       },
       {
         title: "2.3 Marketing and Advertising Cookies",
@@ -36,11 +36,11 @@ const SECTIONS = [
     n: "3",
     title: "Specific Technologies We Use",
     items: [
-      "Google Analytics 4 — measures usage patterns, page views, and conversion events. Data is processed by Google LLC under its Privacy Policy.",
-      "Meta Pixel — tracks conversions from Meta ads and supports retargeting on Facebook and Instagram. Data is processed by Meta Platforms, Inc. under its Data Policy.",
-      "Supabase Auth — sets session cookies required for secure authentication. These are strictly necessary.",
-      "Stripe — sets cookies to detect fraud and manage payment sessions when you interact with payment flows.",
-      "OneSignal — may set cookies to support push notification preferences and email tracking.",
+      "Google Analytics 4: measures usage patterns, page views, and conversion events. Data is processed by Google LLC under its Privacy Policy.",
+      "Meta Pixel: tracks conversions from Meta ads and supports retargeting on Facebook and Instagram. Data is processed by Meta Platforms, Inc. under its Data Policy.",
+      "Supabase Auth: sets session cookies required for secure authentication. These are strictly necessary.",
+      "Stripe: sets cookies to detect fraud and manage payment sessions when you interact with payment flows.",
+      "OneSignal: may set cookies to support push notification preferences and email tracking.",
     ],
   },
   {
@@ -57,7 +57,7 @@ const SECTIONS = [
     title: "How to Control Cookies",
     intro: "You have several options for managing cookies:",
     items: [
-      "Browser settings: most browsers allow you to refuse or delete cookies. Instructions vary by browser — check your browser's help section for guidance (e.g., Chrome, Firefox, Safari, Edge).",
+      "Browser settings: most browsers allow you to refuse or delete cookies. Instructions vary by browser; check your browser's help section for guidance (e.g., Chrome, Firefox, Safari, Edge).",
       "Opt-out tools: you can opt out of Google Analytics tracking at tools.google.com/dlpage/gaoptout. You can manage your Meta ad preferences at your Meta account settings.",
       "Cookie banner: where we display a cookie consent banner, you can use it to accept or reject non-essential cookie categories.",
       "Do Not Track: some browsers transmit a 'Do Not Track' signal. We currently do not respond to Do Not Track signals, but we will update this policy if our practices change.",
@@ -215,7 +215,7 @@ export default function CookiePolicyPage() {
             © 2026 FlatPurse Inc. All rights reserved.
           </p>
           <p style={{ fontSize: 13, color: "rgba(255,255,255,0.15)", margin: 0 }}>
-            FlatPurse Flow — Cookie Policy &nbsp;|&nbsp; flatpurse.com/cookie-policy
+            FlatPurse Flow: Cookie Policy &nbsp;|&nbsp; flatpurse.com/cookie-policy
           </p>
         </div>
       </div>

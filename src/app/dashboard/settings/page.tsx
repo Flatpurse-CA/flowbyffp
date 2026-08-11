@@ -19,7 +19,7 @@ export default async function SettingsPage() {
   const { data: shop } = user
     ? await supabase
         .from("shops")
-        .select("family_hours_enabled, family_hours_start, family_hours_end, handle")
+        .select("family_hours_enabled, family_hours_start, family_hours_end, handle, frontdesk_enabled")
         .eq("owner_id", user.id)
         .maybeSingle()
     : { data: null };
@@ -46,6 +46,7 @@ export default async function SettingsPage() {
         initialStripeConnected={initialStripeConnected}
         initialBookingUrl={initialBookingUrl}
         initialBilling={initialBilling}
+        initialFrontdeskEnabled={Boolean(shop?.frontdesk_enabled)}
       />
     </Suspense>
   );

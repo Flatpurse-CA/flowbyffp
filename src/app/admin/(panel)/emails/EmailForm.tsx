@@ -114,7 +114,7 @@ export default function EmailForm({ initial }: Props) {
 
             <div>
               <label style={labelStyle}>Internal name</label>
-              <input value={name} onChange={e => setName(e.target.value)} required style={inputStyle} placeholder="e.g. Day 1 — Cost of booking" />
+              <input value={name} onChange={e => setName(e.target.value)} required style={inputStyle} placeholder="e.g. Day 1: Cost of booking" />
             </div>
 
             <div>
@@ -174,7 +174,7 @@ export default function EmailForm({ initial }: Props) {
           </div>
           <div style={{ padding: 24 }}>
             <p style={{ fontSize: 11, color: T.dim, margin: "0 0 4px" }}>From: FlatPurse Flow &lt;noreply@flatpurse.com&gt;</p>
-            <p style={{ fontSize: 11, color: T.dim, margin: "0 0 16px" }}>Subject: {subject || "—"}</p>
+            <p style={{ fontSize: 11, color: T.dim, margin: "0 0 16px" }}>Subject: {subject || "-"}</p>
             <div style={{
               background: "#fff", borderRadius: 10, padding: 24,
               color: "#111", fontSize: 14, lineHeight: 1.7,

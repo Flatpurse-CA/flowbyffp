@@ -81,10 +81,10 @@ export function PlanForm({ error, foundersSpotsRemaining }: { error?: string; fo
           }}
         >
           <p style={{ color: "rgb(217,161,10)", fontSize: 13, fontWeight: 700, margin: "0 0 2px" }}>
-            Founders Beta — {foundersSpotsRemaining} spot{foundersSpotsRemaining === 1 ? "" : "s"} left
+            Founders Beta: {foundersSpotsRemaining} spot{foundersSpotsRemaining === 1 ? "" : "s"} left
           </p>
           <p style={{ color: "var(--auth-text-sub)", fontSize: 12.5, margin: 0, lineHeight: 1.5 }}>
-            Pick Pro or Pro+ and get 40% off your first 12 months, then 25% off forever — applied automatically when you set up billing.
+            Pick Pro or Pro+ and get 40% off your first 12 months, then 25% off forever, applied automatically when you set up billing.
           </p>
         </div>
       )}

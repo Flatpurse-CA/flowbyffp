@@ -111,12 +111,12 @@ export function generateExperimentIdeas(
 
   const slowest = findSlowestWeekday(appointments, now);
   if (slowest) {
-    ideas.push(`Test a platform-wide promo on ${WEEKDAYS[slowest.weekdayIndex]}s — it's the lowest-booked day across all shops over the last 4 weeks.`);
+    ideas.push(`Test a platform-wide promo on ${WEEKDAYS[slowest.weekdayIndex]}s: it's the lowest-booked day across all shops over the last 4 weeks.`);
   }
 
   const staleStarters = shops.filter(s => s.plan === "starter" && (now.getTime() - new Date(s.created_at).getTime()) / MS_PER_DAY > 30);
   if (staleStarters.length > 0) {
-    ideas.push(`${staleStarters.length} shop${staleStarters.length === 1 ? "" : "s"} have been on Starter for 30+ days without upgrading — test an in-app upgrade nudge.`);
+    ideas.push(`${staleStarters.length} shop${staleStarters.length === 1 ? "" : "s"} have been on Starter for 30+ days without upgrading. Test an in-app upgrade nudge.`);
   }
 
   if (ideas.length === 0) ideas.push("Not enough platform data yet to suggest an experiment.");
@@ -139,12 +139,12 @@ export function generateStrategicSummary(
 
   const canceled = shops.filter(s => s.subscription_status === "canceled").length;
   if (canceled > 0) {
-    bullets.push(`${canceled} shop${canceled === 1 ? "" : "s"} canceled their subscription — worth a churn-interview outreach.`);
+    bullets.push(`${canceled} shop${canceled === 1 ? "" : "s"} canceled their subscription, worth a churn-interview outreach.`);
   }
 
   if (shops.length > 0) {
     const freePct = Math.round((shops.filter(s => s.plan === "starter").length / shops.length) * 100);
-    bullets.push(`${freePct}% of shops are still on the free Basic plan — the biggest lever for MRR growth is Basic-to-Pro conversion.`);
+    bullets.push(`${freePct}% of shops are still on the free Basic plan: the biggest lever for MRR growth is Basic-to-Pro conversion.`);
   }
 
   if (bullets.length === 0) bullets.push("Not enough data yet for a strategic read.");

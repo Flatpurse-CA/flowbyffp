@@ -454,7 +454,7 @@ function OwnerPopulated(props: OwnerProps) {
               <span style={{ color: labelColor, fontSize: 10, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase" }}>Needs your attention</span>
             </div>
             <p style={{ color: dark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.68)", fontSize: 12.5, margin: "0 0 10px", lineHeight: 1.55 }}>
-              {topNeed ? topNeed.text : "You're all caught up — nothing needs your attention right now."}
+              {topNeed ? topNeed.text : "You're all caught up. Nothing needs your attention right now."}
             </p>
             {topNeed && (
               <Link href="/dashboard/daily-brief" style={{ display: "inline-block", padding: "7px 14px", borderRadius: 9, border: "1px solid rgba(139,92,246,0.3)", background: "rgba(139,92,246,0.1)", color: "rgb(167,139,250)", fontSize: 12, fontWeight: 700, textDecoration: "none" }}>

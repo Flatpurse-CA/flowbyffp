@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { requireShop, getCurrentShopId } from "@/lib/dashboard/shop";
 import { attributeAutopilotRevenue } from "@/lib/dashboard/autopilotAttribution";
 
@@ -9,6 +10,7 @@ export type AppointmentStatus = "confirmed" | "pending" | "deposit" | "completed
 
 export type AppointmentRow = {
   id: string;
+  customer_id: string | null;
   client_name: string;
   client_phone: string | null;
   client_email: string | null;
@@ -72,8 +74,25 @@ export async function createAppointment(input: {
 }) {
   const { supabase, shopId } = await requireShop();
 
+  // Customers are platform-wide (one account can book at any shop) — if this
+  // walk-in/phone booking's email or phone matches an existing customer
+  // account, link it now so it shows up on that person's "My bookings" the
+  // same as an appointment they booked themselves, instead of only existing
+  // as a shop-side record with no way for the client to ever see it.
+  let customerId: string | null = null;
+  if (input.clientEmail || input.clientPhone) {
+    const admin = createAdminClient();
+    const orFilters = [
+      input.clientEmail ? `email.eq.${input.clientEmail}` : null,
+      input.clientPhone ? `phone.eq.${input.clientPhone}` : null,
+    ].filter(Boolean).join(",");
+    const { data: match } = await admin.from("customers").select("id").or(orFilters).limit(1).maybeSingle();
+    customerId = (match?.id as string | undefined) ?? null;
+  }
+
   const { error } = await supabase.from("appointments").insert({
     shop_id: shopId,
+    customer_id: customerId,
     client_name: input.clientName,
     client_phone: input.clientPhone || null,
     client_email: input.clientEmail || null,

@@ -25,8 +25,8 @@ type EventRow = {
 
 function shopNameFrom(row: EventRow): string {
   const s = row.shops;
-  if (!s) return "—";
-  return Array.isArray(s) ? (s[0]?.name ?? "—") : s.name;
+  if (!s) return "-";
+  return Array.isArray(s) ? (s[0]?.name ?? "-") : s.name;
 }
 
 const card: React.CSSProperties = {

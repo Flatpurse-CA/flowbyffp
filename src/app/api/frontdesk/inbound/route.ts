@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const result = await handleInboundMessage({ shopId, fromEmail, fromName: fromName ?? fromEmail, body: messageBody });
+    const result = await handleInboundMessage({ shopId, fromEmail, fromName: fromName ?? fromEmail, body: messageBody, channel: "email" });
     return NextResponse.json(result);
   } catch (err) {
     return NextResponse.json({ error: err instanceof Error ? err.message : "Unknown error" }, { status: 500 });

@@ -159,7 +159,7 @@ export async function openBillingPortal(): Promise<{ url?: string; error?: strin
   const { supabase, shopId } = await requireShop();
 
   const { data: shop } = await supabase.from("shops").select("stripe_customer_id").eq("id", shopId).maybeSingle();
-  if (!shop?.stripe_customer_id) return { error: "No billing account yet — subscribe to a plan first" };
+  if (!shop?.stripe_customer_id) return { error: "No billing account yet, subscribe to a plan first" };
 
   const origin = await getRequestOrigin();
   try {
@@ -171,6 +171,26 @@ export async function openBillingPortal(): Promise<{ url?: string; error?: strin
   } catch (e) {
     return { error: e instanceof Error ? e.message : "Couldn't open billing portal" };
   }
+}
+
+export async function getFrontdeskEnabled(): Promise<boolean> {
+  const ctx = await getShopContext();
+  if (!ctx) return false;
+  const { supabase, shopId } = await requireShop();
+  const { data } = await supabase.from("shops").select("frontdesk_enabled").eq("id", shopId).maybeSingle();
+  return Boolean(data?.frontdesk_enabled);
+}
+
+export async function setFrontdeskEnabled(enabled: boolean): Promise<{ error?: string }> {
+  const ctx = await getShopContext();
+  if (!ctx || ctx.role !== "owner") return { error: "Only the shop owner can change AI Front Desk" };
+  const { supabase, shopId } = await requireShop();
+
+  const { error } = await supabase.from("shops").update({ frontdesk_enabled: enabled }).eq("id", shopId);
+  if (error) return { error: error.message };
+  revalidatePath("/dashboard/settings");
+  revalidatePath("/dashboard/autopilot");
+  return {};
 }
 
 export async function getBusinessHours(): Promise<BusinessHourRow[]> {

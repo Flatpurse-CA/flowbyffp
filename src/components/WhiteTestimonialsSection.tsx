@@ -31,7 +31,7 @@ const QUOTES = [
     highlight: false,
   },
   {
-    quote: "My clients love the booking page. It's seamless and professional — exactly what we needed.",
+    quote: "My clients love the booking page. It's seamless and professional, exactly what we needed.",
     name: "Chioma Eze",
     shop: "Glow Beauty Lounge",
     highlight: false,

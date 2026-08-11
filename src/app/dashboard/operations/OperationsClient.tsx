@@ -48,7 +48,7 @@ export function OperationsClient({ data }: { data: OperationsData }) {
   })), [data.appointments]);
 
   const clientAppts: ClientAppointment[] = useMemo(() => data.appointments.map(a => ({
-    client_name: a.client_name, client_phone: a.client_phone, client_email: a.client_email,
+    client_name: a.client_name, client_phone: a.client_phone, client_email: a.client_email, customer_id: a.customer_id,
     starts_at: a.starts_at, price: Number(a.price), status: a.status,
   })), [data.appointments]);
 
@@ -247,7 +247,7 @@ function Revenue({ appointments, now, thisMonthRevenue, autopilotRevenue, missed
       </div>
 
       <div style={card}>
-        <p style={{ color: "var(--dw4)", fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 16px" }}>Daily revenue — last 30 days</p>
+        <p style={{ color: "var(--dw4)", fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 16px" }}>Daily revenue: last 30 days</p>
         <svg viewBox="0 0 100 70" preserveAspectRatio="none" style={{ width: "100%", height: 140 }}>
           <defs>
             <linearGradient id="rev-grad" x1="0" y1="0" x2="0" y2="1">
@@ -301,7 +301,7 @@ function TeamModule({ staff, metricsAppts, monthStart, now }: {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
       <div style={card}>
-        <p style={{ color: "var(--dw4)", fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 14px" }}>Per-staff efficiency — this month</p>
+        <p style={{ color: "var(--dw4)", fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 14px" }}>Per-staff efficiency: this month</p>
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {rows.map(r => (
             <div key={r.id} style={{ display: "flex", alignItems: "center", gap: 14 }}>
@@ -323,7 +323,7 @@ function TeamModule({ staff, metricsAppts, monthStart, now }: {
       </div>
       <div style={{ ...card, textAlign: "center", padding: "28px 20px" }}>
         <p style={{ color: "var(--dw35)", fontSize: 13, margin: 0 }}>
-          Booking-conversion funnel needs booking-page visit analytics — not available yet.
+          Booking-conversion funnel needs booking-page visit analytics, not available yet.
         </p>
       </div>
     </div>
@@ -396,7 +396,7 @@ function ClientsModule({ clients, appointments, now, retention }: {
       </div>
 
       <div style={card}>
-        <p style={{ color: "var(--dw4)", fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 14px" }}>New vs. returning — last 8 weeks</p>
+        <p style={{ color: "var(--dw4)", fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 14px" }}>New vs. returning: last 8 weeks</p>
         <div style={{ display: "flex", alignItems: "flex-end", gap: 8, height: 100 }}>
           {buckets.map((b, i) => (
             <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "flex-end", height: "100%", gap: 2 }}>
@@ -459,7 +459,7 @@ function Finance() {
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
       <div style={{ ...card, display: "flex", alignItems: "center", gap: 10 }}>
         <span style={{ fontSize: 10, fontWeight: 800, color: "rgb(251,191,36)", background: "rgba(245,158,11,0.12)", padding: "4px 10px", borderRadius: 20 }}>MOCK DATA</span>
-        <span style={{ color: "var(--dw5)", fontSize: 12.5 }}>Requires Stripe Connect for real payouts and GST figures — shown for layout reference only.</span>
+        <span style={{ color: "var(--dw5)", fontSize: 12.5 }}>Requires Stripe Connect for real payouts and GST figures, shown for layout reference only.</span>
       </div>
       <div className="ops-kpi-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14 }}>
         <KPITile label="Next payout" value="C$4,180" sub="Processing in 2 days" />

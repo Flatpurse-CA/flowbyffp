@@ -34,7 +34,7 @@ export default async function AdminCohortsPage() {
       <div>
         <h1 style={{ color: "rgb(250,250,250)", fontSize: 22, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.03em" }}>Cohort Analysis</h1>
         <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 13, margin: 0 }}>
-          Shops grouped by signup week — % that had a real booking in each week after joining. &ldquo;—&rdquo; means that cohort hasn&apos;t reached that week yet.
+          Shops grouped by signup week: % that had a real booking in each week after joining. &ldquo;-&rdquo; means that cohort hasn&apos;t reached that week yet.
         </p>
       </div>
 
@@ -70,7 +70,7 @@ export default async function AdminCohortsPage() {
                   {[r.w1, r.w2, r.w3, r.w4].map((pct, wi) => (
                     <td key={wi} style={{ padding: "13px 18px" }}>
                       {pct === null ? (
-                        <span style={{ color: "rgba(255,255,255,0.15)", fontSize: 12.5 }}>—</span>
+                        <span style={{ color: "rgba(255,255,255,0.15)", fontSize: 12.5 }}>-</span>
                       ) : (
                         <span style={{
                           fontSize: 11.5, fontWeight: 700, padding: "3px 9px", borderRadius: 20,

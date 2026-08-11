@@ -120,14 +120,14 @@ export default async function SubscribersPage({
                 return (
                   <tr key={send.id} style={{ borderBottom: i < filtered.length - 1 ? `1px solid ${T.border}` : "none" }}>
                     <td style={{ padding: "13px 18px", color: T.text, fontSize: 13, fontWeight: 600 }}>
-                      {send.waitlist?.name ?? "—"}
+                      {send.waitlist?.name ?? "-"}
                     </td>
                     <td style={{ padding: "13px 18px", color: T.muted, fontSize: 13 }}>
-                      {send.waitlist?.email ?? "—"}
+                      {send.waitlist?.email ?? "-"}
                     </td>
                     <td style={{ padding: "13px 18px", color: T.muted, fontSize: 13 }}>
                       <span style={{ display: "block", maxWidth: 180, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                        {send.email_sequences?.name ?? "—"}
+                        {send.email_sequences?.name ?? "-"}
                       </span>
                     </td>
                     <td style={{ padding: "13px 18px", color: T.muted, fontSize: 12 }}>

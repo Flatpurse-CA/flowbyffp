@@ -307,7 +307,7 @@ export default function PricingSection() {
           margin: "0 auto 28px",
           maxWidth: 480,
         }}>
-          Beta members are pre-qualified. Founders pricing is locked in for as long as your subscription stays active — cancel and you lose it for good.
+          Beta members are pre-qualified. Founders pricing is locked in for as long as your subscription stays active; cancel and you lose it for good.
         </p>
         <a href="/waitlist" style={{
           display: "inline-flex", alignItems: "center", gap: 8,

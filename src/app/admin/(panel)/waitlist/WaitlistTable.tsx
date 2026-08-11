@@ -162,7 +162,7 @@ export function WaitlistTable({ entries }: { entries: WaitlistEntry[] }) {
                       {entry.shop_type}
                     </span>
                   ) : (
-                    <span style={{ color: "rgba(255,255,255,0.18)", fontSize: 13 }}>—</span>
+                    <span style={{ color: "rgba(255,255,255,0.18)", fontSize: 13 }}>-</span>
                   )}
                 </td>
 

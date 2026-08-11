@@ -10,7 +10,7 @@ export default async function AdminPlansPage() {
   ]);
 
   const shops = (shopsRes.data ?? []) as { owner_id: string; name: string; plan: string; created_at: string }[];
-  const emailMap = Object.fromEntries((usersRes.data?.users ?? []).map(u => [u.id, u.email ?? "—"]));
+  const emailMap = Object.fromEntries((usersRes.data?.users ?? []).map(u => [u.id, u.email ?? "-"]));
 
   const planCounts: Record<string, number> = {};
   shops.forEach(s => {
@@ -91,7 +91,7 @@ export default async function AdminPlansPage() {
                   {planShops.map((shop, i) => (
                     <tr key={shop.owner_id} style={{ borderBottom: i < planShops.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none" }}>
                       <td style={{ padding: "11px 16px", color: "rgb(250,250,250)", fontSize: 13, fontWeight: 600 }}>{shop.name}</td>
-                      <td style={{ padding: "11px 16px", color: "rgba(255,255,255,0.4)", fontSize: 12 }}>{emailMap[shop.owner_id] ?? "—"}</td>
+                      <td style={{ padding: "11px 16px", color: "rgba(255,255,255,0.4)", fontSize: 12 }}>{emailMap[shop.owner_id] ?? "-"}</td>
                       <td style={{ padding: "11px 16px", color: "rgba(255,255,255,0.3)", fontSize: 12 }}>
                         {new Date(shop.created_at).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" })}
                       </td>

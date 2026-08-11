@@ -15,7 +15,7 @@ async function send(payload: { to: string; subject: string; html: string }) {
   if (!c) {
     return {
       data: null,
-      error: { name: "config_error", message: "RESEND_API_KEY is not set — add it to .env.local (or the deployment's env vars) before sending email." },
+      error: { name: "config_error", message: "RESEND_API_KEY is not set, add it to .env.local (or the deployment's env vars) before sending email." },
     };
   }
   return c.emails.send({ from: FROM, ...payload });
@@ -82,7 +82,7 @@ export async function sendBookingConfirmationEmail(to: string, input: { shopName
 
   return send({
     to,
-    subject: `Booking request received — ${input.shopName}`,
+    subject: `Booking request received: ${input.shopName}`,
     html: `
       <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
         <h1 style="font-size: 20px;">Your booking request is in</h1>

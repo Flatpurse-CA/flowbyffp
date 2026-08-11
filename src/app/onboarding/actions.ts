@@ -11,7 +11,7 @@ export async function checkHandleAvailability(
   handle: string,
 ): Promise<{ available: boolean; reason?: string }> {
   if (handle.length < 3) {
-    return { available: false, reason: "Too short — use at least 3 characters." };
+    return { available: false, reason: "Too short, use at least 3 characters." };
   }
   if (!HANDLE_PATTERN.test(handle) || handle.includes("--")) {
     return { available: false, reason: "Can't start, end with, or double up on a dash." };
@@ -34,7 +34,7 @@ export async function checkHandleAvailability(
     if (isMissingColumn) {
       return { available: true };
     }
-    return { available: false, reason: "Couldn't check right now — try again." };
+    return { available: false, reason: "Couldn't check right now, try again." };
   }
 
   if (!data || data.owner_id === ctx?.userId) {

@@ -25,7 +25,7 @@ Where we act as a processor, the Business User is responsible for ensuring it ha
         items: [
           "Account information: name, business name, email address, phone number, password, role, and profile photo.",
           "Business information: business address, service categories, operating hours, staff details, service menu, and pricing.",
-          "Billing information: subscription tier, billing address, and payment-method identifiers. Full card details are collected and stored by our payment processor (Stripe) — we do not store full card numbers on our servers.",
+          "Billing information: subscription tier, billing address, and payment-method identifiers. Full card details are collected and stored by our payment processor (Stripe); we do not store full card numbers on our servers.",
           "End-customer information entered by Business Users: customer names, contact details, appointment history, notes, intake forms, loyalty data (FlowPoints), and marketing preferences.",
           "Communications: messages you send to our support team, survey responses, and content you submit through forms or chat.",
         ],

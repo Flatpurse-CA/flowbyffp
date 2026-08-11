@@ -24,13 +24,20 @@ export async function customerSignup(input: { fullName: string; email: string; p
   });
   if (error || !created.user) return { error: error?.message ?? "Could not create account" };
 
-  const { error: insertError } = await admin.from("customers").insert({
-    user_id: created.user.id,
-    full_name: fullName,
-    email,
-    phone: input.phone?.trim() || null,
-  });
-  if (insertError) return { error: insertError.message };
+  const phone = input.phone?.trim() || null;
+  const { data: customerRow, error: insertError } = await admin
+    .from("customers")
+    .insert({ user_id: created.user.id, full_name: fullName, email, phone })
+    .select("id")
+    .single();
+  if (insertError || !customerRow) return { error: insertError?.message ?? "Could not create account" };
+
+  // Backfill: link any appointment already on file under this email/phone
+  // (e.g. a walk-in a shop entered manually before this person had an
+  // account) so it shows up in "My bookings" retroactively, instead of
+  // being permanently orphaned from the account that now represents them.
+  const orFilters = [`client_email.eq.${email}`, phone ? `client_phone.eq.${phone}` : null].filter(Boolean).join(",");
+  await admin.from("appointments").update({ customer_id: customerRow.id }).is("customer_id", null).or(orFilters);
 
   const supabase = await createClient();
   const { error: signInError } = await supabase.auth.signInWithPassword({ email, password: input.password });
@@ -78,7 +85,7 @@ export async function customerSetNewPassword(password: string): Promise<{ error?
 
   const supabase = await createClient();
   const { data: userData } = await supabase.auth.getUser();
-  if (!userData.user) return { error: "Your reset link has expired — request a new one" };
+  if (!userData.user) return { error: "Your reset link has expired, request a new one" };
 
   const { error } = await supabase.auth.updateUser({ password });
   if (error) return { error: error.message };

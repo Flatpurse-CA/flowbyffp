@@ -80,7 +80,7 @@ export function FlowCoachClient({ data }: { data: FlowCoachData | null }) {
         <h1 style={{ color: "var(--dtext)", fontSize: 22, fontWeight: 800, margin: "0 0 3px", letterSpacing: "-0.03em", display: "flex", alignItems: "center", gap: 8 }}>
           <Compass size={20} color="rgb(167,139,250)" strokeWidth={2} /> Flow Coach™
         </h1>
-        <p style={{ color: "var(--dw35)", fontSize: 13, margin: 0 }}>Your AI business advisor — what changed, why, and what to do about it.</p>
+        <p style={{ color: "var(--dw35)", fontSize: 13, margin: 0 }}>Your AI business advisor: what changed, why, and what to do about it.</p>
       </div>
 
       <div className="flow-coach-hero" style={{ display: "grid", gridTemplateColumns: "220px 1fr", gap: 20 }}>

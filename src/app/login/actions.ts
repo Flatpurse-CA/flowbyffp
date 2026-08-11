@@ -52,7 +52,7 @@ export async function setNewPassword(password: string): Promise<{ error?: string
 
   const supabase = await createClient();
   const { data: userData } = await supabase.auth.getUser();
-  if (!userData.user) return { error: "Your reset link has expired — request a new one" };
+  if (!userData.user) return { error: "Your reset link has expired, request a new one" };
 
   const { error } = await supabase.auth.updateUser({ password });
   if (error) return { error: error.message };

@@ -229,12 +229,12 @@ export function ClientProfilePage({ client, appointments, engaged }: {
             </div>
             <p style={{ color: "white", fontSize: 13, margin: 0, lineHeight: 1.55 }}>
               {client.tag === "Churn risk" || client.tag === "Overdue"
-                ? `${client.name.split(" ")[0]} usually books every ~${Math.round(client.avgIntervalDays ?? 0)} days and is now ${fmtDaysAgo(client.daysSinceLastVisit).toLowerCase()} since their last visit — a win-back message could bring them back.`
+                ? `${client.name.split(" ")[0]} usually books every ~${Math.round(client.avgIntervalDays ?? 0)} days and is now ${fmtDaysAgo(client.daysSinceLastVisit).toLowerCase()} since their last visit. A win-back message could bring them back.`
                 : client.avgIntervalDays
-                  ? `${client.name.split(" ")[0]} books every ~${Math.round(client.avgIntervalDays)} days on average — right on track.`
+                  ? `${client.name.split(" ")[0]} books every ~${Math.round(client.avgIntervalDays)} days on average, right on track.`
                   : client.visits === 0
                     ? `${client.name.split(" ")[0]} has an upcoming booking but no completed visits yet.`
-                    : `${client.name.split(" ")[0]} has one visit so far — not enough history yet to predict a rebooking pattern.`}
+                    : `${client.name.split(" ")[0]} has one visit so far, not enough history yet to predict a rebooking pattern.`}
             </p>
           </div>
 

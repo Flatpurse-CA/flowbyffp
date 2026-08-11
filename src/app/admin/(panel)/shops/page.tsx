@@ -25,7 +25,7 @@ export default async function AdminShopsPage() {
   }[];
 
   const emailMap = Object.fromEntries(
-    (usersRes.data?.users ?? []).map(u => [u.id, u.email ?? "—"])
+    (usersRes.data?.users ?? []).map(u => [u.id, u.email ?? "-"])
   );
 
   const revenueByShop = sumRevenueByShop((apptsRes.data ?? []) as { shop_id: string; price: number }[]);
@@ -93,13 +93,13 @@ export default async function AdminShopsPage() {
                     <td style={{ padding: "13px 18px" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 5, color: "rgba(255,255,255,0.45)", fontSize: 12.5 }}>
                         <MapPin size={11} strokeWidth={1.8} style={{ flexShrink: 0 }} />
-                        {[shop.city, shop.province].filter(Boolean).join(", ") || "—"}
+                        {[shop.city, shop.province].filter(Boolean).join(", ") || "-"}
                       </div>
                     </td>
 
                     {/* Owner email */}
                     <td style={{ padding: "13px 18px", color: "rgba(255,255,255,0.42)", fontSize: 12, maxWidth: 180, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                      {emailMap[shop.owner_id] ?? "—"}
+                      {emailMap[shop.owner_id] ?? "-"}
                     </td>
 
                     {/* Plan */}
@@ -125,7 +125,7 @@ export default async function AdminShopsPage() {
                           {shop.subscription_status}
                         </span>
                       ) : (
-                        <span style={{ color: "rgba(255,255,255,0.2)", fontSize: 12 }}>—</span>
+                        <span style={{ color: "rgba(255,255,255,0.2)", fontSize: 12 }}>-</span>
                       )}
                     </td>
 

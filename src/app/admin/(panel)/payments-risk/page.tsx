@@ -99,7 +99,7 @@ export default async function AdminPaymentsRiskPage() {
                 <tr key={d.id} style={{ borderBottom: i < disputes.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none" }}>
                   <td style={{ padding: "13px 18px", color: "rgb(250,250,250)", fontSize: 13, fontWeight: 600 }}>{shopNameFrom(d)}</td>
                   <td style={{ padding: "13px 18px", color: "rgba(255,255,255,0.6)", fontSize: 13, fontWeight: 600 }}>{formatCAD(Number(d.amount))}</td>
-                  <td style={{ padding: "13px 18px", color: "rgba(255,255,255,0.4)", fontSize: 12.5 }}>{d.reason ?? "—"}</td>
+                  <td style={{ padding: "13px 18px", color: "rgba(255,255,255,0.4)", fontSize: 12.5 }}>{d.reason ?? "-"}</td>
                   <td style={{ padding: "13px 18px" }}>
                     <span style={{
                       fontSize: 10, fontWeight: 700, padding: "3px 9px", borderRadius: 20,

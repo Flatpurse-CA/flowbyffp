@@ -33,10 +33,10 @@ export type FlowCoachCard = {
 
 function healthScoreCard(health: HealthScore): FlowCoachCard {
   const factors = [
-    { name: "booking fill rate", value: health.fillRate, tip: "Your calendar has open capacity — run a promo on your slowest day or let AutoPilot fill more slots." },
-    { name: "client retention", value: health.retention, tip: "Fewer clients are rebooking than expected — send win-back offers to your Overdue and Churn-risk clients." },
-    { name: "revenue growth", value: health.revenueGrowthScore, tip: "Revenue is trending down month-over-month — review pricing and rebooking cadence." },
-    { name: "AI contribution", value: health.aiContribution, tip: "AutoPilot is generating little of your revenue — confirm Stripe is connected and your flows are active." },
+    { name: "booking fill rate", value: health.fillRate, tip: "Your calendar has open capacity: run a promo on your slowest day or let AutoPilot fill more slots." },
+    { name: "client retention", value: health.retention, tip: "Fewer clients are rebooking than expected: send win-back offers to your Overdue and Churn-risk clients." },
+    { name: "revenue growth", value: health.revenueGrowthScore, tip: "Revenue is trending down month-over-month: review pricing and rebooking cadence." },
+    { name: "AI contribution", value: health.aiContribution, tip: "AutoPilot is generating little of your revenue: confirm Stripe is connected and your flows are active." },
   ];
   const weakest = factors.reduce((min, f) => (f.value < min.value ? f : min));
 
@@ -110,7 +110,7 @@ function revenueForecastCard(f: RevenueForecast): FlowCoachCard {
     headline: `~${fmtPrice(f.forecast30d)} projected over the next 30 days`,
     diagnosis: `Trailing weekly average is ${fmtPrice(f.trailingWeeklyAvg)}, ${trendWord} (${f.weekOverWeekPct >= 0 ? "+" : ""}${f.weekOverWeekPct}% week-over-week), with ${fmtPrice(f.scheduledRevenue30d)} already on the calendar.`,
     recommendation: f.weekOverWeekPct < -5
-      ? "Revenue is trending down — see the Retention and Marketing cards below for specific next steps."
+      ? "Revenue is trending down: see the Retention and Marketing cards below for specific next steps."
       : "Keep AutoPilot active to protect this pace.",
     impact: null,
     available: true,
@@ -181,7 +181,7 @@ function retentionCard(clientAppointments: ClientAppointment[], now: Date): Flow
     diagnosis: `Your rebooking rate is ${retention}%. ${atRisk.length} client${atRisk.length === 1 ? " hasn't" : "s haven't"} returned within their usual interval.`,
     recommendation: atRisk.length > 0
       ? `Send a win-back offer to your ${atRisk.length} at-risk client${atRisk.length === 1 ? "" : "s"} before they lapse for good.`
-      : "No action needed — no one is currently overdue.",
+      : "No action needed, no one is currently overdue.",
     impact: revenueAtRisk > 0 ? `-${fmtPrice(revenueAtRisk)} at risk` : null,
     available: true,
   };
@@ -229,7 +229,7 @@ function predictiveCard(clientAppointments: ClientAppointment[], forecast: Reven
     eyebrow: "What's likely to happen next",
     headline: `${dueSoon.length} client${dueSoon.length === 1 ? "" : "s"} expected to book in the next 2 weeks`,
     diagnosis: `Revenue is ${trendWord}, and ${lapseRisk} client${lapseRisk === 1 ? " is" : "s are"} on track to lapse without a nudge.`,
-    recommendation: lapseRisk > 0 ? "Reach out to your at-risk clients before their predicted lapse date." : "No one is predicted to lapse soon — good position.",
+    recommendation: lapseRisk > 0 ? "Reach out to your at-risk clients before their predicted lapse date." : "No one is predicted to lapse soon, good position.",
     impact: null,
     available: true,
   };
@@ -242,7 +242,7 @@ const pricingCard: FlowCoachCard = {
   title: "Pricing Recommendations",
   eyebrow: "Are you priced right",
   headline: "Not available yet",
-  diagnosis: "Pricing recommendations need a competitive market-rate benchmark — not available yet.",
+  diagnosis: "Pricing recommendations need a competitive market-rate benchmark, not available yet.",
   recommendation: null,
   impact: null,
   available: false,
@@ -253,7 +253,7 @@ const goalsCard: FlowCoachCard = {
   title: "Goal Tracking",
   eyebrow: "Set and track targets",
   headline: "Not set up yet",
-  diagnosis: "Goal Tracking needs a place to set targets first — coming soon.",
+  diagnosis: "Goal Tracking needs a place to set targets first, coming soon.",
   recommendation: null,
   impact: null,
   available: false,

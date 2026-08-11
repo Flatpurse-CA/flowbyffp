@@ -7,7 +7,7 @@ const BRAND_PURPLE = "#712AE2";
 const SECTIONS = [
   {
     n: "1",
-    title: "General Rule — Fees Are Non-Refundable",
+    title: "General Rule: Fees Are Non-Refundable",
     intro: "Except as expressly stated in this policy or required by applicable law, all subscription fees paid to FlatPurse are non-refundable. This applies to:",
     items: [
       "Monthly and annual plan fees.",
@@ -25,7 +25,7 @@ If FlatPurse discontinues the Founders Beta program or the Service entirely befo
   },
   {
     n: "3",
-    title: "Exceptions — When We Do Issue Refunds",
+    title: "Exceptions: When We Do Issue Refunds",
     subsections: [
       {
         title: "3.1 Duplicate Charges",
@@ -56,7 +56,7 @@ If FlatPurse discontinues the Founders Beta program or the Service entirely befo
     intro: "To request a refund under one of the exceptions in Section 3, contact us within 30 days of the charge:",
     items: [
       "Email: support@flatpurse.com",
-      "Subject line: \"Refund Request — [Your Account Name]\"",
+      "Subject line: \"Refund Request: [Your Account Name]\"",
       "Include: the date of the charge, the amount, and a brief description of the reason for your request.",
     ],
     footer: "We will acknowledge your request within 3 business days and aim to resolve it within 10 business days. Approved refunds will be returned to the original payment method.",
@@ -201,7 +201,7 @@ export default function RefundPolicyPage() {
             © 2026 FlatPurse Inc. All rights reserved.
           </p>
           <p style={{ fontSize: 13, color: "rgba(255,255,255,0.15)", margin: 0 }}>
-            FlatPurse Flow — Refund Policy &nbsp;|&nbsp; flatpurse.com/refund-policy
+            FlatPurse Flow: Refund Policy &nbsp;|&nbsp; flatpurse.com/refund-policy
           </p>
         </div>
       </div>

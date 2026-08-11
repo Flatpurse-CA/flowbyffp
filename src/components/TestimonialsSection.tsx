@@ -44,7 +44,7 @@ const TESTIMONIALS = [
     shop: "Glow Beauty Lounge",
     type: "Nail & Beauty",
     typeColor: "#ec4899",
-    quote: "My clients love the booking page. It's seamless and professional — exactly what we needed.",
+    quote: "My clients love the booking page. It's seamless and professional, exactly what we needed.",
     img: "/make-up-artist-working-medium-shot.jpg",
   },
   {

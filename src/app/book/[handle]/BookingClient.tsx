@@ -300,7 +300,7 @@ export function BookingClient({ shop, services, staff, businessHours, initialCus
                   <CalendarClock size={22} color={ACCENT} strokeWidth={1.6} />
                 </div>
                 <p style={{ color: "var(--cust-text)", fontSize: 14, fontWeight: 700, margin: "0 0 4px" }}>Booking isn&apos;t open here yet</p>
-                <p style={{ color: "var(--cust-text-sub)", fontSize: 13, margin: 0 }}>This shop is still setting up their services — check back soon.</p>
+                <p style={{ color: "var(--cust-text-sub)", fontSize: 13, margin: 0 }}>This shop is still setting up their services, check back soon.</p>
               </div>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -488,7 +488,7 @@ function DateTimeStep({ service, staff, dayRows, staffId, setStaffId, date, setD
           {loadingSlots ? (
             <p style={{ color: "var(--cust-text-faint)", fontSize: 13 }}>Checking availability…</p>
           ) : slots.length === 0 ? (
-            <p style={{ color: "var(--cust-text-faint)", fontSize: 13 }}>No open times that day — try another date.</p>
+            <p style={{ color: "var(--cust-text-faint)", fontSize: 13 }}>No open times that day, try another date.</p>
           ) : (
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 8 }}>
               {slots.map(t => (
@@ -626,7 +626,7 @@ function ConfirmStep({ service, staffName, time, customer, notes, setNotes, erro
 
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 7, padding: "10px", background: "var(--cust-fill)", borderRadius: 10 }}>
         <span style={{ color: "var(--cust-text-sub)", fontSize: 12 }}>
-          {stripeConnected ? "You'll pay on the next step." : "No payment required — the shop will confirm your booking."}
+          {stripeConnected ? "You'll pay on the next step." : "No payment required, the shop will confirm your booking."}
         </span>
       </div>
 
@@ -699,7 +699,7 @@ function PayStep({ service, appointmentId, savedCards, initialClientSecret, init
 
       {error && (
         <div style={{ padding: "10px 13px", borderRadius: 10, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", color: "rgb(185,28,28)", fontSize: 12.5 }}>
-          {error} — your booking was still created and is waiting for the shop to confirm; you can pay later or contact them directly.
+          {error}. Your booking was still created and is waiting for the shop to confirm; you can pay later or contact them directly.
         </div>
       )}
 

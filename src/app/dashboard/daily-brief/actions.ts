@@ -134,7 +134,7 @@ export async function getDailyBriefData(): Promise<DailyBriefData> {
     : null;
 
   const clientAppts: ClientAppointment[] = appts.map(a => ({
-    client_name: a.client_name, client_phone: a.client_phone, client_email: a.client_email,
+    client_name: a.client_name, client_phone: a.client_phone, client_email: a.client_email, customer_id: a.customer_id,
     starts_at: a.starts_at, price: Number(a.price), status: a.status,
   }));
   const clients = deriveClients(clientAppts, now);
@@ -157,19 +157,19 @@ export async function getDailyBriefData(): Promise<DailyBriefData> {
     const days = churnRisk.daysSinceLastVisit ? Math.round(churnRisk.daysSinceLastVisit) : null;
     needsYou.push({
       id: `winback-${churnRisk.key}`,
-      text: `${churnRisk.name}${days ? ` hasn't booked in ${days}d` : " is overdue for rebook"} — send a win-back offer`,
+      text: `${churnRisk.name}${days ? ` hasn't booked in ${days}d` : " is overdue for rebook"}: send a win-back offer`,
       kind: "winback",
     });
   }
   if (decliningStaffId) {
-    needsYou.push({ id: `staff-${decliningStaffId}`, text: "A team member's rebook rate is dropping — check their Team profile", kind: "staff" });
+    needsYou.push({ id: `staff-${decliningStaffId}`, text: "A team member's rebook rate is dropping, check their Team profile", kind: "staff" });
   }
   if (unpaidDepositToday) {
     needsYou.push({ id: `payment-${unpaidDepositToday.id}`, text: `${unpaidDepositToday.client_name} has an unpaid deposit for today's appointment`, kind: "payment" });
   }
 
   const summary = todayAppts.length === 0 && yesterdayBookings === 0
-    ? "Quiet stretch — no bookings yesterday or today yet."
+    ? "Quiet stretch, no bookings yesterday or today yet."
     : `Yesterday you ${yesterdayRevenue > 0 ? `earned ${fmtPrice(yesterdayRevenue)}` : "had no completed revenue"}. Today you have ${activeTodayAppts.length} booking${activeTodayAppts.length === 1 ? "" : "s"} scheduled.`;
 
   return {
