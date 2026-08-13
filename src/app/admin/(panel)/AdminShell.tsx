@@ -312,12 +312,7 @@ export function AdminShell({ children, user }: { children: React.ReactNode; user
                 }}
               >
                 <Icon size={17} strokeWidth={active ? 2.1 : 1.7} style={{ flexShrink: 0 }} />
-                {asideExpanded && (
-                  <>
-                    <span style={{ flex: 1, whiteSpace: "nowrap" }}>{label}</span>
-                    <ChevronRight size={13} style={{ opacity: 0.28, flexShrink: 0 }} />
-                  </>
-                )}
+                {asideExpanded && <span style={{ flex: 1, whiteSpace: "nowrap" }}>{label}</span>}
               </Link>
             );
           })}
