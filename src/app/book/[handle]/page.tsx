@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getCustomerContext } from "@/lib/dashboard/customer";
 import { BookingClient } from "./BookingClient";
@@ -16,7 +16,21 @@ export default async function BookingPage({ params }: { params: Promise<{ handle
     .eq("handle", handle)
     .maybeSingle();
 
-  if (!shop) notFound();
+  if (!shop) {
+    // The handle might be a retired one — a shop can rename its booking
+    // link (see updateBusinessProfile in dashboard/settings/actions.ts),
+    // which records the old handle here so previously shared links keep
+    // working instead of 404ing.
+    const { data: retired } = await admin
+      .from("shop_handle_history")
+      .select("shops(handle)")
+      .eq("old_handle", handle)
+      .maybeSingle();
+    const shopsRelation = retired?.shops as { handle: string } | { handle: string }[] | null;
+    const currentHandle = Array.isArray(shopsRelation) ? shopsRelation[0]?.handle : shopsRelation?.handle;
+    if (currentHandle) permanentRedirect(`/book/${currentHandle}`);
+    notFound();
+  }
 
   const [{ data: services }, { data: staff }, { data: hours }, customer] = await Promise.all([
     admin.from("services").select("id, name, price, duration_minutes, category").eq("shop_id", shop.id).eq("active", true).order("category", { ascending: true }).order("name", { ascending: true }),

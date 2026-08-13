@@ -8,7 +8,7 @@ import {
   Wallet, Clock, Receipt, Zap,
   ChevronDown, ChevronUp,
 } from "lucide-react";
-import { updateFamilyHours, updateBusinessHours, startStripeOnboarding, startCheckout, chooseStarterPlan, openBillingPortal, setFrontdeskEnabled, type BusinessHourRow, type BillingStatus } from "./actions";
+import { updateFamilyHours, updateBusinessHours, startStripeOnboarding, startCheckout, chooseStarterPlan, openBillingPortal, setFrontdeskEnabled, updateBusinessProfile, type BusinessHourRow, type BillingStatus, type BusinessProfile } from "./actions";
 import { PLANS, NO_MARKETPLACE_FEE_NOTE, type BillingInterval } from "@/lib/plans";
 
 export type FamilyHoursSettings = { enabled: boolean; start: string; end: string };
@@ -36,14 +36,16 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   );
 }
 
-function Field({ label, value, type = "text", readOnly, placeholder, half }: {
-  label: string; value: string; type?: string; readOnly?: boolean; placeholder?: string; half?: boolean;
+function Field({ label, value, onChange, type = "text", readOnly, placeholder, half }: {
+  label: string; value: string; onChange?: (value: string) => void; type?: string; readOnly?: boolean; placeholder?: string; half?: boolean;
 }) {
+  const controlled = onChange !== undefined;
   return (
     <div style={{ flex: half ? "1 1 45%" : "1 1 100%" }}>
       <label style={{ color: "var(--dw38)", fontSize: 12, fontWeight: 600, display: "block", marginBottom: 6, letterSpacing: "0.03em" }}>{label}</label>
       <input
-        defaultValue={value}
+        {...(controlled ? { value } : { defaultValue: value })}
+        onChange={controlled ? (e => onChange(e.target.value)) : undefined}
         type={type}
         readOnly={readOnly}
         placeholder={placeholder}
@@ -79,11 +81,19 @@ function Toggle({ label, sub, on }: { label: string; sub: string; on: boolean })
   );
 }
 
-function SaveBar() {
+function SaveBar({ onSave, onDiscard, saving, saved, error }: {
+  onSave?: () => void; onDiscard?: () => void; saving?: boolean; saved?: boolean; error?: string | null;
+} = {}) {
   return (
-    <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
-      <button style={{ padding: "10px 20px", borderRadius: 10, background: "var(--dsurface3)", border: "1px solid var(--dw09)", color: "var(--dw45)", fontSize: 13, cursor: "pointer" }}>Discard</button>
-      <button style={{ padding: "10px 24px", borderRadius: 10, background: "rgb(109,40,217)", border: "none", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Save changes</button>
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8 }}>
+      {error && <span style={{ color: "rgb(248,113,113)", fontSize: 12.5 }}>{error}</span>}
+      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        {saved && <span style={{ color: "rgb(52,211,153)", fontSize: 12.5, fontWeight: 600 }}>Saved</span>}
+        <button onClick={onDiscard} style={{ padding: "10px 20px", borderRadius: 10, background: "var(--dsurface3)", border: "1px solid var(--dw09)", color: "var(--dw45)", fontSize: 13, cursor: "pointer" }}>Discard</button>
+        <button onClick={onSave} disabled={saving} style={{ padding: "10px 24px", borderRadius: 10, background: "rgb(109,40,217)", border: "none", color: "white", fontSize: 13, fontWeight: 700, cursor: saving ? "default" : "pointer", opacity: saving ? 0.6 : 1 }}>
+          {saving ? "Saving…" : "Save changes"}
+        </button>
+      </div>
     </div>
   );
 }
@@ -149,12 +159,17 @@ function buildHourRows(initial: BusinessHourRow[]): HourRow[] {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export function SettingsClient({ initialFamilyHours, initialBusinessHours, initialStripeConnected, initialBookingUrl, initialBilling, initialFrontdeskEnabled }: { initialFamilyHours: FamilyHoursSettings; initialBusinessHours: BusinessHourRow[]; initialStripeConnected: boolean; initialBookingUrl: string | null; initialBilling: BillingStatus | null; initialFrontdeskEnabled: boolean }) {
+export function SettingsClient({ initialFamilyHours, initialBusinessHours, initialStripeConnected, initialBookingUrl, initialBilling, initialFrontdeskEnabled, initialBusinessProfile }: { initialFamilyHours: FamilyHoursSettings; initialBusinessHours: BusinessHourRow[]; initialStripeConnected: boolean; initialBookingUrl: string | null; initialBilling: BillingStatus | null; initialFrontdeskEnabled: boolean; initialBusinessProfile: BusinessProfile }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab") as TabLabel | null;
   const [tab, setTab]         = useState<TabLabel>(tabParam && TABS.some(t => t.label === tabParam) ? tabParam : "Business");
   const [copied, setCopied]   = useState(false);
+  const [profile, setProfile] = useState<BusinessProfile>(initialBusinessProfile);
+  const [bookingUrl, setBookingUrl] = useState(initialBookingUrl);
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [profileSaved, setProfileSaved]   = useState(false);
+  const [profileError, setProfileError]   = useState<string | null>(null);
   const [flows, setFlows]     = useState<Flow[]>(() => INITIAL_FLOWS.map(f => f.key === "frontdesk" ? { ...f, enabled: initialFrontdeskEnabled } : f));
   const [frontdeskSaving, setFrontdeskSaving] = useState(false);
   const [hours, setHours]     = useState<HourRow[]>(() => buildHourRows(initialBusinessHours));
@@ -225,6 +240,32 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
     if (res.url) window.location.href = res.url;
   };
 
+  const saveBusinessProfile = async () => {
+    setSavingProfile(true);
+    setProfileSaved(false);
+    setProfileError(null);
+    try {
+      const result = await updateBusinessProfile(profile);
+      if (result.error) {
+        setProfileError(result.error);
+        return;
+      }
+      if (bookingUrl && profile.handle) {
+        setBookingUrl(bookingUrl.replace(/\/book\/[^/]+$/, `/book/${profile.handle}`));
+      }
+      setProfileSaved(true);
+      router.refresh();
+      setTimeout(() => setProfileSaved(false), 2500);
+    } finally {
+      setSavingProfile(false);
+    }
+  };
+
+  const discardBusinessProfile = () => {
+    setProfile(initialBusinessProfile);
+    setProfileError(null);
+  };
+
   const saveFamilyHours = async () => {
     setSavingFamily(true);
     setFamilySaved(false);
@@ -251,11 +292,11 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
     }
   };
 
-  const bookingLinkDisplay = initialBookingUrl ? initialBookingUrl.replace(/^https?:\/\//, "") : null;
+  const bookingLinkDisplay = bookingUrl ? bookingUrl.replace(/^https?:\/\//, "") : null;
 
   const copyLink = () => {
-    if (!initialBookingUrl) return;
-    navigator.clipboard.writeText(initialBookingUrl);
+    if (!bookingUrl) return;
+    navigator.clipboard.writeText(bookingUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -320,23 +361,27 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
             <SectionLabel>Business profile</SectionLabel>
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
-                <Field label="Business name" value="Flow by FFP" half />
-                <Field label="Handle (booking URL)" value="ffp" half />
+                <Field label="Business name" value={profile.name} onChange={v => setProfile(p => ({ ...p, name: v }))} half />
+                <Field label="Handle (booking URL)" value={profile.handle} onChange={v => setProfile(p => ({ ...p, handle: v }))} placeholder="e.g. ffp" half />
               </div>
-              <Field label="Business type" value="Hair salon / Independent stylist" />
+              <Field label="Business type" value={profile.businessType} onChange={v => setProfile(p => ({ ...p, businessType: v }))} />
               <div>
                 <label style={{ color: "var(--dw38)", fontSize: 12, fontWeight: 600, display: "block", marginBottom: 6 }}>About / Bio</label>
                 <textarea
-                  defaultValue="Toronto-based luxury hair studio specialising in colour, silk press, and protective styles."
+                  value={profile.bio}
+                  onChange={e => setProfile(p => ({ ...p, bio: e.target.value }))}
                   rows={3}
                   style={{ width: "100%", background: "var(--dsurface3)", border: "1px solid var(--dw09)", borderRadius: 10, padding: "10px 13px", color: "var(--dtext)", fontSize: 13, outline: "none", resize: "vertical", boxSizing: "border-box", fontFamily: "inherit", lineHeight: 1.5 }}
                 />
               </div>
               <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
-                <Field label="City" value="Toronto, ON" half />
-                <Field label="Postal code" value="M5V 1A1" half />
+                <Field label="City" value={profile.city} onChange={v => setProfile(p => ({ ...p, city: v }))} half />
+                <Field label="Province" value={profile.province} onChange={v => setProfile(p => ({ ...p, province: v }))} half />
               </div>
-              <Field label="Phone number" value="+1 647 000 0000" type="tel" />
+              <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
+                <Field label="Postal code" value={profile.postalCode} onChange={v => setProfile(p => ({ ...p, postalCode: v }))} half />
+                <Field label="Phone number" value={profile.phone} onChange={v => setProfile(p => ({ ...p, phone: v }))} type="tel" half />
+              </div>
             </div>
           </div>
 
@@ -349,7 +394,7 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
                   <Link2 size={13} color="var(--dw3)" style={{ flexShrink: 0 }} />
                   <span style={{ color: "var(--dw5)", fontSize: 13, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{bookingLinkDisplay}</span>
                 </div>
-                <a href={initialBookingUrl!} target="_blank" rel="noopener noreferrer" style={{
+                <a href={bookingUrl!} target="_blank" rel="noopener noreferrer" style={{
                   display: "flex", alignItems: "center", gap: 6, padding: "10px 16px",
                   borderRadius: 10, fontSize: 13, whiteSpace: "nowrap", textDecoration: "none",
                   background: "var(--dsurface3)", border: "1px solid var(--dw1)", color: "var(--dw65)",
@@ -374,7 +419,7 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
             )}
           </div>
 
-          <SaveBar />
+          <SaveBar onSave={saveBusinessProfile} onDiscard={discardBusinessProfile} saving={savingProfile} saved={profileSaved} error={profileError} />
         </>
       )}
 

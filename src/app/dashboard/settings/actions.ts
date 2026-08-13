@@ -246,3 +246,73 @@ export async function updateFamilyHours(input: { enabled: boolean; start: string
   revalidatePath("/dashboard/settings");
   revalidatePath("/dashboard/daily-brief");
 }
+
+export type BusinessProfile = {
+  name: string;
+  handle: string;
+  businessType: string;
+  bio: string;
+  city: string;
+  province: string;
+  postalCode: string;
+  phone: string;
+};
+
+// Route segments under src/app/ that a shop handle can't collide with,
+// since /book/[handle] would otherwise be ambiguous with a real route.
+const RESERVED_HANDLES = new Set([
+  "admin", "api", "auth", "book", "cookie-policy", "customer", "dashboard",
+  "forgot-password", "home-main", "login", "main", "onboarding", "privacy",
+  "refund-policy", "reset-password", "signup", "staff", "terms", "waitlist", "waitlist2",
+]);
+
+export async function updateBusinessProfile(input: BusinessProfile): Promise<{ error?: string }> {
+  const ctx = await getShopContext();
+  if (!ctx || ctx.role !== "owner") return { error: "Only the shop owner can edit the business profile" };
+  const { supabase, shopId } = await requireShop();
+
+  const name = input.name.trim();
+  if (!name) return { error: "Business name can't be empty" };
+
+  const handle = input.handle.trim().toLowerCase();
+  if (!/^[a-z0-9-]{3,40}$/.test(handle)) {
+    return { error: "Booking link can only contain lowercase letters, numbers, and hyphens (3-40 characters)" };
+  }
+  if (RESERVED_HANDLES.has(handle)) {
+    return { error: `"${handle}" is a reserved word and can't be used as a booking link` };
+  }
+
+  const { data: current } = await supabase.from("shops").select("handle").eq("id", shopId).maybeSingle();
+  const previousHandle = current?.handle as string | null;
+
+  if (handle !== previousHandle) {
+    const { data: taken } = await supabase.from("shops").select("id").eq("handle", handle).neq("id", shopId).maybeSingle();
+    if (taken) return { error: "That booking link is already taken by another shop" };
+  }
+
+  const { error } = await supabase
+    .from("shops")
+    .update({
+      name,
+      handle,
+      business_type: input.businessType.trim(),
+      bio: input.bio.trim(),
+      city: input.city.trim(),
+      province: input.province.trim(),
+      postal_code: input.postalCode.trim(),
+      phone: input.phone.trim(),
+    })
+    .eq("id", shopId);
+
+  if (error) return { error: error.message };
+
+  // Keep the old link alive as a redirect — best-effort: a stale handle
+  // history row shouldn't block the actual profile save above.
+  if (previousHandle && handle !== previousHandle) {
+    await supabase.from("shop_handle_history").upsert({ old_handle: previousHandle, shop_id: shopId }, { onConflict: "old_handle" });
+  }
+
+  revalidatePath("/dashboard/settings");
+  revalidatePath(`/book/${handle}`);
+  return {};
+}

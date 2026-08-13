@@ -19,7 +19,7 @@ export default async function SettingsPage() {
   const { data: shop } = user
     ? await supabase
         .from("shops")
-        .select("family_hours_enabled, family_hours_start, family_hours_end, handle, frontdesk_enabled")
+        .select("family_hours_enabled, family_hours_start, family_hours_end, handle, frontdesk_enabled, name, business_type, bio, city, province, postal_code, phone")
         .eq("owner_id", user.id)
         .maybeSingle()
     : { data: null };
@@ -38,6 +38,17 @@ export default async function SettingsPage() {
   ]);
   const initialBookingUrl = shop?.handle ? `${origin}/book/${shop.handle}` : null;
 
+  const initialBusinessProfile = {
+    name: (shop?.name as string | undefined) ?? "",
+    handle: (shop?.handle as string | undefined) ?? "",
+    businessType: (shop?.business_type as string | undefined) ?? "",
+    bio: (shop?.bio as string | undefined) ?? "",
+    city: (shop?.city as string | undefined) ?? "",
+    province: (shop?.province as string | undefined) ?? "",
+    postalCode: (shop?.postal_code as string | undefined) ?? "",
+    phone: (shop?.phone as string | undefined) ?? "",
+  };
+
   return (
     <Suspense>
       <SettingsClient
@@ -47,6 +58,7 @@ export default async function SettingsPage() {
         initialBookingUrl={initialBookingUrl}
         initialBilling={initialBilling}
         initialFrontdeskEnabled={Boolean(shop?.frontdesk_enabled)}
+        initialBusinessProfile={initialBusinessProfile}
       />
     </Suspense>
   );
