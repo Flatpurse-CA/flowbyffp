@@ -101,7 +101,7 @@ export async function sendBookingConfirmationEmail(to: string, input: { shopName
 export async function sendOtpEmail(email: string, code: string, firstName: string) {
   return send({
     to: email,
-    subject: `${code} is your FLOWBYFFP verification code`,
+    subject: `${code} is your FlatPurse Flow verification code`,
     html: `
       <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
         <h1 style="font-size: 20px;">Hi ${firstName},</h1>
