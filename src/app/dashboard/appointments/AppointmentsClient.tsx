@@ -6,10 +6,10 @@ import {
   Plus, Search, Copy, Check, MessageSquare,
   Mail, ExternalLink, Zap, Clock, ChevronRight,
   X, Phone, CreditCard, Banknote, Smartphone,
-  Send, Pencil, Ban, CheckCircle2, StickyNote,
+  Send, Pencil, Ban, CheckCircle2, StickyNote, SquarePen,
 } from "lucide-react";
 import type { AppointmentRow, AppointmentStatus } from "./actions";
-import { createAppointment, rescheduleAppointment, cancelAppointment, completeAppointment, confirmAppointment } from "./actions";
+import { createAppointment, rescheduleAppointment, cancelAppointment, completeAppointment, confirmAppointment, updateAppointmentDetails } from "./actions";
 import type { StaffRow } from "../team/actions";
 import { tint } from "@/lib/color";
 
@@ -52,7 +52,7 @@ function fmtPrice(n: number) {
 
 type ApptRecord = {
   id: string; name: string; initials: string; color: string;
-  service: string; stylist: string; price: string; duration: number;
+  service: string; stylist: string; price: string; rawPrice: number; duration: number;
   dateLabel: string; time: string; status: AppointmentStatus;
   phone: string; email: string; notes: string; depositAmount?: string;
   startsAt: string; hour: number;
@@ -68,6 +68,7 @@ function rowToAppt(row: AppointmentRow, now: Date): ApptRecord {
     service: row.service_name,
     stylist: row.stylist_name || "-",
     price: fmtPrice(Number(row.price)),
+    rawPrice: Number(row.price),
     duration: row.duration_minutes,
     dateLabel: dateLabelFor(d, now),
     time: timeLabelFor(d),
@@ -649,6 +650,13 @@ function AppointmentDetail({ appt, onClose, onCloseOut, onChanged }: { appt: App
   const [rescheduling, setRescheduling] = useState(false);
   const [newDate, setNewDate] = useState("");
   const [newTime, setNewTime] = useState("");
+  const [editing, setEditing] = useState(false);
+  const [editName, setEditName] = useState(appt.name);
+  const [editPhone, setEditPhone] = useState(appt.phone);
+  const [editEmail, setEditEmail] = useState(appt.email);
+  const [editService, setEditService] = useState(appt.service);
+  const [editPrice, setEditPrice] = useState(String(appt.rawPrice));
+  const [editNotes, setEditNotes] = useState(appt.notes);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -672,6 +680,32 @@ function AppointmentDetail({ appt, onClose, onCloseOut, onChanged }: { appt: App
       onClose();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Couldn't reschedule, try again.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const doSaveEdit = async () => {
+    setError(null);
+    const price = parseFloat(editPrice);
+    if (!Number.isFinite(price) || price < 0) {
+      setError("Enter a valid price");
+      return;
+    }
+    setBusy(true);
+    try {
+      await updateAppointmentDetails(appt.id, {
+        clientName: editName,
+        clientPhone: editPhone || undefined,
+        clientEmail: editEmail || undefined,
+        serviceName: editService,
+        price,
+        notes: editNotes || undefined,
+      });
+      onChanged();
+      onClose();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Couldn't save changes, try again.");
     } finally {
       setBusy(false);
     }
@@ -802,6 +836,54 @@ function AppointmentDetail({ appt, onClose, onCloseOut, onChanged }: { appt: App
             </p>
           </div>
 
+          {/* Edit details panel */}
+          {editing && (
+            <div style={{ ...card, padding: "14px 16px", display: "flex", flexDirection: "column", gap: 10 }}>
+              <p style={{ color: "var(--dw35)", fontSize: 10, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", margin: 0 }}>Edit details</p>
+              <div>
+                <label style={{ color: "var(--dw35)", fontSize: 11, fontWeight: 600, display: "block", marginBottom: 5 }}>Client name</label>
+                <input value={editName} onChange={e => setEditName(e.target.value)} style={inputStyle} />
+              </div>
+              <div style={{ display: "flex", gap: 10 }}>
+                <div style={{ flex: 1 }}>
+                  <label style={{ color: "var(--dw35)", fontSize: 11, fontWeight: 600, display: "block", marginBottom: 5 }}>Phone</label>
+                  <input value={editPhone} onChange={e => setEditPhone(e.target.value)} style={inputStyle} />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label style={{ color: "var(--dw35)", fontSize: 11, fontWeight: 600, display: "block", marginBottom: 5 }}>Email</label>
+                  <input value={editEmail} onChange={e => setEditEmail(e.target.value)} style={inputStyle} />
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: 10 }}>
+                <div style={{ flex: 2 }}>
+                  <label style={{ color: "var(--dw35)", fontSize: 11, fontWeight: 600, display: "block", marginBottom: 5 }}>Service</label>
+                  <input value={editService} onChange={e => setEditService(e.target.value)} style={inputStyle} />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label style={{ color: "var(--dw35)", fontSize: 11, fontWeight: 600, display: "block", marginBottom: 5 }}>Price</label>
+                  <input type="number" min="0" step="0.01" value={editPrice} onChange={e => setEditPrice(e.target.value)} style={inputStyle} />
+                </div>
+              </div>
+              <div>
+                <label style={{ color: "var(--dw35)", fontSize: 11, fontWeight: 600, display: "block", marginBottom: 5 }}>Notes</label>
+                <textarea value={editNotes} onChange={e => setEditNotes(e.target.value)} rows={2} style={{ ...inputStyle, resize: "vertical", fontFamily: "inherit" }} />
+              </div>
+              {error && <p style={{ color: "rgb(248,113,113)", fontSize: 12, margin: 0 }}>{error}</p>}
+              <div style={{ display: "flex", gap: 8 }}>
+                <button onClick={() => setEditing(false)} style={{ flex: 1, padding: "10px", borderRadius: 10, border: "1px solid var(--dw1)", background: "var(--dsurface2)", color: "var(--dw6)", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>
+                  Cancel
+                </button>
+                <button
+                  disabled={!editName.trim() || !editService.trim() || busy}
+                  onClick={doSaveEdit}
+                  style={{ flex: 2, padding: "10px", borderRadius: 10, border: "none", background: "rgb(109,40,217)", color: "white", fontSize: 12.5, fontWeight: 700, cursor: busy ? "default" : "pointer", opacity: busy ? 0.6 : 1 }}
+                >
+                  {busy ? "Saving…" : "Save changes"}
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Reschedule panel */}
           {rescheduling && (
             <div style={{ ...card, padding: "14px 16px", display: "flex", flexDirection: "column", gap: 12 }}>
@@ -864,10 +946,13 @@ function AppointmentDetail({ appt, onClose, onCloseOut, onChanged }: { appt: App
               </button>
             )}
             <div style={{ display: "flex", gap: 8 }}>
-              <button onClick={() => setRescheduling(v => !v)} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "11px", borderRadius: 11, border: "1px solid var(--dw1)", background: "var(--dsurface2)", color: "var(--dw65)", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>
+              <button onClick={() => { setEditing(v => { const next = !v; if (next) { setRescheduling(false); setConfirmCancel(false); } return next; }); }} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "11px", borderRadius: 11, border: "1px solid var(--dw1)", background: "var(--dsurface2)", color: "var(--dw65)", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>
+                <SquarePen size={13} strokeWidth={2} /> Edit details
+              </button>
+              <button onClick={() => { setRescheduling(v => { const next = !v; if (next) { setEditing(false); setConfirmCancel(false); } return next; }); }} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "11px", borderRadius: 11, border: "1px solid var(--dw1)", background: "var(--dsurface2)", color: "var(--dw65)", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>
                 <Pencil size={13} strokeWidth={2} /> Reschedule
               </button>
-              <button onClick={() => setConfirmCancel(v => !v)} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "11px", borderRadius: 11, border: "1px solid rgba(239,68,68,0.2)", background: "rgba(239,68,68,0.06)", color: "rgb(248,113,113)", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>
+              <button onClick={() => { setConfirmCancel(v => { const next = !v; if (next) { setEditing(false); setRescheduling(false); } return next; }); }} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "11px", borderRadius: 11, border: "1px solid rgba(239,68,68,0.2)", background: "rgba(239,68,68,0.06)", color: "rgb(248,113,113)", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>
                 <Ban size={13} strokeWidth={2} /> Cancel
               </button>
             </div>

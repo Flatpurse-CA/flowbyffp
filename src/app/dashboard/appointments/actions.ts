@@ -127,6 +127,40 @@ export async function rescheduleAppointment(id: string, startsAt: string) {
   revalidatePath("/dashboard/appointments");
 }
 
+export async function updateAppointmentDetails(id: string, input: {
+  clientName: string;
+  clientPhone?: string;
+  clientEmail?: string;
+  serviceName: string;
+  price: number;
+  notes?: string;
+}) {
+  const { supabase, shopId } = await requireShop();
+
+  const clientName = input.clientName.trim();
+  if (!clientName) throw new Error("Client name can't be empty");
+  const serviceName = input.serviceName.trim();
+  if (!serviceName) throw new Error("Service can't be empty");
+  if (!Number.isFinite(input.price) || input.price < 0) throw new Error("Price must be a positive number");
+
+  const { error } = await supabase
+    .from("appointments")
+    .update({
+      client_name: clientName,
+      client_phone: input.clientPhone?.trim() || null,
+      client_email: input.clientEmail?.trim() || null,
+      service_name: serviceName,
+      price: input.price,
+      client_notes: input.notes?.trim() || null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", id)
+    .eq("shop_id", shopId);
+
+  if (error) throw new Error(error.message);
+  revalidatePath("/dashboard/appointments");
+}
+
 export async function confirmAppointment(id: string) {
   const { supabase, shopId } = await requireShop();
 
