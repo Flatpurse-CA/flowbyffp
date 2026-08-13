@@ -3,7 +3,8 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Calendar, Clock, X, LogOut, Gift } from "lucide-react";
-import type { AppointmentRow, AppointmentStatus } from "@/app/dashboard/appointments/actions";
+import type { AppointmentStatus } from "@/app/dashboard/appointments/actions";
+import type { MyBooking } from "./actions";
 import { cancelMyBooking, updateBirthday, type SavedCard } from "./actions";
 import { customerLogout } from "../actions";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -27,7 +28,7 @@ function fmtPrice(n: number) {
 
 const card: React.CSSProperties = { background: "var(--cust-card-bg)", border: "1px solid var(--cust-card-border)", borderRadius: 16, boxShadow: "var(--cust-shadow)" };
 
-export function AccountClient({ customerName, bookings, dateOfBirth, cards }: { customerName: string; bookings: AppointmentRow[]; dateOfBirth: string | null; cards: SavedCard[] }) {
+export function AccountClient({ customerName, bookings, dateOfBirth, cards }: { customerName: string; bookings: MyBooking[]; dateOfBirth: string | null; cards: SavedCard[] }) {
   const router = useRouter();
   const [, startTransition] = useTransition();
   const [cancellingId, setCancellingId] = useState<string | null>(null);
@@ -62,7 +63,7 @@ export function AccountClient({ customerName, bookings, dateOfBirth, cards }: { 
     }
   };
 
-  const Row = ({ b }: { b: AppointmentRow }) => {
+  const Row = ({ b }: { b: MyBooking }) => {
     const s = STATUS_LABEL[b.status];
     const canCancel = b.status !== "cancelled" && b.status !== "completed" && new Date(b.starts_at) >= now;
     return (

@@ -21,16 +21,22 @@ export async function updateBirthday(dateOfBirth: string): Promise<{ error?: str
   return {};
 }
 
-export async function listMyBookings(): Promise<AppointmentRow[]> {
+// Excludes client_notes deliberately — those are staff-internal remarks
+// entered from the dashboard (createAppointment/updateAppointmentDetails),
+// not something written by or meant for the customer, so this only selects
+// columns that are safe to send back to the customer's own browser.
+export type MyBooking = Omit<AppointmentRow, "client_notes">;
+
+export async function listMyBookings(): Promise<MyBooking[]> {
   const { supabase, customerId } = await requireCustomer();
 
   const { data } = await supabase
     .from("appointments")
-    .select("*")
+    .select("id, customer_id, client_name, client_phone, client_email, service_name, stylist_name, staff_id, starts_at, duration_minutes, price, deposit_amount, status, tip_amount, payment_method, paid_amount")
     .eq("customer_id", customerId)
     .order("starts_at", { ascending: false });
 
-  return (data ?? []) as AppointmentRow[];
+  return (data ?? []) as MyBooking[];
 }
 
 export async function cancelMyBooking(appointmentId: string) {
