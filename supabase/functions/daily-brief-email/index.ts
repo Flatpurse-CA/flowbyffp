@@ -1,7 +1,7 @@
 // Nightly Daily Brief email — cron-triggered (see 0 7 * * * schedule note below).
-// Deno can't import the Next.js app's lib modules directly, so the metrics/streak
+// Deno can't import the Next.js app's lib modules directly, so the metrics
 // logic is intentionally re-implemented here in compact form (mirrors
-// src/lib/dashboard/{metrics,clients,familyHours}.ts and
+// src/lib/dashboard/{metrics,clients}.ts and
 // src/app/dashboard/daily-brief/actions.ts — keep both in sync if the formulas change).
 
 import { createClient } from "jsr:@supabase/supabase-js@2";
@@ -15,63 +15,16 @@ const supabase = createClient(
 const resend = new Resend(Deno.env.get("RESEND_API_KEY")!);
 const FROM = Deno.env.get("RESEND_FROM_EMAIL") ?? "FlatPurse Flow <onboarding@resend.dev>";
 
-const SHOP_TZ = "America/Edmonton";
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
 function fmtPrice(n: number) {
   return Number.isInteger(n) ? `C$${n}` : `C$${n.toFixed(2)}`;
 }
 
-function localDateKey(d: Date) {
-  return new Intl.DateTimeFormat("en-CA", { timeZone: SHOP_TZ, year: "numeric", month: "2-digit", day: "2-digit" }).format(d);
-}
-
-function localMinutesOfDay(d: Date) {
-  const parts = new Intl.DateTimeFormat("en-US", { timeZone: SHOP_TZ, hour: "2-digit", minute: "2-digit", hour12: false }).formatToParts(d);
-  const h = Number(parts.find(p => p.type === "hour")?.value ?? "0");
-  const m = Number(parts.find(p => p.type === "minute")?.value ?? "0");
-  return h * 60 + m;
-}
-
-function toMinutes(hhmm: string) {
-  const [h, m] = hhmm.split(":").map(Number);
-  return h * 60 + m;
-}
-
 type Appt = {
   id: string; client_name: string; client_phone: string | null; client_email: string | null;
   starts_at: string; price: number; status: string;
 };
-
-function evaluateFamilyHoursStreak(
-  config: { enabled: boolean; start: string; end: string; streak: number; lastCreditedDate: string | null },
-  appointments: Appt[],
-  now: Date,
-) {
-  const yesterday = new Date(now.getTime() - MS_PER_DAY);
-  const yesterdayKey = localDateKey(yesterday);
-
-  if (config.lastCreditedDate === yesterdayKey) {
-    return { streak: config.streak, lastCreditedDate: config.lastCreditedDate, changed: false };
-  }
-  if (!config.enabled) {
-    const changed = config.streak !== 0 || config.lastCreditedDate !== yesterdayKey;
-    return { streak: 0, lastCreditedDate: yesterdayKey, changed };
-  }
-
-  const startMin = toMinutes(config.start);
-  const endMin = toMinutes(config.end);
-  const violated = appointments.some(a => {
-    if (a.status === "cancelled") return false;
-    const d = new Date(a.starts_at);
-    if (localDateKey(d) !== yesterdayKey) return false;
-    const mins = localMinutesOfDay(d);
-    return mins >= startMin && mins < endMin;
-  });
-
-  const nextStreak = violated ? 0 : config.streak + 1;
-  return { streak: nextStreak, lastCreditedDate: yesterdayKey, changed: true };
-}
 
 function keyFor(a: Appt) {
   return (a.client_phone || a.client_email || a.client_name).trim().toLowerCase();
@@ -84,10 +37,8 @@ function renderEmail(input: {
   yesterday: { revenue: number; bookings: number; cancellations: number };
   today: { bookingsCount: number; revenueScheduled: number };
   needsYouText: string | null;
-  familyHoursEnabled: boolean;
-  familyHoursStreak: number;
 }) {
-  const { shopName, ownerFirstName, summary, yesterday, today, needsYouText, familyHoursEnabled, familyHoursStreak } = input;
+  const { shopName, ownerFirstName, summary, yesterday, today, needsYouText } = input;
   return `
   <div style="font-family: -apple-system, sans-serif; background: #0a0a0c; padding: 32px 20px; color: #f0f0f8;">
     <div style="max-width: 480px; margin: 0 auto;">
@@ -130,15 +81,6 @@ function renderEmail(input: {
           </td>
         </tr>
       </table>
-
-      <div style="background: rgba(139,92,246,0.08); border: 1px solid rgba(139,92,246,0.2); border-radius: 12px; padding: 14px 16px;">
-        <p style="color: rgb(210,196,254); font-size: 13px; font-weight: 700; margin: 0 0 2px;">
-          ${familyHoursEnabled ? `Family Hours — ${familyHoursStreak}-day streak` : "Family Hours is off"}
-        </p>
-        <p style="color: rgba(255,255,255,0.4); font-size: 11.5px; margin: 0;">
-          ${familyHoursEnabled ? "No bookings landed in your protected window yesterday." : "Turn it on in Settings to protect your evenings."}
-        </p>
-      </div>
     </div>
   </div>`;
 }
@@ -152,7 +94,7 @@ Deno.serve(async () => {
 
   const { data: shops, error } = await supabase
     .from("shops")
-    .select("id, owner_id, name, family_hours_enabled, family_hours_start, family_hours_end, family_hours_streak, family_hours_last_credited_date, daily_brief_email_enabled")
+    .select("id, owner_id, name, daily_brief_email_enabled")
     .eq("daily_brief_email_enabled", true);
 
   if (error) return new Response(JSON.stringify({ error: error.message }), { status: 500 });
@@ -171,24 +113,6 @@ Deno.serve(async () => {
         .lte("starts_at", todayEnd.toISOString());
 
       const appts = (apptsRaw ?? []) as Appt[];
-
-      const streakResult = evaluateFamilyHoursStreak(
-        {
-          enabled: Boolean(shop.family_hours_enabled),
-          start: String(shop.family_hours_start).slice(0, 5),
-          end: String(shop.family_hours_end).slice(0, 5),
-          streak: shop.family_hours_streak,
-          lastCreditedDate: shop.family_hours_last_credited_date,
-        },
-        appts,
-        now,
-      );
-      if (streakResult.changed) {
-        await supabase.from("shops").update({
-          family_hours_streak: streakResult.streak,
-          family_hours_last_credited_date: streakResult.lastCreditedDate,
-        }).eq("id", shop.id);
-      }
 
       const yesterdayAppts = appts.filter(a => {
         const t = new Date(a.starts_at);
@@ -249,8 +173,6 @@ Deno.serve(async () => {
         yesterday: { revenue: yesterdayRevenue, bookings: yesterdayBookings, cancellations: yesterdayCancellations },
         today: { bookingsCount: todayBookingsCount, revenueScheduled: todayRevenueScheduled },
         needsYouText,
-        familyHoursEnabled: Boolean(shop.family_hours_enabled),
-        familyHoursStreak: streakResult.streak,
       });
 
       const { error: sendError } = await resend.emails.send({ from: FROM, to: email, subject: `Your daily brief — ${shop.name}`, html });

@@ -79,7 +79,7 @@ export const PLANS: Plan[] = [
       "Quick Charge terminal + Tap to Pay", "Website Builder",
       "AI Front Desk: bundled, unlimited", "AI Daily Brief: bundled, unlimited",
       "Staff Commissions", "Basic Memberships", "500 SMS reminders/month",
-      "Family Hours", "Advanced Permissions", "Up to 10 Team Members", "Standard Support",
+      "Advanced Permissions", "Up to 10 Team Members", "Standard Support",
     ],
     teamMemberLimit: 10,
     bookingLimitPerMonth: null,

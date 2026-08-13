@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { getShopContext } from "@/lib/dashboard/shop";
 import { logFeatureUsage } from "@/lib/featureUsage";
-import { evaluateAndPersistFamilyHoursStreak, getDailyBriefData } from "./actions";
+import { getDailyBriefData } from "./actions";
 import { DailyBriefClient } from "./DailyBriefClient";
 
 export const dynamic = "force-dynamic";
@@ -25,7 +25,6 @@ export default async function DailyBriefPage() {
   }
 
   await logFeatureUsage("daily_brief_viewed", ctx.shopId);
-  await evaluateAndPersistFamilyHoursStreak();
   const data = await getDailyBriefData();
 
   return <DailyBriefClient data={data} />;

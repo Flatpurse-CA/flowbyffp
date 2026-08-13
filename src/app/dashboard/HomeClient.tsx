@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import {
-  CalendarDays, AlertTriangle, Heart,
+  CalendarDays, AlertTriangle,
   BarChart2, ChevronRight, Plus, Users2, Clock,
 } from "lucide-react";
 import type { AppointmentRow, AppointmentStatus } from "./appointments/actions";
@@ -102,8 +102,6 @@ type OwnerProps = {
   autopilot: AutopilotState;
   todayAutopilotRevenue: number;
   needsYou: NeedsYouCard[];
-  familyHoursStreak: number;
-  familyHoursEnabled: boolean;
   todayBookingsCount: number;
   nextAppointmentTime: string | null;
   monthRevenue: number;
@@ -225,7 +223,6 @@ function EmptyState() {
       {[
         { icon: CalendarDays, fill: "rgb(139,92,246)", title: "Add today's bookings", sub: "Enter your first appointment to see the schedule come alive.", cta: "Add booking", href: "/dashboard/appointments" },
         { icon: Users2,       fill: "rgb(59,130,246)",  title: "Add your team",        sub: "Each staff member gets their own calendar column.",        cta: "Add team member", href: "/dashboard/team" },
-        { icon: Heart,        fill: "rgb(239,68,68)",   title: "Set Family Hours",     sub: "Protect your personal time. AutoPilot respects it.",       cta: "Set hours", href: "/dashboard/settings" },
       ].map(row => {
         const Icon = row.icon;
         return (
@@ -260,7 +257,7 @@ function EmptyState() {
 function OwnerPopulated(props: OwnerProps) {
   const { dark } = useDashboardTheme();
   const card = cardStyle(dark);
-  const { autopilot, todayAutopilotRevenue, needsYou, familyHoursStreak, familyHoursEnabled,
+  const { autopilot, todayAutopilotRevenue, needsYou,
     todayBookingsCount, nextAppointmentTime, monthRevenue, monthRevenueDeltaPct, todaySchedule } = props;
 
   const topNeed = needsYou[0] ?? null;
@@ -318,8 +315,8 @@ function OwnerPopulated(props: OwnerProps) {
         </div>
       </div>
 
-      {/* 4 nav cards */}
-      <div className="home-stat-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14 }}>
+      {/* 3 nav cards */}
+      <div className="home-stat-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14 }}>
         <Link href="/dashboard/appointments" style={{ textDecoration: "none" }}>
           <div style={{ ...card, padding: "20px 20px 18px", cursor: "pointer" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
@@ -350,31 +347,6 @@ function OwnerPopulated(props: OwnerProps) {
             <p style={{ color: labelColor, fontSize: 10, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 6px" }}>NEEDS YOUR EYES</p>
             <p style={{ color: needsYou.length > 0 ? "rgb(248,113,113)" : primaryText, fontSize: 28, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.04em" }}>{needsYou.length}</p>
             <p style={{ color: labelColor, fontSize: 12, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{topNeed ? topNeed.text : "All clear"}</p>
-          </div>
-        </Link>
-
-        <Link href="/dashboard/settings" style={{ textDecoration: "none" }}>
-          <div style={{ ...card, padding: "20px 20px 18px", cursor: "pointer" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(239,68,68,0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <Heart size={17} color="rgb(248,113,113)" strokeWidth={1.8} />
-              </div>
-              <ChevronRight size={15} color={faintChevron} />
-            </div>
-            <p style={{ color: labelColor, fontSize: 10, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 6px" }}>FAMILY HOURS</p>
-            {familyHoursEnabled ? (
-              <>
-                <p style={{ color: primaryText, fontSize: 28, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.04em" }}>
-                  {familyHoursStreak} <span style={{ fontSize: 16, color: dark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.48)", fontWeight: 600 }}>day streak</span>
-                </p>
-                <p style={{ color: labelColor, fontSize: 12, margin: 0 }}>Protected daily</p>
-              </>
-            ) : (
-              <>
-                <p style={{ color: primaryText, fontSize: 28, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.04em" }}>Off</p>
-                <p style={{ color: labelColor, fontSize: 12, margin: 0 }}>Tap to set up</p>
-              </>
-            )}
           </div>
         </Link>
 

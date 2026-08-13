@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Heart, Zap, MessageSquare, CreditCard, AlertTriangle } from "lucide-react";
+import { Zap, MessageSquare, CreditCard, AlertTriangle } from "lucide-react";
 import type { DailyBriefData, NeedsYouCard } from "./actions";
 
 function fmtPrice(n: number) {
@@ -93,28 +93,6 @@ export function DailyBriefClient({ data }: { data: DailyBriefData }) {
           <Metric label="Revenue scheduled" value={fmtPrice(data.today.revenueScheduled)} />
           <Metric label="Next appointment" value={data.today.nextAppointmentTime ?? "-"} />
           <Metric label="Staff working" value={String(data.today.staffWorking)} />
-        </div>
-      </div>
-
-      {/* Family Hours streak */}
-      <div style={{
-        background: "rgba(139,92,246,0.06)", border: "1px solid rgba(139,92,246,0.18)",
-        borderRadius: 16, padding: "18px 20px", display: "flex", alignItems: "center", gap: 14,
-      }}>
-        <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(139,92,246,0.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-          <Heart size={18} color="rgb(167,139,250)" strokeWidth={2} />
-        </div>
-        <div>
-          <p style={{ color: "var(--dpurple-text)", fontSize: 14, fontWeight: 700, margin: "0 0 2px" }}>
-            {data.familyHoursEnabled
-              ? `Family Hours: ${data.familyHoursStreak}-day streak`
-              : "Family Hours is off"}
-          </p>
-          <p style={{ color: "var(--dw4)", fontSize: 12, margin: 0 }}>
-            {data.familyHoursEnabled
-              ? "No bookings landed in your protected window yesterday. Keep it up."
-              : "Turn it on in Settings → Hours to protect your evenings."}
-          </p>
         </div>
       </div>
 

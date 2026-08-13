@@ -31,7 +31,7 @@ const PLANS = [
     priceSuffix: "/mo",
     subtitle: "Year 1 · then C$44.25/mo forever",
     description: "Best for growing service businesses",
-    features: ["AI Front Desk", "AI Daily Brief", "Unlimited bookings", "Family Hours", "Up to 10 team members"],
+    features: ["AI Front Desk", "AI Daily Brief", "Unlimited bookings", "Up to 10 team members"],
     cta: "Get started with Pro",
     href: "/signup",
     gradient: "radial-gradient(140% 60% at 50% 100%, rgb(109,40,217) 0%, rgb(76,29,149) 28%, rgb(30,10,60) 58%, rgba(9,9,11,0) 85%)",

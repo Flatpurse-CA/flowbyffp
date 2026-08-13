@@ -1,7 +1,6 @@
 "use server";
 
 import { requireShop, getCurrentShopId } from "@/lib/dashboard/shop";
-import { evaluateFamilyHoursStreak } from "@/lib/dashboard/familyHours";
 import { deriveClients, type ClientAppointment } from "@/lib/dashboard/clients";
 import { computeRebookTrend, type MetricsAppointment } from "@/lib/dashboard/metrics";
 import type { AppointmentRow } from "../appointments/actions";
@@ -12,47 +11,6 @@ function fmtPrice(n: number) {
   return Number.isInteger(n) ? `C$${n}` : `C$${n.toFixed(2)}`;
 }
 
-export async function evaluateAndPersistFamilyHoursStreak(): Promise<void> {
-  const shopId = await getCurrentShopId();
-  if (!shopId) return;
-  const { supabase } = await requireShop();
-
-  const { data: shop } = await supabase
-    .from("shops")
-    .select("family_hours_enabled, family_hours_start, family_hours_end, family_hours_streak, family_hours_last_credited_date")
-    .eq("id", shopId)
-    .maybeSingle();
-  if (!shop) return;
-
-  const now = new Date();
-  const twoDaysAgo = new Date(now.getTime() - 2 * MS_PER_DAY);
-  const { data: appts } = await supabase
-    .from("appointments")
-    .select("starts_at, status")
-    .eq("shop_id", shopId)
-    .gte("starts_at", twoDaysAgo.toISOString())
-    .lte("starts_at", now.toISOString());
-
-  const result = evaluateFamilyHoursStreak(
-    {
-      enabled: Boolean(shop.family_hours_enabled),
-      start: String(shop.family_hours_start).slice(0, 5),
-      end: String(shop.family_hours_end).slice(0, 5),
-      streak: shop.family_hours_streak,
-      lastCreditedDate: shop.family_hours_last_credited_date,
-    },
-    appts ?? [],
-    now,
-  );
-
-  if (result.changed) {
-    await supabase
-      .from("shops")
-      .update({ family_hours_streak: result.streak, family_hours_last_credited_date: result.lastCreditedDate })
-      .eq("id", shopId);
-  }
-}
-
 export type NeedsYouCard = { id: string; text: string; kind: "winback" | "staff" | "payment" };
 
 export type DailyBriefData = {
@@ -60,8 +18,6 @@ export type DailyBriefData = {
   yesterday: { revenue: number; bookings: number; cancellations: number; newClients: number };
   today: { bookingsCount: number; revenueScheduled: number; nextAppointmentTime: string | null; staffWorking: number };
   needsYou: NeedsYouCard[];
-  familyHoursEnabled: boolean;
-  familyHoursStreak: number;
 };
 
 const EMPTY: DailyBriefData = {
@@ -69,8 +25,6 @@ const EMPTY: DailyBriefData = {
   yesterday: { revenue: 0, bookings: 0, cancellations: 0, newClients: 0 },
   today: { bookingsCount: 0, revenueScheduled: 0, nextAppointmentTime: null, staffWorking: 0 },
   needsYou: [],
-  familyHoursEnabled: false,
-  familyHoursStreak: 0,
 };
 
 export async function getDailyBriefData(): Promise<DailyBriefData> {
@@ -85,20 +39,13 @@ export async function getDailyBriefData(): Promise<DailyBriefData> {
   const yesterdayStart = new Date(todayStart.getTime() - MS_PER_DAY);
   const historyStart = new Date(now.getTime() - 120 * MS_PER_DAY);
 
-  const [{ data: shop }, { data: apptsRaw }] = await Promise.all([
-    supabase
-      .from("shops")
-      .select("family_hours_enabled, family_hours_streak")
-      .eq("id", shopId)
-      .maybeSingle(),
-    supabase
-      .from("appointments")
-      .select("*")
-      .eq("shop_id", shopId)
-      .gte("starts_at", historyStart.toISOString())
-      .lte("starts_at", todayEnd.toISOString())
-      .order("starts_at", { ascending: true }),
-  ]);
+  const { data: apptsRaw } = await supabase
+    .from("appointments")
+    .select("*")
+    .eq("shop_id", shopId)
+    .gte("starts_at", historyStart.toISOString())
+    .lte("starts_at", todayEnd.toISOString())
+    .order("starts_at", { ascending: true });
 
   const appts = (apptsRaw ?? []) as AppointmentRow[];
 
@@ -177,7 +124,5 @@ export async function getDailyBriefData(): Promise<DailyBriefData> {
     yesterday: { revenue: yesterdayRevenue, bookings: yesterdayBookings, cancellations: yesterdayCancellations, newClients },
     today: { bookingsCount: activeTodayAppts.length, revenueScheduled, nextAppointmentTime, staffWorking },
     needsYou,
-    familyHoursEnabled: Boolean(shop?.family_hours_enabled),
-    familyHoursStreak: shop?.family_hours_streak ?? 0,
   };
 }

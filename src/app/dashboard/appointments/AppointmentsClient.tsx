@@ -85,7 +85,6 @@ function rowToAppt(row: AppointmentRow, now: Date): ApptRecord {
 const SERVICES = ["Signature Cut", "Cut + Beard", "Full Highlights", "Balayage", "Knotless Braids", "Silk Press", "Loc Retwist", "Trim + Blowout", "Deep Condition + Set", "Colour + Gloss"];
 const TIMES = ["9:00 AM", "9:30 AM", "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM", "12:00 PM", "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM"];
 const HOURS = Array.from({ length: 12 }, (_, i) => i + 8); // 8 AM – 7 PM
-const FAMILY_HOURS = [18, 19]; // 6–8 PM, decorative until Settings/Hours is wired
 
 const fmt12 = (h: number) => h === 12 ? "12 PM" : h > 12 ? `${h - 12} PM` : h === 0 ? "12 AM" : `${h} AM`;
 
@@ -979,7 +978,7 @@ function DayView({ appts, bookingUrl, onNewBooking, onSelect }: {
 }) {
   const todayAppts = useMemo(() => appts.filter(a => a.dateLabel === "Today" && a.status !== "cancelled"), [appts]);
   const bookingAtHour = (h: number) => todayAppts.find(a => a.hour === h);
-  const openCount = HOURS.filter(h => !FAMILY_HOURS.includes(h) && !bookingAtHour(h)).length;
+  const openCount = HOURS.filter(h => !bookingAtHour(h)).length;
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
@@ -1026,7 +1025,6 @@ function DayView({ appts, bookingUrl, onNewBooking, onSelect }: {
 
         {HOURS.map(h => {
           const booking = bookingAtHour(h);
-          const isFamily = FAMILY_HOURS.includes(h);
 
           return (
             <div key={h} style={{
@@ -1071,18 +1069,6 @@ function DayView({ appts, bookingUrl, onNewBooking, onSelect }: {
                       </span>
                       <span style={{ color: "rgb(52,211,153)", fontSize: 13, fontWeight: 700 }}>{booking.price}</span>
                     </div>
-                  </div>
-                ) : isFamily ? (
-                  <div style={{
-                    flex: 1, padding: "10px 14px", borderRadius: 12,
-                    background: "rgba(239,68,68,0.05)",
-                    border: "1px solid rgba(239,68,68,0.15)",
-                    display: "flex", alignItems: "center", gap: 10,
-                  }}>
-                    <span style={{ fontSize: 14 }}>🏠</span>
-                    <p style={{ color: "rgba(248,113,113,0.7)", fontSize: 12.5, fontWeight: 600, margin: 0 }}>
-                      Family Hours: bookings paused
-                    </p>
                   </div>
                 ) : (
                   <div onClick={onNewBooking} style={{

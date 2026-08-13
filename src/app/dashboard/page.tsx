@@ -64,8 +64,6 @@ export default async function HomePage() {
       autopilot={autopilot}
       todayAutopilotRevenue={todayAutopilotRevenue}
       needsYou={brief.needsYou}
-      familyHoursStreak={brief.familyHoursStreak}
-      familyHoursEnabled={brief.familyHoursEnabled}
       todayBookingsCount={brief.today.bookingsCount}
       nextAppointmentTime={brief.today.nextAppointmentTime}
       monthRevenue={monthRevenue}

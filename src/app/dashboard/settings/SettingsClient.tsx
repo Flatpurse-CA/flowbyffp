@@ -8,10 +8,8 @@ import {
   Wallet, Clock, Receipt, Zap,
   ChevronDown, ChevronUp,
 } from "lucide-react";
-import { updateFamilyHours, updateBusinessHours, startStripeOnboarding, startCheckout, chooseStarterPlan, openBillingPortal, setFrontdeskEnabled, updateBusinessProfile, type BusinessHourRow, type BillingStatus, type BusinessProfile } from "./actions";
+import { updateBusinessHours, startStripeOnboarding, startCheckout, chooseStarterPlan, openBillingPortal, setFrontdeskEnabled, updateBusinessProfile, type BusinessHourRow, type BillingStatus, type BusinessProfile } from "./actions";
 import { PLANS, NO_MARKETPLACE_FEE_NOTE, type BillingInterval } from "@/lib/plans";
-
-export type FamilyHoursSettings = { enabled: boolean; start: string; end: string };
 
 function redirectTo(url: string) {
   window.location.href = url;
@@ -159,7 +157,7 @@ function buildHourRows(initial: BusinessHourRow[]): HourRow[] {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export function SettingsClient({ initialFamilyHours, initialBusinessHours, initialStripeConnected, initialBookingUrl, initialBilling, initialFrontdeskEnabled, initialBusinessProfile }: { initialFamilyHours: FamilyHoursSettings; initialBusinessHours: BusinessHourRow[]; initialStripeConnected: boolean; initialBookingUrl: string | null; initialBilling: BillingStatus | null; initialFrontdeskEnabled: boolean; initialBusinessProfile: BusinessProfile }) {
+export function SettingsClient({ initialBusinessHours, initialStripeConnected, initialBookingUrl, initialBilling, initialFrontdeskEnabled, initialBusinessProfile }: { initialBusinessHours: BusinessHourRow[]; initialStripeConnected: boolean; initialBookingUrl: string | null; initialBilling: BillingStatus | null; initialFrontdeskEnabled: boolean; initialBusinessProfile: BusinessProfile }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab") as TabLabel | null;
@@ -176,11 +174,6 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
   const [savingHours, setSavingHours] = useState(false);
   const [hoursSaved, setHoursSaved]   = useState(false);
   const [expandedFlow, setExpandedFlow] = useState<FlowKey | null>(null);
-  const [familyStart, setFamilyStart] = useState(initialFamilyHours.start);
-  const [familyEnd, setFamilyEnd]     = useState(initialFamilyHours.end);
-  const [familyOn, setFamilyOn]       = useState(initialFamilyHours.enabled);
-  const [savingFamily, setSavingFamily] = useState(false);
-  const [familySaved, setFamilySaved]   = useState(false);
   const [taxRate, setTaxRate]         = useState("13");
   const [taxInclusive, setTaxInclusive] = useState(false);
   const [connectingStripe, setConnectingStripe] = useState(false);
@@ -268,19 +261,6 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
   const discardBusinessProfile = () => {
     setProfile(initialBusinessProfile);
     setProfileError(null);
-  };
-
-  const saveFamilyHours = async () => {
-    setSavingFamily(true);
-    setFamilySaved(false);
-    try {
-      await updateFamilyHours({ enabled: familyOn, start: familyStart, end: familyEnd });
-      setFamilySaved(true);
-      router.refresh();
-      setTimeout(() => setFamilySaved(false), 2500);
-    } finally {
-      setSavingFamily(false);
-    }
   };
 
   const saveBusinessHours = async () => {
@@ -508,42 +488,6 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
                   )}
                 </div>
               ))}
-            </div>
-          </div>
-
-          {/* Family hours */}
-          <div style={{ background: "rgba(139,92,246,0.06)", border: "1px solid rgba(139,92,246,0.18)", borderRadius: 16, padding: "22px 24px" }}>
-            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 14 }}>
-              <div>
-                <p style={{ color: "var(--dpurple-text)", fontSize: 14, fontWeight: 700, margin: "0 0 4px" }}>Family hours</p>
-                <p style={{ color: "var(--dw4)", fontSize: 12.5, margin: 0 }}>Block a window each evening, AutoPilot won&apos;t book clients during this time.</p>
-              </div>
-              <button onClick={() => setFamilyOn(v => !v)} style={{
-                width: 42, height: 24, borderRadius: 12, border: "none", cursor: "pointer", flexShrink: 0,
-                background: familyOn ? "rgb(109,40,217)" : "var(--dw12)",
-                position: "relative", transition: "background 0.2s",
-              }}>
-                <span style={{ position: "absolute", top: 4, left: familyOn ? 20 : 4, width: 16, height: 16, borderRadius: "50%", background: "white", transition: "left 0.2s" }} />
-              </button>
-            </div>
-            {familyOn && (
-              <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-                <span style={{ color: "var(--dw45)", fontSize: 13 }}>Block every evening from</span>
-                <input type="time" value={familyStart} onChange={e => setFamilyStart(e.target.value)} style={{ background: "var(--dsurface3)", border: "1px solid rgba(139,92,246,0.25)", borderRadius: 9, padding: "7px 12px", color: "var(--dtext)", fontSize: 13, outline: "none" }} />
-                <span style={{ color: "var(--dw3)", fontSize: 13 }}>to</span>
-                <input type="time" value={familyEnd} onChange={e => setFamilyEnd(e.target.value)} style={{ background: "var(--dsurface3)", border: "1px solid rgba(139,92,246,0.25)", borderRadius: 9, padding: "7px 12px", color: "var(--dtext)", fontSize: 13, outline: "none" }} />
-                <span style={{ fontSize: 11, padding: "3px 10px", borderRadius: 20, background: "rgba(139,92,246,0.15)", color: "rgb(167,139,250)", fontWeight: 700 }}>Protected</span>
-              </div>
-            )}
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 16 }}>
-              <button onClick={saveFamilyHours} disabled={savingFamily} style={{
-                padding: "9px 18px", borderRadius: 10, border: "none",
-                background: "rgb(109,40,217)", color: "white", fontSize: 12.5, fontWeight: 700,
-                cursor: savingFamily ? "default" : "pointer", opacity: savingFamily ? 0.6 : 1,
-              }}>
-                {savingFamily ? "Saving…" : "Save family hours"}
-              </button>
-              {familySaved && <span style={{ color: "rgb(52,211,153)", fontSize: 12.5, fontWeight: 600 }}>Saved</span>}
             </div>
           </div>
 

@@ -19,16 +19,10 @@ export default async function SettingsPage() {
   const { data: shop } = user
     ? await supabase
         .from("shops")
-        .select("family_hours_enabled, family_hours_start, family_hours_end, handle, frontdesk_enabled, name, business_type, bio, city, province, postal_code, phone")
+        .select("handle, frontdesk_enabled, name, business_type, bio, city, province, postal_code, phone")
         .eq("owner_id", user.id)
         .maybeSingle()
     : { data: null };
-
-  const initialFamilyHours = {
-    enabled: shop?.family_hours_enabled ?? false,
-    start: (shop?.family_hours_start as string | undefined)?.slice(0, 5) ?? "18:00",
-    end: (shop?.family_hours_end as string | undefined)?.slice(0, 5) ?? "20:00",
-  };
 
   const [initialBusinessHours, { connected: initialStripeConnected }, origin, initialBilling] = await Promise.all([
     getBusinessHours(),
@@ -52,7 +46,6 @@ export default async function SettingsPage() {
   return (
     <Suspense>
       <SettingsClient
-        initialFamilyHours={initialFamilyHours}
         initialBusinessHours={initialBusinessHours}
         initialStripeConnected={initialStripeConnected}
         initialBookingUrl={initialBookingUrl}

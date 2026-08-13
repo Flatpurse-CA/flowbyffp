@@ -2,7 +2,7 @@
 
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getCustomerContext } from "@/lib/dashboard/customer";
-import { shopWallTimeToUTC } from "@/lib/dashboard/familyHours";
+import { shopWallTimeToUTC } from "@/lib/dashboard/shopTime";
 import { sendBookingConfirmationEmail } from "@/lib/resend";
 import { stripe } from "@/lib/stripe";
 import { ensureStripeCustomerId } from "@/lib/stripeCustomer";
