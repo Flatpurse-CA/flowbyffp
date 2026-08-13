@@ -19,7 +19,7 @@ const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type Shop = { id: string; name: string; city: string; province: string; stripeConnected: boolean };
+type Shop = { id: string; name: string; city: string; province: string; stripeConnected: boolean; profileImageUrl: string | null; coverImageUrl: string | null };
 type Service = { id: string; name: string; price: number; duration_minutes: number; category: string | null };
 type Staff = { id: string; full_name: string; role: string | null; color: string };
 type BusinessHour = { weekday: number; open: boolean; start_time: string; end_time: string };
@@ -205,7 +205,10 @@ export function BookingClient({ shop, services, staff, businessHours, initialCus
     <div style={{ minHeight: "100vh", background: "var(--cust-bg)", fontFamily: "DM Sans, system-ui, sans-serif" }}>
 
       {/* Cover — full-bleed edge to edge */}
-      <div style={{ position: "relative", height: 200, overflow: "hidden", background: "rgb(88,28,218)" }}>
+      <div style={{
+        position: "relative", height: 200, overflow: "hidden",
+        background: shop.coverImageUrl ? `url(${shop.coverImageUrl}) center/cover no-repeat` : "rgb(88,28,218)",
+      }}>
         <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.25)" }} />
         <div style={{ position: "absolute", top: 16, right: 20, display: "flex", alignItems: "center", gap: 10 }}>
           <div style={{ borderRadius: "50%", background: "rgba(255,255,255,0.12)", backdropFilter: "blur(4px)" }}>
@@ -226,13 +229,18 @@ export function BookingClient({ shop, services, staff, businessHours, initialCus
       {/* Profile info — centered column, avatar overlapping the cover */}
       <div style={{ position: "relative", zIndex: 1, maxWidth: 680, margin: "0 auto", padding: "0 24px", textAlign: "center" }}>
         <div style={{
-          width: 96, height: 96, borderRadius: "50%", margin: "-48px auto 0",
-          background: "rgb(109,40,217)",
+          width: 96, height: 96, borderRadius: "50%", margin: "-48px auto 0", overflow: "hidden",
+          background: shop.profileImageUrl ? undefined : "rgb(109,40,217)",
           border: "4px solid var(--cust-bg)", boxShadow: "0 2px 10px rgba(0,0,0,0.15)",
           display: "flex", alignItems: "center", justifyContent: "center",
           color: "white", fontSize: 30, fontWeight: 800,
         }}>
-          {shop.name.trim().split(/\s+/).map(w => w[0]).join("").slice(0, 2).toUpperCase()}
+          {shop.profileImageUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element -- user-uploaded remote URL, not a static asset next/image can optimize without extra config
+            <img src={shop.profileImageUrl} alt={shop.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          ) : (
+            shop.name.trim().split(/\s+/).map(w => w[0]).join("").slice(0, 2).toUpperCase()
+          )}
         </div>
 
         <div style={{ padding: "14px 0 18px" }}>

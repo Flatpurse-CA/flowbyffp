@@ -1,15 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   Copy, Check, Link2, Bell, CreditCard, Shield, Building2,
-  Wallet, Clock, Receipt, Zap,
+  Wallet, Clock, Receipt, Zap, Camera,
   ChevronDown, ChevronUp,
 } from "lucide-react";
-import { updateBusinessHours, startStripeOnboarding, startCheckout, chooseStarterPlan, openBillingPortal, setFrontdeskEnabled, updateBusinessProfile, type BusinessHourRow, type BillingStatus, type BusinessProfile } from "./actions";
+import { updateBusinessHours, startStripeOnboarding, startCheckout, chooseStarterPlan, openBillingPortal, setFrontdeskEnabled, updateBusinessProfile, updateShopImage, type BusinessHourRow, type BillingStatus, type BusinessProfile } from "./actions";
 import { PLANS, NO_MARKETPLACE_FEE_NOTE, type BillingInterval } from "@/lib/plans";
+import { createClient } from "@/lib/supabase/client";
 
 function redirectTo(url: string) {
   window.location.href = url;
@@ -157,7 +158,7 @@ function buildHourRows(initial: BusinessHourRow[]): HourRow[] {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export function SettingsClient({ initialBusinessHours, initialStripeConnected, initialBookingUrl, initialBilling, initialFrontdeskEnabled, initialBusinessProfile }: { initialBusinessHours: BusinessHourRow[]; initialStripeConnected: boolean; initialBookingUrl: string | null; initialBilling: BillingStatus | null; initialFrontdeskEnabled: boolean; initialBusinessProfile: BusinessProfile }) {
+export function SettingsClient({ shopId, initialBusinessHours, initialStripeConnected, initialBookingUrl, initialBilling, initialFrontdeskEnabled, initialBusinessProfile, initialProfileImageUrl, initialCoverImageUrl }: { shopId: string | null; initialBusinessHours: BusinessHourRow[]; initialStripeConnected: boolean; initialBookingUrl: string | null; initialBilling: BillingStatus | null; initialFrontdeskEnabled: boolean; initialBusinessProfile: BusinessProfile; initialProfileImageUrl: string | null; initialCoverImageUrl: string | null }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab") as TabLabel | null;
@@ -168,6 +169,13 @@ export function SettingsClient({ initialBusinessHours, initialStripeConnected, i
   const [savingProfile, setSavingProfile] = useState(false);
   const [profileSaved, setProfileSaved]   = useState(false);
   const [profileError, setProfileError]   = useState<string | null>(null);
+  const [profileImageUrl, setProfileImageUrl] = useState(initialProfileImageUrl);
+  const [coverImageUrl, setCoverImageUrl]     = useState(initialCoverImageUrl);
+  const [uploadingProfile, setUploadingProfile] = useState(false);
+  const [uploadingCover, setUploadingCover]     = useState(false);
+  const [imageError, setImageError]             = useState<string | null>(null);
+  const profileFileRef = useRef<HTMLInputElement>(null);
+  const coverFileRef   = useRef<HTMLInputElement>(null);
   const [flows, setFlows]     = useState<Flow[]>(() => INITIAL_FLOWS.map(f => f.key === "frontdesk" ? { ...f, enabled: initialFrontdeskEnabled } : f));
   const [frontdeskSaving, setFrontdeskSaving] = useState(false);
   const [hours, setHours]     = useState<HourRow[]>(() => buildHourRows(initialBusinessHours));
@@ -263,6 +271,46 @@ export function SettingsClient({ initialBusinessHours, initialStripeConnected, i
     setProfileError(null);
   };
 
+  const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+
+  const uploadImage = async (kind: "profile" | "cover", file: File) => {
+    setImageError(null);
+    if (!shopId) return;
+    if (!file.type.startsWith("image/")) {
+      setImageError("Please choose an image file");
+      return;
+    }
+    if (file.size > MAX_IMAGE_BYTES) {
+      setImageError("Image must be under 5MB");
+      return;
+    }
+
+    const setUploading = kind === "profile" ? setUploadingProfile : setUploadingCover;
+    setUploading(true);
+    try {
+      const ext = file.name.split(".").pop() || "jpg";
+      const path = `${shopId}/${kind}-${Date.now()}.${ext}`;
+      const supabase = createClient();
+      const { error: uploadError } = await supabase.storage.from("shop-assets").upload(path, file, { upsert: true });
+      if (uploadError) {
+        setImageError(uploadError.message);
+        return;
+      }
+      const { data } = supabase.storage.from("shop-assets").getPublicUrl(path);
+      const result = await updateShopImage(kind, data.publicUrl);
+      if (result.error) {
+        setImageError(result.error);
+        return;
+      }
+      if (kind === "profile") setProfileImageUrl(data.publicUrl);
+      else setCoverImageUrl(data.publicUrl);
+    } catch (e) {
+      setImageError(e instanceof Error ? e.message : "Upload failed, try again.");
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const saveBusinessHours = async () => {
     setSavingHours(true);
     setHoursSaved(false);
@@ -341,6 +389,53 @@ export function SettingsClient({ initialBusinessHours, initialStripeConnected, i
       {/* ── Business ── */}
       {tab === "Business" && (
         <>
+          <div style={card}>
+            <SectionLabel>Photos</SectionLabel>
+            <p style={{ color: "var(--dw4)", fontSize: 12.5, margin: "0 0 14px" }}>Shown at the top of your public booking page.</p>
+            <div style={{ position: "relative", borderRadius: 14, overflow: "hidden", height: 140, background: coverImageUrl ? "var(--dsurface3)" : "rgb(88,28,218)" }}>
+              {coverImageUrl && (
+                // eslint-disable-next-line @next/next/no-img-element -- user-uploaded remote URL, not a static asset next/image can optimize without extra config
+                <img src={coverImageUrl} alt="Cover" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              )}
+              <button onClick={() => coverFileRef.current?.click()} disabled={uploadingCover} style={{
+                position: "absolute", bottom: 10, right: 10, display: "flex", alignItems: "center", gap: 6,
+                padding: "7px 13px", borderRadius: 9, background: "rgba(0,0,0,0.55)", border: "1px solid rgba(255,255,255,0.2)",
+                color: "white", fontSize: 12, fontWeight: 700, cursor: uploadingCover ? "default" : "pointer", backdropFilter: "blur(4px)",
+              }}>
+                <Camera size={13} /> {uploadingCover ? "Uploading…" : coverImageUrl ? "Change cover" : "Add cover photo"}
+              </button>
+              <input ref={coverFileRef} type="file" accept="image/*" style={{ display: "none" }} onChange={e => { const f = e.target.files?.[0]; if (f) uploadImage("cover", f); e.target.value = ""; }} />
+            </div>
+
+            <div style={{ display: "flex", alignItems: "center", gap: 16, marginTop: -32, marginLeft: 20, position: "relative" }}>
+              <div style={{
+                width: 72, height: 72, borderRadius: "50%", border: "3px solid var(--dsurface1)", overflow: "hidden", flexShrink: 0,
+                background: profileImageUrl ? "var(--dsurface3)" : "rgb(109,40,217)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}>
+                {profileImageUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element -- user-uploaded remote URL, not a static asset next/image can optimize without extra config
+                  <img src={profileImageUrl} alt="Profile" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                ) : (
+                  <span style={{ color: "white", fontSize: 22, fontWeight: 800 }}>
+                    {(profile.name || "?").trim().split(/\s+/).map(w => w[0]).join("").slice(0, 2).toUpperCase()}
+                  </span>
+                )}
+              </div>
+              <div style={{ paddingTop: 20 }}>
+                <button onClick={() => profileFileRef.current?.click()} disabled={uploadingProfile} style={{
+                  display: "flex", alignItems: "center", gap: 6, padding: "8px 14px", borderRadius: 9,
+                  background: "var(--dsurface3)", border: "1px solid var(--dw1)", color: "var(--dw65)",
+                  fontSize: 12.5, fontWeight: 700, cursor: uploadingProfile ? "default" : "pointer",
+                }}>
+                  <Camera size={13} /> {uploadingProfile ? "Uploading…" : profileImageUrl ? "Change photo" : "Add profile photo"}
+                </button>
+                <input ref={profileFileRef} type="file" accept="image/*" style={{ display: "none" }} onChange={e => { const f = e.target.files?.[0]; if (f) uploadImage("profile", f); e.target.value = ""; }} />
+              </div>
+            </div>
+            {imageError && <p style={{ color: "rgb(248,113,113)", fontSize: 12, margin: "10px 0 0" }}>{imageError}</p>}
+          </div>
+
           <div style={card}>
             <SectionLabel>Business profile</SectionLabel>
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>

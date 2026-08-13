@@ -298,3 +298,22 @@ export async function updateBusinessProfile(input: BusinessProfile): Promise<{ e
   revalidatePath(`/book/${handle}`);
   return { handle };
 }
+
+// The actual file upload happens client-side straight to Supabase Storage
+// (bucket "shop-assets", RLS-scoped to the owner's own shop_id folder — see
+// 0033_shop_images.sql) since Server Actions aren't a great fit for binary
+// file bodies. This just persists the resulting public URL.
+export async function updateShopImage(kind: "profile" | "cover", url: string): Promise<{ error?: string }> {
+  const ctx = await getShopContext();
+  if (!ctx || ctx.role !== "owner") return { error: "Only the shop owner can change photos" };
+  const { supabase, shopId } = await requireShop();
+
+  const column = kind === "profile" ? "profile_image_url" : "cover_image_url";
+  const { data: shop } = await supabase.from("shops").select("handle").eq("id", shopId).maybeSingle();
+  const { error } = await supabase.from("shops").update({ [column]: url }).eq("id", shopId);
+  if (error) return { error: error.message };
+
+  revalidatePath("/dashboard/settings");
+  if (shop?.handle) revalidatePath(`/book/${shop.handle}`);
+  return {};
+}

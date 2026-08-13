@@ -19,7 +19,7 @@ export default async function SettingsPage() {
   const { data: shop } = user
     ? await supabase
         .from("shops")
-        .select("handle, frontdesk_enabled, name, business_type, bio, city, province, postal_code, phone")
+        .select("handle, frontdesk_enabled, name, business_type, bio, city, province, postal_code, phone, profile_image_url, cover_image_url")
         .eq("owner_id", user.id)
         .maybeSingle()
     : { data: null };
@@ -46,12 +46,15 @@ export default async function SettingsPage() {
   return (
     <Suspense>
       <SettingsClient
+        shopId={ctx?.shopId ?? null}
         initialBusinessHours={initialBusinessHours}
         initialStripeConnected={initialStripeConnected}
         initialBookingUrl={initialBookingUrl}
         initialBilling={initialBilling}
         initialFrontdeskEnabled={Boolean(shop?.frontdesk_enabled)}
         initialBusinessProfile={initialBusinessProfile}
+        initialProfileImageUrl={(shop?.profile_image_url as string | undefined) ?? null}
+        initialCoverImageUrl={(shop?.cover_image_url as string | undefined) ?? null}
       />
     </Suspense>
   );
