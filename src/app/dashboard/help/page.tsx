@@ -6,7 +6,7 @@ import { Search, ChevronDown, ChevronUp, MessageCircle, BookOpen, Zap, ExternalL
 const FAQS = [
   {
     q: "How do I share my booking link with clients?",
-    a: "Go to Settings → Business to find your personal booking link (e.g. flowbyffp.co/book/yourname). Copy it and share it via Instagram bio, WhatsApp, or any channel your clients use.",
+    a: "Go to Settings → Business to find your personal booking link (e.g. flow.flatpurse.com/book/yourname). Copy it and share it via Instagram bio, WhatsApp, or any channel your clients use.",
   },
   {
     q: "What does AutoPilot actually do?",

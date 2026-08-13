@@ -69,7 +69,7 @@ export function AuthImagePanel({ isExiting }: { isExiting?: boolean }) {
       <div className="relative h-full w-full overflow-hidden rounded-2xl bg-zinc-900">
         {/* Logo over image */}
         <div className="absolute left-6 top-6 z-20">
-          <img src="/main%20logo.png" alt="FLOWBYFFP" className="h-8 w-auto" />
+          <img src="/main%20logo.png" alt="FlatPurse Flow" className="h-8 w-auto" />
         </div>
 
         {/* Slides */}

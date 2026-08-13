@@ -43,7 +43,7 @@ export function initTerminalBridge() {
 
 function assertNative() {
   if (!Capacitor.isNativePlatform()) {
-    throw new Error("Tap to Pay is only available in the FLOWBYFFP iOS app, not the website.");
+    throw new Error("Tap to Pay is only available in the FlatPurse Flow iOS app, not the website.");
   }
 }
 

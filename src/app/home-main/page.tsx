@@ -153,7 +153,7 @@ export default function HomeMainPage() {
             <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
               <Image
                 src="/heror.png"
-                alt="FLOWBYFFP app"
+                alt="FlatPurse Flow app"
                 width={650}
                 height={930}
                 style={{ marginBottom: -160 }}

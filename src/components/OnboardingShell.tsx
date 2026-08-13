@@ -23,7 +23,7 @@ export function OnboardingShell({ children }: { children: React.ReactNode }) {
       >
         <Image
           src="/main logo.png"
-          alt="FLOWBYFFP"
+          alt="FlatPurse Flow"
           width={52}
           height={52}
           style={{ objectFit: "contain" }}

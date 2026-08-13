@@ -523,7 +523,7 @@ export function SettingsClient({ initialBusinessHours, initialStripeConnected, i
               </div>
 
               <Field label="Business registration number (GST/HST)" value="123456789 RT0001" placeholder="e.g. 123456789 RT0001" />
-              <Field label="Legal business name" value="Flow by FFP Inc." />
+              <Field label="Legal business name" value="FlatPurse Flow Inc." />
 
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 0", borderTop: "1px solid var(--dw05)" }}>
                 <div>
