@@ -266,7 +266,7 @@ const RESERVED_HANDLES = new Set([
   "refund-policy", "reset-password", "signup", "staff", "terms", "waitlist", "waitlist2",
 ]);
 
-export async function updateBusinessProfile(input: BusinessProfile): Promise<{ error?: string }> {
+export async function updateBusinessProfile(input: BusinessProfile): Promise<{ error?: string; handle?: string }> {
   const ctx = await getShopContext();
   if (!ctx || ctx.role !== "owner") return { error: "Only the shop owner can edit the business profile" };
   const { supabase, shopId } = await requireShop();
@@ -314,5 +314,5 @@ export async function updateBusinessProfile(input: BusinessProfile): Promise<{ e
 
   revalidatePath("/dashboard/settings");
   revalidatePath(`/book/${handle}`);
-  return {};
+  return { handle };
 }

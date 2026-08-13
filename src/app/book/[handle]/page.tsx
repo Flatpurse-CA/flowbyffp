@@ -7,7 +7,13 @@ export const dynamic = "force-dynamic";
 export const fetchCache = "force-no-store";
 
 export default async function BookingPage({ params }: { params: Promise<{ handle: string }> }) {
-  const { handle } = await params;
+  const { handle: rawHandle } = await params;
+  // Handles are always stored lowercase (updateBusinessProfile in
+  // dashboard/settings/actions.ts lowercases before saving) — matching
+  // case-insensitively here means a link shared with the wrong casing
+  // (typed, autocapitalized by a phone keyboard, etc.) still resolves
+  // instead of 404ing.
+  const handle = rawHandle.toLowerCase();
   const admin = createAdminClient();
 
   const { data: shop } = await admin
@@ -18,9 +24,8 @@ export default async function BookingPage({ params }: { params: Promise<{ handle
 
   if (!shop) {
     // The handle might be a retired one — a shop can rename its booking
-    // link (see updateBusinessProfile in dashboard/settings/actions.ts),
-    // which records the old handle here so previously shared links keep
-    // working instead of 404ing.
+    // link, which records the old handle here so previously shared links
+    // keep working instead of 404ing.
     const { data: retired } = await admin
       .from("shop_handle_history")
       .select("shops(handle)")
@@ -31,6 +36,9 @@ export default async function BookingPage({ params }: { params: Promise<{ handle
     if (currentHandle) permanentRedirect(`/book/${currentHandle}`);
     notFound();
   }
+
+  // Canonicalize the URL casing so links always converge on one URL.
+  if (rawHandle !== handle) permanentRedirect(`/book/${handle}`);
 
   const [{ data: services }, { data: staff }, { data: hours }, customer] = await Promise.all([
     admin.from("services").select("id, name, price, duration_minutes, category").eq("shop_id", shop.id).eq("active", true).order("category", { ascending: true }).order("name", { ascending: true }),

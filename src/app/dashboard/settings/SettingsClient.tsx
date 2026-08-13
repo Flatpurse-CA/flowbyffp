@@ -250,8 +250,12 @@ export function SettingsClient({ initialFamilyHours, initialBusinessHours, initi
         setProfileError(result.error);
         return;
       }
-      if (bookingUrl && profile.handle) {
-        setBookingUrl(bookingUrl.replace(/\/book\/[^/]+$/, `/book/${profile.handle}`));
+      // Use the server's canonical (lowercased) handle, not whatever
+      // casing was typed — this is what's actually saved in the database,
+      // and /book/[handle] lookups are case-sensitive.
+      if (result.handle) {
+        setProfile(p => ({ ...p, handle: result.handle! }));
+        if (bookingUrl) setBookingUrl(bookingUrl.replace(/\/book\/[^/]+$/, `/book/${result.handle}`));
       }
       setProfileSaved(true);
       router.refresh();
