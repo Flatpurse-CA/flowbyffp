@@ -36,7 +36,7 @@ export async function sendEmail({
 export async function sendPasswordResetEmail(to: string, input: { resetUrl: string }) {
   return send({
     to,
-    subject: "Reset your FLOWBYFFP password",
+    subject: "Reset your FlatPurse Flow password",
     html: `
       <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
         <h1 style="font-size: 20px;">Reset your password</h1>
@@ -57,12 +57,12 @@ export async function sendPasswordResetEmail(to: string, input: { resetUrl: stri
 export async function sendStaffInviteEmail(to: string, input: { shopName: string; inviteUrl: string }) {
   return send({
     to,
-    subject: `You've been invited to join ${input.shopName} on FLOWBYFFP`,
+    subject: `You've been invited to join ${input.shopName} on FlatPurse Flow`,
     html: `
       <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
         <h1 style="font-size: 20px;">You're invited to join ${input.shopName}</h1>
         <p style="color: #444; font-size: 14px; line-height: 1.6;">
-          Your shop has added you as a team member on FLOWBYFFP. Set your password to get access to your bookings.
+          Your shop has added you as a team member on FlatPurse Flow. Set your password to get access to your bookings.
         </p>
         <p style="margin: 28px 0;">
           <a href="${input.inviteUrl}" style="background: #6d28d9; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px;">
