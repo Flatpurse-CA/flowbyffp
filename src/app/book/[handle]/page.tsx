@@ -40,12 +40,39 @@ export default async function BookingPage({ params }: { params: Promise<{ handle
   // Canonicalize the URL casing so links always converge on one URL.
   if (rawHandle !== handle) permanentRedirect(`/book/${handle}`);
 
-  const [{ data: services }, { data: staff }, { data: hours }, customer] = await Promise.all([
+  const [{ data: services }, { data: staff }, { data: hours }, customer, { data: reviewsRaw }] = await Promise.all([
     admin.from("services").select("id, name, price, duration_minutes, category").eq("shop_id", shop.id).eq("active", true).order("category", { ascending: true }).order("name", { ascending: true }),
     admin.from("staff").select("id, full_name, role, color").eq("shop_id", shop.id).eq("active", true),
     admin.from("business_hours").select("weekday, open, start_time, end_time").eq("shop_id", shop.id),
     getCustomerContext(),
+    admin.from("reviews").select("id, rating, comment, created_at, customer_id, customers(full_name)").eq("shop_id", shop.id).order("created_at", { ascending: false }),
   ]);
+
+  const reviews = (reviewsRaw ?? []).map(r => {
+    const rel = r.customers as { full_name: string } | { full_name: string }[] | null;
+    const reviewerName = Array.isArray(rel) ? rel[0]?.full_name : rel?.full_name;
+    return {
+      id: r.id as string,
+      rating: r.rating as number,
+      comment: r.comment as string | null,
+      createdAt: r.created_at as string,
+      reviewerName: (reviewerName as string | undefined) ?? "Anonymous",
+      isMine: customer ? r.customer_id === customer.customerId : false,
+    };
+  });
+
+  let canReview = false;
+  if (customer) {
+    const { data: completedAppt } = await admin
+      .from("appointments")
+      .select("id")
+      .eq("shop_id", shop.id)
+      .eq("customer_id", customer.customerId)
+      .eq("status", "completed")
+      .limit(1)
+      .maybeSingle();
+    canReview = Boolean(completedAppt);
+  }
 
   return (
     <BookingClient
@@ -59,6 +86,8 @@ export default async function BookingPage({ params }: { params: Promise<{ handle
       staff={(staff ?? []) as { id: string; full_name: string; role: string | null; color: string }[]}
       businessHours={(hours ?? []) as { weekday: number; open: boolean; start_time: string; end_time: string }[]}
       initialCustomer={customer ? { fullName: customer.fullName, email: customer.email } : null}
+      reviews={reviews}
+      canReview={canReview}
     />
   );
 }

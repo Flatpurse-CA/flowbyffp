@@ -3,11 +3,11 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
-  Clock, CheckCircle2, ChevronLeft, X, MapPin, Lock, CalendarClock,
+  Clock, CheckCircle2, ChevronLeft, X, MapPin, Lock, CalendarClock, Star,
 } from "lucide-react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
-import { getAvailableSlots, createPublicBooking, createPaymentIntent, payWithSavedCard } from "./actions";
+import { getAvailableSlots, createPublicBooking, createPaymentIntent, payWithSavedCard, submitReview, deleteReview } from "./actions";
 import { customerLogin, customerSignup } from "../../customer/actions";
 import { listMyPaymentMethods, type SavedCard } from "../../customer/account/actions";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -24,6 +24,7 @@ type Service = { id: string; name: string; price: number; duration_minutes: numb
 type Staff = { id: string; full_name: string; role: string | null; color: string };
 type BusinessHour = { weekday: number; open: boolean; start_time: string; end_time: string };
 type Customer = { fullName: string; email: string };
+type Review = { id: string; rating: number; comment: string | null; createdAt: string; reviewerName: string; isMine: boolean };
 
 const ACCENT = "rgb(109,40,217)";
 
@@ -95,8 +96,9 @@ function computeOpenStatus(businessHours: BusinessHour[]): { openNow: boolean; l
 
 // ─── Main component ────────────────────────────────────────────────────────────
 
-export function BookingClient({ shop, services, staff, businessHours, initialCustomer }: {
+export function BookingClient({ shop, services, staff, businessHours, initialCustomer, reviews: initialReviews, canReview }: {
   shop: Shop; services: Service[]; staff: Staff[]; businessHours: BusinessHour[]; initialCustomer: Customer | null;
+  reviews: Review[]; canReview: boolean;
 }) {
   const [showFlow, setShowFlow]     = useState(false);
   const [step, setStep]             = useState<"datetime" | "account" | "confirm" | "pay" | "done">("datetime");
@@ -105,7 +107,13 @@ export function BookingClient({ shop, services, staff, businessHours, initialCus
   const [initialClientSecret, setInitialClientSecret] = useState<string | null>(null);
   const [payError, setPayError] = useState<string | null>(null);
   const [catFilter, setCatFilter]   = useState("All");
-  const [activeTab, setActiveTab]   = useState<"services" | "team" | "hours">("services");
+  const [activeTab, setActiveTab]   = useState<"services" | "team" | "hours" | "reviews">("services");
+  const [reviews, setReviews]       = useState<Review[]>(initialReviews);
+  const [myRating, setMyRating]     = useState(reviews.find(r => r.isMine)?.rating ?? 0);
+  const [myComment, setMyComment]   = useState(reviews.find(r => r.isMine)?.comment ?? "");
+  const [hoverRating, setHoverRating] = useState(0);
+  const [savingReview, setSavingReview] = useState(false);
+  const [reviewError, setReviewError] = useState<string | null>(null);
   const [service, setService]       = useState<Service | null>(null);
   const [staffId, setStaffId]       = useState<string | "any">("any");
   const [date, setDate]             = useState<string | null>(null);
@@ -193,13 +201,40 @@ export function BookingClient({ shop, services, staff, businessHours, initialCus
   const openStatus = useMemo(() => computeOpenStatus(businessHours), [businessHours]);
 
   const tabs = useMemo(() => {
-    const t: { id: "services" | "team" | "hours"; label: string; count: number | null }[] = [
+    const t: { id: "services" | "team" | "hours" | "reviews"; label: string; count: number | null }[] = [
       { id: "services", label: "Services", count: services.length },
     ];
     if (staff.length > 0) t.push({ id: "team", label: "Team", count: staff.length });
     if (businessHours.length > 0) t.push({ id: "hours", label: "Hours", count: null });
+    t.push({ id: "reviews", label: "Reviews", count: reviews.length });
     return t;
-  }, [services.length, staff.length, businessHours.length]);
+  }, [services.length, staff.length, businessHours.length, reviews.length]);
+
+  const avgRating = reviews.length > 0 ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length : null;
+
+  const handleSubmitReview = async () => {
+    if (myRating < 1) { setReviewError("Pick a star rating first"); return; }
+    setSavingReview(true);
+    setReviewError(null);
+    const res = await submitReview({ shopId: shop.id, rating: myRating, comment: myComment });
+    setSavingReview(false);
+    if (res.error) { setReviewError(res.error); return; }
+    setReviews(prev => {
+      const withoutMine = prev.filter(r => !r.isMine);
+      return [{ id: "mine", rating: myRating, comment: myComment || null, createdAt: new Date().toISOString(), reviewerName: initialCustomer?.fullName ?? "You", isMine: true }, ...withoutMine];
+    });
+  };
+
+  const handleDeleteReview = async () => {
+    setSavingReview(true);
+    setReviewError(null);
+    const res = await deleteReview(shop.id);
+    setSavingReview(false);
+    if (res.error) { setReviewError(res.error); return; }
+    setReviews(prev => prev.filter(r => !r.isMine));
+    setMyRating(0);
+    setMyComment("");
+  };
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--cust-bg)", fontFamily: "DM Sans, system-ui, sans-serif" }}>
@@ -249,6 +284,15 @@ export function BookingClient({ shop, services, staff, businessHours, initialCus
             <p style={{ color: "var(--cust-text-sub)", fontSize: 13.5, margin: 0, display: "flex", alignItems: "center", gap: 6 }}>
               <MapPin size={13} /> {shop.city}, {shop.province}
             </p>
+            {avgRating != null && (
+              <button onClick={() => setActiveTab("reviews")} style={{
+                display: "flex", alignItems: "center", gap: 5, fontSize: 12, fontWeight: 700,
+                padding: "3px 10px", borderRadius: 20, border: "none", cursor: "pointer",
+                background: "rgba(245,158,11,0.1)", color: "rgb(180,120,10)",
+              }}>
+                <Star size={11} fill="currentColor" /> {avgRating.toFixed(1)} ({reviews.length})
+              </button>
+            )}
             {openStatus && (
               <span style={{
                 display: "flex", alignItems: "center", gap: 5, fontSize: 12, fontWeight: 700,
@@ -364,6 +408,67 @@ export function BookingClient({ shop, services, staff, businessHours, initialCus
                 );
               })}
             </div>
+          </div>
+        )}
+
+        {activeTab === "reviews" && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 16, maxWidth: 560 }}>
+            {canReview ? (
+              <div style={{ background: "var(--cust-card-bg)", border: "1px solid var(--cust-card-border)", borderRadius: 16, padding: "18px 20px" }}>
+                <p style={{ color: "var(--cust-text)", fontSize: 13.5, fontWeight: 700, margin: "0 0 10px" }}>
+                  {myRating > 0 ? "Your review" : "Leave a review"}
+                </p>
+                <div style={{ display: "flex", gap: 4, marginBottom: 10 }}>
+                  {[1, 2, 3, 4, 5].map(n => (
+                    <button key={n} onClick={() => setMyRating(n)} onMouseEnter={() => setHoverRating(n)} onMouseLeave={() => setHoverRating(0)} style={{ background: "none", border: "none", cursor: "pointer", padding: 2 }}>
+                      <Star size={24} color={n <= (hoverRating || myRating) ? "rgb(245,158,11)" : "var(--cust-card-border)"} fill={n <= (hoverRating || myRating) ? "rgb(245,158,11)" : "none"} />
+                    </button>
+                  ))}
+                </div>
+                <textarea
+                  value={myComment}
+                  onChange={e => setMyComment(e.target.value)}
+                  placeholder="Optional — share how it went"
+                  rows={3}
+                  style={{ width: "100%", background: "var(--cust-fill)", border: "1px solid var(--cust-card-border)", borderRadius: 10, padding: "10px 12px", color: "var(--cust-text)", fontSize: 13, outline: "none", resize: "vertical", boxSizing: "border-box", fontFamily: "inherit", marginBottom: 10 }}
+                />
+                {reviewError && <p style={{ color: "rgb(220,38,38)", fontSize: 12.5, margin: "0 0 10px" }}>{reviewError}</p>}
+                <div style={{ display: "flex", gap: 8 }}>
+                  <button onClick={handleSubmitReview} disabled={savingReview} style={{ padding: "9px 18px", borderRadius: 10, border: "none", background: ACCENT, color: "white", fontSize: 12.5, fontWeight: 700, cursor: savingReview ? "default" : "pointer", opacity: savingReview ? 0.6 : 1 }}>
+                    {savingReview ? "Saving…" : reviews.some(r => r.isMine) ? "Update review" : "Submit review"}
+                  </button>
+                  {reviews.some(r => r.isMine) && (
+                    <button onClick={handleDeleteReview} disabled={savingReview} style={{ padding: "9px 14px", borderRadius: 10, border: "1px solid var(--cust-card-border)", background: "transparent", color: "var(--cust-text-sub)", fontSize: 12.5, fontWeight: 600, cursor: "pointer" }}>
+                      Remove
+                    </button>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div style={{ background: "var(--cust-card-bg)", border: "1px solid var(--cust-card-border)", borderRadius: 16, padding: "16px 20px" }}>
+                <p style={{ color: "var(--cust-text-sub)", fontSize: 13, margin: 0 }}>
+                  {customer ? "You'll be able to leave a review after your first completed visit here." : "Sign in and complete a booking to leave a review."}
+                </p>
+              </div>
+            )}
+
+            {reviews.length === 0 ? (
+              <p style={{ color: "var(--cust-text-faint)", fontSize: 13, textAlign: "center", margin: "10px 0" }}>No reviews yet.</p>
+            ) : (
+              reviews.map(r => (
+                <div key={r.id} style={{ background: "var(--cust-card-bg)", border: "1px solid var(--cust-card-border)", borderRadius: 16, padding: "14px 18px" }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
+                    <span style={{ color: "var(--cust-text)", fontSize: 13, fontWeight: 700 }}>{r.isMine ? "You" : r.reviewerName}</span>
+                    <div style={{ display: "flex", gap: 2 }}>
+                      {[1, 2, 3, 4, 5].map(n => (
+                        <Star key={n} size={13} color={n <= r.rating ? "rgb(245,158,11)" : "var(--cust-card-border)"} fill={n <= r.rating ? "rgb(245,158,11)" : "none"} />
+                      ))}
+                    </div>
+                  </div>
+                  {r.comment && <p style={{ color: "var(--cust-text-sub)", fontSize: 13, margin: 0, lineHeight: 1.5 }}>{r.comment}</p>}
+                </div>
+              ))
+            )}
           </div>
         )}
       </div>

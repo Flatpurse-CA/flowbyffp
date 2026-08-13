@@ -261,3 +261,45 @@ export async function payWithSavedCard(input: {
     return { error: stripeErr.message ?? "Payment failed" };
   }
 }
+
+export async function submitReview(input: { shopId: string; rating: number; comment?: string }): Promise<{ error?: string }> {
+  const ctx = await getCustomerContext();
+  if (!ctx) return { error: "Sign in to leave a review" };
+  if (!Number.isInteger(input.rating) || input.rating < 1 || input.rating > 5) {
+    return { error: "Pick a rating between 1 and 5 stars" };
+  }
+
+  const admin = createAdminClient();
+  const { data: completedAppt } = await admin
+    .from("appointments")
+    .select("id")
+    .eq("shop_id", input.shopId)
+    .eq("customer_id", ctx.customerId)
+    .eq("status", "completed")
+    .limit(1)
+    .maybeSingle();
+  if (!completedAppt) return { error: "You can leave a review after a completed appointment here" };
+
+  const { error } = await admin.from("reviews").upsert(
+    {
+      shop_id: input.shopId,
+      customer_id: ctx.customerId,
+      rating: input.rating,
+      comment: input.comment?.trim() || null,
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: "shop_id,customer_id" },
+  );
+  if (error) return { error: error.message };
+  return {};
+}
+
+export async function deleteReview(shopId: string): Promise<{ error?: string }> {
+  const ctx = await getCustomerContext();
+  if (!ctx) return { error: "Sign in required" };
+
+  const admin = createAdminClient();
+  const { error } = await admin.from("reviews").delete().eq("shop_id", shopId).eq("customer_id", ctx.customerId);
+  if (error) return { error: error.message };
+  return {};
+}
