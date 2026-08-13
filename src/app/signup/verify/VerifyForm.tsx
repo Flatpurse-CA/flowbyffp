@@ -297,8 +297,9 @@ export function VerifyForm({ email, initialError }: { email: string; initialErro
           <div
             style={{
               display: "inline-flex",
-              gap: 12,
+              gap: "clamp(6px, 2vw, 12px)",
               marginBottom: 48,
+              maxWidth: "100%",
               animation: shake ? "fp-shake 0.5s ease both" : "none",
             }}
           >
@@ -310,13 +311,13 @@ export function VerifyForm({ email, initialError }: { email: string; initialErro
                   {/* Per-box purple ring */}
                   {allFilled && (
                     <svg
-                      width={boxRingW}
-                      height={boxRingH}
                       viewBox={`0 0 ${boxRingW} ${boxRingH}`}
                       style={{
                         position: "absolute",
                         top: -5,
                         left: -5,
+                        width: "calc(100% + 10px)",
+                        height: "calc(100% + 10px)",
                         pointerEvents: "none",
                         overflow: "visible",
                         animation: `fp-ring-pulse 1.8s ease-in-out ${staggerDelay} infinite`,
@@ -364,8 +365,8 @@ export function VerifyForm({ email, initialError }: { email: string; initialErro
                     onPaste={handlePaste}
                     disabled={isPending}
                     style={{
-                      width: 68,
-                      height: 80,
+                      width: "clamp(40px, 11vw, 68px)",
+                      height: "clamp(48px, 13vw, 80px)",
                       borderRadius: 18,
                       background: allFilled
                         ? "rgba(109,40,217,0.12)"
@@ -378,7 +379,7 @@ export function VerifyForm({ email, initialError }: { email: string; initialErro
                         ? "1.5px solid rgb(109,40,217)"
                         : "1.5px solid var(--auth-input-border)",
                       color: allFilled ? "rgb(196,181,253)" : "var(--auth-text)",
-                      fontSize: 36,
+                      fontSize: "clamp(18px, 6vw, 36px)",
                       fontWeight: 700,
                       textAlign: "center",
                       outline: "none",
