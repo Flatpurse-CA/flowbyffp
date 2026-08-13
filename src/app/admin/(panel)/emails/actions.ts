@@ -1,8 +1,7 @@
 "use server";
 
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createClient } from "@/lib/supabase/server";
-import { isAdmin } from "@/lib/admin-guard";
+import { requireAdmin, logAdminAction } from "@/lib/admin-guard";
 import { sendSequenceEmail } from "@/lib/email-sequence";
 import { sendEmail } from "@/lib/resend";
 import { revalidatePath } from "next/cache";
@@ -10,14 +9,8 @@ import { redirect } from "next/navigation";
 
 const EMAILS_PATH = "/admin/emails";
 
-async function requireAdmin() {
-  const supabase = await createClient();
-  const { data } = await supabase.auth.getUser();
-  if (!(await isAdmin(data.user?.email))) redirect("/admin/login");
-}
-
 export async function createSequenceEmail(formData: FormData) {
-  await requireAdmin();
+  const { email } = await requireAdmin();
   const admin = createAdminClient();
 
   const { data: last } = await admin
@@ -27,8 +20,9 @@ export async function createSequenceEmail(formData: FormData) {
     .limit(1)
     .single();
 
+  const name = formData.get("name") as string;
   await admin.from("email_sequences").insert({
-    name:       formData.get("name") as string,
+    name,
     subject:    formData.get("subject") as string,
     body:       formData.get("body") as string,
     delay_days: Number(formData.get("delay_days") ?? 0),
@@ -37,12 +31,13 @@ export async function createSequenceEmail(formData: FormData) {
     updated_at: new Date().toISOString(),
   });
 
+  await logAdminAction(email, "create_sequence_email", "email_sequence", null, { name });
   revalidatePath(EMAILS_PATH);
   redirect(EMAILS_PATH);
 }
 
 export async function updateSequenceEmail(id: string, formData: FormData) {
-  await requireAdmin();
+  const { email } = await requireAdmin();
   const admin = createAdminClient();
 
   await admin.from("email_sequences").update({
@@ -54,30 +49,34 @@ export async function updateSequenceEmail(id: string, formData: FormData) {
     updated_at: new Date().toISOString(),
   }).eq("id", id);
 
+  await logAdminAction(email, "update_sequence_email", "email_sequence", id);
   revalidatePath(EMAILS_PATH);
   redirect(EMAILS_PATH);
 }
 
 export async function toggleSequenceEmail(id: string, isActive: boolean) {
-  await requireAdmin();
+  const { email } = await requireAdmin();
   const admin = createAdminClient();
   await admin.from("email_sequences").update({
     is_active: isActive,
     updated_at: new Date().toISOString(),
   }).eq("id", id);
+  await logAdminAction(email, "toggle_sequence_email", "email_sequence", id, { is_active: isActive });
   revalidatePath(EMAILS_PATH);
 }
 
 export async function deleteSequenceEmail(id: string) {
-  await requireAdmin();
+  const { email } = await requireAdmin();
   const admin = createAdminClient();
   await admin.from("email_sequences").delete().eq("id", id);
+  await logAdminAction(email, "delete_sequence_email", "email_sequence", id);
   revalidatePath(EMAILS_PATH);
 }
 
 export async function triggerSendNow(sendId: string) {
-  await requireAdmin();
+  const { email } = await requireAdmin();
   const { error } = await sendSequenceEmail(sendId);
+  await logAdminAction(email, "trigger_send_now", "email_send", sendId, error ? { error } : undefined);
   revalidatePath("/admin/emails/subscribers");
   return { error };
 }
@@ -93,7 +92,7 @@ export async function sendBlast({
   audience: "all" | "pending";
   sequenceId?: string;
 }) {
-  await requireAdmin();
+  const { email: adminEmail } = await requireAdmin();
   const admin = createAdminClient();
 
   let query = admin.from("waitlist").select("id, email, name").eq("status", "pending");
@@ -130,5 +129,6 @@ export async function sendBlast({
     })
   );
 
+  await logAdminAction(adminEmail, "send_email_blast", "waitlist", null, { subject, audience, recipientCount: subscribers.length, sent, errors });
   return { sent, errors };
 }

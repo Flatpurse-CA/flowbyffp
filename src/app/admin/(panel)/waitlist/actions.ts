@@ -2,28 +2,22 @@
 
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createClient } from "@/lib/supabase/server";
-import { isAdmin } from "@/lib/admin-guard";
-import { redirect } from "next/navigation";
-
-async function requireAdmin() {
-  const supabase = await createClient();
-  const { data } = await supabase.auth.getUser();
-  if (!(await isAdmin(data.user?.email))) redirect("/admin/login");
-}
+import { requireAdmin, logAdminAction } from "@/lib/admin-guard";
 
 export async function deleteWaitlistEntry(formData: FormData) {
-  await requireAdmin();
+  const { email } = await requireAdmin();
   const id = formData.get("id") as string;
   const admin = createAdminClient();
   await admin.from("waitlist").delete().eq("id", id);
+  await logAdminAction(email, "delete_waitlist_entry", "waitlist_entry", id);
   revalidatePath("/admin/waitlist", "page");
 }
 
 export async function bulkDeleteWaitlistEntries(ids: string[]) {
-  await requireAdmin();
+  const { email } = await requireAdmin();
   if (!ids.length) return;
   const admin = createAdminClient();
   await admin.from("waitlist").delete().in("id", ids);
+  await logAdminAction(email, "bulk_delete_waitlist_entries", "waitlist_entry", null, { ids, count: ids.length });
   revalidatePath("/admin/waitlist", "page");
 }

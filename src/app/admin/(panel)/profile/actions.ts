@@ -2,14 +2,13 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { isAdmin } from "@/lib/admin-guard";
+import { requireAdmin, logAdminAction } from "@/lib/admin-guard";
 
 const PROFILE_PATH = "/admin/profile";
 
 export async function updateAdminPassword(formData: FormData) {
+  const { email } = await requireAdmin();
   const supabase = await createClient();
-  const { data } = await supabase.auth.getUser();
-  if (!(await isAdmin(data.user?.email))) redirect("/admin/login");
 
   const password = formData.get("password") as string;
   const confirm  = formData.get("confirm") as string;
@@ -26,5 +25,6 @@ export async function updateAdminPassword(formData: FormData) {
     redirect(`${PROFILE_PATH}?error=${encodeURIComponent(error.message)}`);
   }
 
+  await logAdminAction(email, "update_own_password", "admin_user", email);
   redirect(`${PROFILE_PATH}?success=1`);
 }

@@ -7,7 +7,7 @@ import {
   LayoutDashboard, Users, ClipboardList, Store, CreditCard,
   LogOut, ChevronLeft, ChevronRight, Menu, X,
   Sun, Moon, MessageSquare, User as UserIcon, Settings, Mail,
-  BarChart3, GitFork, Zap, ShieldAlert, Flag, FlaskConical, Activity,
+  BarChart3, GitFork, Zap, ShieldAlert, Flag, FlaskConical, Activity, History,
 } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 import { adminLogout } from "@/app/admin/actions";
@@ -31,6 +31,7 @@ const NAV = [
   { icon: Flag,            href: "/admin/feature-flags",      label: "Feature Flags"     },
   { icon: FlaskConical,    href: "/admin/experiments",        label: "Experiments"       },
   { icon: Activity,        href: "/admin/feature-usage",      label: "Feature Usage"     },
+  { icon: History,         href: "/admin/audit-log",          label: "Audit Log"         },
 ];
 
 function isActive(href: string, pathname: string) {
