@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { Users, Store, ClipboardList, CreditCard, TrendingUp } from "lucide-react";
 import { PLAN_COLORS as PLAN_COLOR, planPrice, planLabel, formatCAD } from "@/lib/plans";
+import { MemberGrowthChart } from "./MemberGrowthChart";
 
 function StatCard({
   label, value, Icon, iconColor, iconBg, subtitle,
@@ -73,7 +74,6 @@ export default async function AdminOverviewPage() {
     if (m) m.count++;
   });
   const hasData  = months.some(m => m.count > 0);
-  const chartMax = Math.max(...months.map(m => m.count), 1);
 
   const recentUsers = [...users]
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
@@ -140,77 +140,17 @@ export default async function AdminOverviewPage() {
           <p style={{ color: "var(--atext)", fontSize: 14, fontWeight: 700, margin: "0 0 3px" }}>Member growth</p>
           <p style={{ color: "var(--aw3)", fontSize: 12, margin: 0 }}>Members joined over the last 7 months</p>
 
-          <div style={{ display: "flex", gap: 0, marginTop: 20 }}>
-            {/* Y axis */}
-            <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", paddingRight: 10, paddingBottom: 22, width: 30, flexShrink: 0 }}>
-              {[chartMax, Math.round(chartMax * 0.75), Math.round(chartMax * 0.5), Math.round(chartMax * 0.25), 0].map((v, i) => (
-                <span key={i} style={{ color: "var(--aw18)", fontSize: 10, lineHeight: 1 }}>{v}</span>
-              ))}
-            </div>
-
-            {/* Chart + X axis */}
-            <div style={{ flex: 1 }}>
-              <div style={{ height: 200, position: "relative", borderLeft: "1px solid var(--aw06)", borderBottom: "1px solid var(--aw06)" }}>
-                {[25, 50, 75].map(pct => (
-                  <div key={pct} style={{ position: "absolute", top: `${pct}%`, left: 0, right: 0, borderTop: "1px solid var(--aw04)" }} />
-                ))}
-
-                {hasData ? (
-                  <svg
-                    viewBox="0 0 100 100"
-                    preserveAspectRatio="none"
-                    style={{ position: "absolute", inset: 0, width: "100%", height: "100%", overflow: "visible" }}
-                  >
-                    <defs>
-                      <linearGradient id="lg" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="rgba(139,92,246,0.25)" />
-                        <stop offset="100%" stopColor="rgba(139,92,246,0)" />
-                      </linearGradient>
-                    </defs>
-                    {(() => {
-                      const pts = months.map((m, i) => ({ x: (i / 6) * 100, y: 100 - (m.count / chartMax) * 100 }));
-                      // Smooth the jagged linear path into a curve — each segment eases
-                      // through a control point offset toward its neighbour, so sparse
-                      // month-over-month data (mostly zeros with one real spike) doesn't
-                      // read as a harsh sawtooth.
-                      const smoothPath = pts.reduce((d, p, i) => {
-                        if (i === 0) return `M${p.x},${p.y}`;
-                        const prev = pts[i - 1];
-                        const midX = (prev.x + p.x) / 2;
-                        return `${d} C${midX},${prev.y} ${midX},${p.y} ${p.x},${p.y}`;
-                      }, "");
-                      return (
-                        <>
-                          <path d={`${smoothPath} L100,100 L0,100 Z`} fill="url(#lg)" />
-                          <path d={smoothPath} fill="none" stroke="rgb(139,92,246)" strokeWidth={2} strokeLinecap="round" vectorEffect="non-scaling-stroke" />
-                          {pts.map((p, i) => (
-                            <circle key={i} cx={p.x} cy={p.y} r={months[i].count > 0 ? 3 : 2} fill={months[i].count > 0 ? "rgb(139,92,246)" : "var(--am1)"} stroke="rgb(139,92,246)" strokeWidth={months[i].count > 0 ? 0 : 1.5} vectorEffect="non-scaling-stroke">
-                              <title>{months[i].label} {months[i].year}: {months[i].count} member{months[i].count === 1 ? "" : "s"}</title>
-                            </circle>
-                          ))}
-                        </>
-                      );
-                    })()}
-                  </svg>
-                ) : (
-                  <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8 }}>
-                    <div style={{ width: 44, height: 44, borderRadius: "50%", background: "var(--aw04)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <TrendingUp size={18} color="var(--aw2)" strokeWidth={1.5} />
-                    </div>
-                    <p style={{ color: "var(--aw3)", fontSize: 13, fontWeight: 600, margin: 0 }}>No data yet</p>
-                    <p style={{ color: "var(--aw18)", fontSize: 12, margin: 0 }}>Chart will populate as members join</p>
-                  </div>
-                )}
+          {hasData ? (
+            <MemberGrowthChart months={months} />
+          ) : (
+            <div style={{ height: 200, marginTop: 20, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, borderLeft: "1px solid var(--aw06)", borderBottom: "1px solid var(--aw06)" }}>
+              <div style={{ width: 44, height: 44, borderRadius: "50%", background: "var(--aw04)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <TrendingUp size={18} color="var(--aw2)" strokeWidth={1.5} />
               </div>
-
-              {/* X axis labels */}
-              <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
-                {months.map((m, i) => (
-                  <span key={i} style={{ color: "var(--aw2)", fontSize: 10 }}>{m.label}</span>
-                ))}
-              </div>
+              <p style={{ color: "var(--aw3)", fontSize: 13, fontWeight: 600, margin: 0 }}>No data yet</p>
+              <p style={{ color: "var(--aw18)", fontSize: 12, margin: 0 }}>Chart will populate as members join</p>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Recent members */}
@@ -238,18 +178,18 @@ export default async function AdminOverviewPage() {
               </p>
             </div>
           ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: 13 }}>
-              {recentUsers.map((u, i) => {
+            <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              {recentUsers.map((u) => {
                 const emailStr = u.email ?? "Unknown";
                 const initials = emailStr.slice(0, 2).toUpperCase();
                 const date     = new Date(u.created_at).toLocaleDateString("en-CA", { month: "short", day: "numeric" });
                 return (
-                  <div key={u.id} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <div key={u.id} className="admin-member-row" style={{ display: "flex", alignItems: "center", gap: 11, padding: "7px 8px", margin: "0 -8px", borderRadius: 10, transition: "background 0.12s" }}>
                     <div style={{
                       width: 32, height: 32, borderRadius: "50%", flexShrink: 0,
-                      background: `hsl(${(i * 55 + 200) % 360}, 35%, 20%)`,
+                      background: "rgba(139,92,246,0.14)",
                       display: "flex", alignItems: "center", justifyContent: "center",
-                      fontSize: 11, fontWeight: 700, color: "var(--aw65)",
+                      fontSize: 11, fontWeight: 700, color: "rgb(167,139,250)",
                     }}>
                       {initials}
                     </div>
@@ -257,8 +197,8 @@ export default async function AdminOverviewPage() {
                       <p style={{ color: "var(--aw65)", fontSize: 12.5, margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                         {emailStr}
                       </p>
-                      <p style={{ color: "var(--aw25)", fontSize: 11, margin: 0 }}>{date}</p>
                     </div>
+                    <span style={{ color: "var(--aw25)", fontSize: 11, flexShrink: 0 }}>{date}</span>
                   </div>
                 );
               })}
@@ -418,6 +358,9 @@ export default async function AdminOverviewPage() {
         .admin-stat-card:hover {
           border-color: rgba(139,92,246,0.35) !important;
           transform: translateY(-1px);
+        }
+        .admin-member-row:hover {
+          background: var(--aw03);
         }
       `}</style>
     </div>
