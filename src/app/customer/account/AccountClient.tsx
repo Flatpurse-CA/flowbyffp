@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Calendar, Clock, X, LogOut, Gift } from "lucide-react";
 import type { AppointmentStatus } from "@/app/dashboard/appointments/actions";
 import type { MyBooking } from "./actions";
-import { cancelMyBooking, updateBirthday, type SavedCard } from "./actions";
+import { cancelMyBooking, updateBirthday, deleteMyAccount, type SavedCard } from "./actions";
 import { customerLogout } from "../actions";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { PaymentMethodsSection } from "./PaymentMethodsSection";
@@ -36,6 +36,23 @@ export function AccountClient({ customerName, bookings, dateOfBirth, cards }: { 
   const [birthday, setBirthday] = useState(dateOfBirth ?? "");
   const [savingBirthday, setSavingBirthday] = useState(false);
   const [birthdaySaved, setBirthdaySaved] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deletePassword, setDeletePassword] = useState("");
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const [deletingAccount, setDeletingAccount] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  const handleDeleteAccount = async () => {
+    setDeletingAccount(true);
+    setDeleteError(null);
+    const res = await deleteMyAccount({ password: deletePassword, confirmText: deleteConfirmText });
+    if (res.error) {
+      setDeleteError(res.error);
+      setDeletingAccount(false);
+      return;
+    }
+    router.push("/");
+  };
 
   const handleSaveBirthday = async () => {
     setSavingBirthday(true);
@@ -161,9 +178,73 @@ export function AccountClient({ customerName, bookings, dateOfBirth, cards }: { 
         {past.length === 0 ? (
           <div style={{ ...card, padding: "30px 20px", textAlign: "center", color: "var(--cust-text-faint)", fontSize: 13 }}>No past bookings yet</div>
         ) : (
-          <div>{past.map(b => <Row key={b.id} b={b} />)}</div>
+          <div style={{ marginBottom: 28 }}>{past.map(b => <Row key={b.id} b={b} />)}</div>
         )}
+
+        <div style={{ paddingTop: 20, borderTop: "1px solid var(--cust-card-border)", textAlign: "center" }}>
+          <button
+            onClick={() => { setShowDeleteModal(true); setDeleteError(null); setDeletePassword(""); setDeleteConfirmText(""); }}
+            style={{ background: "none", border: "none", color: "var(--cust-text-faint)", fontSize: 12, cursor: "pointer", textDecoration: "underline", textUnderlineOffset: 3 }}
+          >
+            Delete account
+          </button>
+        </div>
       </div>
+
+      {showDeleteModal && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 300, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }} onClick={() => !deletingAccount && setShowDeleteModal(false)}>
+          <div style={{ ...card, width: "100%", maxWidth: 420, padding: "24px 24px 22px" }} onClick={e => e.stopPropagation()}>
+            <h2 style={{ color: "rgb(220,38,38)", fontSize: 17, fontWeight: 800, margin: "0 0 10px" }}>Delete your account?</h2>
+            <p style={{ color: "var(--cust-text-sub)", fontSize: 13, lineHeight: 1.6, margin: "0 0 18px" }}>
+              This permanently removes your login, saved cards, and reviews. It can&apos;t be undone. Your booking history stays with the shops you&apos;ve visited, but will no longer be linked to an account you can sign into.
+            </p>
+
+            <label style={{ display: "block", color: "var(--cust-text-sub)", fontSize: 12, fontWeight: 600, marginBottom: 5 }}>Enter your password</label>
+            <input
+              type="password"
+              value={deletePassword}
+              onChange={e => setDeletePassword(e.target.value)}
+              style={{ width: "100%", boxSizing: "border-box", padding: "9px 12px", borderRadius: 9, border: "1.5px solid var(--cust-input-border)", background: "var(--cust-input-bg)", color: "var(--cust-text)", fontSize: 14, outline: "none", marginBottom: 14 }}
+            />
+
+            <label style={{ display: "block", color: "var(--cust-text-sub)", fontSize: 12, fontWeight: 600, marginBottom: 5 }}>
+              Type <strong>DELETE</strong> to confirm
+            </label>
+            <input
+              type="text"
+              value={deleteConfirmText}
+              onChange={e => setDeleteConfirmText(e.target.value)}
+              style={{ width: "100%", boxSizing: "border-box", padding: "9px 12px", borderRadius: 9, border: "1.5px solid var(--cust-input-border)", background: "var(--cust-input-bg)", color: "var(--cust-text)", fontSize: 14, outline: "none", marginBottom: 14 }}
+            />
+
+            {deleteError && (
+              <p style={{ color: "rgb(220,38,38)", fontSize: 12.5, margin: "0 0 14px" }}>{deleteError}</p>
+            )}
+
+            <div style={{ display: "flex", gap: 10 }}>
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                disabled={deletingAccount}
+                style={{ flex: 1, padding: "10px", borderRadius: 10, border: "1px solid var(--cust-card-border)", background: "transparent", color: "var(--cust-text-sub)", fontSize: 13, fontWeight: 700, cursor: "pointer" }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteAccount}
+                disabled={deletingAccount || deleteConfirmText.trim().toUpperCase() !== "DELETE" || !deletePassword}
+                style={{
+                  flex: 1, padding: "10px", borderRadius: 10, border: "none",
+                  background: "rgb(220,38,38)", color: "white", fontSize: 13, fontWeight: 700,
+                  cursor: deletingAccount ? "default" : "pointer",
+                  opacity: deleteConfirmText.trim().toUpperCase() !== "DELETE" || !deletePassword ? 0.5 : 1,
+                }}
+              >
+                {deletingAccount ? "Deleting…" : "Delete forever"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

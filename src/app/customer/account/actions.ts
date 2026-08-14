@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
 import { requireCustomer } from "@/lib/dashboard/customer";
 import { stripe } from "@/lib/stripe";
 import { ensureStripeCustomerId } from "@/lib/stripeCustomer";
@@ -133,5 +134,45 @@ export async function setDefaultPaymentMethod(paymentMethodId: string): Promise<
     return { error: e instanceof Error ? e.message : "Couldn't set that card as default" };
   }
   revalidatePath("/customer/account");
+  return {};
+}
+
+// Deliberately hard to trigger by accident: requires re-entering the current
+// password (proves this is really the account owner, not just a session left
+// open on a shared device) and typing DELETE to confirm. Booking history
+// stays on the shop's side (appointments.customer_id just goes null, same
+// as any walk-in with no account) — only the customer's own login, profile,
+// saved cards, and reviews are removed.
+export async function deleteMyAccount(input: { password: string; confirmText: string }): Promise<{ error?: string }> {
+  const { customerId, userId, email } = await requireCustomer();
+
+  if (input.confirmText.trim().toUpperCase() !== "DELETE") {
+    return { error: 'Type "DELETE" to confirm' };
+  }
+  if (!input.password) {
+    return { error: "Enter your password to confirm" };
+  }
+
+  const supabase = await createClient();
+  const { error: authError } = await supabase.auth.signInWithPassword({ email, password: input.password });
+  if (authError) return { error: "Incorrect password" };
+
+  const admin = createAdminClient();
+
+  const { data: row } = await admin.from("customers").select("stripe_customer_id").eq("id", customerId).maybeSingle();
+  const stripeCustomerId = row?.stripe_customer_id as string | undefined;
+  if (stripeCustomerId) {
+    try {
+      await stripe().customers.del(stripeCustomerId);
+    } catch {
+      // Best-effort — a leftover Stripe customer with no linked account
+      // isn't harmful, and shouldn't block the rest of the deletion.
+    }
+  }
+
+  await admin.from("customers").delete().eq("id", customerId);
+  await admin.auth.admin.deleteUser(userId);
+  await supabase.auth.signOut();
+
   return {};
 }
