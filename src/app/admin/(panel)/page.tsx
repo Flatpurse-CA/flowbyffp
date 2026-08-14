@@ -14,14 +14,15 @@ function StatCard({
   subtitle: string;
 }) {
   return (
-    <div style={{
-      background: "rgb(10,10,12)",
-      border: "1px solid rgba(255,255,255,0.09)",
+    <div className="admin-stat-card" style={{
+      background: "var(--am1)",
+      border: "1px solid var(--aw09)",
       borderRadius: 18,
       padding: "22px 24px",
+      transition: "border-color 0.15s, transform 0.15s",
     }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
-        <span style={{ color: "rgba(255,255,255,0.45)", fontSize: 13, fontWeight: 500 }}>{label}</span>
+        <span style={{ color: "var(--aw45)", fontSize: 13, fontWeight: 500 }}>{label}</span>
         <div style={{
           width: 38, height: 38, borderRadius: 11,
           background: iconBg,
@@ -31,10 +32,10 @@ function StatCard({
           <Icon size={18} color={iconColor} strokeWidth={1.8} />
         </div>
       </div>
-      <div style={{ color: "rgb(245,245,252)", fontSize: 36, fontWeight: 800, letterSpacing: "-0.04em", lineHeight: 1, marginBottom: 10 }}>
+      <div style={{ color: "var(--atext2)", fontSize: 36, fontWeight: 800, letterSpacing: "-0.04em", lineHeight: 1, marginBottom: 10 }}>
         {value}
       </div>
-      <div style={{ color: "rgba(255,255,255,0.25)", fontSize: 12.5 }}>
+      <div style={{ color: "var(--aw25)", fontSize: 12.5 }}>
         {subtitle}
       </div>
     </div>
@@ -86,8 +87,8 @@ export default async function AdminOverviewPage() {
   const payingShops  = shops.filter(s => planPrice(s.plan) > 0).length;
 
   const card: React.CSSProperties = {
-    background: "rgb(10,10,12)",
-    border: "1px solid rgba(255,255,255,0.09)",
+    background: "var(--am1)",
+    border: "1px solid var(--aw09)",
     borderRadius: 18,
     overflow: "hidden",
   };
@@ -136,29 +137,29 @@ export default async function AdminOverviewPage() {
 
         {/* Member growth */}
         <div style={{ ...card, padding: "22px 24px" }}>
-          <p style={{ color: "rgb(240,240,248)", fontSize: 14, fontWeight: 700, margin: "0 0 3px" }}>Member growth</p>
-          <p style={{ color: "rgba(255,255,255,0.28)", fontSize: 12, margin: 0 }}>Members joined over the last 7 months</p>
+          <p style={{ color: "var(--atext)", fontSize: 14, fontWeight: 700, margin: "0 0 3px" }}>Member growth</p>
+          <p style={{ color: "var(--aw3)", fontSize: 12, margin: 0 }}>Members joined over the last 7 months</p>
 
           <div style={{ display: "flex", gap: 0, marginTop: 20 }}>
             {/* Y axis */}
             <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", paddingRight: 10, paddingBottom: 22, width: 30, flexShrink: 0 }}>
               {[chartMax, Math.round(chartMax * 0.75), Math.round(chartMax * 0.5), Math.round(chartMax * 0.25), 0].map((v, i) => (
-                <span key={i} style={{ color: "rgba(255,255,255,0.18)", fontSize: 10, lineHeight: 1 }}>{v}</span>
+                <span key={i} style={{ color: "var(--aw18)", fontSize: 10, lineHeight: 1 }}>{v}</span>
               ))}
             </div>
 
             {/* Chart + X axis */}
             <div style={{ flex: 1 }}>
-              <div style={{ height: 200, position: "relative", borderLeft: "1px solid rgba(255,255,255,0.06)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+              <div style={{ height: 200, position: "relative", borderLeft: "1px solid var(--aw06)", borderBottom: "1px solid var(--aw06)" }}>
                 {[25, 50, 75].map(pct => (
-                  <div key={pct} style={{ position: "absolute", top: `${pct}%`, left: 0, right: 0, borderTop: "1px solid rgba(255,255,255,0.04)" }} />
+                  <div key={pct} style={{ position: "absolute", top: `${pct}%`, left: 0, right: 0, borderTop: "1px solid var(--aw04)" }} />
                 ))}
 
                 {hasData ? (
                   <svg
                     viewBox="0 0 100 100"
                     preserveAspectRatio="none"
-                    style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
+                    style={{ position: "absolute", inset: 0, width: "100%", height: "100%", overflow: "visible" }}
                   >
                     <defs>
                       <linearGradient id="lg" x1="0" y1="0" x2="0" y2="1">
@@ -166,38 +167,38 @@ export default async function AdminOverviewPage() {
                         <stop offset="100%" stopColor="rgba(139,92,246,0)" />
                       </linearGradient>
                     </defs>
-                    <path
-                      d={[
-                        ...months.map((m, i) => `${i === 0 ? "M" : "L"}${(i / 6) * 100},${100 - (m.count / chartMax) * 100}`),
-                        "L100,100 L0,100 Z",
-                      ].join(" ")}
-                      fill="url(#lg)"
-                    />
-                    <path
-                      d={months.map((m, i) => `${i === 0 ? "M" : "L"}${(i / 6) * 100},${100 - (m.count / chartMax) * 100}`).join(" ")}
-                      fill="none"
-                      stroke="rgb(139,92,246)"
-                      strokeWidth={2}
-                      vectorEffect="non-scaling-stroke"
-                    />
-                    {months.map((m, i) => (
-                      <circle
-                        key={i}
-                        cx={(i / 6) * 100}
-                        cy={100 - (m.count / chartMax) * 100}
-                        r={3}
-                        fill="rgb(139,92,246)"
-                        vectorEffect="non-scaling-stroke"
-                      />
-                    ))}
+                    {(() => {
+                      const pts = months.map((m, i) => ({ x: (i / 6) * 100, y: 100 - (m.count / chartMax) * 100 }));
+                      // Smooth the jagged linear path into a curve — each segment eases
+                      // through a control point offset toward its neighbour, so sparse
+                      // month-over-month data (mostly zeros with one real spike) doesn't
+                      // read as a harsh sawtooth.
+                      const smoothPath = pts.reduce((d, p, i) => {
+                        if (i === 0) return `M${p.x},${p.y}`;
+                        const prev = pts[i - 1];
+                        const midX = (prev.x + p.x) / 2;
+                        return `${d} C${midX},${prev.y} ${midX},${p.y} ${p.x},${p.y}`;
+                      }, "");
+                      return (
+                        <>
+                          <path d={`${smoothPath} L100,100 L0,100 Z`} fill="url(#lg)" />
+                          <path d={smoothPath} fill="none" stroke="rgb(139,92,246)" strokeWidth={2} strokeLinecap="round" vectorEffect="non-scaling-stroke" />
+                          {pts.map((p, i) => (
+                            <circle key={i} cx={p.x} cy={p.y} r={months[i].count > 0 ? 3 : 2} fill={months[i].count > 0 ? "rgb(139,92,246)" : "var(--am1)"} stroke="rgb(139,92,246)" strokeWidth={months[i].count > 0 ? 0 : 1.5} vectorEffect="non-scaling-stroke">
+                              <title>{months[i].label} {months[i].year}: {months[i].count} member{months[i].count === 1 ? "" : "s"}</title>
+                            </circle>
+                          ))}
+                        </>
+                      );
+                    })()}
                   </svg>
                 ) : (
                   <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8 }}>
-                    <div style={{ width: 44, height: 44, borderRadius: "50%", background: "rgba(255,255,255,0.04)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <TrendingUp size={18} color="rgba(255,255,255,0.2)" strokeWidth={1.5} />
+                    <div style={{ width: 44, height: 44, borderRadius: "50%", background: "var(--aw04)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <TrendingUp size={18} color="var(--aw2)" strokeWidth={1.5} />
                     </div>
-                    <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 13, fontWeight: 600, margin: 0 }}>No data yet</p>
-                    <p style={{ color: "rgba(255,255,255,0.18)", fontSize: 12, margin: 0 }}>Chart will populate as members join</p>
+                    <p style={{ color: "var(--aw3)", fontSize: 13, fontWeight: 600, margin: 0 }}>No data yet</p>
+                    <p style={{ color: "var(--aw18)", fontSize: 12, margin: 0 }}>Chart will populate as members join</p>
                   </div>
                 )}
               </div>
@@ -205,7 +206,7 @@ export default async function AdminOverviewPage() {
               {/* X axis labels */}
               <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
                 {months.map((m, i) => (
-                  <span key={i} style={{ color: "rgba(255,255,255,0.2)", fontSize: 10 }}>{m.label}</span>
+                  <span key={i} style={{ color: "var(--aw2)", fontSize: 10 }}>{m.label}</span>
                 ))}
               </div>
             </div>
@@ -215,11 +216,11 @@ export default async function AdminOverviewPage() {
         {/* Recent members */}
         <div style={{ ...card, padding: "22px 24px", display: "flex", flexDirection: "column" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
-            <p style={{ color: "rgb(240,240,248)", fontSize: 14, fontWeight: 700, margin: 0 }}>Recent members</p>
+            <p style={{ color: "var(--atext)", fontSize: 14, fontWeight: 700, margin: 0 }}>Recent members</p>
             {users.length > 0 && (
               <Link
                 href="/admin/users"
-                style={{ color: "rgba(255,255,255,0.35)", fontSize: 12, textDecoration: "none" }}
+                style={{ color: "var(--aw35)", fontSize: 12, textDecoration: "none" }}
               >
                 View all
               </Link>
@@ -228,11 +229,11 @@ export default async function AdminOverviewPage() {
 
           {recentUsers.length === 0 ? (
             <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, minHeight: 220 }}>
-              <div style={{ width: 50, height: 50, borderRadius: "50%", background: "rgba(255,255,255,0.04)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <Users size={22} color="rgba(255,255,255,0.2)" strokeWidth={1.4} />
+              <div style={{ width: 50, height: 50, borderRadius: "50%", background: "var(--aw04)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <Users size={22} color="var(--aw2)" strokeWidth={1.4} />
               </div>
-              <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 13, fontWeight: 600, margin: 0 }}>No members yet</p>
-              <p style={{ color: "rgba(255,255,255,0.18)", fontSize: 12, margin: 0, textAlign: "center", lineHeight: 1.5 }}>
+              <p style={{ color: "var(--aw3)", fontSize: 13, fontWeight: 600, margin: 0 }}>No members yet</p>
+              <p style={{ color: "var(--aw18)", fontSize: 12, margin: 0, textAlign: "center", lineHeight: 1.5 }}>
                 Members will appear here once they join
               </p>
             </div>
@@ -248,15 +249,15 @@ export default async function AdminOverviewPage() {
                       width: 32, height: 32, borderRadius: "50%", flexShrink: 0,
                       background: `hsl(${(i * 55 + 200) % 360}, 35%, 20%)`,
                       display: "flex", alignItems: "center", justifyContent: "center",
-                      fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.65)",
+                      fontSize: 11, fontWeight: 700, color: "var(--aw65)",
                     }}>
                       {initials}
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 12.5, margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      <p style={{ color: "var(--aw65)", fontSize: 12.5, margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                         {emailStr}
                       </p>
-                      <p style={{ color: "rgba(255,255,255,0.25)", fontSize: 11, margin: 0 }}>{date}</p>
+                      <p style={{ color: "var(--aw25)", fontSize: 11, margin: 0 }}>{date}</p>
                     </div>
                   </div>
                 );
@@ -269,7 +270,7 @@ export default async function AdminOverviewPage() {
       {/* ── Shops ── */}
       <div>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-          <p style={{ color: "rgb(240,240,248)", fontSize: 15, fontWeight: 700, margin: 0 }}>Shops</p>
+          <p style={{ color: "var(--atext)", fontSize: 15, fontWeight: 700, margin: 0 }}>Shops</p>
           <Link
             href="/admin/shops"
             style={{
@@ -291,11 +292,11 @@ export default async function AdminOverviewPage() {
             minHeight: 170,
             display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10,
           }}>
-            <div style={{ width: 50, height: 50, borderRadius: "50%", background: "rgba(255,255,255,0.04)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <Store size={22} color="rgba(255,255,255,0.2)" strokeWidth={1.4} />
+            <div style={{ width: 50, height: 50, borderRadius: "50%", background: "var(--aw04)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <Store size={22} color="var(--aw2)" strokeWidth={1.4} />
             </div>
-            <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 13, fontWeight: 600, margin: 0 }}>No shops yet</p>
-            <p style={{ color: "rgba(255,255,255,0.18)", fontSize: 12, margin: 0 }}>Shops will appear here once owners register</p>
+            <p style={{ color: "var(--aw3)", fontSize: 13, fontWeight: 600, margin: 0 }}>No shops yet</p>
+            <p style={{ color: "var(--aw18)", fontSize: 12, margin: 0 }}>Shops will appear here once owners register</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
@@ -303,29 +304,31 @@ export default async function AdminOverviewPage() {
               const color = PLAN_COLOR[shop.plan] ?? PLAN_COLOR.starter;
               const date  = new Date(shop.created_at).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" });
               return (
-                <div key={i} style={{
-                  background: "rgb(10,10,12)",
-                  border: "1px solid rgba(255,255,255,0.09)",
+                <div key={i} className="admin-stat-card" style={{
+                  background: "var(--am1)",
+                  border: "1px solid var(--aw09)",
                   borderRadius: 14, padding: "16px 18px",
+                  transition: "border-color 0.15s, transform 0.15s",
                 }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
                     <div style={{
                       width: 36, height: 36, borderRadius: 10,
-                      background: "rgba(255,255,255,0.05)",
+                      background: "var(--aw05)",
                       display: "flex", alignItems: "center", justifyContent: "center",
                     }}>
-                      <Store size={16} color="rgba(255,255,255,0.4)" strokeWidth={1.6} />
+                      <Store size={16} color="var(--aw4)" strokeWidth={1.6} />
                     </div>
                     <span style={{
                       fontSize: 10.5, fontWeight: 700, padding: "2px 9px", borderRadius: 20,
                       textTransform: "capitalize", color,
                       background: `${color}1A`,
+                      whiteSpace: "nowrap", flexShrink: 0,
                     }}>
                       {planLabel(shop.plan)}
                     </span>
                   </div>
-                  <p style={{ color: "rgb(240,240,248)", fontSize: 13, fontWeight: 700, margin: "0 0 4px" }}>{shop.name}</p>
-                  <p style={{ color: "rgba(255,255,255,0.25)", fontSize: 11.5, margin: 0 }}>{date}</p>
+                  <p style={{ color: "var(--atext)", fontSize: 13, fontWeight: 700, margin: "0 0 4px" }}>{shop.name}</p>
+                  <p style={{ color: "var(--aw25)", fontSize: 11.5, margin: 0 }}>{date}</p>
                 </div>
               );
             })}
@@ -337,7 +340,7 @@ export default async function AdminOverviewPage() {
       <div>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <p style={{ color: "rgb(240,240,248)", fontSize: 15, fontWeight: 700, margin: 0 }}>Waitlist</p>
+            <p style={{ color: "var(--atext)", fontSize: 15, fontWeight: 700, margin: 0 }}>Waitlist</p>
             {waitlist.length > 0 && (
               <span style={{ fontSize: 10.5, fontWeight: 700, color: "rgb(167,139,250)", background: "rgba(109,40,217,0.1)", padding: "3px 9px", borderRadius: 20 }}>
                 {waitlist.length} total
@@ -348,9 +351,9 @@ export default async function AdminOverviewPage() {
             href="/admin/waitlist"
             style={{
               padding: "7px 14px", borderRadius: 10,
-              background: "rgba(255,255,255,0.04)",
-              border: "1px solid rgba(255,255,255,0.08)",
-              color: "rgba(255,255,255,0.45)", fontSize: 13, fontWeight: 600,
+              background: "var(--aw04)",
+              border: "1px solid var(--aw08)",
+              color: "var(--aw45)", fontSize: 13, fontWeight: 600,
               textDecoration: "none",
             }}
           >
@@ -364,20 +367,20 @@ export default async function AdminOverviewPage() {
             minHeight: 120,
             display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8,
           }}>
-            <ClipboardList size={22} color="rgba(255,255,255,0.15)" strokeWidth={1.4} />
-            <p style={{ color: "rgba(255,255,255,0.25)", fontSize: 13, margin: 0 }}>No waitlist entries yet</p>
+            <ClipboardList size={22} color="var(--aw15)" strokeWidth={1.4} />
+            <p style={{ color: "var(--aw25)", fontSize: 13, margin: 0 }}>No waitlist entries yet</p>
           </div>
         ) : (
           <div style={card} className="overflow-x-auto">
             <table style={{ width: "100%", borderCollapse: "collapse" }}>
               <thead>
-                <tr style={{ background: "rgba(255,255,255,0.02)" }}>
+                <tr style={{ background: "var(--aw02)" }}>
                   {["Email", "Shop Type", "Joined"].map(h => (
                     <th key={h} style={{
                       padding: "10px 20px", textAlign: "left",
-                      color: "rgba(255,255,255,0.22)", fontSize: 11,
+                      color: "var(--aw22)", fontSize: 11,
                       fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase",
-                      borderBottom: "1px solid rgba(255,255,255,0.05)",
+                      borderBottom: "1px solid var(--aw05)",
                     }}>
                       {h}
                     </th>
@@ -388,20 +391,20 @@ export default async function AdminOverviewPage() {
                 {waitlist.slice(0, 6).map((entry, i) => {
                   const date = new Date(entry.created_at).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" });
                   return (
-                    <tr key={i} style={{ borderBottom: i < Math.min(waitlist.length, 6) - 1 ? "1px solid rgba(255,255,255,0.04)" : "none" }}>
-                      <td style={{ padding: "11px 20px", color: "rgba(255,255,255,0.6)", fontSize: 13 }}>{entry.email}</td>
-                      <td style={{ padding: "11px 20px", color: "rgba(255,255,255,0.38)", fontSize: 13 }}>
+                    <tr key={i} style={{ borderBottom: i < Math.min(waitlist.length, 6) - 1 ? "1px solid var(--aw04)" : "none" }}>
+                      <td style={{ padding: "11px 20px", color: "var(--aw6)", fontSize: 13 }}>{entry.email}</td>
+                      <td style={{ padding: "11px 20px", color: "var(--aw38)", fontSize: 13 }}>
                         {entry.shop_type ? (
                           <span style={{
                             fontSize: 11, fontWeight: 600, padding: "2px 9px", borderRadius: 20,
-                            background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.5)",
-                            border: "1px solid rgba(255,255,255,0.08)",
+                            background: "var(--aw06)", color: "var(--aw5)",
+                            border: "1px solid var(--aw08)",
                           }}>
                             {entry.shop_type}
                           </span>
                         ) : "-"}
                       </td>
-                      <td style={{ padding: "11px 20px", color: "rgba(255,255,255,0.28)", fontSize: 12 }}>{date}</td>
+                      <td style={{ padding: "11px 20px", color: "var(--aw3)", fontSize: 12 }}>{date}</td>
                     </tr>
                   );
                 })}
@@ -411,6 +414,12 @@ export default async function AdminOverviewPage() {
         )}
       </div>
 
+      <style>{`
+        .admin-stat-card:hover {
+          border-color: rgba(139,92,246,0.35) !important;
+          transform: translateY(-1px);
+        }
+      `}</style>
     </div>
   );
 }
