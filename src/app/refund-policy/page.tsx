@@ -41,14 +41,16 @@ If FlatPurse discontinues the Founders Beta program or the Service entirely befo
       },
       {
         title: "3.4 Consumer Protection Laws",
-        body: "Nothing in this policy limits rights you may have under applicable Alberta or Canadian consumer-protection legislation. Where such laws require a refund in circumstances not addressed above, we will comply.",
+        body: "Nothing in this policy limits rights you may have under applicable Alberta or Canadian consumer-protection legislation, including, where applicable, Quebec's Consumer Protection Act. Where such laws require a refund, a cancellation right, or different notice periods than those stated in this policy, the applicable law governs and we will comply.",
       },
     ],
   },
   {
     n: "4",
     title: "Transaction Fees and Third-Party Charges",
-    body: "FlatPurse is not responsible for refunding transaction fees charged by Stripe or other third-party payment processors. Stripe's own refund and dispute policies apply to payment processing fees. For chargebacks and disputes initiated by your end customers, you remain responsible under your Stripe Connected Account Agreement.",
+    body: `FlatPurse is not responsible for refunding transaction fees charged by Stripe or other third-party payment processors on payments you make to us — where a refund is approved under Section 3, you receive the full amount originally charged, and FlatPurse bears any non-refundable processing cost on that transaction.
+
+This section does not apply to end-customer transactions processed through your own Stripe Connected Account. Stripe's own refund and dispute policies govern those payments, and for chargebacks and disputes initiated by your end customers, you remain responsible under your Stripe Connected Account Agreement.`,
   },
   {
     n: "5",
@@ -59,7 +61,7 @@ If FlatPurse discontinues the Founders Beta program or the Service entirely befo
       "Subject line: \"Refund Request: [Your Account Name]\"",
       "Include: the date of the charge, the amount, and a brief description of the reason for your request.",
     ],
-    footer: "We will acknowledge your request within 3 business days and aim to resolve it within 10 business days. Approved refunds will be returned to the original payment method.",
+    footer: "We will acknowledge your request within 3 business days and aim to resolve it within 10 business days. Approved refunds will be returned to the original payment method. This 30-day window governs requests made directly to FlatPurse and does not limit or replace any right you may have to dispute a charge with your card issuer or bank.",
   },
   {
     n: "6",
@@ -119,7 +121,7 @@ export default function RefundPolicyPage() {
           Refund Policy
         </h1>
         <p style={{ fontSize: 14, color: "rgba(255,255,255,0.35)", margin: 0, lineHeight: 1.7 }}>
-          FlatPurse Flow &nbsp;|&nbsp; Effective Date: June 2026 &nbsp;|&nbsp; Last Updated: June 2026
+          FlatPurse Flow &nbsp;|&nbsp; Effective Date: June 2026 &nbsp;|&nbsp; Last Updated: August 2026
         </p>
         <p style={{ fontSize: 15, color: "rgba(255,255,255,0.5)", lineHeight: 1.8, margin: "28px 0 0", maxWidth: 720 }}>
           This Refund Policy explains when FlatPurse Inc. ("FlatPurse," "we," "us") issues refunds for subscription fees paid for the FlatPurse Flow platform. It is incorporated into and forms part of the FlatPurse Flow Terms of Service. By using the Service, you agree to this policy.

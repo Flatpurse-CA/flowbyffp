@@ -225,7 +225,7 @@ export default function TermsPage() {
           Terms of Service
         </h1>
         <p style={{ fontSize: 14, color: "rgba(255,255,255,0.35)", margin: 0, lineHeight: 1.7 }}>
-          FlatPurse Flow &nbsp;|&nbsp; Effective Date: June 2026 &nbsp;|&nbsp; Last Updated: June 2026
+          FlatPurse Flow &nbsp;|&nbsp; Effective Date: June 2026 &nbsp;|&nbsp; Last Updated: August 2026
         </p>
         <p style={{ fontSize: 15, color: "rgba(255,255,255,0.5)", lineHeight: 1.8, margin: "28px 0 0", maxWidth: 720 }}>
           These Terms of Service ("Terms") form a binding agreement between you and FlatPurse Inc. ("FlatPurse," "we," "us," or "our"), a company incorporated in Alberta, Canada, governing your access to and use of the FlatPurse Flow platform, including our website at flatpurse.com, our applications, APIs, and related services (collectively, the "Service").

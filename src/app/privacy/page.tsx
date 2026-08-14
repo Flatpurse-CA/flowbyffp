@@ -103,6 +103,7 @@ Where we act as a processor, the Business User is responsible for ensuring it ha
       "Billing and tax records: retained as required by Canadian tax and accounting law (typically seven years).",
       "End-customer data: retained as instructed by the Business User and deleted or returned upon termination of the Business User's account, subject to legal holds.",
       "Logs and security data: typically retained for up to 24 months.",
+      "Deletion of personal data: Upon account closure or a valid deletion request, we will erase your personal data within thirty (30) days, except where longer retention is required to comply with legal, tax, or regulatory obligations (including the billing, tax, and security retention periods described above).",
     ],
   },
   {
@@ -158,11 +159,21 @@ Where we act as a processor, the Business User is responsible for ensuring it ha
   },
   {
     n: "14",
+    title: "Limitation of Liability",
+    body: "In no event shall FlatPurse Inc. be liable for any indirect, incidental, special, or consequential damages arising from your use of FlatPurse Flow. FlatPurse Inc.'s total liability for any claim arising out of or relating to this Policy or your use of the Service shall not exceed the total amount paid by you to FlatPurse Inc. in the twelve (12) months preceding the claim.",
+  },
+  {
+    n: "15",
+    title: "Governing Law and Dispute Resolution",
+    body: "This Policy shall be governed by and construed in accordance with the laws of the Province of Alberta and the federal laws of Canada applicable therein, without regard to conflict of law principles. Any disputes arising under this Policy shall be resolved in the courts of the Province of Alberta.",
+  },
+  {
+    n: "16",
     title: "Changes to This Policy",
     body: "We may update this Privacy Policy from time to time. If we make material changes, we will notify you by email or through the Service. The \"Last Updated\" date at the top of this Policy indicates when it was last revised. Continued use of the Service after changes take effect constitutes acceptance of the updated Policy.",
   },
   {
-    n: "15",
+    n: "17",
     title: "Contact Us",
     body: null,
     contact: true,
@@ -215,7 +226,7 @@ export default function PrivacyPage() {
           Privacy Policy
         </h1>
         <p style={{ fontSize: 14, color: "rgba(255,255,255,0.35)", margin: 0, lineHeight: 1.7 }}>
-          FlatPurse Flow &nbsp;|&nbsp; Effective Date: June 2026 &nbsp;|&nbsp; Last Updated: June 2026
+          FlatPurse Flow &nbsp;|&nbsp; Effective Date: June 2026 &nbsp;|&nbsp; Last Updated: August 2026
         </p>
         <p style={{ fontSize: 15, color: "rgba(255,255,255,0.5)", lineHeight: 1.8, margin: "28px 0 0", maxWidth: 720 }}>
           This Privacy Policy describes how FlatPurse Inc. ("FlatPurse," "we," "us," or "our"), a company incorporated in Alberta, Canada, collects, uses, discloses, and protects personal information in connection with the FlatPurse Flow platform, including our website at flatpurse.com, our web application, mobile applications, APIs, and related services (collectively, the "Service").
