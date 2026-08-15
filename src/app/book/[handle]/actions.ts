@@ -86,7 +86,7 @@ export async function createPublicBooking(input: {
 
   const admin = createAdminClient();
 
-  const { data: shop } = await admin.from("shops").select("id, name").eq("id", input.shopId).maybeSingle();
+  const { data: shop } = await admin.from("shops").select("id, name, street_address, city, province, phone").eq("id", input.shopId).maybeSingle();
   if (!shop) return { error: "This shop couldn't be found" };
 
   const { data: service } = await admin
@@ -152,10 +152,16 @@ export async function createPublicBooking(input: {
 
   try {
     await sendBookingConfirmationEmail(ctx.email, {
+      appointmentId: inserted.id as string,
       shopName: shop.name as string,
       serviceName: service.name as string,
       startsAt: input.startsAt,
+      durationMinutes: service.duration_minutes as number,
       stylistName,
+      streetAddress: shop.street_address as string | null,
+      city: shop.city as string | null,
+      province: shop.province as string | null,
+      shopPhone: shop.phone as string | null,
     });
   } catch {
     // Booking already succeeded — a failed confirmation email shouldn't fail the booking itself.

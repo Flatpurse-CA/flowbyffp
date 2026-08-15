@@ -10,7 +10,7 @@ function client(): Resend | null {
 
 // Never throws — callers destructure `{ error }` the same way the Resend SDK
 // itself responds, whether the failure is a missing API key or a real send error.
-async function send(payload: { to: string; subject: string; html: string }) {
+async function send(payload: { to: string; subject: string; html: string; attachments?: { filename: string; content: string; contentType?: string }[] }) {
   const c = client();
   if (!c) {
     return {
@@ -19,6 +19,36 @@ async function send(payload: { to: string; subject: string; html: string }) {
     };
   }
   return c.emails.send({ from: FROM, ...payload });
+}
+
+function icsEscape(text: string) {
+  return text.replace(/\\/g, "\\\\").replace(/,/g, "\\,").replace(/;/g, "\\;").replace(/\n/g, "\\n");
+}
+
+function icsDate(date: Date) {
+  return date.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+}
+
+function buildBookingIcs(input: { appointmentId: string; shopName: string; serviceName: string; startsAt: string; durationMinutes: number; location: string }) {
+  const start = new Date(input.startsAt);
+  const end = new Date(start.getTime() + input.durationMinutes * 60000);
+  const lines = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//FlatPurse Flow//Booking//EN",
+    "METHOD:PUBLISH",
+    "BEGIN:VEVENT",
+    `UID:${input.appointmentId}@flow.flatpurse.com`,
+    `DTSTAMP:${icsDate(new Date())}`,
+    `DTSTART:${icsDate(start)}`,
+    `DTEND:${icsDate(end)}`,
+    `SUMMARY:${icsEscape(`${input.serviceName} at ${input.shopName}`)}`,
+    ...(input.location ? [`LOCATION:${icsEscape(input.location)}`] : []),
+    `DESCRIPTION:${icsEscape(`Booking with ${input.shopName}`)}`,
+    "END:VEVENT",
+    "END:VCALENDAR",
+  ];
+  return lines.join("\r\n");
 }
 
 export async function sendEmail({
@@ -75,10 +105,26 @@ export async function sendStaffInviteEmail(to: string, input: { shopName: string
   });
 }
 
-export async function sendBookingConfirmationEmail(to: string, input: { shopName: string; serviceName: string; startsAt: string; stylistName: string | null }) {
+export async function sendBookingConfirmationEmail(to: string, input: {
+  appointmentId: string; shopName: string; serviceName: string; startsAt: string; durationMinutes: number; stylistName: string | null;
+  streetAddress?: string | null; city?: string | null; province?: string | null; shopPhone?: string | null;
+}) {
   const when = new Intl.DateTimeFormat("en-US", {
-    timeZone: "America/Edmonton", weekday: "long", month: "long", day: "numeric", hour: "numeric", minute: "2-digit",
+    timeZone: "America/Edmonton", weekday: "long", month: "long", day: "numeric", hour: "numeric", minute: "2-digit", timeZoneName: "short",
   }).format(new Date(input.startsAt));
+
+  const addressParts = [input.streetAddress, input.city, input.province].filter(Boolean);
+  const address = addressParts.join(", ");
+  const mapsUrl = address ? `https://maps.google.com/?q=${encodeURIComponent(address)}` : null;
+
+  const ics = buildBookingIcs({
+    appointmentId: input.appointmentId,
+    shopName: input.shopName,
+    serviceName: input.serviceName,
+    startsAt: input.startsAt,
+    durationMinutes: input.durationMinutes,
+    location: address,
+  });
 
   return send({
     to,
@@ -89,12 +135,16 @@ export async function sendBookingConfirmationEmail(to: string, input: { shopName
         <p style="color: #444; font-size: 14px; line-height: 1.6;">
           ${input.serviceName}${input.stylistName ? ` with ${input.stylistName}` : ""} at ${input.shopName}.
         </p>
-        <p style="font-size: 16px; font-weight: 700; margin: 20px 0;">${when}</p>
+        <p style="font-size: 16px; font-weight: 700; margin: 20px 0 4px;">${when}</p>
+        ${address ? `<p style="color: #666; font-size: 13px; margin: 0 0 20px;">${mapsUrl ? `<a href="${mapsUrl}" style="color: #6d28d9; text-decoration: none;">${address}</a>` : address}</p>` : ""}
         <p style="color: #444; font-size: 14px; line-height: 1.6;">
           The shop will confirm shortly. You can view or cancel this booking anytime from your account.
         </p>
+        <p style="color: #999; font-size: 12px; margin-top: 24px;">Booking ID: ${input.appointmentId}</p>
+        ${input.shopPhone ? `<p style="color: #999; font-size: 12px; margin: 4px 0 0;">${input.shopName}: ${input.shopPhone}</p>` : ""}
       </div>
     `,
+    attachments: [{ filename: "booking.ics", content: Buffer.from(ics).toString("base64"), contentType: "text/calendar" }],
   });
 }
 

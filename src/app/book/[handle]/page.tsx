@@ -18,7 +18,7 @@ export default async function BookingPage({ params }: { params: Promise<{ handle
 
   const { data: shop } = await admin
     .from("shops")
-    .select("id, name, city, province, handle, stripe_connected, profile_image_url, cover_image_url")
+    .select("id, name, city, province, street_address, handle, stripe_connected, profile_image_url, cover_image_url")
     .eq("handle", handle)
     .maybeSingle();
 
@@ -78,6 +78,7 @@ export default async function BookingPage({ params }: { params: Promise<{ handle
     <BookingClient
       shop={{
         id: shop.id as string, name: shop.name as string, city: shop.city as string, province: shop.province as string,
+        streetAddress: (shop.street_address as string | null) ?? null,
         stripeConnected: Boolean(shop.stripe_connected),
         profileImageUrl: (shop.profile_image_url as string | null) ?? null,
         coverImageUrl: (shop.cover_image_url as string | null) ?? null,

@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
-  Clock, CheckCircle2, ChevronLeft, X, MapPin, Lock, CalendarClock, Star,
+  Clock, CheckCircle2, ChevronLeft, X, MapPin, Lock, CalendarClock, Star, Copy, Check,
 } from "lucide-react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
@@ -19,7 +19,7 @@ const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type Shop = { id: string; name: string; city: string; province: string; stripeConnected: boolean; profileImageUrl: string | null; coverImageUrl: string | null };
+type Shop = { id: string; name: string; city: string; province: string; streetAddress: string | null; stripeConnected: boolean; profileImageUrl: string | null; coverImageUrl: string | null };
 type Service = { id: string; name: string; price: number; duration_minutes: number; category: string | null };
 type Staff = { id: string; full_name: string; role: string | null; color: string };
 type BusinessHour = { weekday: number; open: boolean; start_time: string; end_time: string };
@@ -521,7 +521,7 @@ export function BookingClient({ shop, services, staff, businessHours, initialCus
               />
             )}
             {step === "done" && (
-              <DoneStep service={service} time={time!} shop={shop} onDone={reset} />
+              <DoneStep service={service} time={time!} shop={shop} appointmentId={appointmentId} onDone={reset} />
             )}
           </div>
         </div>
@@ -889,7 +889,11 @@ function PayForm({ onPaid }: { onPaid: () => void }) {
 
 // ─── Step: done ──────────────────────────────────────────────────────────────────
 
-function DoneStep({ service, time, shop, onDone }: { service: Service; time: string; shop: Shop; onDone: () => void }) {
+function DoneStep({ service, time, shop, appointmentId, onDone }: { service: Service; time: string; shop: Shop; appointmentId: string | null; onDone: () => void }) {
+  const [copied, setCopied] = useState(false);
+  const address = [shop.streetAddress, shop.city, shop.province].filter(Boolean).join(", ");
+  const mapsUrl = address ? `https://maps.google.com/?q=${encodeURIComponent(address)}` : null;
+
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 20, textAlign: "center", padding: "20px 0" }}>
       <div style={{ width: 80, height: 80, borderRadius: "50%", background: "rgba(52,211,153,0.12)", border: "2px solid rgba(52,211,153,0.3)", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -908,7 +912,23 @@ function DoneStep({ service, time, shop, onDone }: { service: Service; time: str
         <div style={{ padding: "18px 22px", display: "flex", flexDirection: "column", gap: 8, textAlign: "left" }}>
           <p style={{ color: "var(--cust-text)", fontSize: 13, fontWeight: 600, margin: 0 }}>{fmtTime(time)}</p>
           <p style={{ color: "var(--cust-text-sub)", fontSize: 12.5, margin: 0 }}>{fmtDuration(service.duration_minutes)} · C${service.price}</p>
+          {address && (
+            <a href={mapsUrl!} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 5, color: "var(--cust-text-sub)", fontSize: 12.5, textDecoration: "none", marginTop: 2 }}>
+              <MapPin size={12} /> {address}
+            </a>
+          )}
         </div>
+        {appointmentId && (
+          <div style={{ padding: "10px 22px", borderTop: "1px solid var(--cust-input-border)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+            <span style={{ color: "var(--cust-text-sub)", fontSize: 11 }}>Booking ID: {appointmentId.slice(0, 8).toUpperCase()}</span>
+            <button
+              onClick={() => { navigator.clipboard.writeText(appointmentId); setCopied(true); setTimeout(() => setCopied(false), 1500); }}
+              style={{ background: "none", border: "none", color: "var(--cust-text-sub)", cursor: "pointer", display: "flex", alignItems: "center", gap: 4, fontSize: 11, padding: 0 }}
+            >
+              {copied ? <><Check size={12} color="rgb(52,211,153)" /> Copied</> : <><Copy size={12} /> Copy</>}
+            </button>
+          </div>
+        )}
       </div>
 
       <Link href="/customer/account" style={{ width: "100%", boxSizing: "border-box", padding: "13px", borderRadius: 12, border: "1.5px solid var(--cust-input-border)", background: "var(--cust-card-bg)", color: "var(--cust-text)", fontSize: 13.5, fontWeight: 700, textDecoration: "none", textAlign: "center", display: "block" }}>

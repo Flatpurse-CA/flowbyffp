@@ -2,13 +2,19 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { customerRequestPasswordReset } from "../actions";
+import { ArrowLeft } from "lucide-react";
+import { AuthImagePanel } from "@/components/AuthImagePanel";
+import { FlatPurseLogo } from "@/components/FlatPurseLogo";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { customerRequestPasswordReset } from "../actions";
+
+const easing = "cubic-bezier(0.16, 1, 0.3, 1)";
+const fadeUp = (delay: number) => `0.5s ${easing} ${delay}ms 1 normal both running fp-fade-up`;
 
 export default function ForgotPasswordPage() {
-  const [email, setEmail]     = useState("");
+  const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
-  const [sent, setSent]       = useState(false);
+  const [sent, setSent] = useState(false);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,47 +25,72 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--cust-bg)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24, fontFamily: "DM Sans, system-ui, sans-serif", position: "relative" }}>
-      <div style={{ position: "absolute", top: 20, right: 20 }}><ThemeToggle /></div>
-      <div style={{ width: "100%", maxWidth: 380, background: "var(--cust-card-bg)", border: "1px solid var(--cust-card-border)", borderRadius: 20, padding: "32px 28px", boxShadow: "var(--cust-shadow)" }}>
-        {sent ? (
-          <>
-            <h1 style={{ color: "var(--cust-text)", fontSize: 20, fontWeight: 800, margin: "0 0 8px", letterSpacing: "-0.02em" }}>Check your email</h1>
-            <p style={{ color: "var(--cust-text-sub)", fontSize: 13.5, margin: 0, lineHeight: 1.6 }}>
-              If an account exists for {email}, we&apos;ve sent a link to reset your password.
-            </p>
-          </>
-        ) : (
-          <form onSubmit={submit}>
-            <h1 style={{ color: "var(--cust-text)", fontSize: 22, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.02em" }}>Reset your password</h1>
-            <p style={{ color: "var(--cust-text-sub)", fontSize: 13.5, margin: "0 0 22px" }}>We&apos;ll email you a link to set a new one.</p>
+    <div style={{ display: "flex", height: "100vh", overflow: "hidden", background: "var(--auth-bg)", position: "relative" }}>
+      <div className="auth-mobile-gradient" />
+      <div className="absolute left-5 z-10 lg:hidden" style={{ top: "calc(max(env(safe-area-inset-top, 0px), 44px) + 20px)" }}>
+        <FlatPurseLogo className="h-6 w-auto" />
+      </div>
+      <div className="absolute right-5 z-10" style={{ top: "calc(max(env(safe-area-inset-top, 0px), 44px) + 20px)" }}>
+        <ThemeToggle />
+      </div>
 
-            <div style={{ marginBottom: 20 }}>
-              <label style={{ color: "var(--cust-text-sub)", fontSize: 12, fontWeight: 600, display: "block", marginBottom: 6 }}>Email</label>
-              <input type="email" required value={email} onChange={e => setEmail(e.target.value)} style={inputStyle} />
-            </div>
+      <AuthImagePanel />
 
-            <button type="submit" disabled={loading} style={{
-              width: "100%", padding: "13px", borderRadius: 12, border: "none",
-              background: "rgb(109,40,217)", color: "white", fontSize: 14.5, fontWeight: 700,
-              cursor: loading ? "default" : "pointer", opacity: loading ? 0.6 : 1,
-            }}>
-              {loading ? "Sending…" : "Send reset link"}
-            </button>
-          </form>
-        )}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "0 32px", position: "relative", zIndex: 1 }} className="w-full lg:w-1/2">
+        <div style={{ width: "100%", maxWidth: 400, animation: `0.42s ${easing} 0s 1 normal both running fp-slide-in-r` }}>
+          <Link href="/customer/login" style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--auth-text-sub)", fontSize: 13, textDecoration: "none", marginBottom: 28, animation: fadeUp(0) }}>
+            <ArrowLeft size={14} /> Back to sign in
+          </Link>
 
-        <p style={{ color: "var(--cust-text-sub)", fontSize: 13, textAlign: "center", margin: "18px 0 0" }}>
-          <Link href="/customer/login" style={{ color: "rgb(109,40,217)", fontWeight: 700, textDecoration: "none" }}>Back to sign in</Link>
-        </p>
+          {sent ? (
+            <>
+              <h1 style={{ color: "var(--auth-text)", fontSize: 26, fontWeight: 700, letterSpacing: "-0.025em", margin: 0, animation: fadeUp(30) }}>
+                Check your email
+              </h1>
+              <p style={{ color: "var(--auth-text-sub)", fontSize: 14, marginTop: 6, lineHeight: 1.6, animation: fadeUp(60) }}>
+                If an account exists for <strong style={{ color: "var(--auth-text)" }}>{email}</strong>, we&apos;ve sent a link to reset your password.
+              </p>
+            </>
+          ) : (
+            <>
+              <h1 style={{ color: "var(--auth-text)", fontSize: 26, fontWeight: 700, letterSpacing: "-0.025em", margin: 0, animation: fadeUp(30) }}>
+                Reset your password
+              </h1>
+              <p style={{ color: "var(--auth-text-sub)", fontSize: 14, marginBottom: 32, marginTop: 6, lineHeight: 1.6, animation: fadeUp(60) }}>
+                Enter your email and we&apos;ll send you a link to set a new one.
+              </p>
+
+              <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: 18, animation: fadeUp(100) }}>
+                <div>
+                  <label style={labelStyle}>Email</label>
+                  <input
+                    type="email" required value={email} onChange={e => setEmail(e.target.value)}
+                    placeholder="you@example.com" autoComplete="email" style={inputStyle}
+                  />
+                </div>
+                <button type="submit" disabled={loading} style={{ ...primaryBtnStyle, opacity: loading ? 0.6 : 1, cursor: loading ? "default" : "pointer" }}>
+                  {loading ? "Sending…" : "Send reset link"}
+                </button>
+              </form>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
 }
 
+const labelStyle: React.CSSProperties = {
+  display: "block", color: "var(--auth-text-sub)", fontSize: 13, fontWeight: 500, marginBottom: 8,
+};
+
 const inputStyle: React.CSSProperties = {
-  width: "100%", padding: "11px 13px", borderRadius: 10,
-  border: "1.5px solid var(--cust-input-border)", background: "var(--cust-input-bg)",
-  color: "var(--cust-text)", fontSize: 16, outline: "none",
-  boxSizing: "border-box", fontFamily: "inherit",
+  width: "100%", background: "var(--auth-input-bg)", border: "1px solid var(--auth-input-border)",
+  borderRadius: 10, padding: "13px 14px", color: "var(--auth-text)",
+  fontSize: 16, outline: "none", transition: "border-color 0.15s", boxSizing: "border-box",
+};
+
+const primaryBtnStyle: React.CSSProperties = {
+  width: "100%", background: "var(--auth-btn-bg)", color: "var(--auth-btn-text)",
+  border: "none", borderRadius: 12, padding: 14, fontSize: 15, fontWeight: 600,
 };
