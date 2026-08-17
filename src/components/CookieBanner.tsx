@@ -2,10 +2,13 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { CONSENT_CHANGE_EVENT, CONSENT_STORAGE_KEY } from "@/lib/consent";
 
-const STORAGE_KEY = "ffp-cookie-consent";
+const STORAGE_KEY = CONSENT_STORAGE_KEY;
 
 export default function CookieBanner() {
+  const pathname = usePathname();
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -17,13 +20,17 @@ export default function CookieBanner() {
     }
   }, []);
 
+  if (pathname?.startsWith("/admin")) return null;
+
   function handleAccept() {
     try { localStorage.setItem(STORAGE_KEY, "accepted"); } catch {}
+    window.dispatchEvent(new Event(CONSENT_CHANGE_EVENT));
     setVisible(false);
   }
 
   function handleReject() {
     try { localStorage.setItem(STORAGE_KEY, "rejected"); } catch {}
+    window.dispatchEvent(new Event(CONSENT_CHANGE_EVENT));
     setVisible(false);
   }
 

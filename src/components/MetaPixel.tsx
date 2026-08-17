@@ -1,0 +1,55 @@
+"use client";
+
+import Script from "next/script";
+import { useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
+import { CONSENT_CHANGE_EVENT, hasMarketingConsent } from "@/lib/consent";
+
+declare global {
+  interface Window {
+    fbq?: (...args: unknown[]) => void;
+  }
+}
+
+const PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID;
+
+export default function MetaPixel() {
+  const [consented, setConsented] = useState(false);
+  const pathname = usePathname();
+  const isFirstRender = useRef(true);
+
+  useEffect(() => {
+    const check = () => setConsented(hasMarketingConsent());
+    check();
+    window.addEventListener(CONSENT_CHANGE_EVENT, check);
+    return () => window.removeEventListener(CONSENT_CHANGE_EVENT, check);
+  }, []);
+
+  // fbq('init', ...) already fires one PageView; only re-track on later route changes.
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    if (consented) window.fbq?.("track", "PageView");
+  }, [pathname, consented]);
+
+  if (!PIXEL_ID || !consented) return null;
+
+  return (
+    <Script id="meta-pixel" strategy="afterInteractive">
+      {`
+        !function(f,b,e,v,n,t,s)
+        {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+        n.queue=[];t=b.createElement(e);t.async=!0;
+        t.src=v;s=b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t,s)}(window, document,'script',
+        'https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init', '${PIXEL_ID}');
+        fbq('track', 'PageView');
+      `}
+    </Script>
+  );
+}

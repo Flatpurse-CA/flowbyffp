@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/lib/theme-context";
 import CookieBanner from "@/components/CookieBanner";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
+import MetaPixel from "@/components/MetaPixel";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -57,6 +58,7 @@ export default function RootLayout({
         <ThemeProvider>{children}</ThemeProvider>
         <CookieBanner />
         <ServiceWorkerRegister />
+        <MetaPixel />
       </body>
     </html>
   );
