@@ -96,6 +96,7 @@ export default function WaitlistPage() {
     if (error) {
       setFormError(error);
     } else {
+      window.fbq?.("track", "Lead");
       setSubmitted(true);
     }
   }
