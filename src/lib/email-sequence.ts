@@ -36,6 +36,20 @@ export async function enqueueSubscriber(subscriberId: string) {
     onConflict: "subscriber_id,sequence_id",
     ignoreDuplicates: true,
   });
+
+  // Sends due immediately (e.g. the Day 0 confirmation) shouldn't wait for the
+  // next hourly queue run — fire them now instead of leaving the signer-upper
+  // wondering why nothing landed in their inbox.
+  const { data: due } = await admin
+    .from("email_sends")
+    .select("id")
+    .eq("subscriber_id", subscriberId)
+    .eq("status", "pending")
+    .lte("scheduled_at", new Date().toISOString());
+
+  for (const send of due ?? []) {
+    await sendSequenceEmail(send.id);
+  }
 }
 
 export async function sendSequenceEmail(sendId: string): Promise<{ error: string | null }> {
@@ -61,7 +75,8 @@ export async function sendSequenceEmail(sendId: string): Promise<{ error: string
   const html = sequence.body.replace(/\[First Name\]/g, firstName);
 
   try {
-    await sendEmail({ to: subscriber.email, subject: sequence.subject, html });
+    const { error: sendError } = await sendEmail({ to: subscriber.email, subject: sequence.subject, html });
+    if (sendError) throw new Error(sendError.message);
 
     await admin.from("email_sends").update({
       status: "sent",
