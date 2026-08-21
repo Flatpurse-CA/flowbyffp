@@ -37,25 +37,25 @@ export default async function AdminUsersPage() {
     <div style={{ maxWidth: 1200 }}>
       {/* Heading */}
       <div style={{ marginBottom: 24 }}>
-        <h1 style={{ color: "rgb(250,250,250)", fontSize: 22, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.03em" }}>Users</h1>
-        <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 13, margin: 0 }}>{rows.length} total account{rows.length !== 1 ? "s" : ""}</p>
+        <h1 style={{ color: "var(--atext2)", fontSize: 22, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.03em" }}>Users</h1>
+        <p style={{ color: "var(--aw3)", fontSize: 13, margin: 0 }}>{rows.length} total account{rows.length !== 1 ? "s" : ""}</p>
       </div>
 
       {rows.length === 0 ? (
-        <div style={{ padding: "48px 0", textAlign: "center", color: "rgba(255,255,255,0.25)", fontSize: 14 }}>
+        <div style={{ padding: "48px 0", textAlign: "center", color: "var(--aw25)", fontSize: 14 }}>
           No users yet.
         </div>
       ) : (
-        <div style={{ background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 16, overflowY: "hidden", overflowX: "auto" }}>
+        <div style={{ background: "var(--aw025)", border: "1px solid var(--aw07)", borderRadius: 16, overflowY: "hidden", overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 800 }}>
             <thead>
-              <tr style={{ background: "rgba(255,255,255,0.015)" }}>
+              <tr style={{ background: "var(--aw015)" }}>
                 {["User", "Shop", "Plan", "Revenue", "Joined", "Status", "Actions"].map(h => (
                   <th key={h} style={{
                     padding: "11px 18px", textAlign: "left",
-                    color: "rgba(255,255,255,0.28)", fontSize: 11,
+                    color: "var(--aw3)", fontSize: 11,
                     fontWeight: 600, letterSpacing: "0.05em", textTransform: "uppercase",
-                    borderBottom: "1px solid rgba(255,255,255,0.06)",
+                    borderBottom: "1px solid var(--aw06)",
                     whiteSpace: "nowrap",
                   }}>
                     {h}
@@ -68,7 +68,7 @@ export default async function AdminUsersPage() {
                 const initials = row.email.slice(0, 2).toUpperCase();
                 const date = new Date(row.createdAt).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" });
                 return (
-                  <tr key={row.id} style={{ borderBottom: i < rows.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none" }}>
+                  <tr key={row.id} style={{ borderBottom: i < rows.length - 1 ? "1px solid var(--aw04)" : "none" }}>
                     {/* User */}
                     <td style={{ padding: "13px 18px" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -76,20 +76,20 @@ export default async function AdminUsersPage() {
                           width: 32, height: 32, borderRadius: 16, flexShrink: 0,
                           background: `hsl(${(i * 61 + 210) % 360}, 35%, 22%)`,
                           display: "flex", alignItems: "center", justifyContent: "center",
-                          fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.8)",
+                          fontSize: 11, fontWeight: 700, color: "var(--aw85)",
                           opacity: row.isBanned ? 0.4 : 1,
                         }}>
                           {initials}
                         </div>
                         <div>
-                          {row.name && <p style={{ color: "rgb(250,250,250)", fontSize: 12.5, fontWeight: 600, margin: "0 0 1px" }}>{row.name}</p>}
-                          <p style={{ color: "rgba(255,255,255,0.42)", fontSize: 11.5, margin: 0 }}>{row.email}</p>
+                          {row.name && <p style={{ color: "var(--atext2)", fontSize: 12.5, fontWeight: 600, margin: "0 0 1px" }}>{row.name}</p>}
+                          <p style={{ color: "var(--aw42)", fontSize: 11.5, margin: 0 }}>{row.email}</p>
                         </div>
                       </div>
                     </td>
 
                     {/* Shop */}
-                    <td style={{ padding: "13px 18px", color: row.shopName ? "rgba(255,255,255,0.55)" : "rgba(255,255,255,0.18)", fontSize: 12.5 }}>
+                    <td style={{ padding: "13px 18px", color: row.shopName ? "var(--aw55)" : "var(--aw18)", fontSize: 12.5 }}>
                       {row.shopName ?? "-"}
                     </td>
 
@@ -98,17 +98,17 @@ export default async function AdminUsersPage() {
                       {row.plan ? (
                         <PlanSelect userId={row.id} plan={row.plan} />
                       ) : (
-                        <span style={{ color: "rgba(255,255,255,0.18)", fontSize: 12 }}>-</span>
+                        <span style={{ color: "var(--aw18)", fontSize: 12 }}>-</span>
                       )}
                     </td>
 
                     {/* Revenue */}
-                    <td style={{ padding: "13px 18px", color: row.revenue ? "rgba(255,255,255,0.55)" : "rgba(255,255,255,0.18)", fontSize: 12.5, fontWeight: 600, whiteSpace: "nowrap" }}>
+                    <td style={{ padding: "13px 18px", color: row.revenue ? "var(--aw55)" : "var(--aw18)", fontSize: 12.5, fontWeight: 600, whiteSpace: "nowrap" }}>
                       {row.revenue !== null ? formatCAD(row.revenue) : "-"}
                     </td>
 
                     {/* Joined */}
-                    <td style={{ padding: "13px 18px", color: "rgba(255,255,255,0.35)", fontSize: 12, whiteSpace: "nowrap" }}>
+                    <td style={{ padding: "13px 18px", color: "var(--aw35)", fontSize: 12, whiteSpace: "nowrap" }}>
                       {date}
                     </td>
 
@@ -168,8 +168,8 @@ export default async function AdminUsersPage() {
                             style={{
                               display: "flex", alignItems: "center", justifyContent: "center",
                               width: 28, height: 28, borderRadius: 8, cursor: "pointer",
-                              background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
-                              color: "rgba(255,255,255,0.3)", fontFamily: "inherit",
+                              background: "var(--aw04)", border: "1px solid var(--aw08)",
+                              color: "var(--aw3)", fontFamily: "inherit",
                             }}
                           >
                             <Trash2 size={12} />

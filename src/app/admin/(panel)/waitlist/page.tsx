@@ -11,14 +11,14 @@ function StatCard({
 }) {
   return (
     <div style={{
-      background: "rgb(10,10,12)",
-      border: "1px solid rgba(255,255,255,0.09)",
+      background: "var(--am1)",
+      border: "1px solid var(--aw09)",
       borderRadius: 16, padding: "20px 22px",
       display: "flex", alignItems: "center", justifyContent: "space-between",
     }}>
       <div>
-        <p style={{ color: "rgba(255,255,255,0.38)", fontSize: 12, fontWeight: 500, margin: "0 0 8px" }}>{label}</p>
-        <p style={{ color: "rgb(245,245,252)", fontSize: 32, fontWeight: 800, letterSpacing: "-0.04em", margin: 0, lineHeight: 1 }}>{count}</p>
+        <p style={{ color: "var(--aw38)", fontSize: 12, fontWeight: 500, margin: "0 0 8px" }}>{label}</p>
+        <p style={{ color: "var(--atext2)", fontSize: 32, fontWeight: 800, letterSpacing: "-0.04em", margin: 0, lineHeight: 1 }}>{count}</p>
       </div>
       <div style={{
         width: 40, height: 40, borderRadius: 12,
@@ -60,10 +60,10 @@ export default async function AdminWaitlistPage() {
 
       {/* ── Header ── */}
       <div>
-        <h1 style={{ color: "rgb(250,250,250)", fontSize: 22, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.03em" }}>
+        <h1 style={{ color: "var(--atext2)", fontSize: 22, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.03em" }}>
           Waitlist
         </h1>
-        <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 13, margin: 0 }}>
+        <p style={{ color: "var(--aw3)", fontSize: 13, margin: 0 }}>
           {total} {total === 1 ? "person" : "people"} waiting for early access
         </p>
       </div>
@@ -85,19 +85,19 @@ export default async function AdminWaitlistPage() {
       {/* ── Table / empty ── */}
       {entries.length === 0 && !error ? (
         <div style={{
-          background: "rgb(10,10,12)", border: "1px solid rgba(255,255,255,0.09)",
+          background: "var(--am1)", border: "1px solid var(--aw09)",
           borderRadius: 16, padding: "72px 0",
           display: "flex", flexDirection: "column", alignItems: "center", gap: 12,
         }}>
           <div style={{
             width: 52, height: 52, borderRadius: "50%",
-            background: "rgba(255,255,255,0.04)",
+            background: "var(--aw04)",
             display: "flex", alignItems: "center", justifyContent: "center",
           }}>
-            <ClipboardList size={22} color="rgba(255,255,255,0.2)" strokeWidth={1.4} />
+            <ClipboardList size={22} color="var(--aw2)" strokeWidth={1.4} />
           </div>
-          <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 14, fontWeight: 600, margin: 0 }}>No one on the waitlist yet</p>
-          <p style={{ color: "rgba(255,255,255,0.18)", fontSize: 12.5, margin: 0 }}>Entries appear here once people join at /waitlist</p>
+          <p style={{ color: "var(--aw35)", fontSize: 14, fontWeight: 600, margin: 0 }}>No one on the waitlist yet</p>
+          <p style={{ color: "var(--aw18)", fontSize: 12.5, margin: 0 }}>Entries appear here once people join at /waitlist</p>
         </div>
       ) : (
         <WaitlistTable entries={entries} />

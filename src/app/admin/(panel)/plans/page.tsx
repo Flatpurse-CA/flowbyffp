@@ -24,8 +24,8 @@ export default async function AdminPlansPage() {
     <div style={{ maxWidth: 1000 }}>
       {/* Heading */}
       <div style={{ marginBottom: 24 }}>
-        <h1 style={{ color: "rgb(250,250,250)", fontSize: 22, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.03em" }}>Plans</h1>
-        <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 13, margin: 0 }}>Distribution across {totalShops} shop{totalShops !== 1 ? "s" : ""}</p>
+        <h1 style={{ color: "var(--atext2)", fontSize: 22, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.03em" }}>Plans</h1>
+        <p style={{ color: "var(--aw3)", fontSize: 13, margin: 0 }}>Distribution across {totalShops} shop{totalShops !== 1 ? "s" : ""}</p>
       </div>
 
       {/* Plan cards */}
@@ -41,14 +41,14 @@ export default async function AdminPlansPage() {
             }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                 <span style={{ fontSize: 11, fontWeight: 700, color, letterSpacing: "0.06em", textTransform: "uppercase" }}>{label}</span>
-                <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)" }}>{priceLabel}</span>
+                <span style={{ fontSize: 11, color: "var(--aw3)" }}>{priceLabel}</span>
               </div>
-              <p style={{ color: "rgb(250,250,250)", fontSize: 30, fontWeight: 800, margin: 0, letterSpacing: "-0.04em", lineHeight: 1 }}>{count}</p>
+              <p style={{ color: "var(--atext2)", fontSize: 30, fontWeight: 800, margin: 0, letterSpacing: "-0.04em", lineHeight: 1 }}>{count}</p>
               <div>
-                <div style={{ height: 4, borderRadius: 2, background: "rgba(255,255,255,0.08)", overflow: "hidden" }}>
+                <div style={{ height: 4, borderRadius: 2, background: "var(--aw08)", overflow: "hidden" }}>
                   <div style={{ height: "100%", width: `${pct}%`, borderRadius: 2, background: color }} />
                 </div>
-                <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, margin: "5px 0 0" }}>{pct}% of shops</p>
+                <p style={{ color: "var(--aw3)", fontSize: 11, margin: "5px 0 0" }}>{pct}% of shops</p>
               </div>
             </div>
           );
@@ -69,18 +69,18 @@ export default async function AdminPlansPage() {
               }}>
                 {label}
               </span>
-              <span style={{ color: "rgba(255,255,255,0.28)", fontSize: 12 }}>{planShops.length} shop{planShops.length !== 1 ? "s" : ""}</span>
+              <span style={{ color: "var(--aw3)", fontSize: 12 }}>{planShops.length} shop{planShops.length !== 1 ? "s" : ""}</span>
             </div>
-            <div style={{ background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 14, overflowY: "hidden", overflowX: "auto" }}>
+            <div style={{ background: "var(--aw025)", border: "1px solid var(--aw07)", borderRadius: 14, overflowY: "hidden", overflowX: "auto" }}>
               <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 480 }}>
                 <thead>
-                  <tr style={{ background: "rgba(255,255,255,0.015)" }}>
+                  <tr style={{ background: "var(--aw015)" }}>
                     {["Shop", "Owner", "Joined"].map(h => (
                       <th key={h} style={{
                         padding: "10px 16px", textAlign: "left",
-                        color: "rgba(255,255,255,0.25)", fontSize: 10.5,
+                        color: "var(--aw25)", fontSize: 10.5,
                         fontWeight: 600, letterSpacing: "0.05em", textTransform: "uppercase",
-                        borderBottom: "1px solid rgba(255,255,255,0.05)",
+                        borderBottom: "1px solid var(--aw05)",
                       }}>
                         {h}
                       </th>
@@ -89,10 +89,10 @@ export default async function AdminPlansPage() {
                 </thead>
                 <tbody>
                   {planShops.map((shop, i) => (
-                    <tr key={shop.owner_id} style={{ borderBottom: i < planShops.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none" }}>
-                      <td style={{ padding: "11px 16px", color: "rgb(250,250,250)", fontSize: 13, fontWeight: 600 }}>{shop.name}</td>
-                      <td style={{ padding: "11px 16px", color: "rgba(255,255,255,0.4)", fontSize: 12 }}>{emailMap[shop.owner_id] ?? "-"}</td>
-                      <td style={{ padding: "11px 16px", color: "rgba(255,255,255,0.3)", fontSize: 12 }}>
+                    <tr key={shop.owner_id} style={{ borderBottom: i < planShops.length - 1 ? "1px solid var(--aw04)" : "none" }}>
+                      <td style={{ padding: "11px 16px", color: "var(--atext2)", fontSize: 13, fontWeight: 600 }}>{shop.name}</td>
+                      <td style={{ padding: "11px 16px", color: "var(--aw4)", fontSize: 12 }}>{emailMap[shop.owner_id] ?? "-"}</td>
+                      <td style={{ padding: "11px 16px", color: "var(--aw3)", fontSize: 12 }}>
                         {new Date(shop.created_at).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" })}
                       </td>
                     </tr>
@@ -105,7 +105,7 @@ export default async function AdminPlansPage() {
       })}
 
       {totalShops === 0 && (
-        <div style={{ padding: "48px 0", textAlign: "center", color: "rgba(255,255,255,0.25)", fontSize: 14 }}>
+        <div style={{ padding: "48px 0", textAlign: "center", color: "var(--aw25)", fontSize: 14 }}>
           No shops yet.
         </div>
       )}

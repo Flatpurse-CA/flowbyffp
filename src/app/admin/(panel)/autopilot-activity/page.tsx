@@ -30,8 +30,8 @@ function shopNameFrom(row: EventRow): string {
 }
 
 const card: React.CSSProperties = {
-  background: "rgb(10,10,12)",
-  border: "1px solid rgba(255,255,255,0.09)",
+  background: "var(--am1)",
+  border: "1px solid var(--aw09)",
   borderRadius: 18,
   overflow: "hidden",
 };
@@ -67,8 +67,8 @@ export default async function AdminAutoPilotActivityPage() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
       <div>
-        <h1 style={{ color: "rgb(250,250,250)", fontSize: 22, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.03em" }}>AutoPilot Activity</h1>
-        <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 13, margin: 0 }}>Real automation events across every shop on the platform, this month.</p>
+        <h1 style={{ color: "var(--atext2)", fontSize: 22, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.03em" }}>AutoPilot Activity</h1>
+        <p style={{ color: "var(--aw3)", fontSize: 13, margin: 0 }}>Real automation events across every shop on the platform, this month.</p>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5">
@@ -80,29 +80,29 @@ export default async function AdminAutoPilotActivityPage() {
         ].map(s => (
           <div key={s.label} style={{ ...card, padding: "22px 24px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
-              <span style={{ color: "rgba(255,255,255,0.45)", fontSize: 13, fontWeight: 500 }}>{s.label}</span>
+              <span style={{ color: "var(--aw45)", fontSize: 13, fontWeight: 500 }}>{s.label}</span>
               <div style={{ width: 38, height: 38, borderRadius: 11, background: s.iconBg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                 <s.Icon size={18} color={s.iconColor} strokeWidth={1.8} />
               </div>
             </div>
-            <div style={{ color: "rgb(245,245,252)", fontSize: 32, fontWeight: 800, letterSpacing: "-0.04em", lineHeight: 1, marginBottom: 10 }}>{s.value}</div>
-            <div style={{ color: "rgba(255,255,255,0.25)", fontSize: 12.5 }}>{s.subtitle}</div>
+            <div style={{ color: "var(--atext2)", fontSize: 32, fontWeight: 800, letterSpacing: "-0.04em", lineHeight: 1, marginBottom: 10 }}>{s.value}</div>
+            <div style={{ color: "var(--aw25)", fontSize: 12.5 }}>{s.subtitle}</div>
           </div>
         ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.4fr] gap-3.5">
         <div style={{ ...card, padding: "20px 24px" }}>
-          <p style={{ color: "rgb(240,240,248)", fontSize: 14, fontWeight: 700, margin: "0 0 14px" }}>By flow, this month</p>
+          <p style={{ color: "var(--atext)", fontSize: 14, fontWeight: 700, margin: "0 0 14px" }}>By flow, this month</p>
           {byFlow.length === 0 ? (
-            <p style={{ color: "rgba(255,255,255,0.25)", fontSize: 13, margin: 0 }}>No AutoPilot activity yet this month.</p>
+            <p style={{ color: "var(--aw25)", fontSize: 13, margin: 0 }}>No AutoPilot activity yet this month.</p>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               {byFlow.map(([flow, stats]) => (
                 <div key={flow} style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                   <div>
-                    <p style={{ color: "rgba(255,255,255,0.7)", fontSize: 13, fontWeight: 600, margin: "0 0 1px" }}>{FLOW_LABELS[flow] ?? flow}</p>
-                    <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 11.5, margin: 0 }}>{stats.count} event{stats.count !== 1 ? "s" : ""}</p>
+                    <p style={{ color: "var(--aw7)", fontSize: 13, fontWeight: 600, margin: "0 0 1px" }}>{FLOW_LABELS[flow] ?? flow}</p>
+                    <p style={{ color: "var(--aw3)", fontSize: 11.5, margin: 0 }}>{stats.count} event{stats.count !== 1 ? "s" : ""}</p>
                   </div>
                   <span style={{ color: "rgb(52,211,153)", fontSize: 13, fontWeight: 700 }}>{formatCAD(stats.revenue)}</span>
                 </div>
@@ -113,19 +113,19 @@ export default async function AdminAutoPilotActivityPage() {
 
         <div style={card}>
           <div style={{ padding: "18px 24px 4px" }}>
-            <p style={{ color: "rgb(240,240,248)", fontSize: 14, fontWeight: 700, margin: 0 }}>Recent events</p>
+            <p style={{ color: "var(--atext)", fontSize: 14, fontWeight: 700, margin: 0 }}>Recent events</p>
           </div>
           {recentEvents.length === 0 ? (
-            <p style={{ color: "rgba(255,255,255,0.25)", fontSize: 13, padding: "8px 24px 20px" }}>No events yet.</p>
+            <p style={{ color: "var(--aw25)", fontSize: 13, padding: "8px 24px 20px" }}>No events yet.</p>
           ) : (
             <div style={{ maxHeight: 420, overflowY: "auto" }}>
               <table style={{ width: "100%", borderCollapse: "collapse", marginTop: 8 }}>
                 <tbody>
                   {recentEvents.map((e, i) => (
-                    <tr key={e.id} style={{ borderBottom: i < recentEvents.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none" }}>
-                      <td style={{ padding: "10px 24px", color: "rgba(255,255,255,0.6)", fontSize: 12.5, whiteSpace: "nowrap" }}>{shopNameFrom(e)}</td>
-                      <td style={{ padding: "10px 12px", color: "rgba(255,255,255,0.4)", fontSize: 12 }}>{FLOW_LABELS[e.flow_key] ?? e.flow_key}</td>
-                      <td style={{ padding: "10px 12px", color: "rgba(255,255,255,0.35)", fontSize: 11.5, maxWidth: 220, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{e.event_text}</td>
+                    <tr key={e.id} style={{ borderBottom: i < recentEvents.length - 1 ? "1px solid var(--aw04)" : "none" }}>
+                      <td style={{ padding: "10px 24px", color: "var(--aw6)", fontSize: 12.5, whiteSpace: "nowrap" }}>{shopNameFrom(e)}</td>
+                      <td style={{ padding: "10px 12px", color: "var(--aw4)", fontSize: 12 }}>{FLOW_LABELS[e.flow_key] ?? e.flow_key}</td>
+                      <td style={{ padding: "10px 12px", color: "var(--aw35)", fontSize: 11.5, maxWidth: 220, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{e.event_text}</td>
                       <td style={{ padding: "10px 24px", textAlign: "right" }}>
                         <span style={{
                           fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 20,

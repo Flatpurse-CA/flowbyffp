@@ -4,11 +4,11 @@ import { Plus, Mail, CheckCircle, XCircle, Clock } from "lucide-react";
 import { ToggleButton, DeleteButton } from "./SequenceActions";
 
 const T = {
-  bg:      "rgb(10,10,12)",
-  border:  "rgba(255,255,255,0.09)",
-  text:    "rgb(245,245,252)",
-  muted:   "rgba(255,255,255,0.35)",
-  dim:     "rgba(255,255,255,0.18)",
+  bg:      "var(--am1)",
+  border:  "var(--aw09)",
+  text:    "var(--atext2)",
+  muted:   "var(--aw35)",
+  dim:     "var(--aw18)",
   purple:  "rgb(139,92,246)",
   purpleBg:"rgba(139,92,246,0.12)",
 };
@@ -52,7 +52,7 @@ export default async function AdminEmailsPage() {
           <Link href="/admin/emails/subscribers" style={{
             display: "inline-flex", alignItems: "center", gap: 6,
             padding: "9px 16px", borderRadius: 10,
-            background: "rgba(255,255,255,0.05)",
+            background: "var(--aw05)",
             border: `1px solid ${T.border}`,
             color: T.muted, fontSize: 13, fontWeight: 600,
             textDecoration: "none",
@@ -62,7 +62,7 @@ export default async function AdminEmailsPage() {
           <Link href="/admin/emails/send" style={{
             display: "inline-flex", alignItems: "center", gap: 6,
             padding: "9px 16px", borderRadius: 10,
-            background: "rgba(255,255,255,0.05)",
+            background: "var(--aw05)",
             border: `1px solid ${T.border}`,
             color: T.muted, fontSize: 13, fontWeight: 600,
             textDecoration: "none",

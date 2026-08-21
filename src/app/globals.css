@@ -228,6 +228,109 @@
   --dpurple-text: rgb(109,40,217);
 }
 
+/* ── Admin panel content tokens (data-admin-theme on <html>) ──
+   Same shape as the dashboard's --d* system above, kept on a separate
+   attribute so the admin theme choice never leaks onto /dashboard, /book,
+   or auth pages sharing the same <html> element. Admin content pages
+   (Overview, Users, Shops, Plans, Analytics, Cohorts, AutoPilot Activity,
+   Payments Risk, Feature Flags, Experiments, Feature Usage, Emails,
+   Waitlist, Settings, Profile) were hardcoded to raw rgba(255,255,255,X)
+   white-on-dark literals with zero theme awareness — the header toggle
+   only ever re-themed AdminShell's own chrome. These vars are what those
+   pages get retrofitted onto. */
+:root,
+[data-admin-theme="dark"] {
+  --atext:  rgb(240,240,248);
+  --atext2: rgb(250,250,250);
+  --am1: rgb(10,10,12);
+  --am2: rgb(12,12,16);
+  --am3: rgb(18,18,24);
+  --am4: rgb(20,20,26);
+
+  --asurface1: rgba(255,255,255,0.02);
+  --asurface2: rgba(255,255,255,0.035);
+  --asurface3: rgba(255,255,255,0.055);
+
+  --aw015: rgba(255,255,255,0.015);
+  --aw02:  rgba(255,255,255,0.02);
+  --aw025: rgba(255,255,255,0.025);
+  --aw03:  rgba(255,255,255,0.03);
+  --aw04:  rgba(255,255,255,0.04);
+  --aw05:  rgba(255,255,255,0.05);
+  --aw06:  rgba(255,255,255,0.06);
+  --aw07:  rgba(255,255,255,0.07);
+  --aw08:  rgba(255,255,255,0.08);
+  --aw09:  rgba(255,255,255,0.09);
+  --aw1:   rgba(255,255,255,0.1);
+  --aw12:  rgba(255,255,255,0.12);
+  --aw15:  rgba(255,255,255,0.15);
+  --aw18:  rgba(255,255,255,0.18);
+  --aw2:   rgba(255,255,255,0.2);
+  --aw22:  rgba(255,255,255,0.22);
+  --aw25:  rgba(255,255,255,0.25);
+  --aw3:   rgba(255,255,255,0.3);
+  --aw35:  rgba(255,255,255,0.35);
+  --aw38:  rgba(255,255,255,0.38);
+  --aw4:   rgba(255,255,255,0.4);
+  --aw42:  rgba(255,255,255,0.42);
+  --aw45:  rgba(255,255,255,0.45);
+  --aw5:   rgba(255,255,255,0.5);
+  --aw55:  rgba(255,255,255,0.55);
+  --aw6:   rgba(255,255,255,0.6);
+  --aw65:  rgba(255,255,255,0.65);
+  --aw7:   rgba(255,255,255,0.7);
+  --aw75:  rgba(255,255,255,0.75);
+  --aw85:  rgba(255,255,255,0.85);
+
+  --apurple-text: rgb(196,181,253);
+}
+
+[data-admin-theme="light"] {
+  --atext:  rgb(12,12,20);
+  --atext2: rgb(9,9,15);
+  --am1: rgb(246,246,250);
+  --am2: rgb(255,255,255);
+  --am3: rgb(255,255,255);
+  --am4: rgb(250,250,252);
+
+  --asurface1: rgb(255,255,255);
+  --asurface2: rgb(250,250,252);
+  --asurface3: rgb(243,243,247);
+
+  --aw015: rgba(0,0,0,0.035);
+  --aw02:  rgba(0,0,0,0.04);
+  --aw025: rgba(0,0,0,0.045);
+  --aw03:  rgba(0,0,0,0.05);
+  --aw04:  rgba(0,0,0,0.06);
+  --aw05:  rgba(0,0,0,0.07);
+  --aw06:  rgba(0,0,0,0.08);
+  --aw07:  rgba(0,0,0,0.09);
+  --aw08:  rgba(0,0,0,0.1);
+  --aw09:  rgba(0,0,0,0.11);
+  --aw1:   rgba(0,0,0,0.12);
+  --aw12:  rgba(0,0,0,0.18);
+  --aw15:  rgba(0,0,0,0.22);
+  --aw18:  rgba(0,0,0,0.26);
+  --aw2:   rgba(0,0,0,0.28);
+  --aw22:  rgba(0,0,0,0.3);
+  --aw25:  rgba(0,0,0,0.33);
+  --aw3:   rgba(0,0,0,0.38);
+  --aw35:  rgba(0,0,0,0.43);
+  --aw38:  rgba(0,0,0,0.46);
+  --aw4:   rgba(0,0,0,0.48);
+  --aw42:  rgba(0,0,0,0.5);
+  --aw45:  rgba(0,0,0,0.52);
+  --aw5:   rgba(0,0,0,0.56);
+  --aw55:  rgba(0,0,0,0.6);
+  --aw6:   rgba(0,0,0,0.62);
+  --aw65:  rgba(0,0,0,0.65);
+  --aw7:   rgba(0,0,0,0.68);
+  --aw75:  rgba(0,0,0,0.7);
+  --aw85:  rgba(0,0,0,0.74);
+
+  --apurple-text: rgb(109,40,217);
+}
+
 /* Native <input type="date"> calendar-icon/popup rendering — was hardcoded to
    color-scheme: dark inline, which made the calendar icon render light-on-light
    (invisible) once the light theme shipped. Ties it to the actual portal theme

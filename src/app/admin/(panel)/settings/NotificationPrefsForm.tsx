@@ -46,8 +46,8 @@ export function NotificationPrefsForm() {
           }}
         >
           <div>
-            <p style={{ color: "rgb(240,240,248)", fontSize: 13, fontWeight: 600, margin: "0 0 2px" }}>{row.label}</p>
-            <p style={{ color: "rgba(255,255,255,0.32)", fontSize: 11.5, margin: 0 }}>{row.hint}</p>
+            <p style={{ color: "var(--atext)", fontSize: 13, fontWeight: 600, margin: "0 0 2px" }}>{row.label}</p>
+            <p style={{ color: "var(--aw3)", fontSize: 11.5, margin: 0 }}>{row.hint}</p>
           </div>
           <input
             type="checkbox"
@@ -57,7 +57,7 @@ export function NotificationPrefsForm() {
           />
         </label>
       ))}
-      <p style={{ color: "rgba(255,255,255,0.2)", fontSize: 11, margin: "6px 4px 0" }}>
+      <p style={{ color: "var(--aw2)", fontSize: 11, margin: "6px 4px 0" }}>
         Stored on this device only; controls what shows up in the notification bell.
       </p>
     </div>

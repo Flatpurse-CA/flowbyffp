@@ -5,8 +5,8 @@ import { PasswordForm } from "./PasswordForm";
 import { KeyRound, ShieldCheck } from "lucide-react";
 
 const card: React.CSSProperties = {
-  background: "rgb(10,10,12)",
-  border: "1px solid rgba(255,255,255,0.09)",
+  background: "var(--am1)",
+  border: "1px solid var(--aw09)",
   borderRadius: 18,
   padding: "22px 24px",
 };
@@ -27,8 +27,8 @@ export default async function AdminProfilePage() {
   return (
     <div style={{ maxWidth: 560, display: "flex", flexDirection: "column", gap: 20 }}>
       <div>
-        <h1 style={{ color: "rgb(250,250,250)", fontSize: 22, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.03em" }}>Profile</h1>
-        <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 13, margin: 0 }}>Your admin account</p>
+        <h1 style={{ color: "var(--atext2)", fontSize: 22, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.03em" }}>Profile</h1>
+        <p style={{ color: "var(--aw3)", fontSize: 13, margin: 0 }}>Your admin account</p>
       </div>
 
       {/* Account card */}
@@ -44,7 +44,7 @@ export default async function AdminProfilePage() {
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3 }}>
-            <p style={{ color: "rgb(240,240,248)", fontSize: 16, fontWeight: 700, margin: 0 }}>{name}</p>
+            <p style={{ color: "var(--atext)", fontSize: 16, fontWeight: 700, margin: 0 }}>{name}</p>
             {isRoot && (
               <span style={{
                 display: "inline-flex", alignItems: "center", gap: 4,
@@ -56,8 +56,8 @@ export default async function AdminProfilePage() {
               </span>
             )}
           </div>
-          <p style={{ color: "rgba(255,255,255,0.42)", fontSize: 13, margin: "0 0 2px" }}>{email}</p>
-          <p style={{ color: "rgba(255,255,255,0.25)", fontSize: 12, margin: 0 }}>Admin since {joined}</p>
+          <p style={{ color: "var(--aw42)", fontSize: 13, margin: "0 0 2px" }}>{email}</p>
+          <p style={{ color: "var(--aw25)", fontSize: 12, margin: 0 }}>Admin since {joined}</p>
         </div>
       </div>
 
@@ -72,8 +72,8 @@ export default async function AdminProfilePage() {
             <KeyRound size={16} color="rgb(167,139,250)" strokeWidth={1.8} />
           </div>
           <div>
-            <p style={{ color: "rgb(240,240,248)", fontSize: 14.5, fontWeight: 700, margin: "0 0 2px" }}>Password</p>
-            <p style={{ color: "rgba(255,255,255,0.32)", fontSize: 12, margin: 0 }}>Change your admin login password</p>
+            <p style={{ color: "var(--atext)", fontSize: 14.5, fontWeight: 700, margin: "0 0 2px" }}>Password</p>
+            <p style={{ color: "var(--aw3)", fontSize: 12, margin: 0 }}>Change your admin login password</p>
           </div>
         </div>
         <PasswordForm />

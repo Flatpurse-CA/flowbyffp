@@ -13,10 +13,10 @@ export function PlanSelect({ userId, plan }: { userId: string; plan: string }) {
         name="plan"
         defaultValue={plan}
         style={{
-          background: PLAN_BG[plan] ?? "rgba(255,255,255,0.06)",
-          border: `1px solid ${PLAN_COLORS[plan] ?? "rgba(255,255,255,0.15)"}33`,
+          background: PLAN_BG[plan] ?? "var(--aw06)",
+          border: `1px solid ${PLAN_COLORS[plan] ?? "var(--aw15)"}33`,
           borderRadius: 20,
-          color: PLAN_COLORS[plan] ?? "rgba(255,255,255,0.35)",
+          color: PLAN_COLORS[plan] ?? "var(--aw35)",
           fontSize: 10.5,
           fontWeight: 700,
           padding: "3px 8px",

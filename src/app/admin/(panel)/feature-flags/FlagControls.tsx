@@ -11,7 +11,7 @@ export function FlagToggle({ id, enabled }: { id: string; enabled: boolean }) {
       <input type="hidden" name="enabled" value={String(enabled)} />
       <button type="submit" style={{
         width: 38, height: 22, borderRadius: 11, border: "none", cursor: "pointer",
-        background: enabled ? "rgb(109,40,217)" : "rgba(255,255,255,0.12)",
+        background: enabled ? "rgb(109,40,217)" : "var(--aw12)",
         position: "relative", transition: "background 0.2s",
       }}>
         <span style={{ position: "absolute", top: 3, left: enabled ? 18 : 3, width: 16, height: 16, borderRadius: "50%", background: "white", transition: "left 0.2s" }} />
@@ -30,11 +30,11 @@ export function RolloutInput({ id, rolloutPct }: { id: string; rolloutPct: numbe
         onChange={e => setValue(Number(e.target.value))}
         onBlur={e => e.currentTarget.form?.requestSubmit()}
         style={{
-          width: 56, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)",
-          borderRadius: 8, padding: "5px 8px", color: "rgb(240,240,248)", fontSize: 12.5, outline: "none",
+          width: 56, background: "var(--aw04)", border: "1px solid var(--aw09)",
+          borderRadius: 8, padding: "5px 8px", color: "var(--atext)", fontSize: 12.5, outline: "none",
         }}
       />
-      <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 12 }}>%</span>
+      <span style={{ color: "var(--aw3)", fontSize: 12 }}>%</span>
     </form>
   );
 }
@@ -46,8 +46,8 @@ export function DeleteFlagButton({ id }: { id: string }) {
       <button type="submit" title="Delete" style={{
         display: "flex", alignItems: "center", justifyContent: "center",
         width: 28, height: 28, borderRadius: 8, cursor: "pointer",
-        background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
-        color: "rgba(255,255,255,0.3)", fontFamily: "inherit",
+        background: "var(--aw04)", border: "1px solid var(--aw08)",
+        color: "var(--aw3)", fontFamily: "inherit",
       }}>
         <Trash2 size={12} />
       </button>

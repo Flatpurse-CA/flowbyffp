@@ -5,14 +5,14 @@ import { useRouter } from "next/navigation";
 import { createSequenceEmail, updateSequenceEmail } from "./actions";
 
 const T = {
-  bg:      "rgb(10,10,12)",
-  bg2:     "rgb(16,16,20)",
-  border:  "rgba(255,255,255,0.09)",
-  text:    "rgb(245,245,252)",
-  muted:   "rgba(255,255,255,0.35)",
-  dim:     "rgba(255,255,255,0.18)",
+  bg:      "var(--am1)",
+  bg2:     "var(--am2)",
+  border:  "var(--aw09)",
+  text:    "var(--atext2)",
+  muted:   "var(--aw35)",
+  dim:     "var(--aw18)",
   purple:  "rgb(139,92,246)",
-  input:   "rgba(255,255,255,0.05)",
+  input:   "var(--aw05)",
 };
 
 const inputStyle: React.CSSProperties = {
@@ -88,12 +88,12 @@ export default function EmailForm({ initial }: Props) {
         <div style={{ display: "flex", gap: 8 }}>
           <button type="button" onClick={() => router.back()} style={{
             padding: "9px 16px", borderRadius: 10,
-            background: "rgba(255,255,255,0.05)", border: `1px solid ${T.border}`,
+            background: "var(--aw05)", border: `1px solid ${T.border}`,
             color: T.muted, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
           }}>Cancel</button>
           <button type="button" onClick={() => setPreview(v => !v)} style={{
             padding: "9px 16px", borderRadius: 10,
-            background: "rgba(255,255,255,0.05)", border: `1px solid ${T.border}`,
+            background: "var(--aw05)", border: `1px solid ${T.border}`,
             color: T.muted, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
           }}>{preview ? "Edit" : "Preview"}</button>
           <button type="submit" disabled={loading} style={{

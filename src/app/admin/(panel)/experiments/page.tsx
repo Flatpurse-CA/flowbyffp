@@ -16,8 +16,8 @@ type Experiment = {
 
 type GuardrailMetric = { id: string; key: string; label: string; comparison: "above_bad" | "below_bad"; threshold: number };
 
-const card: React.CSSProperties = { background: "rgb(10,10,12)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 18 };
-const STATUS_COLOR: Record<string, string> = { draft: "rgba(255,255,255,0.4)", running: "rgb(52,211,153)", paused: "rgb(251,191,36)", completed: "rgb(96,165,250)", archived: "rgba(255,255,255,0.25)" };
+const card: React.CSSProperties = { background: "var(--am1)", border: "1px solid var(--aw09)", borderRadius: 18 };
+const STATUS_COLOR: Record<string, string> = { draft: "var(--aw4)", running: "rgb(52,211,153)", paused: "rgb(251,191,36)", completed: "rgb(96,165,250)", archived: "var(--aw25)" };
 
 function guardrailStatus(value: number, g: GuardrailMetric): "healthy" | "warning" | "critical" {
   if (g.comparison === "above_bad") {
@@ -87,15 +87,15 @@ export default async function AdminExperimentsPage() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
       <div>
-        <h1 style={{ color: "rgb(250,250,250)", fontSize: 22, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.03em" }}>Experiments</h1>
-        <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 13, margin: 0 }}>
+        <h1 style={{ color: "var(--atext2)", fontSize: 22, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.03em" }}>Experiments</h1>
+        <p style={{ color: "var(--aw3)", fontSize: 13, margin: 0 }}>
           Real A/B tests backed by feature flags: variant split is deterministic, conversion is measured against actual completed bookings. No LLM involved; the cards below are templated summaries of real numbers.
         </p>
       </div>
 
       {/* Guardrails */}
       <div style={{ ...card, padding: "20px 24px" }}>
-        <p style={{ color: "rgb(240,240,248)", fontSize: 14, fontWeight: 700, margin: "0 0 14px", display: "flex", alignItems: "center", gap: 8 }}>
+        <p style={{ color: "var(--atext)", fontSize: 14, fontWeight: 700, margin: "0 0 14px", display: "flex", alignItems: "center", gap: 8 }}>
           <ShieldAlert size={16} color="rgb(251,191,36)" /> Guardrail metrics
         </p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -103,14 +103,14 @@ export default async function AdminExperimentsPage() {
             const value = guardrailValues[g.key] ?? 0;
             const status = guardrailStatus(value, g);
             return (
-              <div key={g.id} style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 12, padding: "14px 16px" }}>
+              <div key={g.id} style={{ background: "var(--aw02)", border: "1px solid var(--aw06)", borderRadius: 12, padding: "14px 16px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
-                  <p style={{ color: "rgba(255,255,255,0.6)", fontSize: 12.5, fontWeight: 600, margin: 0 }}>{g.label}</p>
+                  <p style={{ color: "var(--aw6)", fontSize: 12.5, fontWeight: 600, margin: 0 }}>{g.label}</p>
                   <span style={{ fontSize: 9.5, fontWeight: 700, padding: "2px 8px", borderRadius: 20, textTransform: "uppercase", color: GUARDRAIL_STATUS_COLOR[status], background: `${GUARDRAIL_STATUS_COLOR[status]}1A` }}>
                     {status}
                   </span>
                 </div>
-                <p style={{ color: "rgb(250,250,250)", fontSize: 22, fontWeight: 800, margin: "0 0 10px" }}>{value}{g.key === "open_disputes" ? "" : "%"}</p>
+                <p style={{ color: "var(--atext2)", fontSize: 22, fontWeight: 800, margin: "0 0 10px" }}>{value}{g.key === "open_disputes" ? "" : "%"}</p>
                 <GuardrailThresholdInput id={g.id} threshold={g.threshold} />
               </div>
             );
@@ -121,28 +121,28 @@ export default async function AdminExperimentsPage() {
       {/* AI cards (deterministic templates over real data) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-3.5">
         <div style={{ ...card, padding: "18px 20px" }}>
-          <p style={{ color: "rgb(240,240,248)", fontSize: 13.5, fontWeight: 700, margin: "0 0 10px", display: "flex", alignItems: "center", gap: 7 }}>
+          <p style={{ color: "var(--atext)", fontSize: 13.5, fontWeight: 700, margin: "0 0 10px", display: "flex", alignItems: "center", gap: 7 }}>
             <Sparkles size={15} color="rgb(167,139,250)" /> Analyst
           </p>
-          <p style={{ color: "rgba(255,255,255,0.55)", fontSize: 12.5, lineHeight: 1.6, margin: 0 }}>{analystText}</p>
+          <p style={{ color: "var(--aw55)", fontSize: 12.5, lineHeight: 1.6, margin: 0 }}>{analystText}</p>
         </div>
         <div style={{ ...card, padding: "18px 20px" }}>
-          <p style={{ color: "rgb(240,240,248)", fontSize: 13.5, fontWeight: 700, margin: "0 0 10px", display: "flex", alignItems: "center", gap: 7 }}>
+          <p style={{ color: "var(--atext)", fontSize: 13.5, fontWeight: 700, margin: "0 0 10px", display: "flex", alignItems: "center", gap: 7 }}>
             <Lightbulb size={15} color="rgb(251,191,36)" /> Generator
           </p>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {ideas.map((idea, i) => (
-              <p key={i} style={{ color: "rgba(255,255,255,0.55)", fontSize: 12.5, lineHeight: 1.6, margin: 0 }}>{idea}</p>
+              <p key={i} style={{ color: "var(--aw55)", fontSize: 12.5, lineHeight: 1.6, margin: 0 }}>{idea}</p>
             ))}
           </div>
         </div>
         <div style={{ ...card, padding: "18px 20px" }}>
-          <p style={{ color: "rgb(240,240,248)", fontSize: 13.5, fontWeight: 700, margin: "0 0 10px", display: "flex", alignItems: "center", gap: 7 }}>
+          <p style={{ color: "var(--atext)", fontSize: 13.5, fontWeight: 700, margin: "0 0 10px", display: "flex", alignItems: "center", gap: 7 }}>
             <Brain size={15} color="rgb(52,211,153)" /> Product Scientist
           </p>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {strategicBullets.map((b, i) => (
-              <p key={i} style={{ color: "rgba(255,255,255,0.55)", fontSize: 12.5, lineHeight: 1.6, margin: 0 }}>{b}</p>
+              <p key={i} style={{ color: "var(--aw55)", fontSize: 12.5, lineHeight: 1.6, margin: 0 }}>{b}</p>
             ))}
           </div>
         </div>
@@ -150,7 +150,7 @@ export default async function AdminExperimentsPage() {
 
       {/* Create experiment */}
       <div style={{ ...card, padding: "20px 24px" }}>
-        <p style={{ color: "rgb(240,240,248)", fontSize: 14, fontWeight: 700, margin: "0 0 14px" }}>New experiment</p>
+        <p style={{ color: "var(--atext)", fontSize: 14, fontWeight: 700, margin: "0 0 14px" }}>New experiment</p>
         <form action={createExperiment} style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "flex-end" }}>
           {[
             { name: "key", label: "Key", placeholder: "e.g. new_booking_cta", required: true, flex: "1 1 160px" },
@@ -160,10 +160,10 @@ export default async function AdminExperimentsPage() {
             { name: "hypothesis", label: "Hypothesis", placeholder: "Optional", required: false, flex: "2 1 220px" },
           ].map(f => (
             <div key={f.name} style={{ flex: f.flex }}>
-              <label style={{ color: "rgba(255,255,255,0.4)", fontSize: 11.5, fontWeight: 600, display: "block", marginBottom: 5 }}>{f.label}</label>
+              <label style={{ color: "var(--aw4)", fontSize: 11.5, fontWeight: 600, display: "block", marginBottom: 5 }}>{f.label}</label>
               <input name={f.name} placeholder={f.placeholder} required={f.required} style={{
-                width: "100%", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)",
-                borderRadius: 9, padding: "9px 12px", color: "rgb(240,240,248)", fontSize: 13, outline: "none", boxSizing: "border-box",
+                width: "100%", background: "var(--aw04)", border: "1px solid var(--aw09)",
+                borderRadius: 9, padding: "9px 12px", color: "var(--atext)", fontSize: 13, outline: "none", boxSizing: "border-box",
               }} />
             </div>
           ))}
@@ -176,10 +176,10 @@ export default async function AdminExperimentsPage() {
       {/* Experiments list */}
       {experiments.length === 0 ? (
         <div style={{ ...card, minHeight: 170, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10 }}>
-          <div style={{ width: 50, height: 50, borderRadius: "50%", background: "rgba(255,255,255,0.04)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <FlaskConical size={22} color="rgba(255,255,255,0.2)" strokeWidth={1.4} />
+          <div style={{ width: 50, height: 50, borderRadius: "50%", background: "var(--aw04)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <FlaskConical size={22} color="var(--aw2)" strokeWidth={1.4} />
           </div>
-          <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 13, fontWeight: 600, margin: 0 }}>No experiments yet</p>
+          <p style={{ color: "var(--aw3)", fontSize: 13, fontWeight: 600, margin: 0 }}>No experiments yet</p>
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -195,7 +195,7 @@ export default async function AdminExperimentsPage() {
                 <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: 10, marginBottom: results ? 14 : 0 }}>
                   <div>
                     <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3 }}>
-                      <p style={{ color: "rgb(250,250,250)", fontSize: 14, fontWeight: 700, margin: 0 }}>{e.name}</p>
+                      <p style={{ color: "var(--atext2)", fontSize: 14, fontWeight: 700, margin: 0 }}>{e.name}</p>
                       <span style={{ fontSize: 9.5, fontWeight: 700, padding: "2px 8px", borderRadius: 20, textTransform: "uppercase", color: STATUS_COLOR[e.status], background: `${STATUS_COLOR[e.status]}1A` }}>
                         {e.status}
                       </span>
@@ -205,8 +205,8 @@ export default async function AdminExperimentsPage() {
                         </span>
                       )}
                     </div>
-                    <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 11.5, margin: 0, fontFamily: "monospace" }}>{e.key}</p>
-                    {e.hypothesis && <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, margin: "4px 0 0" }}>{e.hypothesis}</p>}
+                    <p style={{ color: "var(--aw35)", fontSize: 11.5, margin: 0, fontFamily: "monospace" }}>{e.key}</p>
+                    {e.hypothesis && <p style={{ color: "var(--aw4)", fontSize: 12, margin: "4px 0 0" }}>{e.hypothesis}</p>}
                   </div>
 
                   <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
@@ -220,7 +220,7 @@ export default async function AdminExperimentsPage() {
                       <>
                         <form action={pauseExperiment}>
                           <input type="hidden" name="id" value={e.id} /><input type="hidden" name="flagKey" value={e.feature_flag_key} />
-                          <button type="submit" style={{ padding: "7px 14px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.6)", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Pause</button>
+                          <button type="submit" style={{ padding: "7px 14px", borderRadius: 8, border: "1px solid var(--aw1)", background: "var(--aw04)", color: "var(--aw6)", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Pause</button>
                         </form>
                         <form action={rolloutWinner}>
                           <input type="hidden" name="id" value={e.id} /><input type="hidden" name="flagKey" value={e.feature_flag_key} /><input type="hidden" name="winner" value="a" />
@@ -241,7 +241,7 @@ export default async function AdminExperimentsPage() {
                     {(e.status === "completed" || e.status === "paused") && (
                       <form action={archiveExperiment}>
                         <input type="hidden" name="id" value={e.id} />
-                        <button type="submit" style={{ padding: "7px 14px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.1)", background: "transparent", color: "rgba(255,255,255,0.4)", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Archive</button>
+                        <button type="submit" style={{ padding: "7px 14px", borderRadius: 8, border: "1px solid var(--aw1)", background: "transparent", color: "var(--aw4)", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Archive</button>
                       </form>
                     )}
                   </div>
@@ -255,10 +255,10 @@ export default async function AdminExperimentsPage() {
                       { label: "Lift", sub: "B vs A", value: results.liftPct !== null ? `${results.liftPct > 0 ? "+" : ""}${results.liftPct}%` : "-" },
                       { label: "Significance", sub: results.zScore !== null ? `z=${results.zScore}` : "no data", value: results.significant ? "Significant" : "Not yet" },
                     ].map(m => (
-                      <div key={m.label} style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 10, padding: "10px 12px" }}>
-                        <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 10.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", margin: "0 0 4px" }}>{m.label}</p>
-                        <p style={{ color: "rgb(250,250,250)", fontSize: 16, fontWeight: 800, margin: "0 0 2px" }}>{m.value}</p>
-                        <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, margin: 0 }}>{m.sub}</p>
+                      <div key={m.label} style={{ background: "var(--aw02)", border: "1px solid var(--aw06)", borderRadius: 10, padding: "10px 12px" }}>
+                        <p style={{ color: "var(--aw4)", fontSize: 10.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", margin: "0 0 4px" }}>{m.label}</p>
+                        <p style={{ color: "var(--atext2)", fontSize: 16, fontWeight: 800, margin: "0 0 2px" }}>{m.value}</p>
+                        <p style={{ color: "var(--aw3)", fontSize: 11, margin: 0 }}>{m.sub}</p>
                       </div>
                     ))}
                   </div>

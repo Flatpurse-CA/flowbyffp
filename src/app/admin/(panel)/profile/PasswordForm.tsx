@@ -6,11 +6,11 @@ import { updateAdminPassword } from "./actions";
 
 const inputStyle: React.CSSProperties = {
   width: "100%",
-  background: "rgba(255,255,255,0.04)",
-  border: "1px solid rgba(255,255,255,0.09)",
+  background: "var(--aw04)",
+  border: "1px solid var(--aw09)",
   borderRadius: 10,
   padding: "10px 14px",
-  color: "rgb(240,240,248)",
+  color: "var(--atext)",
   fontSize: 13,
   outline: "none",
   fontFamily: "inherit",
@@ -19,7 +19,7 @@ const inputStyle: React.CSSProperties = {
 
 const labelStyle: React.CSSProperties = {
   display: "block",
-  color: "rgba(255,255,255,0.4)",
+  color: "var(--aw4)",
   fontSize: 12,
   fontWeight: 500,
   marginBottom: 6,

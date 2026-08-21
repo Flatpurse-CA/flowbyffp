@@ -4,8 +4,8 @@ import { useState } from "react";
 import { toggleSequenceEmail, deleteSequenceEmail } from "./actions";
 
 const T = {
-  border: "rgba(255,255,255,0.09)",
-  muted:  "rgba(255,255,255,0.35)",
+  border: "var(--aw09)",
+  muted:  "var(--aw35)",
 };
 
 export function ToggleButton({ id, isActive }: { id: string; isActive: boolean }) {
@@ -27,7 +27,7 @@ export function ToggleButton({ id, isActive }: { id: string; isActive: boolean }
         fontSize: 11, fontWeight: 700,
         padding: "3px 10px", borderRadius: 6,
         border: "none", cursor: loading ? "not-allowed" : "pointer",
-        background: active ? "rgba(16,185,129,0.12)" : "rgba(255,255,255,0.06)",
+        background: active ? "rgba(16,185,129,0.12)" : "var(--aw06)",
         color: active ? "rgb(52,211,153)" : T.muted,
         opacity: loading ? 0.6 : 1,
         fontFamily: "inherit",

@@ -45,7 +45,7 @@ export function WaitlistTable({ entries }: { entries: WaitlistEntry[] }) {
   };
 
   return (
-    <div style={{ background: "rgb(10,10,12)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 16, overflow: "hidden" }}>
+    <div style={{ background: "var(--am1)", border: "1px solid var(--aw09)", borderRadius: 16, overflow: "hidden" }}>
       {/* Bulk action bar */}
       {someSelected && (
         <div style={{
@@ -54,7 +54,7 @@ export function WaitlistTable({ entries }: { entries: WaitlistEntry[] }) {
           background: "rgba(234,88,12,0.07)",
           borderBottom: "1px solid rgba(234,88,12,0.15)",
         }}>
-          <span style={{ color: "rgba(255,255,255,0.6)", fontSize: 13 }}>
+          <span style={{ color: "var(--aw6)", fontSize: 13 }}>
             <strong style={{ color: "rgb(251,146,60)" }}>{selected.size}</strong> {selected.size === 1 ? "entry" : "entries"} selected
           </span>
           <button
@@ -76,9 +76,9 @@ export function WaitlistTable({ entries }: { entries: WaitlistEntry[] }) {
 
       <table style={{ width: "100%", borderCollapse: "collapse" }}>
         <thead>
-          <tr style={{ background: "rgba(255,255,255,0.02)" }}>
+          <tr style={{ background: "var(--aw02)" }}>
             {/* Select all */}
-            <th style={{ padding: "12px 16px 12px 20px", borderBottom: "1px solid rgba(255,255,255,0.06)", width: 20 }}>
+            <th style={{ padding: "12px 16px 12px 20px", borderBottom: "1px solid var(--aw06)", width: 20 }}>
               <input
                 type="checkbox"
                 checked={allSelected}
@@ -89,9 +89,9 @@ export function WaitlistTable({ entries }: { entries: WaitlistEntry[] }) {
             {["Name", "Email", "Shop Type", "Joined", ""].map((h, i) => (
               <th key={i} style={{
                 padding: "12px 20px 12px 0", textAlign: "left",
-                color: "rgba(255,255,255,0.25)", fontSize: 11,
+                color: "var(--aw25)", fontSize: 11,
                 fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase",
-                borderBottom: "1px solid rgba(255,255,255,0.06)",
+                borderBottom: "1px solid var(--aw06)",
                 whiteSpace: "nowrap",
               }}>
                 {h}
@@ -112,7 +112,7 @@ export function WaitlistTable({ entries }: { entries: WaitlistEntry[] }) {
               <tr
                 key={entry.id}
                 style={{
-                  borderBottom: i < entries.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none",
+                  borderBottom: i < entries.length - 1 ? "1px solid var(--aw04)" : "none",
                   background: isSelected ? "rgba(234,88,12,0.04)" : "transparent",
                   transition: "background 0.1s",
                 }}
@@ -134,20 +134,20 @@ export function WaitlistTable({ entries }: { entries: WaitlistEntry[] }) {
                       width: 32, height: 32, borderRadius: "50%", flexShrink: 0,
                       background: `hsl(${(i * 61 + 180) % 360}, 30%, 20%)`,
                       display: "flex", alignItems: "center", justifyContent: "center",
-                      fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.7)",
+                      fontSize: 11, fontWeight: 700, color: "var(--aw7)",
                     }}>
                       {initials}
                     </div>
-                    <span style={{ color: "rgb(240,240,248)", fontSize: 13.5, fontWeight: 600 }}>
+                    <span style={{ color: "var(--atext)", fontSize: 13.5, fontWeight: 600 }}>
                       {entry.name ?? (
-                        <span style={{ color: "rgba(255,255,255,0.25)", fontWeight: 400, fontStyle: "italic" }}>no name</span>
+                        <span style={{ color: "var(--aw25)", fontWeight: 400, fontStyle: "italic" }}>no name</span>
                       )}
                     </span>
                   </div>
                 </td>
 
                 {/* Email */}
-                <td style={{ padding: "14px 20px 14px 0", color: "rgba(255,255,255,0.5)", fontSize: 13 }}>
+                <td style={{ padding: "14px 20px 14px 0", color: "var(--aw5)", fontSize: 13 }}>
                   {entry.email}
                 </td>
 
@@ -156,18 +156,18 @@ export function WaitlistTable({ entries }: { entries: WaitlistEntry[] }) {
                   {entry.shop_type ? (
                     <span style={{
                       fontSize: 11.5, fontWeight: 600, padding: "3px 10px", borderRadius: 20,
-                      background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.55)",
-                      border: "1px solid rgba(255,255,255,0.08)",
+                      background: "var(--aw06)", color: "var(--aw55)",
+                      border: "1px solid var(--aw08)",
                     }}>
                       {entry.shop_type}
                     </span>
                   ) : (
-                    <span style={{ color: "rgba(255,255,255,0.18)", fontSize: 13 }}>-</span>
+                    <span style={{ color: "var(--aw18)", fontSize: 13 }}>-</span>
                   )}
                 </td>
 
                 {/* Date */}
-                <td style={{ padding: "14px 20px 14px 0", color: "rgba(255,255,255,0.32)", fontSize: 12.5, whiteSpace: "nowrap" }}>
+                <td style={{ padding: "14px 20px 14px 0", color: "var(--aw3)", fontSize: 12.5, whiteSpace: "nowrap" }}>
                   {date}
                 </td>
 
@@ -180,8 +180,8 @@ export function WaitlistTable({ entries }: { entries: WaitlistEntry[] }) {
                     style={{
                       display: "flex", alignItems: "center", justifyContent: "center",
                       width: 30, height: 30, borderRadius: 8, cursor: pending ? "not-allowed" : "pointer",
-                      background: "transparent", border: "1px solid rgba(255,255,255,0.07)",
-                      color: "rgba(255,255,255,0.25)", fontFamily: "inherit",
+                      background: "transparent", border: "1px solid var(--aw07)",
+                      color: "var(--aw25)", fontFamily: "inherit",
                       opacity: pending ? 0.5 : 1,
                     }}
                   >

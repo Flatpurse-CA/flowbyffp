@@ -34,25 +34,25 @@ export default async function AdminShopsPage() {
     <div style={{ maxWidth: 1100 }}>
       {/* Heading */}
       <div style={{ marginBottom: 24 }}>
-        <h1 style={{ color: "rgb(250,250,250)", fontSize: 22, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.03em" }}>Shops</h1>
-        <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 13, margin: 0 }}>{shops.length} registered shop{shops.length !== 1 ? "s" : ""}</p>
+        <h1 style={{ color: "var(--atext2)", fontSize: 22, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.03em" }}>Shops</h1>
+        <p style={{ color: "var(--aw3)", fontSize: 13, margin: 0 }}>{shops.length} registered shop{shops.length !== 1 ? "s" : ""}</p>
       </div>
 
       {shops.length === 0 ? (
-        <div style={{ padding: "48px 0", textAlign: "center", color: "rgba(255,255,255,0.25)", fontSize: 14 }}>
+        <div style={{ padding: "48px 0", textAlign: "center", color: "var(--aw25)", fontSize: 14 }}>
           No shops yet.
         </div>
       ) : (
-        <div style={{ background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 16, overflowY: "hidden", overflowX: "auto" }}>
+        <div style={{ background: "var(--aw025)", border: "1px solid var(--aw07)", borderRadius: 16, overflowY: "hidden", overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 820 }}>
             <thead>
-              <tr style={{ background: "rgba(255,255,255,0.015)" }}>
+              <tr style={{ background: "var(--aw015)" }}>
                 {["Shop", "Type", "Location", "Owner", "Plan", "Billing", "Revenue", "Joined"].map(h => (
                   <th key={h} style={{
                     padding: "11px 18px", textAlign: "left",
-                    color: "rgba(255,255,255,0.28)", fontSize: 11,
+                    color: "var(--aw3)", fontSize: 11,
                     fontWeight: 600, letterSpacing: "0.05em", textTransform: "uppercase",
-                    borderBottom: "1px solid rgba(255,255,255,0.06)",
+                    borderBottom: "1px solid var(--aw06)",
                     whiteSpace: "nowrap",
                   }}>
                     {h}
@@ -68,7 +68,7 @@ export default async function AdminShopsPage() {
                 const planBg    = PLAN_BG[shop.plan]    ?? PLAN_BG.starter;
 
                 return (
-                  <tr key={shop.id} style={{ borderBottom: i < shops.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none" }}>
+                  <tr key={shop.id} style={{ borderBottom: i < shops.length - 1 ? "1px solid var(--aw04)" : "none" }}>
                     {/* Shop name */}
                     <td style={{ padding: "13px 18px" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -76,29 +76,29 @@ export default async function AdminShopsPage() {
                           width: 32, height: 32, borderRadius: 9, flexShrink: 0,
                           background: `hsl(${(i * 53 + 260) % 360}, 35%, 20%)`,
                           display: "flex", alignItems: "center", justifyContent: "center",
-                          fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.8)",
+                          fontSize: 11, fontWeight: 700, color: "var(--aw85)",
                         }}>
                           {initials}
                         </div>
-                        <span style={{ color: "rgb(250,250,250)", fontSize: 13, fontWeight: 600 }}>{shop.name}</span>
+                        <span style={{ color: "var(--atext2)", fontSize: 13, fontWeight: 600 }}>{shop.name}</span>
                       </div>
                     </td>
 
                     {/* Type */}
-                    <td style={{ padding: "13px 18px", color: "rgba(255,255,255,0.45)", fontSize: 12.5 }}>
+                    <td style={{ padding: "13px 18px", color: "var(--aw45)", fontSize: 12.5 }}>
                       {shop.business_type}
                     </td>
 
                     {/* Location */}
                     <td style={{ padding: "13px 18px" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 5, color: "rgba(255,255,255,0.45)", fontSize: 12.5 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 5, color: "var(--aw45)", fontSize: 12.5 }}>
                         <MapPin size={11} strokeWidth={1.8} style={{ flexShrink: 0 }} />
                         {[shop.city, shop.province].filter(Boolean).join(", ") || "-"}
                       </div>
                     </td>
 
                     {/* Owner email */}
-                    <td style={{ padding: "13px 18px", color: "rgba(255,255,255,0.42)", fontSize: 12, maxWidth: 180, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    <td style={{ padding: "13px 18px", color: "var(--aw42)", fontSize: 12, maxWidth: 180, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                       {emailMap[shop.owner_id] ?? "-"}
                     </td>
 
@@ -125,17 +125,17 @@ export default async function AdminShopsPage() {
                           {shop.subscription_status}
                         </span>
                       ) : (
-                        <span style={{ color: "rgba(255,255,255,0.2)", fontSize: 12 }}>-</span>
+                        <span style={{ color: "var(--aw2)", fontSize: 12 }}>-</span>
                       )}
                     </td>
 
                     {/* Revenue */}
-                    <td style={{ padding: "13px 18px", color: "rgba(255,255,255,0.55)", fontSize: 12.5, fontWeight: 600, whiteSpace: "nowrap" }}>
+                    <td style={{ padding: "13px 18px", color: "var(--aw55)", fontSize: 12.5, fontWeight: 600, whiteSpace: "nowrap" }}>
                       {formatCAD(revenueByShop[shop.id] ?? 0)}
                     </td>
 
                     {/* Date */}
-                    <td style={{ padding: "13px 18px", color: "rgba(255,255,255,0.3)", fontSize: 12, whiteSpace: "nowrap" }}>
+                    <td style={{ padding: "13px 18px", color: "var(--aw3)", fontSize: 12, whiteSpace: "nowrap" }}>
                       {date}
                     </td>
                   </tr>

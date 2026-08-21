@@ -5,8 +5,8 @@ import { NotificationPrefsForm } from "./NotificationPrefsForm";
 import { ShieldCheck, Bell, Palette, UserMinus } from "lucide-react";
 
 const card: React.CSSProperties = {
-  background: "rgb(10,10,12)",
-  border: "1px solid rgba(255,255,255,0.09)",
+  background: "var(--am1)",
+  border: "1px solid var(--aw09)",
   borderRadius: 18,
   padding: "22px 24px",
 };
@@ -22,8 +22,8 @@ function SectionHeader({ Icon, title, subtitle }: { Icon: React.ComponentType<{ 
         <Icon size={16} color="rgb(167,139,250)" strokeWidth={1.8} />
       </div>
       <div>
-        <p style={{ color: "rgb(240,240,248)", fontSize: 14.5, fontWeight: 700, margin: "0 0 2px" }}>{title}</p>
-        <p style={{ color: "rgba(255,255,255,0.32)", fontSize: 12, margin: 0 }}>{subtitle}</p>
+        <p style={{ color: "var(--atext)", fontSize: 14.5, fontWeight: 700, margin: "0 0 2px" }}>{title}</p>
+        <p style={{ color: "var(--aw3)", fontSize: 12, margin: 0 }}>{subtitle}</p>
       </div>
     </div>
   );
@@ -41,8 +41,8 @@ export default async function AdminSettingsPage() {
   return (
     <div style={{ maxWidth: 640, display: "flex", flexDirection: "column", gap: 20 }}>
       <div>
-        <h1 style={{ color: "rgb(250,250,250)", fontSize: 22, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.03em" }}>Settings</h1>
-        <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 13, margin: 0 }}>Admin access and panel preferences</p>
+        <h1 style={{ color: "var(--atext2)", fontSize: 22, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.03em" }}>Settings</h1>
+        <p style={{ color: "var(--aw3)", fontSize: 13, margin: 0 }}>Admin access and panel preferences</p>
       </div>
 
       {/* Admin access */}
@@ -60,7 +60,7 @@ export default async function AdminSettingsPage() {
               }}>
                 {ROOT_ADMIN_EMAIL.slice(0, 2).toUpperCase()}
               </div>
-              <span style={{ color: "rgb(240,240,248)", fontSize: 13, fontWeight: 600 }}>{ROOT_ADMIN_EMAIL}</span>
+              <span style={{ color: "var(--atext)", fontSize: 13, fontWeight: 600 }}>{ROOT_ADMIN_EMAIL}</span>
             </div>
             <span style={{
               fontSize: 10, fontWeight: 700, padding: "3px 9px", borderRadius: 20,
@@ -76,13 +76,13 @@ export default async function AdminSettingsPage() {
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <div style={{
                   width: 30, height: 30, borderRadius: "50%",
-                  background: "rgba(255,255,255,0.06)",
+                  background: "var(--aw06)",
                   display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.6)",
+                  fontSize: 11, fontWeight: 700, color: "var(--aw6)",
                 }}>
                   {a.email.slice(0, 2).toUpperCase()}
                 </div>
-                <span style={{ color: "rgb(240,240,248)", fontSize: 13, fontWeight: 600 }}>{a.email}</span>
+                <span style={{ color: "var(--atext)", fontSize: 13, fontWeight: 600 }}>{a.email}</span>
               </div>
               <form action={removeAdmin}>
                 <input type="hidden" name="email" value={a.email} />
@@ -111,8 +111,8 @@ export default async function AdminSettingsPage() {
             placeholder="teammate@email.com"
             style={{
               flex: 1, padding: "9px 14px", borderRadius: 10,
-              background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)",
-              color: "rgb(240,240,248)", fontSize: 13, fontFamily: "inherit", outline: "none",
+              background: "var(--aw04)", border: "1px solid var(--aw09)",
+              color: "var(--atext)", fontSize: 13, fontFamily: "inherit", outline: "none",
             }}
           />
           <button
@@ -126,7 +126,7 @@ export default async function AdminSettingsPage() {
             Add admin
           </button>
         </form>
-        <p style={{ color: "rgba(255,255,255,0.2)", fontSize: 11, margin: "10px 4px 0" }}>
+        <p style={{ color: "var(--aw2)", fontSize: 11, margin: "10px 4px 0" }}>
           Added admins must already have an account (sign up at /signup) before they can log in here.
         </p>
       </div>
@@ -140,7 +140,7 @@ export default async function AdminSettingsPage() {
       {/* Appearance */}
       <div style={card}>
         <SectionHeader Icon={Palette} title="Appearance" subtitle="Light and dark mode" />
-        <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 13, margin: 0, lineHeight: 1.6 }}>
+        <p style={{ color: "var(--aw45)", fontSize: 13, margin: 0, lineHeight: 1.6 }}>
           Toggle light/dark from the sun/moon icon in the header. It applies across the whole admin panel and is remembered on this device.
         </p>
       </div>

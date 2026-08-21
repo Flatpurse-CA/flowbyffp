@@ -20,14 +20,14 @@ export default async function SendBlastPage() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-        <Link href="/admin/emails" style={{ color: "rgba(255,255,255,0.35)", display: "flex", alignItems: "center" }}>
+        <Link href="/admin/emails" style={{ color: "var(--aw35)", display: "flex", alignItems: "center" }}>
           <ArrowLeft size={16} />
         </Link>
         <div>
-          <h1 style={{ color: "rgb(245,245,252)", fontSize: 22, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.03em" }}>
+          <h1 style={{ color: "var(--atext2)", fontSize: 22, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.03em" }}>
             Send Blast
           </h1>
-          <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 13, margin: 0 }}>
+          <p style={{ color: "var(--aw35)", fontSize: 13, margin: 0 }}>
             {totalSubs ?? 0} subscribers on the waitlist
           </p>
         </div>

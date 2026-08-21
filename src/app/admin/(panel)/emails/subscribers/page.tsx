@@ -4,11 +4,11 @@ import { ArrowLeft, CheckCircle, Clock, XCircle, Send } from "lucide-react";
 import { SendNowButton } from "./SendNowButton";
 
 const T = {
-  bg:     "rgb(10,10,12)",
-  border: "rgba(255,255,255,0.09)",
-  text:   "rgb(245,245,252)",
-  muted:  "rgba(255,255,255,0.35)",
-  dim:    "rgba(255,255,255,0.18)",
+  bg:     "var(--am1)",
+  border: "var(--aw09)",
+  text:   "var(--atext2)",
+  muted:  "var(--aw35)",
+  dim:    "var(--aw18)",
   purple: "rgb(139,92,246)",
 };
 
@@ -84,7 +84,7 @@ export default async function SubscribersPage({
           <Link key={String(s)} href={s ? `?status=${s}` : "?"} style={{
             padding: "6px 14px", borderRadius: 999, fontSize: 12, fontWeight: 600,
             textDecoration: "none",
-            background: filterStatus === s ? T.purple : "rgba(255,255,255,0.05)",
+            background: filterStatus === s ? T.purple : "var(--aw05)",
             color:      filterStatus === s ? "#fff"   : T.muted,
             border: `1px solid ${filterStatus === s ? T.purple : T.border}`,
           }}>

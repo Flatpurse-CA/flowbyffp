@@ -7,7 +7,7 @@ const FEATURE_LABELS: Record<string, string> = {
   daily_brief_viewed: "Daily Brief",
 };
 
-const card: React.CSSProperties = { background: "rgb(10,10,12)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 18, overflow: "hidden" };
+const card: React.CSSProperties = { background: "var(--am1)", border: "1px solid var(--aw09)", borderRadius: 18, overflow: "hidden" };
 
 export default async function AdminFeatureUsagePage() {
   const admin = createAdminClient();
@@ -37,8 +37,8 @@ export default async function AdminFeatureUsagePage() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
       <div>
-        <h1 style={{ color: "rgb(250,250,250)", fontSize: 22, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.03em" }}>Feature Usage</h1>
-        <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 13, margin: 0 }}>Real page-view tracking for premium features, this month. Starts empty and fills in as shops actually use them.</p>
+        <h1 style={{ color: "var(--atext2)", fontSize: 22, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.03em" }}>Feature Usage</h1>
+        <p style={{ color: "var(--aw3)", fontSize: 13, margin: 0 }}>Real page-view tracking for premium features, this month. Starts empty and fills in as shops actually use them.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
@@ -49,28 +49,28 @@ export default async function AdminFeatureUsagePage() {
         ].map(s => (
           <div key={s.label} style={{ ...card, padding: "20px 22px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
-              <span style={{ color: "rgba(255,255,255,0.45)", fontSize: 13, fontWeight: 500 }}>{s.label}</span>
+              <span style={{ color: "var(--aw45)", fontSize: 13, fontWeight: 500 }}>{s.label}</span>
               <div style={{ width: 34, height: 34, borderRadius: 10, background: s.iconBg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                 <s.Icon size={16} color={s.iconColor} strokeWidth={1.8} />
               </div>
             </div>
-            <p style={{ color: "rgb(245,245,252)", fontSize: 28, fontWeight: 800, letterSpacing: "-0.03em", margin: 0 }}>{s.value}</p>
+            <p style={{ color: "var(--atext2)", fontSize: 28, fontWeight: 800, letterSpacing: "-0.03em", margin: 0 }}>{s.value}</p>
           </div>
         ))}
       </div>
 
       <div style={card}>
         <div style={{ padding: "18px 24px 4px" }}>
-          <p style={{ color: "rgb(240,240,248)", fontSize: 14, fontWeight: 700, margin: 0 }}>By feature, this month</p>
+          <p style={{ color: "var(--atext)", fontSize: 14, fontWeight: 700, margin: 0 }}>By feature, this month</p>
         </div>
         {byFeature.length === 0 ? (
-          <p style={{ color: "rgba(255,255,255,0.25)", fontSize: 13, padding: "8px 24px 24px" }}>No tracked feature views yet.</p>
+          <p style={{ color: "var(--aw25)", fontSize: 13, padding: "8px 24px 24px" }}>No tracked feature views yet.</p>
         ) : (
           <table style={{ width: "100%", borderCollapse: "collapse", marginTop: 8 }}>
             <thead>
-              <tr style={{ background: "rgba(255,255,255,0.015)" }}>
+              <tr style={{ background: "var(--aw015)" }}>
                 {["Feature", "Shops using it", "% of all shops", "Total views"].map(h => (
-                  <th key={h} style={{ padding: "10px 24px", textAlign: "left", color: "rgba(255,255,255,0.28)", fontSize: 11, fontWeight: 600, letterSpacing: "0.05em", textTransform: "uppercase", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                  <th key={h} style={{ padding: "10px 24px", textAlign: "left", color: "var(--aw3)", fontSize: 11, fontWeight: 600, letterSpacing: "0.05em", textTransform: "uppercase", borderBottom: "1px solid var(--aw06)" }}>
                     {h}
                   </th>
                 ))}
@@ -78,11 +78,11 @@ export default async function AdminFeatureUsagePage() {
             </thead>
             <tbody>
               {byFeature.map((f, i) => (
-                <tr key={f.key} style={{ borderBottom: i < byFeature.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none" }}>
-                  <td style={{ padding: "12px 24px", color: "rgb(250,250,250)", fontSize: 13, fontWeight: 600 }}>{FEATURE_LABELS[f.key] ?? f.key}</td>
-                  <td style={{ padding: "12px 24px", color: "rgba(255,255,255,0.6)", fontSize: 13 }}>{f.uniqueShops}</td>
-                  <td style={{ padding: "12px 24px", color: "rgba(255,255,255,0.4)", fontSize: 13 }}>{totalShops > 0 ? Math.round((f.uniqueShops / totalShops) * 100) : 0}%</td>
-                  <td style={{ padding: "12px 24px", color: "rgba(255,255,255,0.4)", fontSize: 13 }}>{f.events}</td>
+                <tr key={f.key} style={{ borderBottom: i < byFeature.length - 1 ? "1px solid var(--aw04)" : "none" }}>
+                  <td style={{ padding: "12px 24px", color: "var(--atext2)", fontSize: 13, fontWeight: 600 }}>{FEATURE_LABELS[f.key] ?? f.key}</td>
+                  <td style={{ padding: "12px 24px", color: "var(--aw6)", fontSize: 13 }}>{f.uniqueShops}</td>
+                  <td style={{ padding: "12px 24px", color: "var(--aw4)", fontSize: 13 }}>{totalShops > 0 ? Math.round((f.uniqueShops / totalShops) * 100) : 0}%</td>
+                  <td style={{ padding: "12px 24px", color: "var(--aw4)", fontSize: 13 }}>{f.events}</td>
                 </tr>
               ))}
             </tbody>

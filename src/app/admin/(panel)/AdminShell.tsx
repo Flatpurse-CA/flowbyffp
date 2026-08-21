@@ -132,7 +132,7 @@ export function AdminShell({ children, user }: { children: React.ReactNode; user
     const stored = localStorage.getItem("admin-theme");
     if (stored === "light") {
       setDark(false);
-      document.documentElement.setAttribute("data-theme", "light");
+      document.documentElement.setAttribute("data-admin-theme", "light");
     }
   }, []);
 
@@ -140,7 +140,7 @@ export function AdminShell({ children, user }: { children: React.ReactNode; user
     const next = !dark;
     setDark(next);
     localStorage.setItem("admin-theme", next ? "dark" : "light");
-    document.documentElement.setAttribute("data-theme", next ? "dark" : "light");
+    document.documentElement.setAttribute("data-admin-theme", next ? "dark" : "light");
   };
 
   useEffect(() => {
