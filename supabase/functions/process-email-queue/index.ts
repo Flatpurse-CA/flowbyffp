@@ -43,7 +43,8 @@ Deno.serve(async () => {
     const html = seq.body.replace(/\[First Name\]/g, firstName);
 
     try {
-      await resend.emails.send({ from: FROM, to: subscriber.email, subject: seq.subject, html });
+      const { error: sendError } = await resend.emails.send({ from: FROM, to: subscriber.email, subject: seq.subject, html });
+      if (sendError) throw new Error(sendError.message);
       await supabase.from("email_sends").update({ status: "sent", sent_at: new Date().toISOString(), error_message: null }).eq("id", send.id);
       sent++;
     } catch (err) {
