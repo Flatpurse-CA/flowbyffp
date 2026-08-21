@@ -9,15 +9,15 @@ const BRAND_PURPLE = "#712AE2";
 const PLANS = [
   {
     id: "starter",
-    label: "Basic",
+    label: "Starter",
     badge: null,
-    originalPrice: null,
-    price: "Free",
-    priceSuffix: "forever",
-    subtitle: "No card required",
-    description: "Perfect for solo businesses getting started",
-    features: ["Dashboard", "Online Booking Page", "Payments", "1 Team Member", "Up to 50 bookings/mo"],
-    cta: "Start for free",
+    originalPrice: "C$39/mo",
+    price: "C$23.40",
+    priceSuffix: "/mo",
+    subtitle: "Year 1 · then C$29.25/mo forever",
+    description: "Solo businesses getting started",
+    features: ["Home Dashboard & booking calendar", "Full POS, payments & Tap to Pay", "Client CRM & appointment history", "Up to 2 team members"],
+    cta: "Start Free Trial",
     href: "/signup",
     gradient: "radial-gradient(140% 60% at 50% 100%, rgb(109,40,217) 0%, rgb(76,29,149) 28%, rgb(30,10,60) 58%, rgba(9,9,11,0) 85%)",
     isFounders: false,
@@ -25,13 +25,13 @@ const PLANS = [
   {
     id: "pro",
     label: "Pro",
-    badge: "Most Popular",
-    originalPrice: "C$59/mo",
-    price: "C$35.40",
+    badge: null,
+    originalPrice: "C$89/mo",
+    price: "C$53.40",
     priceSuffix: "/mo",
-    subtitle: "Year 1 · then C$44.25/mo forever",
-    description: "Best for growing service businesses",
-    features: ["AI Front Desk", "AI Daily Brief", "Unlimited bookings", "Up to 10 team members"],
+    subtitle: "Year 1 · then C$66.75/mo forever",
+    description: "Run your business",
+    features: ["AutoPilot — no-show recovery, win-backs, AI Front Desk", "Daily Brief — morning business summary", "Client segmentation & churn-risk alerts", "Up to 10 team members"],
     cta: "Get started with Pro",
     href: "/signup",
     gradient: "radial-gradient(140% 60% at 50% 100%, rgb(109,40,217) 0%, rgb(76,29,149) 28%, rgb(30,10,60) 58%, rgba(9,9,11,0) 85%)",
@@ -40,13 +40,13 @@ const PLANS = [
   {
     id: "pro-plus",
     label: "Pro+",
-    badge: null,
-    originalPrice: "C$199/mo",
-    price: "C$119.40",
+    badge: "Most Popular",
+    originalPrice: "C$189/mo",
+    price: "C$113.40",
     priceSuffix: "/mo",
-    subtitle: "Year 1 · then C$149.25/mo forever",
-    description: "For businesses focused on growth",
-    features: ["Flow Coach™", "AI Autopilot", "Advanced Analytics", "Revenue Optimization", "Up to 25 team members"],
+    subtitle: "Year 1 · then C$141.75/mo forever",
+    description: "Grow your business",
+    features: ["Flow Coach™ — your AI business consultant", "Business Health Score & revenue forecasting", "Staffing & retention insights", "Up to 25 team members"],
     cta: "Get started with Pro+",
     href: "/signup",
     gradient: "radial-gradient(140% 60% at 50% 100%, rgb(109,40,217) 0%, rgb(76,29,149) 28%, rgb(30,10,60) 58%, rgba(9,9,11,0) 85%)",
@@ -59,10 +59,10 @@ const PLANS = [
     originalPrice: null,
     price: "Custom",
     priceSuffix: "",
-    subtitle: "From $179/location/mo",
-    description: "For multi-location businesses and larger orgs",
-    features: ["Everything in Pro+", "Unlimited locations", "Unlimited team members", "Dedicated CSM", "Enterprise security"],
-    cta: "Contact sales",
+    subtitle: "Unlimited staff, 3+ locations",
+    description: "Scale your business",
+    features: ["Multi-location dashboard", "Advanced reporting & priority support", "Dedicated onboarding", "Unlimited team members"],
+    cta: "Talk to Us",
     href: "mailto:sales@flatpurse.com?subject=Enterprise%20plan",
     gradient: "radial-gradient(140% 60% at 50% 100%, rgb(109,40,217) 0%, rgb(76,29,149) 28%, rgb(30,10,60) 58%, rgba(9,9,11,0) 85%)",
     isFounders: false,
@@ -309,7 +309,7 @@ export default function PricingSection() {
         }}>
           Beta members are pre-qualified. Founders pricing is locked in for as long as your subscription stays active; cancel and you lose it for good.
         </p>
-        <a href="/waitlist" style={{
+        <a href="/signup" style={{
           display: "inline-flex", alignItems: "center", gap: 8,
           background: BRAND_PURPLE,
           color: "#fff",
@@ -322,7 +322,7 @@ export default function PricingSection() {
           onMouseEnter={e => (e.currentTarget.style.opacity = "0.85")}
           onMouseLeave={e => (e.currentTarget.style.opacity = "1")}
         >
-          Claim your beta spot now
+          Start your free trial
         </a>
       </div>
 

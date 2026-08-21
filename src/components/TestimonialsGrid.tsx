@@ -138,7 +138,7 @@ export default function TestimonialsGrid() {
             <img
               src={featured.img}
               alt={featured.name}
-              style={{ width: 44, height: 44, borderRadius: "50%", objectFit: "cover", flexShrink: 0 }}
+              style={{ width: 44, height: 44, borderRadius: "50%", objectFit: "cover", objectPosition: "top", flexShrink: 0 }}
             />
             <div>
               <p style={{ fontSize: 14, fontWeight: 700, color: "#fff", margin: 0 }}>{featured.name}</p>
@@ -177,7 +177,7 @@ export default function TestimonialsGrid() {
                 <img
                   src={t.img}
                   alt={t.name}
-                  style={{ width: 36, height: 36, borderRadius: "50%", objectFit: "cover", flexShrink: 0 }}
+                  style={{ width: 36, height: 36, borderRadius: "50%", objectFit: "cover", objectPosition: "top", flexShrink: 0 }}
                 />
                 <div>
                   <p style={{ fontSize: 13, fontWeight: 700, color: "#fff", margin: 0 }}>{t.name}</p>

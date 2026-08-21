@@ -201,7 +201,7 @@ export default function TestimonialsSection() {
             <img
               src={t.img}
               alt={t.name}
-              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+              style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top", display: "block" }}
             />
             {/* Type pill — always visible top-right */}
             <div style={{
