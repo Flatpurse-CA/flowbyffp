@@ -38,9 +38,9 @@ export default function Footer() {
             margin: "0 auto 40px",
             maxWidth: 480,
           }}>
-            Free during beta. No credit card. Auto-enrolled in 40% off forever. Edmonton-built and the door&apos;s closing.
+            Start free today. No credit card required. Auto-enrolled in 40% off for life if you&apos;re one of the first 40 shops.
           </p>
-          <Link href="/waitlist#waitlist-form" style={{
+          <Link href="/signup" style={{
             display: "inline-flex", alignItems: "center", justifyContent: "center",
             padding: "16px 36px",
             background: "transparent",
@@ -53,7 +53,7 @@ export default function Footer() {
           }}
             className="footer-cta-btn"
           >
-            Claim Your Beta Spot
+            Start Your Free Trial
           </Link>
         </div>
       </div>

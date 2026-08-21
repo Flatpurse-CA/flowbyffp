@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { requireShop, getCurrentShopId } from "@/lib/dashboard/shop";
+import { requireShop, getCurrentShopId, getShopContext } from "@/lib/dashboard/shop";
 import { attributeAutopilotRevenue } from "@/lib/dashboard/autopilotAttribution";
 
 export type AppointmentStatus = "confirmed" | "pending" | "deposit" | "completed" | "cancelled";
@@ -73,6 +73,11 @@ export async function createAppointment(input: {
   notes?: string;
 }) {
   const { supabase, shopId } = await requireShop();
+
+  const ctx = await getShopContext();
+  if (ctx?.accessStatus === "grace" || ctx?.accessStatus === "inactive") {
+    throw new Error("New bookings are paused until a card is added — visit Billing to resume.");
+  }
 
   // Customers are platform-wide (one account can book at any shop) — if this
   // walk-in/phone booking's email or phone matches an existing customer

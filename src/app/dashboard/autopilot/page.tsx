@@ -25,6 +25,19 @@ export default async function AutoPilotPage() {
 
   if (ctx.role !== "owner") redirect("/dashboard");
 
+  if (ctx.accessStatus === "grace" || ctx.accessStatus === "inactive") {
+    return (
+      <div style={{ maxWidth: 460, margin: "100px auto 0", textAlign: "center" }}>
+        <h1 style={{ color: "var(--dtext2)", fontSize: 19, fontWeight: 800, margin: "0 0 10px", letterSpacing: "-0.02em" }}>
+          AutoPilot is paused
+        </h1>
+        <p style={{ color: "var(--dw45)", fontSize: 13.5, lineHeight: 1.6, margin: 0 }}>
+          Your trial ended, so no-show recovery, win-backs, and the AI Front Desk are paused. Add a card to turn AutoPilot back on.
+        </p>
+      </div>
+    );
+  }
+
   await logFeatureUsage("autopilot_viewed", ctx.shopId);
 
   const state = await getAutopilotState();

@@ -93,27 +93,27 @@ export default function CookiePolicyPage() {
         justifyContent: "space-between",
         borderBottom: "1px solid rgba(255,255,255,0.06)",
       }}>
-        <Link href="/waitlist" style={{ textDecoration: "none", display: "flex", alignItems: "center" }}>
+        <Link href="/home-main" style={{ textDecoration: "none", display: "flex", alignItems: "center" }}>
           <Image src="/group-starter.svg" alt="FlatPurse Flow" width={130} height={37} priority />
         </Link>
-        <Link href="/waitlist" style={{
+        <Link href="/signup" style={{
           fontSize: 13, fontWeight: 600, color: "#fff",
           background: BRAND_PURPLE, textDecoration: "none",
           padding: "9px 20px", borderRadius: 8, letterSpacing: "-0.01em",
         }}>
-          Join Beta
+          Start Free Trial
         </Link>
       </nav>
 
       {/* Hero */}
       <div style={{ padding: "80px 48px 60px", maxWidth: 860, margin: "0 auto" }}>
-        <Link href="/waitlist" style={{
+        <Link href="/home-main" style={{
           display: "inline-flex", alignItems: "center", gap: 6,
           fontSize: 13, color: "rgba(255,255,255,0.4)", textDecoration: "none",
           marginBottom: 32, letterSpacing: "-0.01em",
         }}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-          Back to waitlist
+          Back to home
         </Link>
         <div style={{
           display: "inline-flex", alignItems: "center", gap: 7,

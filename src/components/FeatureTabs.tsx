@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 
 const BRAND_PURPLE = "#712AE2";
 const TAB_DURATION = 5;
@@ -179,10 +180,9 @@ export default function FeatureTabs() {
                 </button>
               );
             })}
-            {/* Join waitlist button */}
+            {/* Start free trial button */}
             <div style={{ paddingTop: 32 }}>
-              <button style={{
-                all: "unset",
+              <Link href="/signup" style={{
                 display: "inline-flex",
                 alignItems: "center",
                 gap: 8,
@@ -194,9 +194,10 @@ export default function FeatureTabs() {
                 borderRadius: 10,
                 cursor: "pointer",
                 letterSpacing: "-0.01em",
+                textDecoration: "none",
               }}>
-                Join the waitlist
-              </button>
+                Start Free Trial
+              </Link>
             </div>
           </div>
 

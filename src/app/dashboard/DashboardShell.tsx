@@ -127,7 +127,7 @@ function SidebarNav({ open, pathname, T, tabs }: { open: boolean; pathname: stri
   );
 }
 
-export function DashboardShell(props: { children: React.ReactNode; user: User; role: ShopRole; staffName: string | null; unreadCount: number }) {
+export function DashboardShell(props: { children: React.ReactNode; user: User; role: ShopRole; staffName: string | null; unreadCount: number; accessStatus?: "trialing" | "grace" | "inactive" | "active" }) {
   return (
     <DashboardThemeProvider>
       <DashboardShellInner {...props} />
@@ -135,7 +135,7 @@ export function DashboardShell(props: { children: React.ReactNode; user: User; r
   );
 }
 
-function DashboardShellInner({ children, user, role, staffName, unreadCount }: { children: React.ReactNode; user: User; role: ShopRole; staffName: string | null; unreadCount: number }) {
+function DashboardShellInner({ children, user, role, staffName, unreadCount, accessStatus }: { children: React.ReactNode; user: User; role: ShopRole; staffName: string | null; unreadCount: number; accessStatus?: "trialing" | "grace" | "inactive" | "active" }) {
   const router = useRouter();
   const pathname = usePathname();
   const visibleTabs = role === "owner" ? NAV_TABS : NAV_TABS.filter(t => !t.ownerOnly);
@@ -575,6 +575,23 @@ function DashboardShellInner({ children, user, role, staffName, unreadCount }: {
 
         {/* Scrollable content */}
         <main className="dashboard-main" style={{ flex: 1, overflowY: "auto", padding: "28px 32px", background: T.bg, paddingBottom: 90 }}>
+          {accessStatus === "grace" && (
+            <div style={{
+              display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap",
+              background: "rgba(113,42,226,0.12)", border: "1px solid rgba(113,42,226,0.35)",
+              borderRadius: 12, padding: "14px 18px", marginBottom: 20,
+            }}>
+              <p style={{ margin: 0, fontSize: 13.5, color: T.text, lineHeight: 1.5 }}>
+                Your trial ended — AutoPilot is paused. Add a card to pick up right where you left off.
+              </p>
+              <Link href="/dashboard/settings?tab=Billing" style={{
+                flexShrink: 0, background: "#712AE2", color: "#fff", fontSize: 13, fontWeight: 700,
+                padding: "9px 16px", borderRadius: 8, textDecoration: "none", whiteSpace: "nowrap",
+              }}>
+                Add a card
+              </Link>
+            </div>
+          )}
           {children}
         </main>
       </div>

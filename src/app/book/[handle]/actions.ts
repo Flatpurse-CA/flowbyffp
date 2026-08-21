@@ -7,6 +7,7 @@ import { sendBookingConfirmationEmail } from "@/lib/resend";
 import { stripe } from "@/lib/stripe";
 import { ensureStripeCustomerId } from "@/lib/stripeCustomer";
 import { attributeAutopilotRevenue } from "@/lib/dashboard/autopilotAttribution";
+import { computeAccessStatus } from "@/lib/dashboard/accessStatus";
 
 const SLOT_INTERVAL_MINUTES = 30;
 
@@ -86,8 +87,13 @@ export async function createPublicBooking(input: {
 
   const admin = createAdminClient();
 
-  const { data: shop } = await admin.from("shops").select("id, name, street_address, city, province, phone").eq("id", input.shopId).maybeSingle();
+  const { data: shop } = await admin.from("shops").select("id, name, street_address, city, province, phone, created_at, subscription_status").eq("id", input.shopId).maybeSingle();
   if (!shop) return { error: "This shop couldn't be found" };
+
+  const { status: shopAccessStatus } = computeAccessStatus(shop as { created_at: string; subscription_status: string | null });
+  if (shopAccessStatus === "grace" || shopAccessStatus === "inactive") {
+    return { error: "This business isn't currently accepting new bookings" };
+  }
 
   const { data: service } = await admin
     .from("services")
