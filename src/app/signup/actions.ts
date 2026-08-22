@@ -3,6 +3,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { validatePassword } from "@/lib/passwordPolicy";
 
 const ONBOARDING_COOKIE_MAX_AGE = 60 * 30;
 
@@ -15,8 +16,9 @@ export async function createAccount(formData: FormData) {
   if (!firstName || !lastName || !email || !password) {
     redirect(`/signup?error=${encodeURIComponent("All fields are required")}`);
   }
-  if (password.length < 8) {
-    redirect(`/signup?error=${encodeURIComponent("Password must be at least 8 characters")}`);
+  const passwordError = validatePassword(password);
+  if (passwordError) {
+    redirect(`/signup?error=${encodeURIComponent(passwordError)}`);
   }
 
   const admin = createAdminClient();

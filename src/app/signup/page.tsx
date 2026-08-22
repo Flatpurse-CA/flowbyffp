@@ -138,7 +138,7 @@ function SignupStep1() {
                   name="password"
                   type={showPassword ? "text" : "password"}
                   required
-                  minLength={8}
+                  minLength={10}
                   autoComplete="new-password"
                   placeholder="Enter your password"
                   style={{ ...inputStyle, paddingRight: 44 }}
@@ -165,7 +165,7 @@ function SignupStep1() {
                 </button>
               </div>
               <p style={{ color: "rgb(113,113,122)", fontSize: 12, marginTop: 6 }}>
-                Must be at least 8 characters.
+                Must be at least 10 characters, with a letter and a number.
               </p>
             </div>
 

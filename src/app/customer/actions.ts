@@ -5,13 +5,15 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { sendPasswordResetEmail } from "@/lib/resend";
 import { getRequestOrigin } from "@/lib/requestOrigin";
+import { validatePassword } from "@/lib/passwordPolicy";
 
 export async function customerSignup(input: { fullName: string; email: string; phone?: string; password: string }): Promise<{ error?: string }> {
   const fullName = input.fullName.trim();
   const email = input.email.trim();
 
   if (!fullName || !email || !input.password) return { error: "All fields are required" };
-  if (input.password.length < 8) return { error: "Password must be at least 8 characters" };
+  const signupPasswordError = validatePassword(input.password);
+  if (signupPasswordError) return { error: signupPasswordError };
 
   const admin = createAdminClient();
 
@@ -81,7 +83,8 @@ export async function customerRequestPasswordReset(email: string): Promise<{ err
 }
 
 export async function customerSetNewPassword(password: string): Promise<{ error?: string }> {
-  if (password.length < 8) return { error: "Password must be at least 8 characters" };
+  const newPasswordError = validatePassword(password);
+  if (newPasswordError) return { error: newPasswordError };
 
   const supabase = await createClient();
   const { data: userData } = await supabase.auth.getUser();

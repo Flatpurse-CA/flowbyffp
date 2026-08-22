@@ -4,8 +4,13 @@ import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendOtpEmail } from "@/lib/resend";
+import { checkRateLimit } from "@/lib/rateLimit";
 
 export async function verifyCode(email: string, token: string): Promise<{ error?: string }> {
+  if (!checkRateLimit(`verify-otp:${email.toLowerCase()}`, 8, 10 * 60 * 1000)) {
+    return { error: "Too many attempts — wait a few minutes and try again" };
+  }
+
   const supabase = await createClient();
   const { error } = await supabase.auth.verifyOtp({ email, token, type: "signup" });
   if (error) return { error: error.message };
@@ -16,6 +21,10 @@ export async function verifyCode(email: string, token: string): Promise<{ error?
 }
 
 export async function resendCode(email: string): Promise<{ error?: string }> {
+  if (!checkRateLimit(`resend-otp:${email.toLowerCase()}`, 3, 10 * 60 * 1000)) {
+    return { error: "Too many resend attempts — wait a few minutes and try again" };
+  }
+
   // Regenerate via the admin API + send through Resend, same as the initial send in
   // signup/actions.ts — supabase.auth.resend() relies on Supabase's own mailer, which
   // has no custom SMTP configured for this project and is capped at 2 emails/hour.

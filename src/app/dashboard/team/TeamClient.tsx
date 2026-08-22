@@ -1,10 +1,10 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, TrendingDown, TrendingUp, AlertTriangle, MoreHorizontal, X } from "lucide-react";
-import type { StaffRow } from "./actions";
-import { inviteStaff, inviteExistingStaff, resendInvite, archiveStaff } from "./actions";
+import { Plus, TrendingDown, TrendingUp, AlertTriangle, MoreHorizontal, X, Clock } from "lucide-react";
+import type { StaffRow, StaffHourRow } from "./actions";
+import { inviteStaff, inviteExistingStaff, resendInvite, archiveStaff, getStaffHours, updateStaffHours, clearStaffHours } from "./actions";
 import type { AppointmentRow } from "../appointments/actions";
 import { computeStaffUtilization, computeRebookTrend, type MetricsAppointment } from "@/lib/dashboard/metrics";
 import { tint } from "@/lib/color";
@@ -192,6 +192,125 @@ function AddEmailModal({ staffId, staffName, onClose, onSent }: { staffId: strin
             {submitting ? "Sending invite…" : "Send invite"}
           </button>
         </div>
+      </div>
+    </div>
+  );
+}
+
+const DAY_LABELS: Array<{ weekday: number; label: string }> = [
+  { weekday: 1, label: "Mon" }, { weekday: 2, label: "Tue" }, { weekday: 3, label: "Wed" },
+  { weekday: 4, label: "Thu" }, { weekday: 5, label: "Fri" }, { weekday: 6, label: "Sat" }, { weekday: 0, label: "Sun" },
+];
+
+function buildStaffHourRows(initial: StaffHourRow[]): StaffHourRow[] {
+  return DAY_LABELS.map(({ weekday }) => {
+    const existing = initial.find(r => r.weekday === weekday);
+    return existing ?? { weekday, open: weekday !== 0, start: "09:00", end: "18:00" };
+  });
+}
+
+// Per-staff hours, distinct from the shop-wide hours in Settings — no rows
+// here means this staff member just follows the shop's default hours.
+function StaffHoursCard({ staffId }: { staffId: string }) {
+  const [loading, setLoading] = useState(true);
+  const [customized, setCustomized] = useState(false);
+  const [rows, setRows] = useState<StaffHourRow[]>([]);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    getStaffHours(staffId).then(existing => {
+      if (cancelled) return;
+      setCustomized(existing.length > 0);
+      setRows(buildStaffHourRows(existing));
+      setLoading(false);
+    });
+    return () => { cancelled = true; };
+  }, [staffId]);
+
+  const toggleDay = (weekday: number) =>
+    setRows(rs => rs.map(r => r.weekday === weekday ? { ...r, open: !r.open } : r));
+  const setTime = (weekday: number, field: "start" | "end", value: string) =>
+    setRows(rs => rs.map(r => r.weekday === weekday ? { ...r, [field]: value } : r));
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      await updateStaffHours(staffId, rows);
+      setCustomized(true);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const useShopDefault = async () => {
+    setSaving(true);
+    try {
+      await clearStaffHours(staffId);
+      setCustomized(false);
+      setRows(buildStaffHourRows([]));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const card: React.CSSProperties = { background: "var(--dsurface1)", border: "1px solid var(--dw07)", borderRadius: 16, padding: 20 };
+
+  if (loading) return null;
+
+  return (
+    <div style={card}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <Clock size={14} color="var(--dw4)" />
+          <p style={{ color: "var(--dw5)", fontSize: 11, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", margin: 0 }}>Availability</p>
+        </div>
+        {customized && (
+          <button onClick={useShopDefault} disabled={saving} style={{ background: "transparent", border: "none", color: "var(--dw35)", fontSize: 11, cursor: "pointer", textDecoration: "underline" }}>
+            Use shop default
+          </button>
+        )}
+      </div>
+      {!customized && (
+        <p style={{ color: "var(--dw3)", fontSize: 11.5, margin: "0 0 12px" }}>Following the shop&apos;s default hours. Set custom hours below.</p>
+      )}
+      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+        {rows.map(r => {
+          const label = DAY_LABELS.find(d => d.weekday === r.weekday)!.label;
+          return (
+            <div key={r.weekday} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <button onClick={() => toggleDay(r.weekday)} style={{
+                width: 34, height: 22, borderRadius: 11, border: "none", cursor: "pointer", flexShrink: 0,
+                background: r.open ? "rgb(109,40,217)" : "var(--dw1)", position: "relative",
+              }}>
+                <span style={{ position: "absolute", top: 3, left: r.open ? 15 : 3, width: 16, height: 16, borderRadius: "50%", background: "white" }} />
+              </button>
+              <span style={{ width: 30, color: "var(--dw45)", fontSize: 11.5, fontWeight: 600, flexShrink: 0 }}>{label}</span>
+              {r.open ? (
+                <>
+                  <input type="time" value={r.start} onChange={e => setTime(r.weekday, "start", e.target.value)} style={{ flex: 1, background: "var(--dsurface3)", border: "1px solid var(--dw09)", borderRadius: 7, padding: "5px 8px", color: "var(--dtext)", fontSize: 11.5, outline: "none", minWidth: 0 }} />
+                  <span style={{ color: "var(--dw25)", fontSize: 11 }}>–</span>
+                  <input type="time" value={r.end} onChange={e => setTime(r.weekday, "end", e.target.value)} style={{ flex: 1, background: "var(--dsurface3)", border: "1px solid var(--dw09)", borderRadius: 7, padding: "5px 8px", color: "var(--dtext)", fontSize: 11.5, outline: "none", minWidth: 0 }} />
+                </>
+              ) : (
+                <span style={{ flex: 1, color: "var(--dw2)", fontSize: 11.5 }}>Closed</span>
+              )}
+            </div>
+          );
+        })}
+      </div>
+      <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 10, marginTop: 14 }}>
+        {saved && <span style={{ color: "rgb(52,211,153)", fontSize: 11.5, fontWeight: 600 }}>Saved</span>}
+        <button onClick={save} disabled={saving} style={{
+          padding: "8px 18px", borderRadius: 9, background: "rgb(109,40,217)", border: "none",
+          color: "white", fontSize: 12, fontWeight: 700, cursor: saving ? "default" : "pointer", opacity: saving ? 0.6 : 1,
+        }}>
+          {saving ? "Saving…" : "Save hours"}
+        </button>
       </div>
     </div>
   );
@@ -531,6 +650,8 @@ export function TeamClient({ staff, appointments }: { staff: StaffRow[]; appoint
               ))}
             </div>
           </div>
+
+          <StaffHoursCard staffId={selectedRow.id} />
         </div>
       )}
 

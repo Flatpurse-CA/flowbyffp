@@ -22,7 +22,7 @@ export async function BookingsPageContent({ statusFilter }: { statusFilter?: Boo
   }
 
   const supabase = await createClient();
-  const { data: shop } = await supabase.from("shops").select("handle").eq("id", ctx.shopId).maybeSingle();
+  const { data: shop } = await supabase.from("shops").select("handle, stripe_terminal_location_id").eq("id", ctx.shopId).maybeSingle();
 
   const now = new Date();
   const rangeStart = new Date(now);
@@ -44,6 +44,7 @@ export async function BookingsPageContent({ statusFilter }: { statusFilter?: Boo
       staff={staff}
       selfStaffId={ctx.staffId}
       statusFilter={statusFilter}
+      stripeTerminalLocationId={(shop?.stripe_terminal_location_id as string | null) ?? null}
     />
   );
 }

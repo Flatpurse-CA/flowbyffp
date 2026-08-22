@@ -9,6 +9,11 @@ import { handleInboundMessage } from "@/lib/dashboard/frontdesk";
 // infrastructure decision. The engine behind this route is real and directly
 // testable today via a manual POST.
 export async function POST(req: NextRequest) {
+  const expectedSecret = process.env.FRONTDESK_INBOUND_SECRET;
+  if (!expectedSecret || req.headers.get("x-frontdesk-secret") !== expectedSecret) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const body = await req.json().catch(() => null);
   if (!body || typeof body !== "object") {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });

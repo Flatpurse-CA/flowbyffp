@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
   Plus, Search, Copy, Check, MessageSquare,
@@ -9,7 +9,8 @@ import {
   Send, Pencil, Ban, CheckCircle2, StickyNote, SquarePen,
 } from "lucide-react";
 import type { AppointmentRow, AppointmentStatus } from "./actions";
-import { createAppointment, rescheduleAppointment, cancelAppointment, completeAppointment, confirmAppointment, updateAppointmentDetails } from "./actions";
+import { createAppointment, rescheduleAppointment, cancelAppointment, completeAppointment, confirmAppointment, updateAppointmentDetails, sendAppointmentPaymentLink, sendAppointmentReceipt } from "./actions";
+import { chargeInPerson } from "@/lib/terminal/nativeBridge";
 import type { StaffRow } from "../team/actions";
 import { tint } from "@/lib/color";
 
@@ -131,8 +132,8 @@ function combineDateTime(dateStr: string, timeStr: string) {
 
 // ─── New Appointment Overlay ───────────────────────────────────────────────────
 
-function NewBookingOverlay({ onClose, onCreated, staff, selfStaffId }: { onClose: () => void; onCreated: () => void; staff: StaffRow[]; selfStaffId?: string | null }) {
-  const [clientQ, setClientQ] = useState("");
+function NewBookingOverlay({ onClose, onCreated, staff, selfStaffId, initialClientName }: { onClose: () => void; onCreated: () => void; staff: StaffRow[]; selfStaffId?: string | null; initialClientName?: string }) {
+  const [clientQ, setClientQ] = useState(initialClientName ?? "");
   const [selectedService, setSelectedService] = useState("");
   const [selectedStaffId, setSelectedStaffId] = useState(selfStaffId ?? "");
   const selectedStylist = staff.find(s => s.id === selectedStaffId)?.full_name ?? "";
@@ -400,11 +401,10 @@ function NewBookingOverlay({ onClose, onCreated, staff, selfStaffId }: { onClose
 
 const GRATUITY_PRESETS = [0, 15, 18, 20];
 
-function CloseOutModal({ appt, onClose, onCompleted }: { appt: ApptRecord; onClose: () => void; onCompleted: () => void }) {
+function CloseOutModal({ appt, onClose, onCompleted, stripeTerminalLocationId }: { appt: ApptRecord; onClose: () => void; onCompleted: () => void; stripeTerminalLocationId?: string | null }) {
   const [gratuityPct, setGratuityPct] = useState<number | "custom">(18);
   const [customTip, setCustomTip] = useState("");
   const [method, setMethod] = useState<"tap" | "link" | "card" | "cash" | null>(null);
-  const [linkChannel, setLinkChannel] = useState<"sms" | "whatsapp" | "email">("sms");
   const [receiptSms, setReceiptSms] = useState(true);
   const [stage, setStage] = useState<"select" | "processing" | "success">("select");
   const [error, setError] = useState<string | null>(null);
@@ -416,11 +416,55 @@ function CloseOutModal({ appt, onClose, onCompleted }: { appt: ApptRecord; onClo
   const total = subtotal + tipAmount;
   const fmtMoney = (n: number) => `C$${n.toFixed(2)}`;
 
-  const runCharge = () => {
+  const sendReceiptIfRequested = async () => {
+    if (!receiptSms) return;
+    // Best-effort — a receipt failure shouldn't undo an already-recorded payment.
+    await sendAppointmentReceipt({ clientPhone: appt.phone || null, clientName: appt.name, serviceName: appt.service, amount: total }).catch(() => {});
+  };
+
+  const runCharge = async () => {
     setStage("processing");
+    setError(null);
+
+    if (method === "link") {
+      const res = await sendAppointmentPaymentLink(appt.id, { amount: total, clientName: appt.name, clientPhone: appt.phone || null, serviceName: appt.service });
+      if (res.error) {
+        setError(res.error);
+        setStage("select");
+        return;
+      }
+      // A sent link isn't a collected payment yet — don't mark the booking
+      // paid/completed until the client actually pays it.
+      setStage("success");
+      return;
+    }
+
+    if (method === "tap") {
+      if (!stripeTerminalLocationId) {
+        setError("No Tap to Pay reader location set up for this shop yet — check Settings.");
+        setStage("select");
+        return;
+      }
+      try {
+        await chargeInPerson({ amount: total, appointmentId: appt.id, locationId: stripeTerminalLocationId });
+        await completeAppointment(appt.id, { tipAmount, paymentMethod: "tap", paidAmount: total });
+        await sendReceiptIfRequested();
+        setStage("success");
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Couldn't complete the Tap to Pay charge, try again.");
+        setStage("select");
+      }
+      return;
+    }
+
+    // cash / card: unchanged from before — cash has no payment step to make
+    // real, and charging a saved card on file for a walk-in appointment
+    // (which may have no linked customer/payment method) is a separate,
+    // larger feature not part of this change.
     setTimeout(async () => {
       try {
         await completeAppointment(appt.id, { tipAmount, paymentMethod: method ?? "cash", paidAmount: total });
+        await sendReceiptIfRequested();
         setStage("success");
       } catch (e) {
         setError(e instanceof Error ? e.message : "Couldn't record that payment, try again.");
@@ -455,13 +499,16 @@ function CloseOutModal({ appt, onClose, onCompleted }: { appt: ApptRecord; onClo
             <div style={{ width: 64, height: 64, borderRadius: "50%", background: "rgba(52,211,153,0.12)", border: "2px solid rgba(52,211,153,0.35)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
               <CheckCircle2 size={30} color="rgb(52,211,153)" strokeWidth={1.8} />
             </div>
-            <h2 style={{ color: "var(--dtext)", fontSize: 19, fontWeight: 800, margin: "0 0 6px", letterSpacing: "-0.02em" }}>{fmtMoney(total)} collected</h2>
+            <h2 style={{ color: "var(--dtext)", fontSize: 19, fontWeight: 800, margin: "0 0 6px", letterSpacing: "-0.02em" }}>
+              {method === "link" ? `${fmtMoney(total)} link sent` : `${fmtMoney(total)} collected`}
+            </h2>
             <p style={{ color: "var(--dw45)", fontSize: 13, margin: "0 0 4px" }}>
-              {method === "link" ? `Payment link sent via ${linkChannel === "sms" ? "SMS" : linkChannel === "whatsapp" ? "WhatsApp" : "Email"}`
+              {method === "link" ? "Texted to the client — they'll pay through the link"
+                : method === "tap" ? "Charged via Tap to Pay"
                 : method === "cash" ? "Marked as received in cash"
                 : "Charged card on file"}
             </p>
-            {receiptSms ? (
+            {receiptSms && method !== "link" ? (
               <p style={{ color: "var(--dw3)", fontSize: 12, margin: "0 0 22px" }}>Receipt texted to {appt.phone || "client"}</p>
             ) : (
               <div style={{ marginBottom: 22 }} />
@@ -558,7 +605,7 @@ function CloseOutModal({ appt, onClose, onCompleted }: { appt: ApptRecord; onClo
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
                     {[
                       { id: "tap" as const, Icon: Smartphone, label: "Tap to Pay", sub: "NFC / contactless" },
-                      { id: "link" as const, Icon: Send, label: "Payment Link", sub: "SMS / WhatsApp / Email" },
+                      { id: "link" as const, Icon: Send, label: "Payment Link", sub: "Texted to client" },
                       { id: "card" as const, Icon: CreditCard, label: "Card on File", sub: "Visa •••• 4242" },
                       { id: "cash" as const, Icon: Banknote, label: "Cash", sub: "Collected in person" },
                     ].map(m => (
@@ -579,25 +626,11 @@ function CloseOutModal({ appt, onClose, onCompleted }: { appt: ApptRecord; onClo
                   </div>
                 </div>
 
-                {/* Payment link channel picker */}
+                {/* Payment link goes out by SMS to the client's number on file */}
                 {method === "link" && (
-                  <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
-                    {[
-                      { id: "sms" as const, label: "SMS" },
-                      { id: "whatsapp" as const, label: "WhatsApp" },
-                      { id: "email" as const, label: "Email" },
-                    ].map(c => (
-                      <button key={c.id} onClick={() => setLinkChannel(c.id)} style={{
-                        flex: 1, padding: "8px 6px", borderRadius: 9,
-                        border: `1px solid ${linkChannel === c.id ? "rgba(139,92,246,0.5)" : "var(--dw07)"}`,
-                        background: linkChannel === c.id ? "rgba(109,40,217,0.15)" : "var(--dw02)",
-                        color: linkChannel === c.id ? "var(--dpurple-text)" : "var(--dw5)",
-                        fontSize: 12, fontWeight: linkChannel === c.id ? 700 : 400, cursor: "pointer",
-                      }}>
-                        {c.label}
-                      </button>
-                    ))}
-                  </div>
+                  <p style={{ color: "var(--dw35)", fontSize: 11.5, margin: "0 0 14px" }}>
+                    {appt.phone ? `Will text the link to ${appt.phone}.` : "No phone number on file — add one to this client before sending a link."}
+                  </p>
                 )}
 
                 {/* Receipt SMS toggle */}
@@ -1333,14 +1366,30 @@ const STATUS_FILTER_TITLE: Record<BookingsStatusFilter, string> = {
   pending: "Pending Bookings",
 };
 
-export function AppointmentsClient({ initialAppointments, bookingUrl, staff, selfStaffId, statusFilter }: { initialAppointments: AppointmentRow[]; bookingUrl: string | null; staff: StaffRow[]; selfStaffId?: string | null; statusFilter?: BookingsStatusFilter }) {
+export function AppointmentsClient({ initialAppointments, bookingUrl, staff, selfStaffId, statusFilter, stripeTerminalLocationId }: { initialAppointments: AppointmentRow[]; bookingUrl: string | null; staff: StaffRow[]; selfStaffId?: string | null; statusFilter?: BookingsStatusFilter; stripeTerminalLocationId?: string | null }) {
   const router = useRouter();
   const [, startTransition] = useTransition();
   const [view, setView]           = useState<View>("Day");
   const [query, setQuery]         = useState("");
   const [showNewBooking, setNew]  = useState(false);
+  const [prefillClientName, setPrefillClientName] = useState<string | undefined>(undefined);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [closingOut, setClosingOut] = useState(false);
+
+  // Deep-link from a client's profile ("Book now") — read once on mount via
+  // location.search rather than useSearchParams(), which needs a Suspense
+  // boundary this deeply-nested client component doesn't sit under.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("newBooking") === "1") {
+      const name = params.get("clientName");
+      if (name) setPrefillClientName(name);
+      setNew(true);
+      const url = new URL(window.location.href);
+      url.search = "";
+      window.history.replaceState({}, "", url.toString());
+    }
+  }, []);
 
   const now = useMemo(() => new Date(), []);
   const allAppts = useMemo(() => initialAppointments.map(r => rowToAppt(r, now)), [initialAppointments, now]);
@@ -1406,7 +1455,7 @@ export function AppointmentsClient({ initialAppointments, bookingUrl, staff, sel
       {view === "List" && <ListView appts={appts} onSelect={a => setSelectedId(a.id)} />}
 
       {/* New booking overlay */}
-      {showNewBooking && <NewBookingOverlay onClose={() => setNew(false)} onCreated={refresh} staff={staff} selfStaffId={selfStaffId} />}
+      {showNewBooking && <NewBookingOverlay onClose={() => { setNew(false); setPrefillClientName(undefined); }} onCreated={refresh} staff={staff} selfStaffId={selfStaffId} initialClientName={prefillClientName} />}
 
       {/* Appointment detail → close-out */}
       {selectedAppt && !closingOut && (
@@ -1422,6 +1471,7 @@ export function AppointmentsClient({ initialAppointments, bookingUrl, staff, sel
           appt={selectedAppt}
           onClose={() => setClosingOut(false)}
           onCompleted={() => { setClosingOut(false); setSelectedId(null); refresh(); }}
+          stripeTerminalLocationId={stripeTerminalLocationId}
         />
       )}
     </div>

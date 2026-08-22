@@ -37,8 +37,9 @@ function renderEmail(input: {
   yesterday: { revenue: number; bookings: number; cancellations: number };
   today: { bookingsCount: number; revenueScheduled: number };
   needsYouText: string | null;
+  autopilot: { actionsCount: number; revenue: number } | null;
 }) {
-  const { shopName, ownerFirstName, summary, yesterday, today, needsYouText } = input;
+  const { shopName, ownerFirstName, summary, yesterday, today, needsYouText, autopilot } = input;
   return `
   <div style="font-family: -apple-system, sans-serif; background: #0a0a0c; padding: 32px 20px; color: #f0f0f8;">
     <div style="max-width: 480px; margin: 0 auto;">
@@ -81,6 +82,20 @@ function renderEmail(input: {
           </td>
         </tr>
       </table>
+
+      ${autopilot && autopilot.actionsCount > 0 ? `
+      <table width="100%" style="border-collapse: separate; border-spacing: 8px 0; margin-bottom: 4px;">
+        <tr>
+          <td style="background: rgba(109,40,217,0.08); border-radius: 10px; padding: 12px 14px; width: 50%;">
+            <p style="color: rgba(196,181,253,0.6); font-size: 10px; text-transform: uppercase; margin: 0 0 4px;">AutoPilot actions</p>
+            <p style="color: #fff; font-size: 16px; font-weight: 800; margin: 0;">${autopilot.actionsCount}</p>
+          </td>
+          <td style="background: rgba(109,40,217,0.08); border-radius: 10px; padding: 12px 14px; width: 50%;">
+            <p style="color: rgba(196,181,253,0.6); font-size: 10px; text-transform: uppercase; margin: 0 0 4px;">Revenue recovered</p>
+            <p style="color: #fff; font-size: 16px; font-weight: 800; margin: 0;">${fmtPrice(autopilot.revenue)}</p>
+          </td>
+        </tr>
+      </table>` : ""}
     </div>
   </div>`;
 }
@@ -161,6 +176,15 @@ Deno.serve(async () => {
         ? "Quiet stretch — no bookings yesterday or today yet."
         : `Yesterday you ${yesterdayRevenue > 0 ? `earned ${fmtPrice(yesterdayRevenue)}` : "had no completed revenue"}. Today you have ${todayBookingsCount} booking${todayBookingsCount === 1 ? "" : "s"} scheduled.`;
 
+      const { data: autopilotEventsRaw } = await supabase
+        .from("autopilot_events")
+        .select("amount")
+        .eq("shop_id", shop.id)
+        .gte("created_at", yesterdayStart.toISOString())
+        .lt("created_at", todayStart.toISOString());
+      const autopilotEvents = autopilotEventsRaw ?? [];
+      const autopilot = { actionsCount: autopilotEvents.length, revenue: autopilotEvents.reduce((s, e) => s + Number(e.amount ?? 0), 0) };
+
       const { data: userRes } = await supabase.auth.admin.getUserById(shop.owner_id);
       const email = userRes?.user?.email;
       if (!email) { errors.push(`${shop.name}: owner has no email`); failed++; continue; }
@@ -173,6 +197,7 @@ Deno.serve(async () => {
         yesterday: { revenue: yesterdayRevenue, bookings: yesterdayBookings, cancellations: yesterdayCancellations },
         today: { bookingsCount: todayBookingsCount, revenueScheduled: todayRevenueScheduled },
         needsYouText,
+        autopilot,
       });
 
       const { error: sendError } = await resend.emails.send({ from: FROM, to: email, subject: `Your daily brief — ${shop.name}`, html });

@@ -19,7 +19,7 @@ export default async function SettingsPage() {
   const { data: shop } = user
     ? await supabase
         .from("shops")
-        .select("handle, frontdesk_enabled, name, business_type, bio, city, province, postal_code, phone, profile_image_url, cover_image_url")
+        .select("handle, frontdesk_enabled, noshow_recovery_enabled, filler_enabled, winback_enabled, reminders_enabled, birthday_enabled, notification_prefs, tax_rate, tax_inclusive, name, business_type, bio, city, province, postal_code, phone, profile_image_url, cover_image_url")
         .eq("owner_id", user.id)
         .maybeSingle()
     : { data: null };
@@ -43,6 +43,21 @@ export default async function SettingsPage() {
     phone: (shop?.phone as string | undefined) ?? "",
   };
 
+  const initialFlowFlags = {
+    rebooking:  Boolean(shop?.reminders_enabled),
+    noshow:     Boolean(shop?.noshow_recovery_enabled),
+    winback:    Boolean(shop?.winback_enabled),
+    birthday:   Boolean(shop?.birthday_enabled),
+    lastminute: Boolean(shop?.filler_enabled),
+    frontdesk:  Boolean(shop?.frontdesk_enabled),
+  };
+
+  const DEFAULT_NOTIFICATION_PREFS = {
+    new_booking: true, cancellation: true, no_show_alert: true, payment_received: false,
+    autopilot_win: true, daily_brief: true, weekly_revenue_recap: true, monthly_statement: false,
+  };
+  const initialNotificationPrefs = { ...DEFAULT_NOTIFICATION_PREFS, ...(shop?.notification_prefs as object ?? {}) };
+
   return (
     <Suspense>
       <SettingsClient
@@ -51,7 +66,10 @@ export default async function SettingsPage() {
         initialStripeConnected={initialStripeConnected}
         initialBookingUrl={initialBookingUrl}
         initialBilling={initialBilling}
-        initialFrontdeskEnabled={Boolean(shop?.frontdesk_enabled)}
+        initialFlowFlags={initialFlowFlags}
+        initialNotificationPrefs={initialNotificationPrefs}
+        initialTaxRate={(shop?.tax_rate as number | null | undefined) ?? null}
+        initialTaxInclusive={Boolean(shop?.tax_inclusive)}
         initialBusinessProfile={initialBusinessProfile}
         initialProfileImageUrl={(shop?.profile_image_url as string | undefined) ?? null}
         initialCoverImageUrl={(shop?.cover_image_url as string | undefined) ?? null}

@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { requireShop, getShopContext, getAuthUser } from "@/lib/dashboard/shop";
+import { TEAM_CHANNEL_KEY, OWNER_THREAD_KEY } from "./constants";
 
 export type ConversationSummary = {
   id: string;
@@ -22,12 +23,39 @@ export type MessageRow = {
   readAt: string | null;
 };
 
-export async function getOrCreateConversation(staffId?: string): Promise<{ id: string } | null> {
+export async function getOrCreateTeamChannel(): Promise<{ id: string } | null> {
   const ctx = await getShopContext();
   if (!ctx) return null;
   const { supabase, shopId } = await requireShop();
 
-  const targetStaffId = ctx.role === "owner" ? staffId : ctx.staffId;
+  const { data: existing } = await supabase
+    .from("conversations")
+    .select("id")
+    .eq("shop_id", shopId)
+    .eq("kind", "team_channel")
+    .maybeSingle();
+
+  if (existing) return { id: existing.id as string };
+
+  const { data: created, error } = await supabase
+    .from("conversations")
+    .insert({ shop_id: shopId, kind: "team_channel", staff_id: null })
+    .select("id")
+    .single();
+
+  if (error || !created) throw new Error(error?.message ?? "Couldn't start the team channel");
+  return { id: created.id as string };
+}
+
+export async function getOrCreateConversation(staffId?: string): Promise<{ id: string } | null> {
+  const ctx = await getShopContext();
+  if (!ctx) return null;
+  if (staffId === TEAM_CHANNEL_KEY) return getOrCreateTeamChannel();
+
+  const { supabase, shopId } = await requireShop();
+
+  const resolvedStaffId = staffId === OWNER_THREAD_KEY ? undefined : staffId;
+  const targetStaffId = ctx.role === "owner" ? resolvedStaffId : ctx.staffId;
   if (!targetStaffId) {
     if (ctx.role === "owner") throw new Error("staffId is required");
     return null;
@@ -54,22 +82,15 @@ export async function getOrCreateConversation(staffId?: string): Promise<{ id: s
 
 export async function listConversations(): Promise<ConversationSummary[]> {
   const ctx = await getShopContext();
-  if (!ctx || ctx.role !== "owner") return [];
+  if (!ctx) return [];
 
   const { supabase, shopId } = await requireShop();
   const user = await getAuthUser();
   const myId = user?.id;
 
-  const { data: staffRows } = await supabase
-    .from("staff")
-    .select("id, full_name, color")
-    .eq("shop_id", shopId)
-    .eq("active", true)
-    .order("full_name");
-
-  if (!staffRows || staffRows.length === 0) return [];
-
-  const { data: convRows } = await supabase.from("conversations").select("id, staff_id").eq("shop_id", shopId);
+  // Every conversation this shop has — includes the team channel (staff_id
+  // null, kind team_channel) alongside each owner<->staff 1:1 thread.
+  const { data: convRows } = await supabase.from("conversations").select("id, staff_id, kind").eq("shop_id", shopId);
   const convs = convRows ?? [];
   const convIds = convs.map(c => c.id as string);
 
@@ -90,22 +111,42 @@ export async function listConversations(): Promise<ConversationSummary[]> {
     if (m.sender_id !== myId && !m.read_at) unreadByConv.set(cid, (unreadByConv.get(cid) ?? 0) + 1);
   }
 
-  const convByStaff = new Map(convs.map(c => [c.staff_id as string, c.id as string]));
-
-  return staffRows.map(s => {
-    const convId = convByStaff.get(s.id as string);
+  const rowFor = (convId: string | undefined, key: string, name: string, color: string): ConversationSummary => {
     const msgs = convId ? byConv.get(convId) ?? [] : [];
     const last = msgs[msgs.length - 1];
     return {
       id: convId ?? "",
-      staffId: s.id as string,
-      staffName: s.full_name as string,
-      staffColor: s.color as string,
+      staffId: key,
+      staffName: name,
+      staffColor: color,
       lastMessage: last?.body ?? null,
       lastMessageAt: last?.created_at ?? null,
       unreadCount: convId ? unreadByConv.get(convId) ?? 0 : 0,
     };
-  });
+  };
+
+  const teamConvId = convs.find(c => c.kind === "team_channel")?.id as string | undefined;
+  const teamRow = rowFor(teamConvId, TEAM_CHANNEL_KEY, "Team channel", "rgb(139,92,246)");
+
+  if (ctx.role === "owner") {
+    const { data: staffRows } = await supabase
+      .from("staff")
+      .select("id, full_name, color")
+      .eq("shop_id", shopId)
+      .eq("active", true)
+      .order("full_name");
+
+    const convByStaff = new Map(convs.filter(c => c.kind !== "team_channel").map(c => [c.staff_id as string, c.id as string]));
+    const staffRowsOut = (staffRows ?? []).map(s => rowFor(convByStaff.get(s.id as string), s.id as string, s.full_name as string, s.color as string));
+
+    return [teamRow, ...staffRowsOut];
+  }
+
+  // Staff: their own 1:1 with the owner, plus the shared team channel.
+  const ownerConvId = convs.find(c => c.staff_id === ctx.staffId && c.kind !== "team_channel")?.id as string | undefined;
+  const ownerRow = rowFor(ownerConvId, OWNER_THREAD_KEY, "Shop owner", "rgb(96,165,250)");
+
+  return [ownerRow, teamRow];
 }
 
 export async function listMessages(conversationId: string): Promise<MessageRow[]> {

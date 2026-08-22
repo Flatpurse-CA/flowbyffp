@@ -44,11 +44,11 @@ function Form() {
       )}
       <div>
         <label style={labelStyle}>New password</label>
-        <input type="password" name="password" required minLength={8} autoComplete="new-password" style={inputStyle} />
+        <input type="password" name="password" required minLength={10} autoComplete="new-password" style={inputStyle} />
       </div>
       <div>
         <label style={labelStyle}>Confirm new password</label>
-        <input type="password" name="confirm" required minLength={8} autoComplete="new-password" style={inputStyle} />
+        <input type="password" name="confirm" required minLength={10} autoComplete="new-password" style={inputStyle} />
       </div>
       <button
         type="submit"

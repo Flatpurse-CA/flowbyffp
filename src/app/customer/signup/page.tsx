@@ -92,7 +92,7 @@ function SignupForm() {
               <label style={labelStyle}>Password</label>
               <div style={{ position: "relative" }}>
                 <input
-                  type={showPassword ? "text" : "password"} required minLength={8} value={password} onChange={e => setPassword(e.target.value)}
+                  type={showPassword ? "text" : "password"} required minLength={10} value={password} onChange={e => setPassword(e.target.value)}
                   placeholder="Enter your password" autoComplete="new-password" style={{ ...inputStyle, paddingRight: 44 }}
                 />
                 <button
@@ -102,7 +102,7 @@ function SignupForm() {
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
-              <p style={{ color: "var(--auth-text-sub)", fontSize: 12, marginTop: 6 }}>Must be at least 8 characters.</p>
+              <p style={{ color: "var(--auth-text-sub)", fontSize: 12, marginTop: 6 }}>Must be at least 10 characters, with a letter and a number.</p>
             </div>
 
             <button type="submit" disabled={loading} style={{ ...primaryBtnStyle, opacity: loading ? 0.6 : 1, cursor: loading ? "default" : "pointer" }}>

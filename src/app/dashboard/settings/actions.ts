@@ -173,23 +173,60 @@ export async function openBillingPortal(): Promise<{ url?: string; error?: strin
   }
 }
 
-export async function getFrontdeskEnabled(): Promise<boolean> {
-  const ctx = await getShopContext();
-  if (!ctx) return false;
-  const { supabase, shopId } = await requireShop();
-  const { data } = await supabase.from("shops").select("frontdesk_enabled").eq("id", shopId).maybeSingle();
-  return Boolean(data?.frontdesk_enabled);
-}
+export type FlowKey = "rebooking" | "noshow" | "winback" | "birthday" | "lastminute" | "frontdesk";
 
-export async function setFrontdeskEnabled(enabled: boolean): Promise<{ error?: string }> {
+const FLOW_COLUMN: Record<FlowKey, string> = {
+  rebooking:  "reminders_enabled",
+  noshow:     "noshow_recovery_enabled",
+  winback:    "winback_enabled",
+  birthday:   "birthday_enabled",
+  lastminute: "filler_enabled",
+  frontdesk:  "frontdesk_enabled",
+};
+
+export async function setFlowEnabled(flow: FlowKey, enabled: boolean): Promise<{ error?: string }> {
   const ctx = await getShopContext();
-  if (!ctx || ctx.role !== "owner") return { error: "Only the shop owner can change AI Front Desk" };
+  if (!ctx || ctx.role !== "owner") return { error: "Only the shop owner can change AutoPilot flows" };
   const { supabase, shopId } = await requireShop();
 
-  const { error } = await supabase.from("shops").update({ frontdesk_enabled: enabled }).eq("id", shopId);
+  const column = FLOW_COLUMN[flow];
+  const { error } = await supabase.from("shops").update({ [column]: enabled }).eq("id", shopId);
   if (error) return { error: error.message };
   revalidatePath("/dashboard/settings");
   revalidatePath("/dashboard/autopilot");
+  return {};
+}
+
+export type NotificationPrefs = {
+  new_booking: boolean;
+  cancellation: boolean;
+  no_show_alert: boolean;
+  payment_received: boolean;
+  autopilot_win: boolean;
+  daily_brief: boolean;
+  weekly_revenue_recap: boolean;
+  monthly_statement: boolean;
+};
+
+export async function updateNotificationPrefs(prefs: NotificationPrefs): Promise<{ error?: string }> {
+  const ctx = await getShopContext();
+  if (!ctx || ctx.role !== "owner") return { error: "Only the shop owner can change notification settings" };
+  const { supabase, shopId } = await requireShop();
+
+  const { error } = await supabase.from("shops").update({ notification_prefs: prefs }).eq("id", shopId);
+  if (error) return { error: error.message };
+  revalidatePath("/dashboard/settings");
+  return {};
+}
+
+export async function updateTaxSettings(input: { taxRate: number | null; taxInclusive: boolean }): Promise<{ error?: string }> {
+  const ctx = await getShopContext();
+  if (!ctx || ctx.role !== "owner") return { error: "Only the shop owner can change tax settings" };
+  const { supabase, shopId } = await requireShop();
+
+  const { error } = await supabase.from("shops").update({ tax_rate: input.taxRate, tax_inclusive: input.taxInclusive }).eq("id", shopId);
+  if (error) return { error: error.message };
+  revalidatePath("/dashboard/settings");
   return {};
 }
 
@@ -299,14 +336,31 @@ export async function updateBusinessProfile(input: BusinessProfile): Promise<{ e
   return { handle };
 }
 
-// The actual file upload happens client-side straight to Supabase Storage
-// (bucket "shop-assets", RLS-scoped to the owner's own shop_id folder — see
-// 0033_shop_images.sql) since Server Actions aren't a great fit for binary
-// file bodies. This just persists the resulting public URL.
-export async function updateShopImage(kind: "profile" | "cover", url: string): Promise<{ error?: string }> {
+const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+
+// The file itself is uploaded here (not client-direct-to-storage) so type and
+// size are actually enforced — a client-side-only check can be bypassed by
+// anyone who skips the browser. Uses the session-bound client (not the admin
+// client), so bucket "shop-assets" RLS (0033_shop_images.sql) still applies.
+export async function updateShopImage(formData: FormData): Promise<{ error?: string; url?: string }> {
   const ctx = await getShopContext();
   if (!ctx || ctx.role !== "owner") return { error: "Only the shop owner can change photos" };
   const { supabase, shopId } = await requireShop();
+
+  const kind = formData.get("kind") as "profile" | "cover" | null;
+  const file = formData.get("file") as File | null;
+  if (kind !== "profile" && kind !== "cover") return { error: "Invalid image kind" };
+  if (!file || file.size === 0) return { error: "No file provided" };
+  if (!file.type.startsWith("image/")) return { error: "Please choose an image file" };
+  if (file.size > MAX_IMAGE_BYTES) return { error: "Image must be under 5MB" };
+
+  const ext = file.name.split(".").pop() || "jpg";
+  const path = `${shopId}/${kind}-${Date.now()}.${ext}`;
+  const { error: uploadError } = await supabase.storage.from("shop-assets").upload(path, file, { upsert: true, contentType: file.type });
+  if (uploadError) return { error: uploadError.message };
+
+  const { data: publicUrlData } = supabase.storage.from("shop-assets").getPublicUrl(path);
+  const url = publicUrlData.publicUrl;
 
   const column = kind === "profile" ? "profile_image_url" : "cover_image_url";
   const { data: shop } = await supabase.from("shops").select("handle").eq("id", shopId).maybeSingle();
@@ -315,5 +369,5 @@ export async function updateShopImage(kind: "profile" | "cover", url: string): P
 
   revalidatePath("/dashboard/settings");
   if (shop?.handle) revalidatePath(`/book/${shop.handle}`);
-  return {};
+  return { url };
 }

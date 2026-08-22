@@ -96,6 +96,30 @@ export function DailyBriefClient({ data }: { data: DailyBriefData }) {
         </div>
       </div>
 
+      {/* AutoPilot activity */}
+      {data.autopilotActivity.actionsCount > 0 && (
+        <div style={card}>
+          <p style={{ color: "var(--dw4)", fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 14px" }}>AutoPilot activity — yesterday</p>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: data.autopilotActivity.byFlow.length > 0 ? 12 : 0 }}>
+            <Metric label="Actions taken" value={String(data.autopilotActivity.actionsCount)} />
+            <Metric label="Revenue recovered" value={fmtPrice(data.autopilotActivity.revenue)} />
+          </div>
+          {data.autopilotActivity.byFlow.length > 0 && (
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+              {data.autopilotActivity.byFlow.map(f => (
+                <span key={f.flowKey} style={{
+                  fontSize: 11.5, fontWeight: 600, color: "var(--dpurple-text)",
+                  background: "rgba(109,40,217,0.1)", border: "1px solid rgba(109,40,217,0.2)",
+                  borderRadius: 20, padding: "4px 10px",
+                }}>
+                  {f.flowKey}: {f.count}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
       {data.needsYou.length === 0 && (
         <p style={{ color: "var(--dw25)", fontSize: 12.5, textAlign: "center", margin: 0 }}>
           <MessageSquare size={12} style={{ verticalAlign: "-2px", marginRight: 4 }} />

@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { TrendingUp, TrendingDown, Users, ChevronDown } from "lucide-react";
 import type { OperationsData } from "./actions";
+import type { AppointmentRow } from "../appointments/actions";
 import { computeStaffUtilization, computeHealthScore, type MetricsAppointment } from "@/lib/dashboard/metrics";
 import { deriveClients, type ClientAppointment } from "@/lib/dashboard/clients";
 import { computeOpportunities } from "@/lib/dashboard/opportunities";
@@ -126,7 +127,7 @@ export function OperationsClient({ data }: { data: OperationsData }) {
       {mod === "Team" && <TeamModule staff={data.staff} metricsAppts={metricsAppts} monthStart={monthStart} now={now} />}
       {mod === "Clients" && <ClientsModule clients={allClients} appointments={clientAppts} now={now} retention={retention} />}
       {mod === "AI" && <AIModule opportunities={opportunities} />}
-      {mod === "Finance" && <Finance />}
+      {mod === "Finance" && <Finance data={data} />}
     </div>
   );
 }
@@ -454,28 +455,105 @@ function AIModule({ opportunities }: { opportunities: ReturnType<typeof computeO
 }
 
 // ─── Finance ──────────────────────────────────────────────────────────────────
-function Finance() {
+
+function downloadCsv(filename: string, rows: (string | number)[][]) {
+  const csv = rows.map(r => r.map(cell => {
+    const s = String(cell);
+    return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+  }).join(",")).join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function Finance({ data }: { data: OperationsData }) {
+  const now = new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+
+  const paidAppts = data.appointments.filter(a => a.status === "completed" && (a.paid_amount != null));
+
+  const inRange = (a: AppointmentRow, start: Date, end: Date) => {
+    const t = new Date(a.completed_at ?? a.starts_at);
+    return t >= start && t < end;
+  };
+
+  const thisMonthAppts = paidAppts.filter(a => inRange(a, monthStart, now));
+  const lastMonthAppts = paidAppts.filter(a => inRange(a, lastMonthStart, monthStart));
+
+  const sumNet = (rows: AppointmentRow[]) => rows.reduce((s, a) => s + Number(a.paid_amount ?? 0) + Number(a.tip_amount ?? 0), 0);
+  const netThisMonth = sumNet(thisMonthAppts);
+  const netLastMonth = sumNet(lastMonthAppts);
+  const netDeltaPct = netLastMonth > 0 ? ((netThisMonth - netLastMonth) / netLastMonth) * 100 : null;
+
+  const taxRate = data.taxRate ?? 0;
+  // Revenue net of tax, so GST owing is computed on the actual taxable amount
+  // whether prices are entered tax-inclusive or tax is added at checkout.
+  const gstOwing = data.taxRate == null ? null : thisMonthAppts.reduce((s, a) => {
+    const paid = Number(a.paid_amount ?? 0);
+    const taxable = data.taxInclusive ? paid / (1 + taxRate / 100) : paid;
+    return s + taxable * (taxRate / 100);
+  }, 0);
+
+  const fmtDate = (iso: string) => new Intl.DateTimeFormat("en-CA", { timeZone: "America/Edmonton", month: "short", day: "numeric" }).format(new Date(iso));
+
+  const exportItemised = () => downloadCsv(
+    `itemised-transactions-${now.toISOString().slice(0, 10)}.csv`,
+    [["Date", "Client", "Service", "Price", "Tip", "Paid", "Method", "Status"],
+      ...data.appointments.filter(a => a.paid_amount != null).map(a => [
+        fmtDate(a.starts_at), a.client_name, a.service_name, a.price, a.tip_amount ?? 0, a.paid_amount ?? 0, a.payment_method ?? "-", a.status,
+      ])],
+  );
+
+  const exportGst34 = () => downloadCsv(
+    `gst34-report-${now.toISOString().slice(0, 10)}.csv`,
+    [["Period", "Taxable revenue", `GST/HST rate (${taxRate}%)`, "GST/HST owing"],
+      [monthStart.toISOString().slice(0, 10), fmtPrice(netThisMonth), `${taxRate}%`, gstOwing != null ? fmtPrice(gstOwing) : "-"]],
+  );
+
+  const exportAccountantSummary = () => downloadCsv(
+    `accountant-summary-${now.toISOString().slice(0, 10)}.csv`,
+    [["Metric", "This month", "Last month"],
+      ["Net revenue", fmtPrice(netThisMonth), fmtPrice(netLastMonth)],
+      ["Transactions", String(thisMonthAppts.length), String(lastMonthAppts.length)],
+      ["GST/HST owing", gstOwing != null ? fmtPrice(gstOwing) : "-", "-"]],
+  );
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-      <div style={{ ...card, display: "flex", alignItems: "center", gap: 10 }}>
-        <span style={{ fontSize: 10, fontWeight: 800, color: "rgb(251,191,36)", background: "rgba(245,158,11,0.12)", padding: "4px 10px", borderRadius: 20 }}>MOCK DATA</span>
-        <span style={{ color: "var(--dw5)", fontSize: 12.5 }}>Requires Stripe Connect for real payouts and GST figures, shown for layout reference only.</span>
-      </div>
+      {!data.stripeConnected && (
+        <div style={{ ...card, display: "flex", alignItems: "center", gap: 10 }}>
+          <span style={{ fontSize: 10, fontWeight: 800, color: "rgb(251,191,36)", background: "rgba(245,158,11,0.12)", padding: "4px 10px", borderRadius: 20 }}>NO PAYOUT DATA</span>
+          <span style={{ color: "var(--dw5)", fontSize: 12.5 }}>Connect Stripe in Settings to see real payout figures. Revenue/GST below are already real, computed from your bookings.</span>
+        </div>
+      )}
       <div className="ops-kpi-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14 }}>
-        <KPITile label="Next payout" value="C$4,180" sub="Processing in 2 days" />
-        <KPITile label="GST owing" value="C$424" sub="Due Jun 30" positive={false} />
-        <KPITile label="Net this month" value="C$11,820" sub="+7.4% vs last" />
+        <KPITile
+          label="Next payout"
+          value={data.nextPayout ? fmtPrice(data.nextPayout.amount) : "-"}
+          sub={data.nextPayout ? `Arriving ${fmtDate(data.nextPayout.arrivalDate)}` : data.stripeConnected ? "No pending payout" : "Stripe not connected"}
+        />
+        <KPITile label="GST owing" value={gstOwing != null ? fmtPrice(gstOwing) : "-"} sub={data.taxRate == null ? "Set a tax rate in Settings" : "This month"} positive={false} />
+        <KPITile label="Net this month" value={fmtPrice(netThisMonth)} sub={netDeltaPct != null ? `${netDeltaPct >= 0 ? "+" : ""}${netDeltaPct.toFixed(1)}% vs last` : "No data last month"} />
       </div>
       <div style={card}>
         <p style={{ color: "var(--dw4)", fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 14px" }}>Exports</p>
-        <div style={{ display: "flex", gap: 10 }}>
-          {["GST34 Report", "Accountant Summary", "Itemised Transactions"].map(label => (
-            <button key={label} disabled style={{
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          {[
+            { label: "GST34 Report", onClick: exportGst34 },
+            { label: "Accountant Summary", onClick: exportAccountantSummary },
+            { label: "Itemised Transactions", onClick: exportItemised },
+          ].map(btn => (
+            <button key={btn.label} onClick={btn.onClick} style={{
               padding: "9px 16px", borderRadius: 10, border: "1px solid var(--dw1)",
-              background: "var(--dsurface2)", color: "var(--dw4)",
-              fontSize: 12, fontWeight: 600, cursor: "not-allowed",
+              background: "var(--dsurface2)", color: "var(--dtext)",
+              fontSize: 12, fontWeight: 600, cursor: "pointer",
             }}>
-              {label}
+              {btn.label}
             </button>
           ))}
         </div>

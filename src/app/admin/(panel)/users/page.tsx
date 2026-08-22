@@ -1,9 +1,23 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-import { banUser, unbanUser, deleteUser } from "./actions";
-import { UserX, UserCheck, Trash2 } from "lucide-react";
+import { banUser, unbanUser, deleteUser, resetShopTrial, setTrialOverride } from "./actions";
+import { UserX, UserCheck, Trash2, RotateCcw, ShieldCheck, ShieldOff } from "lucide-react";
 import { PlanSelect } from "./PlanSelect";
 import { formatCAD } from "@/lib/plans";
 import { sumRevenueByShop } from "@/lib/admin/shopRevenue";
+import { computeAccessStatus, type AccessStatus } from "@/lib/dashboard/accessStatus";
+
+const ACCESS_STATUS_LABEL: Record<AccessStatus, string> = {
+  trialing: "Trialing",
+  grace:    "Grace",
+  inactive: "Locked out",
+  active:   "Active",
+};
+const ACCESS_STATUS_COLOR: Record<AccessStatus, { fg: string; bg: string }> = {
+  trialing: { fg: "rgb(96,165,250)",  bg: "rgba(59,130,246,0.1)" },
+  grace:    { fg: "rgb(251,191,36)",  bg: "rgba(245,158,11,0.1)" },
+  inactive: { fg: "rgb(248,113,113)", bg: "rgba(239,68,68,0.1)" },
+  active:   { fg: "rgb(52,211,153)",  bg: "rgba(16,185,129,0.1)" },
+};
 
 export default async function AdminUsersPage() {
   const admin = createAdminClient();
@@ -11,7 +25,7 @@ export default async function AdminUsersPage() {
   const [usersRes, profilesRes, shopsRes, apptsRes] = await Promise.all([
     admin.auth.admin.listUsers({ perPage: 1000 }),
     admin.from("profiles").select("id, first_name, last_name"),
-    admin.from("shops").select("id, owner_id, name, plan"),
+    admin.from("shops").select("id, owner_id, name, plan, trial_started_at, subscription_status, trial_override"),
     admin.from("appointments").select("shop_id, price").eq("status", "completed"),
   ]);
 
@@ -22,16 +36,24 @@ export default async function AdminUsersPage() {
 
   const rows = users
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-    .map(u => ({
-      id:        u.id,
-      email:     u.email ?? "-",
-      name:      profiles[u.id] ? `${profiles[u.id].first_name} ${profiles[u.id].last_name}` : null,
-      shopName:  shops[u.id]?.name ?? null,
-      plan:      shops[u.id]?.plan ?? null,
-      revenue:   shops[u.id] ? revenueByShop[shops[u.id].id] ?? 0 : null,
-      createdAt: u.created_at,
-      isBanned:  !!(u.banned_until && new Date(u.banned_until) > new Date()),
-    }));
+    .map(u => {
+      const shop = shops[u.id];
+      const access = shop?.trial_started_at
+        ? computeAccessStatus(shop as { trial_started_at: string; subscription_status: string | null; trial_override: boolean })
+        : null;
+      return {
+        id:        u.id,
+        email:     u.email ?? "-",
+        name:      profiles[u.id] ? `${profiles[u.id].first_name} ${profiles[u.id].last_name}` : null,
+        shopName:  shop?.name ?? null,
+        plan:      shop?.plan ?? null,
+        revenue:   shop ? revenueByShop[shop.id] ?? 0 : null,
+        createdAt: u.created_at,
+        isBanned:  !!(u.banned_until && new Date(u.banned_until) > new Date()),
+        accessStatus: access?.status ?? null,
+        trialOverride: shop?.trial_override ?? false,
+      };
+    });
 
   return (
     <div style={{ maxWidth: 1200 }}>
@@ -50,7 +72,7 @@ export default async function AdminUsersPage() {
           <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 800 }}>
             <thead>
               <tr style={{ background: "var(--aw015)" }}>
-                {["User", "Shop", "Plan", "Revenue", "Joined", "Status", "Actions"].map(h => (
+                {["User", "Shop", "Plan", "Revenue", "Joined", "Status", "Trial", "Actions"].map(h => (
                   <th key={h} style={{
                     padding: "11px 18px", textAlign: "left",
                     color: "var(--aw3)", fontSize: 11,
@@ -124,9 +146,63 @@ export default async function AdminUsersPage() {
                       </span>
                     </td>
 
+                    {/* Trial */}
+                    <td style={{ padding: "13px 18px" }}>
+                      {row.accessStatus ? (
+                        <span style={{
+                          fontSize: 10, fontWeight: 700, padding: "3px 9px", borderRadius: 20,
+                          letterSpacing: "0.04em", textTransform: "uppercase",
+                          color: ACCESS_STATUS_COLOR[row.accessStatus].fg,
+                          background: ACCESS_STATUS_COLOR[row.accessStatus].bg,
+                        }}>
+                          {row.trialOverride ? "Bypassed" : ACCESS_STATUS_LABEL[row.accessStatus]}
+                        </span>
+                      ) : (
+                        <span style={{ color: "var(--aw18)", fontSize: 12 }}>-</span>
+                      )}
+                    </td>
+
                     {/* Actions */}
                     <td style={{ padding: "13px 18px" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                        {row.accessStatus && (
+                          <>
+                            <form action={resetShopTrial}>
+                              <input type="hidden" name="userId" value={row.id} />
+                              <button
+                                type="submit"
+                                title="Reset trial clock to today"
+                                style={{
+                                  display: "flex", alignItems: "center", justifyContent: "center",
+                                  width: 28, height: 28, borderRadius: 8, cursor: "pointer",
+                                  background: "var(--aw04)", border: "1px solid var(--aw08)",
+                                  color: "var(--aw3)", fontFamily: "inherit",
+                                }}
+                              >
+                                <RotateCcw size={12} />
+                              </button>
+                            </form>
+                            <form action={setTrialOverride}>
+                              <input type="hidden" name="userId" value={row.id} />
+                              <input type="hidden" name="enabled" value={row.trialOverride ? "false" : "true"} />
+                              <button
+                                type="submit"
+                                title={row.trialOverride ? "Remove bypass — trial gating applies again" : "Bypass trial gating — always full access"}
+                                style={{
+                                  display: "flex", alignItems: "center", gap: 5,
+                                  padding: "5px 10px", borderRadius: 8, cursor: "pointer",
+                                  background: row.trialOverride ? "rgba(16,185,129,0.1)" : "var(--aw04)",
+                                  border: row.trialOverride ? "1px solid rgba(52,211,153,0.2)" : "1px solid var(--aw08)",
+                                  color: row.trialOverride ? "rgb(52,211,153)" : "var(--aw3)",
+                                  fontSize: 11, fontWeight: 600, fontFamily: "inherit",
+                                }}
+                              >
+                                {row.trialOverride ? <ShieldOff size={12} /> : <ShieldCheck size={12} />}
+                                {row.trialOverride ? "Remove bypass" : "Bypass"}
+                              </button>
+                            </form>
+                          </>
+                        )}
                         {row.isBanned ? (
                           <form action={unbanUser}>
                             <input type="hidden" name="userId" value={row.id} />

@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getAuthUser } from "@/lib/dashboard/shop";
+import { validatePassword } from "@/lib/passwordPolicy";
 
 const PROFILE_PATH = "/dashboard/profile";
 
@@ -15,8 +16,9 @@ export async function updateOwnPassword(formData: FormData) {
   const password = formData.get("password") as string;
   const confirm = formData.get("confirm") as string;
 
-  if (!password || password.length < 8) {
-    redirect(`${PROFILE_PATH}?error=${encodeURIComponent("Password must be at least 8 characters")}`);
+  const passwordError = !password ? "Password is required" : validatePassword(password);
+  if (passwordError) {
+    redirect(`${PROFILE_PATH}?error=${encodeURIComponent(passwordError)}`);
   }
   if (password !== confirm) {
     redirect(`${PROFILE_PATH}?error=${encodeURIComponent("Passwords don't match")}`);

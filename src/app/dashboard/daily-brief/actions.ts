@@ -13,11 +13,18 @@ function fmtPrice(n: number) {
 
 export type NeedsYouCard = { id: string; text: string; kind: "winback" | "staff" | "payment" };
 
+export type AutopilotActivitySummary = {
+  actionsCount: number;
+  revenue: number;
+  byFlow: { flowKey: string; count: number }[];
+};
+
 export type DailyBriefData = {
   summary: string;
   yesterday: { revenue: number; bookings: number; cancellations: number; newClients: number };
   today: { bookingsCount: number; revenueScheduled: number; nextAppointmentTime: string | null; staffWorking: number };
   needsYou: NeedsYouCard[];
+  autopilotActivity: AutopilotActivitySummary;
 };
 
 const EMPTY: DailyBriefData = {
@@ -25,6 +32,7 @@ const EMPTY: DailyBriefData = {
   yesterday: { revenue: 0, bookings: 0, cancellations: 0, newClients: 0 },
   today: { bookingsCount: 0, revenueScheduled: 0, nextAppointmentTime: null, staffWorking: 0 },
   needsYou: [],
+  autopilotActivity: { actionsCount: 0, revenue: 0, byFlow: [] },
 };
 
 export async function getDailyBriefData(): Promise<DailyBriefData> {
@@ -99,6 +107,23 @@ export async function getDailyBriefData(): Promise<DailyBriefData> {
 
   const unpaidDepositToday = todayAppts.find(a => a.status === "deposit");
 
+  const { data: autopilotEventsRaw } = await supabase
+    .from("autopilot_events")
+    .select("flow_key, amount")
+    .eq("shop_id", shopId)
+    .gte("created_at", yesterdayStart.toISOString())
+    .lt("created_at", todayStart.toISOString());
+  const autopilotEvents = autopilotEventsRaw ?? [];
+  const flowCounts = new Map<string, number>();
+  for (const e of autopilotEvents) {
+    flowCounts.set(e.flow_key as string, (flowCounts.get(e.flow_key as string) ?? 0) + 1);
+  }
+  const autopilotActivity: AutopilotActivitySummary = {
+    actionsCount: autopilotEvents.length,
+    revenue: autopilotEvents.reduce((s, e) => s + Number(e.amount ?? 0), 0),
+    byFlow: Array.from(flowCounts.entries()).map(([flowKey, count]) => ({ flowKey, count })),
+  };
+
   const needsYou: NeedsYouCard[] = [];
   if (churnRisk) {
     const days = churnRisk.daysSinceLastVisit ? Math.round(churnRisk.daysSinceLastVisit) : null;
@@ -124,5 +149,6 @@ export async function getDailyBriefData(): Promise<DailyBriefData> {
     yesterday: { revenue: yesterdayRevenue, bookings: yesterdayBookings, cancellations: yesterdayCancellations, newClients },
     today: { bookingsCount: activeTodayAppts.length, revenueScheduled, nextAppointmentTime, staffWorking },
     needsYou,
+    autopilotActivity,
   };
 }

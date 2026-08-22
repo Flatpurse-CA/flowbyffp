@@ -5,6 +5,8 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { requireShop, getCurrentShopId, getShopContext } from "@/lib/dashboard/shop";
 import { attributeAutopilotRevenue } from "@/lib/dashboard/autopilotAttribution";
+import { stripe } from "@/lib/stripe";
+import { sendSms } from "@/lib/twilio";
 
 export type AppointmentStatus = "confirmed" | "pending" | "deposit" | "completed" | "cancelled";
 
@@ -26,6 +28,7 @@ export type AppointmentRow = {
   tip_amount: number | null;
   payment_method: string | null;
   paid_amount: number | null;
+  completed_at: string | null;
 };
 
 export async function hasAnyAppointments(): Promise<boolean> {
@@ -213,4 +216,54 @@ export async function completeAppointment(
 
   if (error) throw new Error(error.message);
   revalidatePath("/dashboard/appointments");
+}
+
+// Real Stripe Payment Link, created on the shop's own connected account —
+// same { stripeAccount } convention as the Tap to Pay terminal routes
+// (src/app/api/terminal/create-payment-intent/route.ts). Replaces what was
+// previously a fake "Sending payment link…" simulation with no backend call.
+export async function sendAppointmentPaymentLink(
+  appointmentId: string,
+  input: { amount: number; clientName: string; clientPhone: string | null; serviceName: string },
+): Promise<{ error?: string; url?: string }> {
+  const { supabase, shopId } = await requireShop();
+
+  const { data: shop } = await supabase.from("shops").select("stripe_account_id, country, name").eq("id", shopId).maybeSingle();
+  const stripeAccountId = shop?.stripe_account_id as string | undefined;
+  if (!stripeAccountId) return { error: "Connect Stripe in Settings before sending payment links" };
+  if (!input.clientPhone) return { error: "This client has no phone number on file to text the link to" };
+
+  const currency = (shop?.country as string | undefined)?.trim().toLowerCase() === "united states" ? "usd" : "cad";
+
+  try {
+    const link = await stripe().paymentLinks.create(
+      {
+        line_items: [{
+          price_data: {
+            currency,
+            product_data: { name: `${input.serviceName} — ${shop?.name ?? "Appointment"}` },
+            unit_amount: Math.round(input.amount * 100),
+          },
+          quantity: 1,
+        }],
+        metadata: { appointment_id: appointmentId, shop_id: shopId },
+      },
+      { stripeAccount: stripeAccountId },
+    );
+
+    const { error: smsError } = await sendSms(input.clientPhone, `Hi ${input.clientName.split(" ")[0]}, here's your payment link for ${input.serviceName}: ${link.url}`);
+    if (smsError) return { error: `Link created but the text didn't send: ${smsError}`, url: link.url };
+
+    return { url: link.url };
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : "Couldn't create the payment link" };
+  }
+}
+
+export async function sendAppointmentReceipt(input: { clientPhone: string | null; clientName: string; serviceName: string; amount: number }): Promise<{ error?: string }> {
+  if (!input.clientPhone) return { error: "This client has no phone number on file to text a receipt to" };
+  const fmtMoney = (n: number) => `C$${n.toFixed(2)}`;
+  const { error } = await sendSms(input.clientPhone, `Hi ${input.clientName.split(" ")[0]}, your receipt for ${input.serviceName}: ${fmtMoney(input.amount)} paid. Thanks for booking with us!`);
+  if (error) return { error };
+  return {};
 }

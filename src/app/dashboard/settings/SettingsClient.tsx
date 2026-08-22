@@ -8,9 +8,8 @@ import {
   Wallet, Clock, Receipt, Zap, Camera,
   ChevronDown, ChevronUp,
 } from "lucide-react";
-import { updateBusinessHours, startStripeOnboarding, startCheckout, chooseStarterPlan, openBillingPortal, setFrontdeskEnabled, updateBusinessProfile, updateShopImage, type BusinessHourRow, type BillingStatus, type BusinessProfile } from "./actions";
+import { updateBusinessHours, startStripeOnboarding, startCheckout, chooseStarterPlan, openBillingPortal, setFlowEnabled, updateNotificationPrefs, updateTaxSettings, updateBusinessProfile, updateShopImage, type BusinessHourRow, type BillingStatus, type BusinessProfile, type FlowKey, type NotificationPrefs } from "./actions";
 import { PLANS, NO_MARKETPLACE_FEE_NOTE, type BillingInterval } from "@/lib/plans";
-import { createClient } from "@/lib/supabase/client";
 
 function redirectTo(url: string) {
   window.location.href = url;
@@ -61,20 +60,25 @@ function Field({ label, value, onChange, type = "text", readOnly, placeholder, h
   );
 }
 
-function Toggle({ label, sub, on }: { label: string; sub: string; on: boolean }) {
+function Toggle({ label, sub, on, onToggle }: { label: string; sub: string; on: boolean; onToggle?: () => void }) {
+  // Uncontrolled by default (own local state) when no onToggle is passed —
+  // some tabs (e.g. Payments deposit/gratuity) intentionally still don't
+  // persist. Notifications passes onToggle and drives `on` from real state.
   const [active, setActive] = useState(on);
+  const isControlled = onToggle !== undefined;
+  const displayActive = isControlled ? on : active;
   return (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 0", borderBottom: "1px solid var(--dw04)" }}>
       <div>
         <p style={{ color: "var(--dtext)", fontSize: 13.5, fontWeight: 600, margin: "0 0 2px" }}>{label}</p>
         <p style={{ color: "var(--dw35)", fontSize: 12, margin: 0 }}>{sub}</p>
       </div>
-      <button onClick={() => setActive(v => !v)} style={{
+      <button onClick={() => isControlled ? onToggle() : setActive(v => !v)} style={{
         width: 42, height: 24, borderRadius: 12, border: "none", cursor: "pointer",
-        background: active ? "rgb(109,40,217)" : "var(--dw12)",
+        background: displayActive ? "rgb(109,40,217)" : "var(--dw12)",
         position: "relative", transition: "background 0.2s", flexShrink: 0,
       }}>
-        <span style={{ position: "absolute", top: 4, left: active ? 20 : 4, width: 16, height: 16, borderRadius: "50%", background: "white", transition: "left 0.2s" }} />
+        <span style={{ position: "absolute", top: 4, left: displayActive ? 20 : 4, width: 16, height: 16, borderRadius: "50%", background: "white", transition: "left 0.2s" }} />
       </button>
     </div>
   );
@@ -112,8 +116,6 @@ const TABS = [
 type TabLabel = typeof TABS[number]["label"];
 
 // ─── AutoPilot flows data ─────────────────────────────────────────────────────
-
-type FlowKey = "rebooking" | "noshow" | "winback" | "birthday" | "lastminute" | "frontdesk";
 
 type Flow = {
   key: FlowKey; name: string; description: string;
@@ -158,7 +160,7 @@ function buildHourRows(initial: BusinessHourRow[]): HourRow[] {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export function SettingsClient({ shopId, initialBusinessHours, initialStripeConnected, initialBookingUrl, initialBilling, initialFrontdeskEnabled, initialBusinessProfile, initialProfileImageUrl, initialCoverImageUrl }: { shopId: string | null; initialBusinessHours: BusinessHourRow[]; initialStripeConnected: boolean; initialBookingUrl: string | null; initialBilling: BillingStatus | null; initialFrontdeskEnabled: boolean; initialBusinessProfile: BusinessProfile; initialProfileImageUrl: string | null; initialCoverImageUrl: string | null }) {
+export function SettingsClient({ shopId, initialBusinessHours, initialStripeConnected, initialBookingUrl, initialBilling, initialFlowFlags, initialNotificationPrefs, initialTaxRate, initialTaxInclusive, initialBusinessProfile, initialProfileImageUrl, initialCoverImageUrl }: { shopId: string | null; initialBusinessHours: BusinessHourRow[]; initialStripeConnected: boolean; initialBookingUrl: string | null; initialBilling: BillingStatus | null; initialFlowFlags: Record<FlowKey, boolean>; initialNotificationPrefs: NotificationPrefs; initialTaxRate: number | null; initialTaxInclusive: boolean; initialBusinessProfile: BusinessProfile; initialProfileImageUrl: string | null; initialCoverImageUrl: string | null }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab") as TabLabel | null;
@@ -176,14 +178,20 @@ export function SettingsClient({ shopId, initialBusinessHours, initialStripeConn
   const [imageError, setImageError]             = useState<string | null>(null);
   const profileFileRef = useRef<HTMLInputElement>(null);
   const coverFileRef   = useRef<HTMLInputElement>(null);
-  const [flows, setFlows]     = useState<Flow[]>(() => INITIAL_FLOWS.map(f => f.key === "frontdesk" ? { ...f, enabled: initialFrontdeskEnabled } : f));
-  const [frontdeskSaving, setFrontdeskSaving] = useState(false);
+  const [flows, setFlows]     = useState<Flow[]>(() => INITIAL_FLOWS.map(f => ({ ...f, enabled: initialFlowFlags[f.key] })));
+  const [flowSaving, setFlowSaving] = useState<FlowKey | null>(null);
   const [hours, setHours]     = useState<HourRow[]>(() => buildHourRows(initialBusinessHours));
   const [savingHours, setSavingHours] = useState(false);
   const [hoursSaved, setHoursSaved]   = useState(false);
   const [expandedFlow, setExpandedFlow] = useState<FlowKey | null>(null);
-  const [taxRate, setTaxRate]         = useState("13");
-  const [taxInclusive, setTaxInclusive] = useState(false);
+  const [taxRate, setTaxRate]         = useState(initialTaxRate !== null ? String(initialTaxRate) : "");
+  const [taxInclusive, setTaxInclusive] = useState(initialTaxInclusive);
+  const [savingTax, setSavingTax]     = useState(false);
+  const [taxSaved, setTaxSaved]       = useState(false);
+  const [taxError, setTaxError]       = useState<string | null>(null);
+  const [notificationPrefs, setNotificationPrefs] = useState<NotificationPrefs>(initialNotificationPrefs);
+  const [savingNotifications, setSavingNotifications] = useState(false);
+  const [notificationsSaved, setNotificationsSaved]   = useState(false);
   const [connectingStripe, setConnectingStripe] = useState(false);
   const [stripeError, setStripeError]           = useState<string | null>(null);
   const [billingInterval, setBillingInterval]   = useState<BillingInterval>(initialBilling?.billingInterval ?? "monthly");
@@ -288,22 +296,16 @@ export function SettingsClient({ shopId, initialBusinessHours, initialStripeConn
     const setUploading = kind === "profile" ? setUploadingProfile : setUploadingCover;
     setUploading(true);
     try {
-      const ext = file.name.split(".").pop() || "jpg";
-      const path = `${shopId}/${kind}-${Date.now()}.${ext}`;
-      const supabase = createClient();
-      const { error: uploadError } = await supabase.storage.from("shop-assets").upload(path, file, { upsert: true });
-      if (uploadError) {
-        setImageError(uploadError.message);
+      const formData = new FormData();
+      formData.set("kind", kind);
+      formData.set("file", file);
+      const result = await updateShopImage(formData);
+      if (result.error || !result.url) {
+        setImageError(result.error ?? "Upload failed, try again.");
         return;
       }
-      const { data } = supabase.storage.from("shop-assets").getPublicUrl(path);
-      const result = await updateShopImage(kind, data.publicUrl);
-      if (result.error) {
-        setImageError(result.error);
-        return;
-      }
-      if (kind === "profile") setProfileImageUrl(data.publicUrl);
-      else setCoverImageUrl(data.publicUrl);
+      if (kind === "profile") setProfileImageUrl(result.url);
+      else setCoverImageUrl(result.url);
     } catch (e) {
       setImageError(e instanceof Error ? e.message : "Upload failed, try again.");
     } finally {
@@ -333,28 +335,59 @@ export function SettingsClient({ shopId, initialBusinessHours, initialStripeConn
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // Only "frontdesk" is wired to a real backend flag today (shops.frontdesk_enabled,
-  // checked by the AI Front Desk engine before it auto-replies). The other five
-  // flows here (rebooking/noshow/winback/birthday/lastminute) run unconditionally
-  // for any Stripe-connected shop — their toggles are still cosmetic, a known
-  // pre-existing gap, not something this change tries to fix.
   const toggleFlow = (key: FlowKey) => {
-    if (key === "frontdesk") {
-      const next = !flows.find(f => f.key === "frontdesk")?.enabled;
-      setFlows(f => f.map(fl => fl.key === key ? { ...fl, enabled: next } : fl));
-      setFrontdeskSaving(true);
-      setFrontdeskEnabled(next)
-        .then(res => {
-          if (res.error) setFlows(f => f.map(fl => fl.key === key ? { ...fl, enabled: !next } : fl));
-        })
-        .finally(() => setFrontdeskSaving(false));
-      return;
-    }
-    setFlows(f => f.map(fl => fl.key === key ? { ...fl, enabled: !fl.enabled } : fl));
+    const next = !flows.find(f => f.key === key)?.enabled;
+    setFlows(f => f.map(fl => fl.key === key ? { ...fl, enabled: next } : fl));
+    setFlowSaving(key);
+    setFlowEnabled(key, next)
+      .then(res => {
+        if (res.error) setFlows(f => f.map(fl => fl.key === key ? { ...fl, enabled: !next } : fl));
+      })
+      .finally(() => setFlowSaving(null));
   };
 
   const toggleHour = (idx: number) =>
     setHours(h => h.map((r, i) => i === idx ? { ...r, open: !r.open } : r));
+
+  const saveTax = async () => {
+    setSavingTax(true);
+    setTaxSaved(false);
+    setTaxError(null);
+    try {
+      const parsed = taxRate.trim() === "" ? null : parseFloat(taxRate);
+      const result = await updateTaxSettings({ taxRate: parsed !== null && !Number.isNaN(parsed) ? parsed : null, taxInclusive });
+      if (result.error) {
+        setTaxError(result.error);
+        return;
+      }
+      setTaxSaved(true);
+      setTimeout(() => setTaxSaved(false), 2500);
+    } finally {
+      setSavingTax(false);
+    }
+  };
+
+  const discardTax = () => {
+    setTaxRate(initialTaxRate !== null ? String(initialTaxRate) : "");
+    setTaxInclusive(initialTaxInclusive);
+    setTaxError(null);
+  };
+
+  const toggleNotification = (key: keyof NotificationPrefs) =>
+    setNotificationPrefs(p => ({ ...p, [key]: !p[key] }));
+
+  const saveNotifications = async () => {
+    setSavingNotifications(true);
+    try {
+      const result = await updateNotificationPrefs(notificationPrefs);
+      if (!result.error) {
+        setNotificationsSaved(true);
+        setTimeout(() => setNotificationsSaved(false), 2500);
+      }
+    } finally {
+      setSavingNotifications(false);
+    }
+  };
 
   return (
     <div style={{ maxWidth: 800, margin: "0 auto", display: "flex", flexDirection: "column", gap: 22 }}>
@@ -652,7 +685,7 @@ export function SettingsClient({ shopId, initialBusinessHours, initialStripeConn
             ))}
           </div>
 
-          <SaveBar />
+          <SaveBar onSave={saveTax} onDiscard={discardTax} saving={savingTax} saved={taxSaved} error={taxError} />
         </>
       )}
 
@@ -677,12 +710,12 @@ export function SettingsClient({ shopId, initialBusinessHours, initialStripeConn
                     {/* Toggle */}
                     <button
                       onClick={() => toggleFlow(fl.key)}
-                      disabled={fl.key === "frontdesk" && frontdeskSaving}
+                      disabled={flowSaving === fl.key}
                       style={{
                         width: 38, height: 22, borderRadius: 11, border: "none", cursor: "pointer", flexShrink: 0,
                         background: fl.enabled ? "rgb(109,40,217)" : "var(--dw1)",
                         position: "relative", transition: "background 0.2s",
-                        opacity: fl.key === "frontdesk" && frontdeskSaving ? 0.6 : 1,
+                        opacity: flowSaving === fl.key ? 0.6 : 1,
                       }}>
                       <span style={{ position: "absolute", top: 3, left: fl.enabled ? 18 : 3, width: 16, height: 16, borderRadius: "50%", background: "white", transition: "left 0.2s" }} />
                     </button>
@@ -757,19 +790,19 @@ export function SettingsClient({ shopId, initialBusinessHours, initialStripeConn
         <>
           <div style={card}>
             <SectionLabel>Push & SMS alerts</SectionLabel>
-            <Toggle label="New booking"          sub="When a client books an appointment"             on={true}  />
-            <Toggle label="Cancellation"         sub="When a booking is cancelled"                     on={true}  />
-            <Toggle label="No-show alert"        sub="When a client doesn't turn up"                   on={true}  />
-            <Toggle label="Payment received"     sub="When a client pays online"                       on={false} />
-            <Toggle label="AutoPilot win"        sub="When AutoPilot books or recovers a client"       on={true}  />
+            <Toggle label="New booking"          sub="When a client books an appointment"             on={notificationPrefs.new_booking}      onToggle={() => toggleNotification("new_booking")} />
+            <Toggle label="Cancellation"         sub="When a booking is cancelled"                     on={notificationPrefs.cancellation}      onToggle={() => toggleNotification("cancellation")} />
+            <Toggle label="No-show alert"        sub="When a client doesn't turn up"                   on={notificationPrefs.no_show_alert}     onToggle={() => toggleNotification("no_show_alert")} />
+            <Toggle label="Payment received"     sub="When a client pays online"                       on={notificationPrefs.payment_received}  onToggle={() => toggleNotification("payment_received")} />
+            <Toggle label="AutoPilot win"        sub="When AutoPilot books or recovers a client"       on={notificationPrefs.autopilot_win}     onToggle={() => toggleNotification("autopilot_win")} />
           </div>
           <div style={card}>
             <SectionLabel>Reports & summaries</SectionLabel>
-            <Toggle label="Daily brief"          sub="Morning summary delivered at 8 AM"              on={true}  />
-            <Toggle label="Weekly revenue recap" sub="Revenue + bookings recap every Monday"          on={true}  />
-            <Toggle label="Monthly statement"    sub="Full income statement on the 1st"               on={false} />
+            <Toggle label="Daily brief"          sub="Morning summary delivered at 8 AM"              on={notificationPrefs.daily_brief}            onToggle={() => toggleNotification("daily_brief")} />
+            <Toggle label="Weekly revenue recap" sub="Revenue + bookings recap every Monday"          on={notificationPrefs.weekly_revenue_recap}   onToggle={() => toggleNotification("weekly_revenue_recap")} />
+            <Toggle label="Monthly statement"    sub="Full income statement on the 1st"               on={notificationPrefs.monthly_statement}      onToggle={() => toggleNotification("monthly_statement")} />
           </div>
-          <SaveBar />
+          <SaveBar onSave={saveNotifications} onDiscard={() => setNotificationPrefs(initialNotificationPrefs)} saving={savingNotifications} saved={notificationsSaved} />
         </>
       )}
 

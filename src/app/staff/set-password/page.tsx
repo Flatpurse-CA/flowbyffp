@@ -48,8 +48,8 @@ function SetPasswordForm() {
                 name="password"
                 type={showPassword ? "text" : "password"}
                 required
-                minLength={8}
-                placeholder="At least 8 characters"
+                minLength={10}
+                placeholder="At least 10 characters"
                 autoComplete="new-password"
                 style={{ ...inputStyle, paddingRight: 44 }}
               />

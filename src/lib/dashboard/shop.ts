@@ -37,23 +37,23 @@ export const getShopContext = cache(async (): Promise<ShopContext | null> => {
 
   const { data: shop } = await supabase
     .from("shops")
-    .select("id, created_at, subscription_status")
+    .select("id, trial_started_at, subscription_status, trial_override")
     .eq("owner_id", user.id)
     .maybeSingle();
 
   if (shop) {
-    const { status, trialEndsAt, graceEndsAt } = computeAccessStatus(shop as { created_at: string; subscription_status: string | null });
+    const { status, trialEndsAt, graceEndsAt } = computeAccessStatus(shop as { trial_started_at: string; subscription_status: string | null; trial_override: boolean });
     return { shopId: shop.id as string, role: "owner", staffId: null, staffName: null, accessStatus: status, trialEndsAt, graceEndsAt };
   }
 
   const { data: staff } = await supabase
     .from("staff")
-    .select("id, shop_id, full_name, shops(created_at, subscription_status)")
+    .select("id, shop_id, full_name, shops(trial_started_at, subscription_status, trial_override)")
     .eq("user_id", user.id)
     .maybeSingle();
 
   if (staff) {
-    const staffShop = staff.shops as unknown as { created_at: string; subscription_status: string | null } | null;
+    const staffShop = staff.shops as unknown as { trial_started_at: string; subscription_status: string | null; trial_override: boolean } | null;
     const { status, trialEndsAt, graceEndsAt } = staffShop
       ? computeAccessStatus(staffShop)
       : { status: "inactive" as const, trialEndsAt: new Date(0), graceEndsAt: new Date(0) };

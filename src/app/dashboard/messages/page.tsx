@@ -1,5 +1,5 @@
 import { getShopContext, getAuthUser } from "@/lib/dashboard/shop";
-import { listConversations, listMessages, getOrCreateConversation } from "./actions";
+import { listConversations } from "./actions";
 import { MessagesClient } from "./MessagesClient";
 
 export const dynamic = "force-dynamic";
@@ -23,29 +23,14 @@ export default async function MessagesPage() {
 
   const user = await getAuthUser();
   const currentUserId = user?.id ?? "";
-
-  if (ctx.role === "owner") {
-    const conversations = await listConversations();
-    return (
-      <MessagesClient
-        role="owner"
-        conversations={conversations}
-        initialConversationId={null}
-        initialMessages={[]}
-        currentUserId={currentUserId}
-      />
-    );
-  }
-
-  const conversation = await getOrCreateConversation();
-  const messages = conversation ? await listMessages(conversation.id) : [];
+  const conversations = await listConversations();
 
   return (
     <MessagesClient
-      role="staff"
-      conversations={[]}
-      initialConversationId={conversation?.id ?? null}
-      initialMessages={messages}
+      role={ctx.role}
+      conversations={conversations}
+      initialConversationId={null}
+      initialMessages={[]}
       currentUserId={currentUserId}
     />
   );

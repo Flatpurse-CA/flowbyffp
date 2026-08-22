@@ -273,7 +273,7 @@ Deno.serve(async () => {
 
   const { data: shops, error } = await supabase
     .from("shops")
-    .select("id, name, handle")
+    .select("id, name, handle, noshow_recovery_enabled, filler_enabled")
     .eq("stripe_connected", true);
 
   if (error) return new Response(JSON.stringify({ error: error.message }), { status: 500 });
@@ -283,8 +283,8 @@ Deno.serve(async () => {
 
   for (const shop of shops ?? []) {
     try {
-      noshowSent += await runNoShow(shop, now);
-      fillerSent += await runFiller(shop, now);
+      if (shop.noshow_recovery_enabled) noshowSent += await runNoShow(shop, now);
+      if (shop.filler_enabled) fillerSent += await runFiller(shop, now);
     } catch (err) {
       errors.push(`${shop.name}: ${err instanceof Error ? err.message : "Unknown error"}`);
       failed++;

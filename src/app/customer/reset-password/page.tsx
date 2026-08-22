@@ -59,7 +59,7 @@ export default function ResetPasswordPage() {
                 Choose a new password
               </h1>
               <p style={{ color: "var(--auth-text-sub)", fontSize: 14, marginBottom: 32, marginTop: 6, lineHeight: 1.6, animation: fadeUp(60) }}>
-                At least 8 characters.
+                At least 10 characters, with a letter and a number.
               </p>
 
               {error && (
@@ -73,8 +73,8 @@ export default function ResetPasswordPage() {
                   <label style={labelStyle}>New password</label>
                   <div style={{ position: "relative" }}>
                     <input
-                      type={showPassword ? "text" : "password"} required minLength={8} value={password} onChange={e => setPassword(e.target.value)}
-                      placeholder="At least 8 characters" autoComplete="new-password" style={{ ...inputStyle, paddingRight: 44 }}
+                      type={showPassword ? "text" : "password"} required minLength={10} value={password} onChange={e => setPassword(e.target.value)}
+                      placeholder="At least 10 characters" autoComplete="new-password" style={{ ...inputStyle, paddingRight: 44 }}
                     />
                     <button
                       type="button" tabIndex={-1} onClick={() => setShowPassword(v => !v)}

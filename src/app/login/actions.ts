@@ -5,10 +5,16 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getRequestOrigin } from "@/lib/requestOrigin";
 import { sendPasswordResetEmail } from "@/lib/resend";
+import { checkRateLimit } from "@/lib/rateLimit";
+import { validatePassword } from "@/lib/passwordPolicy";
 
 export async function loginWithPassword(formData: FormData) {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
+
+  if (!checkRateLimit(`login:${email.toLowerCase()}`, 10, 10 * 60 * 1000)) {
+    redirect(`/login?error=${encodeURIComponent("Too many attempts — wait a few minutes and try again")}`);
+  }
 
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -21,6 +27,11 @@ export async function loginWithPassword(formData: FormData) {
 }
 
 export async function requestPasswordReset(email: string): Promise<{ error?: string }> {
+  if (!checkRateLimit(`reset-request:${email.trim().toLowerCase()}`, 3, 10 * 60 * 1000)) {
+    // Same "don't leak account state" reasoning as below — report success either way.
+    return {};
+  }
+
   const origin = await getRequestOrigin();
   const admin = createAdminClient();
 
@@ -48,7 +59,8 @@ export async function requestPasswordReset(email: string): Promise<{ error?: str
 }
 
 export async function setNewPassword(password: string): Promise<{ error?: string }> {
-  if (password.length < 8) return { error: "Password must be at least 8 characters" };
+  const passwordError = validatePassword(password);
+  if (passwordError) return { error: passwordError };
 
   const supabase = await createClient();
   const { data: userData } = await supabase.auth.getUser();

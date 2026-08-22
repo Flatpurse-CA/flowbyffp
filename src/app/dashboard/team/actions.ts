@@ -263,3 +263,58 @@ export async function archiveStaff(id: string) {
   revalidatePath("/dashboard/team");
   revalidatePath("/dashboard/operations");
 }
+
+export type StaffHourRow = { weekday: number; open: boolean; start: string; end: string };
+
+// Absence of any rows for a staff member means "use shop-wide business_hours"
+// — this is checked by getAvailableSlots (src/app/book/[handle]/actions.ts),
+// so a staff member with no configured hours yet keeps booking exactly as
+// they did before per-staff availability existed.
+export async function getStaffHours(staffId: string): Promise<StaffHourRow[]> {
+  const ctx = await getShopContext();
+  if (!ctx) return [];
+  const { supabase, shopId } = await requireShop();
+
+  const { data } = await supabase
+    .from("staff_hours")
+    .select("weekday, open, start_time, end_time")
+    .eq("shop_id", shopId)
+    .eq("staff_id", staffId)
+    .order("weekday", { ascending: true });
+
+  return (data ?? []).map(r => ({
+    weekday: r.weekday as number,
+    open: Boolean(r.open),
+    start: String(r.start_time).slice(0, 5),
+    end: String(r.end_time).slice(0, 5),
+  }));
+}
+
+export async function updateStaffHours(staffId: string, rows: StaffHourRow[]) {
+  const ctx = await getShopContext();
+  if (!ctx || ctx.role !== "owner") throw new Error("Only the shop owner can change staff hours");
+  const { supabase, shopId } = await requireShop();
+
+  const { error } = await supabase
+    .from("staff_hours")
+    .upsert(
+      rows.map(r => ({ shop_id: shopId, staff_id: staffId, weekday: r.weekday, open: r.open, start_time: r.start, end_time: r.end })),
+      { onConflict: "staff_id,weekday" },
+    );
+
+  if (error) throw new Error(error.message);
+  revalidatePath("/dashboard/team");
+}
+
+// Lets a staff member fall back to shop-wide hours after being customized —
+// deleting the rows (rather than storing "use default") keeps the "no rows
+// = shop hours" contract simple everywhere else that reads this table.
+export async function clearStaffHours(staffId: string) {
+  const ctx = await getShopContext();
+  if (!ctx || ctx.role !== "owner") throw new Error("Only the shop owner can change staff hours");
+  const { supabase, shopId } = await requireShop();
+
+  const { error } = await supabase.from("staff_hours").delete().eq("shop_id", shopId).eq("staff_id", staffId);
+  if (error) throw new Error(error.message);
+  revalidatePath("/dashboard/team");
+}

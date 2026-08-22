@@ -9,7 +9,7 @@ import {
   LayoutGrid, Users2, Settings, Compass,
   LogOut, Bell, ChevronLeft, ChevronRight, ChevronDown,
   Sun, Moon, User as UserIcon, Search, MessageSquare, Sparkles,
-  CalendarClock, UserRound, MoreHorizontal, Star, type LucideIcon,
+  CalendarClock, UserRound, MoreHorizontal, Star, Wallet, type LucideIcon,
 } from "lucide-react";
 import { logout, searchDashboard, type SearchResult } from "./actions";
 import type { ShopRole } from "@/lib/dashboard/shop";
@@ -34,6 +34,7 @@ const NAV_TABS: NavTab[] = [
     ],
   },
   { icon: Users,           href: "/dashboard/clients",      label: "Clients",    badge: 0, ownerOnly: false },
+  { icon: Wallet,          href: "/dashboard/payments",     label: "Payments",   badge: 0, ownerOnly: true  },
   { icon: Star,            href: "/dashboard/reviews",      label: "Reviews",    badge: 0, ownerOnly: false },
   { icon: Users2,          href: "/dashboard/team",         label: "Team",       badge: 0, ownerOnly: true  },
   { icon: Zap,             href: "/dashboard/autopilot",    label: "AutoPilot",  badge: 0, ownerOnly: true  },

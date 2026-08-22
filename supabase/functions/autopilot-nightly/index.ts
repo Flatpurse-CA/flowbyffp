@@ -349,7 +349,7 @@ Deno.serve(async () => {
 
   const { data: shops, error } = await supabase
     .from("shops")
-    .select("id, name, handle")
+    .select("id, name, handle, winback_enabled, reminders_enabled, birthday_enabled")
     .eq("stripe_connected", true);
 
   if (error) return new Response(JSON.stringify({ error: error.message }), { status: 500 });
@@ -359,10 +359,12 @@ Deno.serve(async () => {
 
   for (const shop of shops ?? []) {
     try {
+      // Client-segmentation refresh is bookkeeping, not customer-facing
+      // outreach — it stays unconditional regardless of flow toggles.
       clientsRefreshed += await refreshClients(shop.id, now);
-      winbackSent += await runWinback(shop, now);
-      remindersSent += await runReminders(shop, now);
-      birthdaySent += await runBirthdays(shop, now);
+      if (shop.winback_enabled) winbackSent += await runWinback(shop, now);
+      if (shop.reminders_enabled) remindersSent += await runReminders(shop, now);
+      if (shop.birthday_enabled) birthdaySent += await runBirthdays(shop, now);
     } catch (err) {
       errors.push(`${shop.name}: ${err instanceof Error ? err.message : "Unknown error"}`);
       failed++;

@@ -81,6 +81,7 @@ export function ClientProfilePage({ client, appointments, engaged }: {
   const past = own.filter(a => a.status === "completed");
   const avgSpend = client.visits > 0 ? client.ltv / client.visits : 0;
   const color = colorFor(client.name);
+  const bookHref = `/dashboard/appointments?newBooking=1&clientName=${encodeURIComponent(client.name)}`;
 
   const statItem = (label: string, value: string, valColor?: string) => (
     <div style={{ textAlign: "center" }}>
@@ -174,7 +175,7 @@ export function ClientProfilePage({ client, appointments, engaged }: {
       </div>
 
       <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
-        {actionBtn(CalendarDays, "Book", "/dashboard/appointments", true)}
+        {actionBtn(CalendarDays, "Book", bookHref, true)}
         {actionBtn(MessageSquare, "SMS", client.phone ? `sms:${client.phone}` : null)}
         {actionBtn(Phone, "Call", client.phone ? `tel:${client.phone}` : null)}
         {actionBtn(Mail, "Email", client.email ? `mailto:${client.email}` : null)}
@@ -216,7 +217,7 @@ export function ClientProfilePage({ client, appointments, engaged }: {
                   <p style={{ color: "rgba(255,255,255,0.85)", fontSize: 13, margin: 0 }}>Last seen {fmtDaysAgo(client.daysSinceLastVisit).toLowerCase()}</p>
                 </div>
               </div>
-              <Link href="/dashboard/appointments" style={{ padding: "6px 14px", borderRadius: 9, background: "white", color: "rgb(153,27,27)", fontSize: 12, fontWeight: 700, whiteSpace: "nowrap", textDecoration: "none", flexShrink: 0 }}>
+              <Link href={bookHref} style={{ padding: "6px 14px", borderRadius: 9, background: "white", color: "rgb(153,27,27)", fontSize: 12, fontWeight: 700, whiteSpace: "nowrap", textDecoration: "none", flexShrink: 0 }}>
                 Book now
               </Link>
             </div>

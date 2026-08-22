@@ -4,16 +4,20 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 
 export type AccessStatus = "trialing" | "grace" | "inactive" | "active";
 
-export function computeAccessStatus(shop: { created_at: string; subscription_status: string | null }): {
+export function computeAccessStatus(shop: {
+  trial_started_at: string;
+  subscription_status: string | null;
+  trial_override: boolean;
+}): {
   status: AccessStatus;
   trialEndsAt: Date;
   graceEndsAt: Date;
 } {
-  const createdAt = new Date(shop.created_at);
-  const trialEndsAt = new Date(createdAt.getTime() + TRIAL_DAYS * DAY_MS);
+  const startedAt = new Date(shop.trial_started_at);
+  const trialEndsAt = new Date(startedAt.getTime() + TRIAL_DAYS * DAY_MS);
   const graceEndsAt = new Date(trialEndsAt.getTime() + GRACE_DAYS * DAY_MS);
 
-  if (shop.subscription_status === "active") {
+  if (shop.subscription_status === "active" || shop.trial_override) {
     return { status: "active", trialEndsAt, graceEndsAt };
   }
 

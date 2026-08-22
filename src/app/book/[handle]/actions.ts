@@ -8,6 +8,7 @@ import { stripe } from "@/lib/stripe";
 import { ensureStripeCustomerId } from "@/lib/stripeCustomer";
 import { attributeAutopilotRevenue } from "@/lib/dashboard/autopilotAttribution";
 import { computeAccessStatus } from "@/lib/dashboard/accessStatus";
+import { checkRateLimit } from "@/lib/rateLimit";
 
 const SLOT_INTERVAL_MINUTES = 30;
 
@@ -35,15 +36,37 @@ export async function getAvailableSlots(input: {
     .maybeSingle();
   if (!hoursRow || !hoursRow.open) return [];
 
-  const dayStart = shopWallTimeToUTC(input.date, String(hoursRow.start_time).slice(0, 5));
-  const dayEnd = shopWallTimeToUTC(input.date, String(hoursRow.end_time).slice(0, 5));
+  let dayStart = shopWallTimeToUTC(input.date, String(hoursRow.start_time).slice(0, 5));
+  let dayEnd = shopWallTimeToUTC(input.date, String(hoursRow.end_time).slice(0, 5));
 
   let staffIds: string[] = [];
   if (input.staffId === "any") {
     const { data: staffRows } = await admin.from("staff").select("id").eq("shop_id", input.shopId).eq("active", true);
     staffIds = (staffRows ?? []).map(s => s.id as string);
+    // "Any staff" intentionally stays on the shop-wide window — narrowing to
+    // each staff member's own hours here would mean a different available
+    // window per candidate, which this single-window slot loop doesn't model.
   } else {
     staffIds = [input.staffId];
+
+    // A specific staff member's own hours (if they've been configured) narrow
+    // the shop-wide window. No row for this weekday = fall back to shop hours
+    // unchanged, so staff added before this feature existed keep working.
+    const { data: staffHoursRow } = await admin
+      .from("staff_hours")
+      .select("open, start_time, end_time")
+      .eq("staff_id", input.staffId)
+      .eq("weekday", weekday)
+      .maybeSingle();
+
+    if (staffHoursRow) {
+      if (!staffHoursRow.open) return [];
+      const staffStart = shopWallTimeToUTC(input.date, String(staffHoursRow.start_time).slice(0, 5));
+      const staffEnd = shopWallTimeToUTC(input.date, String(staffHoursRow.end_time).slice(0, 5));
+      dayStart = new Date(Math.max(dayStart.getTime(), staffStart.getTime()));
+      dayEnd = new Date(Math.min(dayEnd.getTime(), staffEnd.getTime()));
+      if (dayStart >= dayEnd) return [];
+    }
   }
   const unstaffed = staffIds.length === 0;
 
@@ -85,12 +108,16 @@ export async function createPublicBooking(input: {
   const ctx = await getCustomerContext();
   if (!ctx) return { error: "You need to be signed in to book" };
 
+  if (!checkRateLimit(`create-booking:${ctx.customerId}`, 10, 10 * 60 * 1000)) {
+    return { error: "Too many booking attempts — wait a few minutes and try again" };
+  }
+
   const admin = createAdminClient();
 
-  const { data: shop } = await admin.from("shops").select("id, name, street_address, city, province, phone, created_at, subscription_status").eq("id", input.shopId).maybeSingle();
+  const { data: shop } = await admin.from("shops").select("id, name, street_address, city, province, phone, trial_started_at, subscription_status, trial_override").eq("id", input.shopId).maybeSingle();
   if (!shop) return { error: "This shop couldn't be found" };
 
-  const { status: shopAccessStatus } = computeAccessStatus(shop as { created_at: string; subscription_status: string | null });
+  const { status: shopAccessStatus } = computeAccessStatus(shop as { trial_started_at: string; subscription_status: string | null; trial_override: boolean });
   if (shopAccessStatus === "grace" || shopAccessStatus === "inactive") {
     return { error: "This business isn't currently accepting new bookings" };
   }
