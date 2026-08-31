@@ -60,9 +60,14 @@ export const PLANS: Plan[] = [
     smsOverageRate: "$0.05/message",
     support: "Community",
     payoutSpeed: "Standard (2–3 days)",
-    color: "rgba(255,255,255,0.45)",
-    bg: "rgba(255,255,255,0.06)",
-    border: "rgba(255,255,255,0.1)",
+    // A fixed slate tone (not a theme-relative white/black alpha) since this
+    // is used only in the admin panel's light theme — the previous
+    // "rgba(255,255,255,...)" values were tuned for a dark background and
+    // read as a near-invisible white-on-white pill once the panel got a
+    // light theme.
+    color: "rgb(100,116,139)",
+    bg: "rgba(100,116,139,0.14)",
+    border: "rgba(100,116,139,0.3)",
   },
   {
     key: "pro",
@@ -158,8 +163,9 @@ export const PLANS: Plan[] = [
   },
 ];
 
-export const PLAN_COLORS = Object.fromEntries(PLANS.map(p => [p.key, p.color])) as Record<string, string>;
-export const PLAN_BG     = Object.fromEntries(PLANS.map(p => [p.key, p.bg]))    as Record<string, string>;
+export const PLAN_COLORS = Object.fromEntries(PLANS.map(p => [p.key, p.color]))  as Record<string, string>;
+export const PLAN_BG     = Object.fromEntries(PLANS.map(p => [p.key, p.bg]))     as Record<string, string>;
+export const PLAN_BORDER = Object.fromEntries(PLANS.map(p => [p.key, p.border])) as Record<string, string>;
 
 export function getPlan(key: string): Plan {
   return PLANS.find(p => p.key === key) ?? PLANS[0];

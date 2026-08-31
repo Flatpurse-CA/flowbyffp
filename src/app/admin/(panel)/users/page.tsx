@@ -15,12 +15,16 @@ const ACCESS_STATUS_LABEL: Record<AccessStatus, string> = {
   active:   "Active",
   paused:   "Paused",
 };
+// References the theme-aware --astatus-* pairs (globals.css) instead of
+// fixed rgb values — a pastel accent tuned for a dark card reads as
+// washed-out on a white one, so the token itself flips to a deeper shade
+// under [data-admin-theme="light"].
 const ACCESS_STATUS_COLOR: Record<AccessStatus, { fg: string; bg: string }> = {
-  trialing: { fg: "rgb(96,165,250)",  bg: "rgba(59,130,246,0.1)" },
-  grace:    { fg: "rgb(251,191,36)",  bg: "rgba(245,158,11,0.1)" },
-  inactive: { fg: "rgb(248,113,113)", bg: "rgba(239,68,68,0.1)" },
-  active:   { fg: "rgb(52,211,153)",  bg: "rgba(16,185,129,0.1)" },
-  paused:   { fg: "rgb(196,181,253)", bg: "rgba(139,92,246,0.1)" },
+  trialing: { fg: "var(--astatus-blue-fg)",   bg: "var(--astatus-blue-bg)" },
+  grace:    { fg: "var(--astatus-amber-fg)",  bg: "var(--astatus-amber-bg)" },
+  inactive: { fg: "var(--astatus-red-fg)",    bg: "var(--astatus-red-bg)" },
+  active:   { fg: "var(--astatus-green-fg)",  bg: "var(--astatus-green-bg)" },
+  paused:   { fg: "var(--astatus-purple-fg)", bg: "var(--astatus-purple-bg)" },
 };
 
 export default async function AdminUsersPage() {
@@ -76,7 +80,7 @@ export default async function AdminUsersPage() {
           No users yet.
         </div>
       ) : (
-        <div style={{ background: "var(--aw025)", border: "1px solid var(--aw07)", borderRadius: 16, overflowY: "hidden", overflowX: "auto" }}>
+        <div style={{ background: "var(--asurface1)", border: "1px solid var(--aw07)", borderRadius: 16, overflowY: "hidden", overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 800 }}>
             <thead>
               <tr style={{ background: "var(--aw015)" }}>
@@ -147,8 +151,8 @@ export default async function AdminUsersPage() {
                       <span style={{
                         fontSize: 10, fontWeight: 700, padding: "3px 9px", borderRadius: 20,
                         letterSpacing: "0.04em", textTransform: "uppercase",
-                        color: row.isBanned ? "rgb(248,113,113)" : "rgb(52,211,153)",
-                        background: row.isBanned ? "rgba(239,68,68,0.1)" : "rgba(16,185,129,0.1)",
+                        color: row.isBanned ? "var(--astatus-red-fg)" : "var(--astatus-green-fg)",
+                        background: row.isBanned ? "var(--astatus-red-bg)" : "var(--astatus-green-bg)",
                       }}>
                         {row.isBanned ? "Banned" : "Active"}
                       </span>
@@ -198,9 +202,9 @@ export default async function AdminUsersPage() {
                                 style={{
                                   display: "flex", alignItems: "center", justifyContent: "center",
                                   width: 28, height: 28, borderRadius: 8, cursor: "pointer",
-                                  background: row.trialPaused ? "rgba(139,92,246,0.12)" : "var(--aw04)",
-                                  border: row.trialPaused ? "1px solid rgba(139,92,246,0.3)" : "1px solid var(--aw08)",
-                                  color: row.trialPaused ? "rgb(196,181,253)" : "var(--aw3)", fontFamily: "inherit",
+                                  background: row.trialPaused ? "var(--astatus-purple-bg)" : "var(--aw04)",
+                                  border: row.trialPaused ? "1px solid var(--astatus-purple-border)" : "1px solid var(--aw08)",
+                                  color: row.trialPaused ? "var(--astatus-purple-fg)" : "var(--aw3)", fontFamily: "inherit",
                                 }}
                               >
                                 {row.trialPaused ? <Play size={12} /> : <Pause size={12} />}
@@ -216,9 +220,9 @@ export default async function AdminUsersPage() {
                                 style={{
                                   display: "flex", alignItems: "center", gap: 5,
                                   padding: "5px 10px", borderRadius: 8, cursor: "pointer",
-                                  background: row.trialOverride ? "rgba(16,185,129,0.1)" : "var(--aw04)",
-                                  border: row.trialOverride ? "1px solid rgba(52,211,153,0.2)" : "1px solid var(--aw08)",
-                                  color: row.trialOverride ? "rgb(52,211,153)" : "var(--aw3)",
+                                  background: row.trialOverride ? "var(--astatus-green-bg)" : "var(--aw04)",
+                                  border: row.trialOverride ? "1px solid var(--astatus-green-border)" : "1px solid var(--aw08)",
+                                  color: row.trialOverride ? "var(--astatus-green-fg)" : "var(--aw3)",
                                   fontSize: 11, fontWeight: 600, fontFamily: "inherit",
                                 }}
                               >
@@ -237,8 +241,8 @@ export default async function AdminUsersPage() {
                               style={{
                                 display: "flex", alignItems: "center", gap: 5,
                                 padding: "5px 10px", borderRadius: 8, cursor: "pointer",
-                                background: "rgba(16,185,129,0.1)", border: "1px solid rgba(52,211,153,0.2)",
-                                color: "rgb(52,211,153)", fontSize: 11, fontWeight: 600, fontFamily: "inherit",
+                                background: "var(--astatus-green-bg)", border: "1px solid var(--astatus-green-border)",
+                                color: "var(--astatus-green-fg)", fontSize: 11, fontWeight: 600, fontFamily: "inherit",
                               }}
                             >
                               <UserCheck size={12} /> Unban
@@ -253,8 +257,8 @@ export default async function AdminUsersPage() {
                               style={{
                                 display: "flex", alignItems: "center", gap: 5,
                                 padding: "5px 10px", borderRadius: 8, cursor: "pointer",
-                                background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.18)",
-                                color: "rgb(248,113,113)", fontSize: 11, fontWeight: 600, fontFamily: "inherit",
+                                background: "var(--astatus-red-bg)", border: "1px solid var(--astatus-red-border)",
+                                color: "var(--astatus-red-fg)", fontSize: 11, fontWeight: 600, fontFamily: "inherit",
                               }}
                             >
                               <UserX size={12} /> Ban

@@ -22,8 +22,8 @@ export function RestartAllTrialsButton() {
       style={{
         display: "flex", alignItems: "center", gap: 6,
         padding: "8px 14px", borderRadius: 9, cursor: pending ? "default" : "pointer",
-        background: "rgba(139,92,246,0.1)", border: "1px solid rgba(139,92,246,0.3)",
-        color: "rgb(196,181,253)", fontSize: 12.5, fontWeight: 700, fontFamily: "inherit",
+        background: "var(--astatus-purple-bg)", border: "1px solid var(--astatus-purple-border)",
+        color: "var(--astatus-purple-fg)", fontSize: 12.5, fontWeight: 700, fontFamily: "inherit",
         opacity: pending ? 0.6 : 1, whiteSpace: "nowrap",
       }}
     >

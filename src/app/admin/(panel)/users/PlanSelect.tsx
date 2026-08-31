@@ -1,7 +1,7 @@
 "use client";
 
 import { changeUserPlan } from "./actions";
-import { PLAN_COLORS, PLAN_BG, planLabel } from "@/lib/plans";
+import { PLAN_COLORS, PLAN_BG, PLAN_BORDER, planLabel } from "@/lib/plans";
 
 const PLAN_OPTIONS = ["starter", "pro", "pro_plus", "enterprise"];
 
@@ -14,7 +14,7 @@ export function PlanSelect({ userId, plan }: { userId: string; plan: string }) {
         defaultValue={plan}
         style={{
           background: PLAN_BG[plan] ?? "var(--aw06)",
-          border: `1px solid ${PLAN_COLORS[plan] ?? "var(--aw15)"}33`,
+          border: `1px solid ${PLAN_BORDER[plan] ?? "var(--aw15)"}`,
           borderRadius: 20,
           color: PLAN_COLORS[plan] ?? "var(--aw35)",
           fontSize: 10.5,

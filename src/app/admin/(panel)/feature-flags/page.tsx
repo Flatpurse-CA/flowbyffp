@@ -27,7 +27,7 @@ export default async function AdminFeatureFlagsPage() {
         </p>
       </div>
 
-      <div style={{ background: "var(--aw025)", border: "1px solid var(--aw07)", borderRadius: 16, padding: "20px 24px" }}>
+      <div style={{ background: "var(--asurface1)", border: "1px solid var(--aw07)", borderRadius: 16, padding: "20px 24px" }}>
         <p style={{ color: "var(--atext)", fontSize: 14, fontWeight: 700, margin: "0 0 14px" }}>New flag</p>
         <form action={createFlag} style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "flex-end" }}>
           <div style={{ flex: "1 1 160px" }}>
@@ -68,7 +68,7 @@ export default async function AdminFeatureFlagsPage() {
           <p style={{ color: "var(--aw3)", fontSize: 13, fontWeight: 600, margin: 0 }}>No feature flags yet</p>
         </div>
       ) : (
-        <div style={{ background: "var(--aw025)", border: "1px solid var(--aw07)", borderRadius: 16, overflowX: "auto" }}>
+        <div style={{ background: "var(--asurface1)", border: "1px solid var(--aw07)", borderRadius: 16, overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 700 }}>
             <thead>
               <tr style={{ background: "var(--aw015)" }}>

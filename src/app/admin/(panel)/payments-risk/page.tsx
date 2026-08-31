@@ -78,7 +78,7 @@ export default async function AdminPaymentsRiskPage() {
           <p style={{ color: "var(--aw18)", fontSize: 12, margin: 0 }}>Real disputes will appear here once Stripe is connected</p>
         </div>
       ) : (
-        <div style={{ background: "var(--aw025)", border: "1px solid var(--aw07)", borderRadius: 16, overflowX: "auto" }}>
+        <div style={{ background: "var(--asurface1)", border: "1px solid var(--aw07)", borderRadius: 16, overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 700 }}>
             <thead>
               <tr style={{ background: "var(--aw015)" }}>

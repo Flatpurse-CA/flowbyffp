@@ -71,7 +71,7 @@ export default async function AdminPlansPage() {
               </span>
               <span style={{ color: "var(--aw3)", fontSize: 12 }}>{planShops.length} shop{planShops.length !== 1 ? "s" : ""}</span>
             </div>
-            <div style={{ background: "var(--aw025)", border: "1px solid var(--aw07)", borderRadius: 14, overflowY: "hidden", overflowX: "auto" }}>
+            <div style={{ background: "var(--asurface1)", border: "1px solid var(--aw07)", borderRadius: 14, overflowY: "hidden", overflowX: "auto" }}>
               <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 480 }}>
                 <thead>
                   <tr style={{ background: "var(--aw015)" }}>

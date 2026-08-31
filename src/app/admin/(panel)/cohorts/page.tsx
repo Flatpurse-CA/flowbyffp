@@ -46,7 +46,7 @@ export default async function AdminCohortsPage() {
           <p style={{ color: "var(--aw3)", fontSize: 13, fontWeight: 600, margin: 0 }}>No shops yet</p>
         </div>
       ) : (
-        <div style={{ background: "var(--aw025)", border: "1px solid var(--aw07)", borderRadius: 16, overflowX: "auto" }}>
+        <div style={{ background: "var(--asurface1)", border: "1px solid var(--aw07)", borderRadius: 16, overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 560 }}>
             <thead>
               <tr style={{ background: "var(--aw015)" }}>
