@@ -1,6 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { MapPin } from "lucide-react";
-import { PLAN_COLORS, PLAN_BG, planLabel, formatCAD } from "@/lib/plans";
+import { ADMIN_PLAN_BADGE, planLabel, formatCAD } from "@/lib/plans";
 import { sumRevenueByShop } from "@/lib/admin/shopRevenue";
 
 export default async function AdminShopsPage() {
@@ -64,8 +64,9 @@ export default async function AdminShopsPage() {
               {shops.map((shop, i) => {
                 const initials = shop.name.slice(0, 2).toUpperCase();
                 const date = new Date(shop.created_at).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" });
-                const planColor = PLAN_COLORS[shop.plan] ?? PLAN_COLORS.starter;
-                const planBg    = PLAN_BG[shop.plan]    ?? PLAN_BG.starter;
+                const planBadge = ADMIN_PLAN_BADGE[shop.plan] ?? ADMIN_PLAN_BADGE.starter;
+                const planColor = planBadge.fg;
+                const planBg    = planBadge.bg;
 
                 return (
                   <tr key={shop.id} style={{ borderBottom: i < shops.length - 1 ? "1px solid var(--aw04)" : "none" }}>
@@ -119,8 +120,8 @@ export default async function AdminShopsPage() {
                         <span style={{
                           fontSize: 10, fontWeight: 700, padding: "3px 9px", borderRadius: 20,
                           letterSpacing: "0.04em", textTransform: "capitalize",
-                          color: shop.subscription_status === "active" ? "rgb(52,211,153)" : "rgb(251,191,36)",
-                          background: shop.subscription_status === "active" ? "rgba(16,185,129,0.1)" : "rgba(245,158,11,0.1)",
+                          color: shop.subscription_status === "active" ? "var(--astatus-green-fg)" : "var(--astatus-amber-fg)",
+                          background: shop.subscription_status === "active" ? "var(--astatus-green-bg)" : "var(--astatus-amber-bg)",
                         }}>
                           {shop.subscription_status}
                         </span>

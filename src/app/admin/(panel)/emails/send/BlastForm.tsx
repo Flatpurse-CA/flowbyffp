@@ -96,9 +96,9 @@ export function BlastForm({ sequences, totalSubs }: { sequences: Sequence[]; tot
             {(["sequence", "oneoff"] as const).map((m) => (
               <button key={m} type="button" onClick={() => setMode(m)} style={{
                 flex: 1, padding: "10px 0", borderRadius: 10, fontSize: 13, fontWeight: 600,
-                border: `1px solid ${mode === m ? T.purple : T.border}`,
-                background: mode === m ? "rgba(139,92,246,0.12)" : T.input,
-                color: mode === m ? T.purple : T.muted,
+                border: mode === m ? "none" : `1px solid ${T.border}`,
+                background: mode === m ? "var(--astatus-purple-bg)" : T.input,
+                color: mode === m ? "var(--astatus-purple-fg)" : T.muted,
                 cursor: "pointer", fontFamily: "inherit",
               }}>
                 {m === "sequence" ? "From sequence" : "One-off"}
@@ -142,9 +142,9 @@ export function BlastForm({ sequences, totalSubs }: { sequences: Sequence[]; tot
             ] as const).map(({ val, label }) => (
               <button key={val} type="button" onClick={() => setAudience(val)} style={{
                 flex: 1, padding: "10px 0", borderRadius: 10, fontSize: 13, fontWeight: 600,
-                border: `1px solid ${audience === val ? T.purple : T.border}`,
-                background: audience === val ? "rgba(139,92,246,0.12)" : T.input,
-                color: audience === val ? T.purple : T.muted,
+                border: audience === val ? "none" : `1px solid ${T.border}`,
+                background: audience === val ? "var(--astatus-purple-bg)" : T.input,
+                color: audience === val ? "var(--astatus-purple-fg)" : T.muted,
                 cursor: "pointer", fontFamily: "inherit",
               }}>{label}</button>
             ))}

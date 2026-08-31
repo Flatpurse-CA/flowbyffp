@@ -10,7 +10,6 @@ const T = {
   muted:   "var(--aw35)",
   dim:     "var(--aw18)",
   purple:  "rgb(139,92,246)",
-  purpleBg:"rgba(139,92,246,0.12)",
 };
 
 export default async function AdminEmailsPage() {
@@ -115,8 +114,8 @@ export default async function AdminEmailsPage() {
                     </td>
                     <td style={{ padding: "14px 18px" }}>
                       <span style={{
-                        fontSize: 12, fontWeight: 600, color: T.purple,
-                        background: T.purpleBg, padding: "3px 9px", borderRadius: 6,
+                        fontSize: 12, fontWeight: 600, color: "var(--astatus-purple-fg)",
+                        background: "var(--astatus-purple-bg)", padding: "3px 9px", borderRadius: 6,
                       }}>
                         Day {seq.delay_days}
                       </span>
@@ -157,8 +156,8 @@ export default async function AdminEmailsPage() {
         <div style={{
           display: "flex", alignItems: "center", gap: 10,
           padding: "12px 16px", borderRadius: 12,
-          background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)",
-          color: "rgb(248,113,113)", fontSize: 13,
+          background: "var(--astatus-red-bg)",
+          color: "var(--astatus-red-fg)", fontSize: 13, fontWeight: 600,
         }}>
           <XCircle size={15} />
           Some sends have failed. Check the{" "}

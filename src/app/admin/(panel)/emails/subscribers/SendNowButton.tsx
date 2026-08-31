@@ -27,9 +27,9 @@ export function SendNowButton({ sendId }: { sendId: string }) {
       <button onClick={handle} disabled={loading} style={{
         fontSize: 12, fontWeight: 600,
         padding: "5px 12px", borderRadius: 7,
-        border: "1px solid rgba(139,92,246,0.3)",
-        background: "rgba(139,92,246,0.1)",
-        color: "rgb(139,92,246)",
+        border: "none",
+        background: "var(--astatus-purple-bg)",
+        color: "var(--astatus-purple-fg)",
         cursor: loading ? "not-allowed" : "pointer",
         opacity: loading ? 0.6 : 1,
         fontFamily: "inherit",

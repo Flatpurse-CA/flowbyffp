@@ -284,13 +284,15 @@
 
   --apurple-text: rgb(196,181,253);
 
-  /* Status/plan badge pairs (fg text + tinted bg) — pastel accents read fine
-     against this theme's near-black surfaces. */
-  --astatus-blue-fg:   rgb(96,165,250);  --astatus-blue-bg:   rgba(59,130,246,0.1);   --astatus-blue-border:   rgba(59,130,246,0.25);
-  --astatus-amber-fg:  rgb(251,191,36);  --astatus-amber-bg:  rgba(245,158,11,0.1);   --astatus-amber-border:  rgba(245,158,11,0.25);
-  --astatus-red-fg:    rgb(248,113,113); --astatus-red-bg:    rgba(239,68,68,0.1);    --astatus-red-border:    rgba(239,68,68,0.22);
-  --astatus-green-fg:  rgb(52,211,153);  --astatus-green-bg:  rgba(16,185,129,0.1);   --astatus-green-border:  rgba(52,211,153,0.25);
-  --astatus-purple-fg: rgb(196,181,253); --astatus-purple-bg: rgba(139,92,246,0.1);   --astatus-purple-border: rgba(139,92,246,0.3);
+  /* Status/plan badge pairs — solid fill + white text, no tinted/translucent
+     backgrounds (explicit user preference: tints read as washed-out no
+     matter how the alpha/contrast is tuned). Border matches the fill so it
+     never shows as a mismatched outline. */
+  --astatus-blue-fg:   rgb(255,255,255); --astatus-blue-bg:   rgb(37,99,235);  --astatus-blue-border:   rgb(37,99,235);
+  --astatus-amber-fg:  rgb(255,255,255); --astatus-amber-bg:  rgb(217,119,6);  --astatus-amber-border:  rgb(217,119,6);
+  --astatus-red-fg:    rgb(255,255,255); --astatus-red-bg:    rgb(220,38,38);  --astatus-red-border:    rgb(220,38,38);
+  --astatus-green-fg:  rgb(255,255,255); --astatus-green-bg:  rgb(5,150,105);  --astatus-green-border:  rgb(5,150,105);
+  --astatus-purple-fg: rgb(255,255,255); --astatus-purple-bg: rgb(124,58,237); --astatus-purple-border: rgb(124,58,237);
 }
 
 [data-admin-theme="light"] {
@@ -345,15 +347,15 @@
 
   --apurple-text: rgb(109,40,217);
 
-  /* Same pastel fg/bg pairs as dark mode, deepened to a saturated 600-700
-     shade — a pale dark-mode accent color used verbatim as small badge text
-     on a white card reads as washed-out/low-contrast instead of a
-     deliberate color. */
-  --astatus-blue-fg:   rgb(29,78,216);   --astatus-blue-bg:   rgba(37,99,235,0.12);  --astatus-blue-border:   rgba(37,99,235,0.3);
-  --astatus-amber-fg:  rgb(180,83,9);    --astatus-amber-bg:  rgba(245,158,11,0.16); --astatus-amber-border:  rgba(180,83,9,0.3);
-  --astatus-red-fg:    rgb(220,38,38);   --astatus-red-bg:    rgba(239,68,68,0.12);  --astatus-red-border:    rgba(220,38,38,0.3);
-  --astatus-green-fg:  rgb(5,150,105);   --astatus-green-bg:  rgba(16,185,129,0.14); --astatus-green-border:  rgba(5,150,105,0.3);
-  --astatus-purple-fg: rgb(124,58,237);  --astatus-purple-bg: rgba(139,92,246,0.13); --astatus-purple-border: rgba(124,58,237,0.35);
+  /* Same solid-fill tokens as dark mode — a saturated 600-shade badge reads
+     the same, deliberate way against either a white or near-black card, so
+     there's no reason for these to differ by theme the way the neutral
+     --aw* scale does. */
+  --astatus-blue-fg:   rgb(255,255,255); --astatus-blue-bg:   rgb(37,99,235);  --astatus-blue-border:   rgb(37,99,235);
+  --astatus-amber-fg:  rgb(255,255,255); --astatus-amber-bg:  rgb(217,119,6);  --astatus-amber-border:  rgb(217,119,6);
+  --astatus-red-fg:    rgb(255,255,255); --astatus-red-bg:    rgb(220,38,38);  --astatus-red-border:    rgb(220,38,38);
+  --astatus-green-fg:  rgb(255,255,255); --astatus-green-bg:  rgb(5,150,105);  --astatus-green-border:  rgb(5,150,105);
+  --astatus-purple-fg: rgb(255,255,255); --astatus-purple-bg: rgb(124,58,237); --astatus-purple-border: rgb(124,58,237);
 }
 
 /* Native <input type="date"> calendar-icon/popup rendering — was hardcoded to

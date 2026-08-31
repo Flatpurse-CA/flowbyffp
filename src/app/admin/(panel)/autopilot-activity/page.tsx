@@ -129,8 +129,8 @@ export default async function AdminAutoPilotActivityPage() {
                       <td style={{ padding: "10px 24px", textAlign: "right" }}>
                         <span style={{
                           fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 20,
-                          color: e.outcome === "failed" ? "rgb(248,113,113)" : "rgb(52,211,153)",
-                          background: e.outcome === "failed" ? "rgba(239,68,68,0.1)" : "rgba(16,185,129,0.1)",
+                          color: e.outcome === "failed" ? "var(--astatus-red-fg)" : "var(--astatus-green-fg)",
+                          background: e.outcome === "failed" ? "var(--astatus-red-bg)" : "var(--astatus-green-bg)",
                         }}>
                           {e.outcome}
                         </span>

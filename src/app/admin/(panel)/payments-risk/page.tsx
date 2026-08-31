@@ -22,10 +22,10 @@ function shopNameFrom(row: DisputeRow): string {
   return Array.isArray(s) ? (s[0]?.name ?? "Unknown shop") : s.name;
 }
 
-function statusColor(status: string) {
-  if (status === "won") return "rgb(52,211,153)";
-  if (status === "lost") return "rgb(248,113,113)";
-  return "rgb(251,191,36)";
+function statusBadge(status: string): { fg: string; bg: string } {
+  if (status === "won") return { fg: "var(--astatus-green-fg)", bg: "var(--astatus-green-bg)" };
+  if (status === "lost") return { fg: "var(--astatus-red-fg)", bg: "var(--astatus-red-bg)" };
+  return { fg: "var(--astatus-amber-fg)", bg: "var(--astatus-amber-bg)" };
 }
 
 const card: React.CSSProperties = {
@@ -103,7 +103,7 @@ export default async function AdminPaymentsRiskPage() {
                   <td style={{ padding: "13px 18px" }}>
                     <span style={{
                       fontSize: 10, fontWeight: 700, padding: "3px 9px", borderRadius: 20,
-                      textTransform: "capitalize", color: statusColor(d.status), background: `${statusColor(d.status)}1A`,
+                      textTransform: "capitalize", color: statusBadge(d.status).fg, background: statusBadge(d.status).bg,
                     }}>
                       {d.status.replace(/_/g, " ")}
                     </span>

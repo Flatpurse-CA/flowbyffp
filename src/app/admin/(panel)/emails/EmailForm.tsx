@@ -137,9 +137,9 @@ export default function EmailForm({ initial }: Props) {
                   {[true, false].map((val) => (
                     <button key={String(val)} type="button" onClick={() => setIsActive(val)} style={{
                       flex: 1, padding: "11px 0", borderRadius: 10, fontSize: 13, fontWeight: 600,
-                      border: `1px solid ${isActive === val ? (val ? "rgba(16,185,129,0.4)" : "rgba(239,68,68,0.3)") : T.border}`,
-                      background: isActive === val ? (val ? "rgba(16,185,129,0.1)" : "rgba(239,68,68,0.08)") : T.input,
-                      color: isActive === val ? (val ? "rgb(52,211,153)" : "rgb(248,113,113)") : T.muted,
+                      border: isActive === val ? "none" : `1px solid ${T.border}`,
+                      background: isActive === val ? (val ? "var(--astatus-green-bg)" : "var(--astatus-red-bg)") : T.input,
+                      color: isActive === val ? (val ? "var(--astatus-green-fg)" : "var(--astatus-red-fg)") : T.muted,
                       cursor: "pointer", fontFamily: "inherit",
                     }}>
                       {val ? "Active" : "Inactive"}

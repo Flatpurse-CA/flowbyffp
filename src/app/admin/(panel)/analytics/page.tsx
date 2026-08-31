@@ -1,6 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { TrendingUp, DollarSign, CreditCard, Store } from "lucide-react";
-import { PLANS, PLAN_COLORS, PLAN_BG, planPrice, planLabel, formatCAD } from "@/lib/plans";
+import { PLANS, ADMIN_PLAN_BADGE, planPrice, planLabel, formatCAD } from "@/lib/plans";
 import { sumRevenueByShop } from "@/lib/admin/shopRevenue";
 
 function StatCard({ label, value, Icon, iconColor, iconBg, subtitle }: {
@@ -136,7 +136,7 @@ export default async function AdminAnalyticsPage() {
             {planRows.map((p, i) => (
               <tr key={p.key} style={{ borderBottom: i < planRows.length - 1 ? "1px solid var(--aw04)" : "none" }}>
                 <td style={{ padding: "12px 24px" }}>
-                  <span style={{ fontSize: 10, fontWeight: 700, padding: "3px 9px", borderRadius: 20, color: PLAN_COLORS[p.key], background: PLAN_BG[p.key] }}>
+                  <span style={{ fontSize: 10, fontWeight: 700, padding: "3px 9px", borderRadius: 20, color: ADMIN_PLAN_BADGE[p.key].fg, background: ADMIN_PLAN_BADGE[p.key].bg }}>
                     {planLabel(p.key)}
                   </span>
                 </td>

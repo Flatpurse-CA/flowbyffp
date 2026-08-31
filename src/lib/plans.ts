@@ -60,11 +60,11 @@ export const PLANS: Plan[] = [
     smsOverageRate: "$0.05/message",
     support: "Community",
     payoutSpeed: "Standard (2–3 days)",
-    // A fixed slate tone (not a theme-relative white/black alpha) since this
-    // is used only in the admin panel's light theme — the previous
-    // "rgba(255,255,255,...)" values were tuned for a dark background and
-    // read as a near-invisible white-on-white pill once the panel got a
-    // light theme.
+    // A fixed slate accent (not a theme-relative white/black alpha) — this
+    // field doubles as plain accent text/border color on the owner-facing
+    // dashboard billing page, where the old "rgba(255,255,255,...)" values
+    // (tuned only for that page's dark theme) read as a near-invisible
+    // white-on-white label once it got a light theme too.
     color: "rgb(100,116,139)",
     bg: "rgba(100,116,139,0.14)",
     border: "rgba(100,116,139,0.3)",
@@ -163,9 +163,19 @@ export const PLANS: Plan[] = [
   },
 ];
 
-export const PLAN_COLORS = Object.fromEntries(PLANS.map(p => [p.key, p.color]))  as Record<string, string>;
-export const PLAN_BG     = Object.fromEntries(PLANS.map(p => [p.key, p.bg]))     as Record<string, string>;
-export const PLAN_BORDER = Object.fromEntries(PLANS.map(p => [p.key, p.border])) as Record<string, string>;
+export const PLAN_COLORS = Object.fromEntries(PLANS.map(p => [p.key, p.color])) as Record<string, string>;
+export const PLAN_BG     = Object.fromEntries(PLANS.map(p => [p.key, p.bg]))    as Record<string, string>;
+
+// Solid-fill (no tint) badge colors for the admin panel only — kept separate
+// from PLAN_COLORS/PLAN_BG above, which double as plain accent text/border
+// colors on the owner-facing dashboard billing page and would go invisible
+// (white-on-white) if repurposed as solid white-on-color fill there too.
+export const ADMIN_PLAN_BADGE: Record<string, { fg: string; bg: string }> = {
+  starter:    { fg: "rgb(255,255,255)", bg: "rgb(100,116,139)" },
+  pro:        { fg: "rgb(255,255,255)", bg: "rgb(37,99,235)" },
+  pro_plus:   { fg: "rgb(255,255,255)", bg: "rgb(124,58,237)" },
+  enterprise: { fg: "rgb(255,255,255)", bg: "rgb(217,119,6)" },
+};
 
 export function getPlan(key: string): Plan {
   return PLANS.find(p => p.key === key) ?? PLANS[0];

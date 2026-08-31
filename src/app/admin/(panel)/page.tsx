@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { Users, Store, ClipboardList, CreditCard, TrendingUp } from "lucide-react";
-import { PLAN_COLORS as PLAN_COLOR, planPrice, planLabel, formatCAD } from "@/lib/plans";
+import { ADMIN_PLAN_BADGE, planPrice, planLabel, formatCAD } from "@/lib/plans";
 import { MemberGrowthChart } from "./MemberGrowthChart";
 
 function StatCard({
@@ -187,9 +187,9 @@ export default async function AdminOverviewPage() {
                   <div key={u.id} className="admin-member-row" style={{ display: "flex", alignItems: "center", gap: 11, padding: "7px 8px", margin: "0 -8px", borderRadius: 10, transition: "background 0.12s" }}>
                     <div style={{
                       width: 32, height: 32, borderRadius: "50%", flexShrink: 0,
-                      background: "rgba(139,92,246,0.14)",
+                      background: "rgb(124,58,237)",
                       display: "flex", alignItems: "center", justifyContent: "center",
-                      fontSize: 11, fontWeight: 700, color: "rgb(167,139,250)",
+                      fontSize: 11, fontWeight: 700, color: "white",
                     }}>
                       {initials}
                     </div>
@@ -216,9 +216,8 @@ export default async function AdminOverviewPage() {
             style={{
               display: "inline-flex", alignItems: "center", gap: 6,
               padding: "8px 16px", borderRadius: 10,
-              background: "rgba(139,92,246,0.1)",
-              border: "1px solid rgba(139,92,246,0.2)",
-              color: "rgb(167,139,250)", fontSize: 13, fontWeight: 600,
+              background: "var(--astatus-purple-bg)",
+              color: "var(--astatus-purple-fg)", fontSize: 13, fontWeight: 600,
               textDecoration: "none",
             }}
           >
@@ -241,7 +240,7 @@ export default async function AdminOverviewPage() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
             {recentShops.map((shop, i) => {
-              const color = PLAN_COLOR[shop.plan] ?? PLAN_COLOR.starter;
+              const badge = ADMIN_PLAN_BADGE[shop.plan] ?? ADMIN_PLAN_BADGE.starter;
               const date  = new Date(shop.created_at).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" });
               return (
                 <div key={i} className="admin-stat-card" style={{
@@ -260,8 +259,8 @@ export default async function AdminOverviewPage() {
                     </div>
                     <span style={{
                       fontSize: 10.5, fontWeight: 700, padding: "2px 9px", borderRadius: 20,
-                      textTransform: "capitalize", color,
-                      background: `${color}1A`,
+                      textTransform: "capitalize", color: badge.fg,
+                      background: badge.bg,
                       whiteSpace: "nowrap", flexShrink: 0,
                     }}>
                       {planLabel(shop.plan)}
@@ -282,7 +281,7 @@ export default async function AdminOverviewPage() {
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <p style={{ color: "var(--atext)", fontSize: 15, fontWeight: 700, margin: 0 }}>Waitlist</p>
             {waitlist.length > 0 && (
-              <span style={{ fontSize: 10.5, fontWeight: 700, color: "rgb(167,139,250)", background: "rgba(109,40,217,0.1)", padding: "3px 9px", borderRadius: 20 }}>
+              <span style={{ fontSize: 10.5, fontWeight: 700, color: "var(--astatus-purple-fg)", background: "var(--astatus-purple-bg)", padding: "3px 9px", borderRadius: 20 }}>
                 {waitlist.length} total
               </span>
             )}

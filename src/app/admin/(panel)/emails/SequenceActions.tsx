@@ -27,8 +27,8 @@ export function ToggleButton({ id, isActive }: { id: string; isActive: boolean }
         fontSize: 11, fontWeight: 700,
         padding: "3px 10px", borderRadius: 6,
         border: "none", cursor: loading ? "not-allowed" : "pointer",
-        background: active ? "rgba(16,185,129,0.12)" : "var(--aw06)",
-        color: active ? "rgb(52,211,153)" : T.muted,
+        background: active ? "var(--astatus-green-bg)" : "var(--aw06)",
+        color: active ? "var(--astatus-green-fg)" : T.muted,
         opacity: loading ? 0.6 : 1,
         fontFamily: "inherit",
       }}
@@ -54,9 +54,9 @@ export function DeleteButton({ id }: { id: string }) {
       style={{
         fontSize: 12, fontWeight: 600,
         padding: "5px 10px", borderRadius: 7,
-        border: "1px solid rgba(239,68,68,0.25)",
-        background: "rgba(239,68,68,0.07)",
-        color: "rgb(248,113,113)",
+        border: "none",
+        background: "var(--astatus-red-bg)",
+        color: "var(--astatus-red-fg)",
         cursor: loading ? "not-allowed" : "pointer",
         opacity: loading ? 0.6 : 1,
         fontFamily: "inherit",

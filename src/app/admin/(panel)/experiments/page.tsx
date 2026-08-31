@@ -17,7 +17,18 @@ type Experiment = {
 type GuardrailMetric = { id: string; key: string; label: string; comparison: "above_bad" | "below_bad"; threshold: number };
 
 const card: React.CSSProperties = { background: "var(--am1)", border: "1px solid var(--aw09)", borderRadius: 18 };
-const STATUS_COLOR: Record<string, string> = { draft: "var(--aw4)", running: "rgb(52,211,153)", paused: "rgb(251,191,36)", completed: "rgb(96,165,250)", archived: "var(--aw25)" };
+// Solid fg/bg pairs, not a single accent color with a `${color}1A` hex-alpha
+// suffix appended for the background — that trick silently produces invalid
+// CSS (and therefore no background at all) when color is an rgb()/var()
+// string rather than a hex literal.
+const NEUTRAL_BADGE = { fg: "rgb(255,255,255)", bg: "rgb(100,116,139)" };
+const STATUS_COLOR: Record<string, { fg: string; bg: string }> = {
+  draft:     NEUTRAL_BADGE,
+  running:   { fg: "var(--astatus-green-fg)",  bg: "var(--astatus-green-bg)" },
+  paused:    { fg: "var(--astatus-amber-fg)",  bg: "var(--astatus-amber-bg)" },
+  completed: { fg: "var(--astatus-blue-fg)",   bg: "var(--astatus-blue-bg)" },
+  archived:  NEUTRAL_BADGE,
+};
 
 function guardrailStatus(value: number, g: GuardrailMetric): "healthy" | "warning" | "critical" {
   if (g.comparison === "above_bad") {
@@ -30,7 +41,11 @@ function guardrailStatus(value: number, g: GuardrailMetric): "healthy" | "warnin
   return "healthy";
 }
 
-const GUARDRAIL_STATUS_COLOR = { healthy: "rgb(52,211,153)", warning: "rgb(251,191,36)", critical: "rgb(248,113,113)" };
+const GUARDRAIL_STATUS_COLOR = {
+  healthy:  { fg: "var(--astatus-green-fg)", bg: "var(--astatus-green-bg)" },
+  warning:  { fg: "var(--astatus-amber-fg)", bg: "var(--astatus-amber-bg)" },
+  critical: { fg: "var(--astatus-red-fg)",   bg: "var(--astatus-red-bg)" },
+};
 
 export default async function AdminExperimentsPage() {
   const admin = createAdminClient();
@@ -106,7 +121,7 @@ export default async function AdminExperimentsPage() {
               <div key={g.id} style={{ background: "var(--aw02)", border: "1px solid var(--aw06)", borderRadius: 12, padding: "14px 16px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
                   <p style={{ color: "var(--aw6)", fontSize: 12.5, fontWeight: 600, margin: 0 }}>{g.label}</p>
-                  <span style={{ fontSize: 9.5, fontWeight: 700, padding: "2px 8px", borderRadius: 20, textTransform: "uppercase", color: GUARDRAIL_STATUS_COLOR[status], background: `${GUARDRAIL_STATUS_COLOR[status]}1A` }}>
+                  <span style={{ fontSize: 9.5, fontWeight: 700, padding: "2px 8px", borderRadius: 20, textTransform: "uppercase", color: GUARDRAIL_STATUS_COLOR[status].fg, background: GUARDRAIL_STATUS_COLOR[status].bg }}>
                     {status}
                   </span>
                 </div>
@@ -196,11 +211,11 @@ export default async function AdminExperimentsPage() {
                   <div>
                     <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3 }}>
                       <p style={{ color: "var(--atext2)", fontSize: 14, fontWeight: 700, margin: 0 }}>{e.name}</p>
-                      <span style={{ fontSize: 9.5, fontWeight: 700, padding: "2px 8px", borderRadius: 20, textTransform: "uppercase", color: STATUS_COLOR[e.status], background: `${STATUS_COLOR[e.status]}1A` }}>
+                      <span style={{ fontSize: 9.5, fontWeight: 700, padding: "2px 8px", borderRadius: 20, textTransform: "uppercase", color: STATUS_COLOR[e.status].fg, background: STATUS_COLOR[e.status].bg }}>
                         {e.status}
                       </span>
                       {e.winner && (
-                        <span style={{ fontSize: 9.5, fontWeight: 700, padding: "2px 8px", borderRadius: 20, color: "rgb(52,211,153)", background: "rgba(16,185,129,0.12)" }}>
+                        <span style={{ fontSize: 9.5, fontWeight: 700, padding: "2px 8px", borderRadius: 20, color: "var(--astatus-green-fg)", background: "var(--astatus-green-bg)" }}>
                           Winner: {e.winner === "a" ? e.variant_a_label : e.variant_b_label}
                         </span>
                       )}
@@ -213,7 +228,7 @@ export default async function AdminExperimentsPage() {
                     {e.status === "draft" && (
                       <form action={startExperiment}>
                         <input type="hidden" name="id" value={e.id} /><input type="hidden" name="flagKey" value={e.feature_flag_key} />
-                        <button type="submit" style={{ padding: "7px 14px", borderRadius: 8, border: "none", background: "rgba(16,185,129,0.15)", color: "rgb(52,211,153)", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Start</button>
+                        <button type="submit" style={{ padding: "7px 14px", borderRadius: 8, border: "none", background: "var(--astatus-green-bg)", color: "var(--astatus-green-fg)", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Start</button>
                       </form>
                     )}
                     {e.status === "running" && (
@@ -224,18 +239,18 @@ export default async function AdminExperimentsPage() {
                         </form>
                         <form action={rolloutWinner}>
                           <input type="hidden" name="id" value={e.id} /><input type="hidden" name="flagKey" value={e.feature_flag_key} /><input type="hidden" name="winner" value="a" />
-                          <button type="submit" style={{ padding: "7px 14px", borderRadius: 8, border: "none", background: "rgba(96,165,250,0.15)", color: "rgb(96,165,250)", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Roll out {e.variant_a_label}</button>
+                          <button type="submit" style={{ padding: "7px 14px", borderRadius: 8, border: "none", background: "var(--astatus-blue-bg)", color: "var(--astatus-blue-fg)", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Roll out {e.variant_a_label}</button>
                         </form>
                         <form action={rolloutWinner}>
                           <input type="hidden" name="id" value={e.id} /><input type="hidden" name="flagKey" value={e.feature_flag_key} /><input type="hidden" name="winner" value="b" />
-                          <button type="submit" style={{ padding: "7px 14px", borderRadius: 8, border: "none", background: "rgba(109,40,217,0.2)", color: "rgb(167,139,250)", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Roll out {e.variant_b_label}</button>
+                          <button type="submit" style={{ padding: "7px 14px", borderRadius: 8, border: "none", background: "var(--astatus-purple-bg)", color: "var(--astatus-purple-fg)", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Roll out {e.variant_b_label}</button>
                         </form>
                       </>
                     )}
                     {e.status === "paused" && (
                       <form action={startExperiment}>
                         <input type="hidden" name="id" value={e.id} /><input type="hidden" name="flagKey" value={e.feature_flag_key} />
-                        <button type="submit" style={{ padding: "7px 14px", borderRadius: 8, border: "none", background: "rgba(16,185,129,0.15)", color: "rgb(52,211,153)", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Resume</button>
+                        <button type="submit" style={{ padding: "7px 14px", borderRadius: 8, border: "none", background: "var(--astatus-green-bg)", color: "var(--astatus-green-fg)", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Resume</button>
                       </form>
                     )}
                     {(e.status === "completed" || e.status === "paused") && (

@@ -13,9 +13,9 @@ const T = {
 };
 
 const STATUS_STYLE: Record<string, React.CSSProperties> = {
-  sent:    { color: "rgb(52,211,153)",  background: "rgba(16,185,129,0.1)",  border: "1px solid rgba(16,185,129,0.2)"  },
-  pending: { color: "rgb(251,191,36)",  background: "rgba(245,158,11,0.1)",  border: "1px solid rgba(245,158,11,0.2)"  },
-  failed:  { color: "rgb(248,113,113)", background: "rgba(239,68,68,0.08)",  border: "1px solid rgba(239,68,68,0.2)"   },
+  sent:    { color: "var(--astatus-green-fg)", background: "var(--astatus-green-bg)" },
+  pending: { color: "var(--astatus-amber-fg)", background: "var(--astatus-amber-bg)" },
+  failed:  { color: "var(--astatus-red-fg)",   background: "var(--astatus-red-bg)"   },
 };
 
 const STATUS_ICON = {

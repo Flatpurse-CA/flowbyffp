@@ -1,11 +1,12 @@
 "use client";
 
 import { changeUserPlan } from "./actions";
-import { PLAN_COLORS, PLAN_BG, PLAN_BORDER, planLabel } from "@/lib/plans";
+import { ADMIN_PLAN_BADGE, planLabel } from "@/lib/plans";
 
 const PLAN_OPTIONS = ["starter", "pro", "pro_plus", "enterprise"];
 
 export function PlanSelect({ userId, plan }: { userId: string; plan: string }) {
+  const badge = ADMIN_PLAN_BADGE[plan];
   return (
     <form action={changeUserPlan} style={{ display: "inline" }}>
       <input type="hidden" name="userId" value={userId} />
@@ -13,10 +14,10 @@ export function PlanSelect({ userId, plan }: { userId: string; plan: string }) {
         name="plan"
         defaultValue={plan}
         style={{
-          background: PLAN_BG[plan] ?? "var(--aw06)",
-          border: `1px solid ${PLAN_BORDER[plan] ?? "var(--aw15)"}`,
+          background: badge?.bg ?? "var(--aw3)",
+          border: `1px solid ${badge?.bg ?? "var(--aw3)"}`,
           borderRadius: 20,
-          color: PLAN_COLORS[plan] ?? "var(--aw35)",
+          color: badge?.fg ?? "rgb(255,255,255)",
           fontSize: 10.5,
           fontWeight: 700,
           padding: "3px 8px",

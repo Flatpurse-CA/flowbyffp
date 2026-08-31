@@ -15,7 +15,6 @@ import { NotificationsBell } from "./NotificationsBell";
 import { AdminSearch } from "./AdminSearch";
 
 const PURPLE = "rgb(139,92,246)";
-const PURPLE_BG = "rgba(109,40,217,0.18)";
 
 const NAV = [
   { icon: LayoutDashboard, href: "/admin",                    label: "Overview"          },
@@ -49,8 +48,8 @@ const DARK = {
   iconBtnBorder:  "rgba(255,255,255,0.07)",
   iconColor:      "rgba(255,255,255,0.35)",
   menuLabel:      "rgba(255,255,255,0.2)",
-  activePill:     "rgba(139,92,246,0.12)",
-  activeText:     "rgb(200,180,255)",
+  activePill:     "rgb(124,58,237)",
+  activeText:     "rgb(255,255,255)",
   inactiveText:   "rgba(255,255,255,0.42)",
   searchBg:       "rgba(255,255,255,0.04)",
   searchBorder:   "rgba(255,255,255,0.07)",
@@ -75,8 +74,8 @@ const LIGHT = {
   iconBtnBorder:  "rgba(0,0,0,0.09)",
   iconColor:      "rgba(0,0,0,0.4)",
   menuLabel:      "rgba(0,0,0,0.25)",
-  activePill:     "rgba(139,92,246,0.1)",
-  activeText:     "rgb(109,40,217)",
+  activePill:     "rgb(124,58,237)",
+  activeText:     "rgb(255,255,255)",
   inactiveText:   "rgba(0,0,0,0.48)",
   searchBg:       "rgba(0,0,0,0.04)",
   searchBorder:   "rgba(0,0,0,0.09)",
@@ -219,10 +218,9 @@ export function AdminShell({ children, user }: { children: React.ReactNode; user
             <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0, flex: 1 }}>
               <div style={{
                 width: 38, height: 38, borderRadius: 10,
-                background: PURPLE_BG,
-                border: `1px solid rgba(139,92,246,0.3)`,
+                background: PURPLE,
                 display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: 17, fontWeight: 800, color: PURPLE, flexShrink: 0,
+                fontSize: 17, fontWeight: 800, color: "white", flexShrink: 0,
               }}>
                 {initial}
               </div>
@@ -250,10 +248,9 @@ export function AdminShell({ children, user }: { children: React.ReactNode; user
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "18px 0 14px", gap: 10, flexShrink: 0 }}>
             <div style={{
               width: 38, height: 38, borderRadius: 10,
-              background: PURPLE_BG,
-              border: `1px solid rgba(139,92,246,0.3)`,
+              background: PURPLE,
               display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 17, fontWeight: 800, color: PURPLE,
+              fontSize: 17, fontWeight: 800, color: "white",
             }}>
               {initial}
             </div>

@@ -63,8 +63,8 @@ export function WaitlistTable({ entries }: { entries: WaitlistEntry[] }) {
             style={{
               display: "flex", alignItems: "center", gap: 7,
               padding: "6px 14px", borderRadius: 8, cursor: pending ? "not-allowed" : "pointer",
-              background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.25)",
-              color: "rgb(248,113,113)", fontSize: 12.5, fontWeight: 600, fontFamily: "inherit",
+              background: "var(--astatus-red-bg)",
+              color: "var(--astatus-red-fg)", fontSize: 12.5, fontWeight: 600, fontFamily: "inherit",
               opacity: pending ? 0.6 : 1,
             }}
           >

@@ -77,7 +77,7 @@ export default async function AdminWaitlistPage() {
 
       {/* ── Error ── */}
       {error && (
-        <div style={{ padding: "14px 18px", borderRadius: 12, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", color: "rgb(248,113,113)", fontSize: 13 }}>
+        <div style={{ padding: "14px 18px", borderRadius: 12, background: "var(--astatus-red-bg)", color: "var(--astatus-red-fg)", fontSize: 13, fontWeight: 600 }}>
           Could not load waitlist.
         </div>
       )}

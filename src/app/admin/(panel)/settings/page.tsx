@@ -65,7 +65,7 @@ export default async function AdminSettingsPage() {
             <span style={{
               fontSize: 10, fontWeight: 700, padding: "3px 9px", borderRadius: 20,
               letterSpacing: "0.04em", textTransform: "uppercase",
-              color: "rgb(251,191,36)", background: "rgba(245,158,11,0.1)",
+              color: "var(--astatus-amber-fg)", background: "var(--astatus-amber-bg)",
             }}>
               Root
             </span>

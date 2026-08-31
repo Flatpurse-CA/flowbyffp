@@ -49,7 +49,7 @@ export default async function AdminProfilePage() {
               <span style={{
                 display: "inline-flex", alignItems: "center", gap: 4,
                 fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 20,
-                color: "rgb(251,191,36)", background: "rgba(245,158,11,0.1)",
+                color: "var(--astatus-amber-fg)", background: "var(--astatus-amber-bg)",
                 letterSpacing: "0.04em", textTransform: "uppercase",
               }}>
                 <ShieldCheck size={10} /> Root

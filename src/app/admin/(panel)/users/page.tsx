@@ -65,7 +65,7 @@ export default async function AdminUsersPage() {
     });
 
   return (
-    <div style={{ maxWidth: 1200 }}>
+    <div>
       {/* Heading */}
       <div style={{ marginBottom: 24, display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
         <div>
