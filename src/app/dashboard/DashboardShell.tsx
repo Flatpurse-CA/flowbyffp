@@ -128,7 +128,7 @@ function SidebarNav({ open, pathname, T, tabs }: { open: boolean; pathname: stri
   );
 }
 
-export function DashboardShell(props: { children: React.ReactNode; user: User; role: ShopRole; staffName: string | null; unreadCount: number; accessStatus?: "trialing" | "grace" | "inactive" | "active" }) {
+export function DashboardShell(props: { children: React.ReactNode; user: User; role: ShopRole; staffName: string | null; unreadCount: number; accessStatus?: "trialing" | "grace" | "inactive" | "active" | "paused" }) {
   return (
     <DashboardThemeProvider>
       <DashboardShellInner {...props} />
@@ -136,7 +136,7 @@ export function DashboardShell(props: { children: React.ReactNode; user: User; r
   );
 }
 
-function DashboardShellInner({ children, user, role, staffName, unreadCount, accessStatus }: { children: React.ReactNode; user: User; role: ShopRole; staffName: string | null; unreadCount: number; accessStatus?: "trialing" | "grace" | "inactive" | "active" }) {
+function DashboardShellInner({ children, user, role, staffName, unreadCount, accessStatus }: { children: React.ReactNode; user: User; role: ShopRole; staffName: string | null; unreadCount: number; accessStatus?: "trialing" | "grace" | "inactive" | "active" | "paused" }) {
   const router = useRouter();
   const pathname = usePathname();
   const visibleTabs = role === "owner" ? NAV_TABS : NAV_TABS.filter(t => !t.ownerOnly);

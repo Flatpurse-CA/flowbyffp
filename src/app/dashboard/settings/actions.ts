@@ -158,8 +158,25 @@ export async function openBillingPortal(): Promise<{ url?: string; error?: strin
   if (!ctx || ctx.role !== "owner") return { error: "Only the shop owner can manage billing" };
   const { supabase, shopId } = await requireShop();
 
-  const { data: shop } = await supabase.from("shops").select("stripe_customer_id").eq("id", shopId).maybeSingle();
-  if (!shop?.stripe_customer_id) return { error: "No billing account yet, subscribe to a plan first" };
+  const { data: shop } = await supabase
+    .from("shops")
+    .select("stripe_customer_id, subscription_status, plan, billing_interval")
+    .eq("id", shopId)
+    .maybeSingle();
+  if (!shop) return { error: "Shop not found" };
+
+  // A shop can be nominally "on" a paid plan (chosen at signup) without ever
+  // having completed Checkout, so there's no active subscription for the
+  // portal to manage yet. Rather than dead-ending with an error, start real
+  // Checkout for that plan — this is the actual "add a card" path.
+  if (!shop.stripe_customer_id || shop.subscription_status !== "active") {
+    const planKey = shop.plan === "pro_plus" ? "pro_plus" : "pro";
+    return startCheckout({
+      planKey,
+      interval: (shop.billing_interval as BillingInterval | null) ?? "monthly",
+      claimFounders: false,
+    });
+  }
 
   const origin = await getRequestOrigin();
   try {

@@ -114,10 +114,10 @@ export async function createPublicBooking(input: {
 
   const admin = createAdminClient();
 
-  const { data: shop } = await admin.from("shops").select("id, name, street_address, city, province, phone, trial_started_at, subscription_status, trial_override").eq("id", input.shopId).maybeSingle();
+  const { data: shop } = await admin.from("shops").select("id, name, street_address, city, province, phone, trial_started_at, subscription_status, trial_override, trial_paused_at").eq("id", input.shopId).maybeSingle();
   if (!shop) return { error: "This shop couldn't be found" };
 
-  const { status: shopAccessStatus } = computeAccessStatus(shop as { trial_started_at: string; subscription_status: string | null; trial_override: boolean });
+  const { status: shopAccessStatus } = computeAccessStatus(shop as { trial_started_at: string; subscription_status: string | null; trial_override: boolean; trial_paused_at: string | null });
   if (shopAccessStatus === "grace" || shopAccessStatus === "inactive") {
     return { error: "This business isn't currently accepting new bookings" };
   }

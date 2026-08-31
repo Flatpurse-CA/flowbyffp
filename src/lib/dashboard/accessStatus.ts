@@ -2,12 +2,13 @@ const TRIAL_DAYS = 7;
 const GRACE_DAYS = 7;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-export type AccessStatus = "trialing" | "grace" | "inactive" | "active";
+export type AccessStatus = "trialing" | "grace" | "inactive" | "active" | "paused";
 
 export function computeAccessStatus(shop: {
   trial_started_at: string;
   subscription_status: string | null;
   trial_override: boolean;
+  trial_paused_at?: string | null;
 }): {
   status: AccessStatus;
   trialEndsAt: Date;
@@ -19,6 +20,12 @@ export function computeAccessStatus(shop: {
 
   if (shop.subscription_status === "active" || shop.trial_override) {
     return { status: "active", trialEndsAt, graceEndsAt };
+  }
+
+  // Frozen by an admin — full access, clock doesn't advance until resumed
+  // (resuming shifts trial_started_at forward to preserve remaining time).
+  if (shop.trial_paused_at) {
+    return { status: "paused", trialEndsAt, graceEndsAt };
   }
 
   const now = Date.now();

@@ -878,7 +878,11 @@ export function SettingsClient({ shopId, initialBusinessHours, initialStripeConn
           {/* Plan cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {PLANS.map(plan => {
-              const isCurrent = initialBilling?.plan === plan.key;
+              // A plan chosen at signup isn't "current" until Checkout actually
+              // completed — otherwise the plan card locks with no way to add a
+              // card and "Manage billing" has no subscription to manage either.
+              const isCurrent = initialBilling?.plan === plan.key
+                && (plan.key === "starter" || initialBilling?.subscriptionStatus === "active");
               const price = plan.monthlyPrice === null ? plan.priceLabel : plan.monthlyPrice === 0 ? "Free" : `C$${billingInterval === "annual" ? plan.annualPrice : plan.monthlyPrice}/${billingInterval === "annual" ? "yr" : "mo"}`;
               return (
                 <div key={plan.key} style={{ ...card, border: `1px solid ${isCurrent ? plan.color : "var(--dw07)"}`, display: "flex", flexDirection: "column", gap: 10 }}>

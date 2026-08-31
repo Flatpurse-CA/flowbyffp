@@ -1,7 +1,9 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-import { banUser, unbanUser, deleteUser, resetShopTrial, setTrialOverride } from "./actions";
-import { UserX, UserCheck, Trash2, RotateCcw, ShieldCheck, ShieldOff } from "lucide-react";
+import { banUser, unbanUser, deleteUser, resetShopTrial, setTrialOverride, pauseShopTrial, resumeShopTrial } from "./actions";
+import { UserX, UserCheck, Trash2, RotateCcw, ShieldCheck, ShieldOff, Pause, Play } from "lucide-react";
 import { PlanSelect } from "./PlanSelect";
+import { AddTrialDaysForm } from "./AddTrialDaysForm";
+import { RestartAllTrialsButton } from "./RestartAllTrialsButton";
 import { formatCAD } from "@/lib/plans";
 import { sumRevenueByShop } from "@/lib/admin/shopRevenue";
 import { computeAccessStatus, type AccessStatus } from "@/lib/dashboard/accessStatus";
@@ -11,12 +13,14 @@ const ACCESS_STATUS_LABEL: Record<AccessStatus, string> = {
   grace:    "Grace",
   inactive: "Locked out",
   active:   "Active",
+  paused:   "Paused",
 };
 const ACCESS_STATUS_COLOR: Record<AccessStatus, { fg: string; bg: string }> = {
   trialing: { fg: "rgb(96,165,250)",  bg: "rgba(59,130,246,0.1)" },
   grace:    { fg: "rgb(251,191,36)",  bg: "rgba(245,158,11,0.1)" },
   inactive: { fg: "rgb(248,113,113)", bg: "rgba(239,68,68,0.1)" },
   active:   { fg: "rgb(52,211,153)",  bg: "rgba(16,185,129,0.1)" },
+  paused:   { fg: "rgb(196,181,253)", bg: "rgba(139,92,246,0.1)" },
 };
 
 export default async function AdminUsersPage() {
@@ -25,7 +29,7 @@ export default async function AdminUsersPage() {
   const [usersRes, profilesRes, shopsRes, apptsRes] = await Promise.all([
     admin.auth.admin.listUsers({ perPage: 1000 }),
     admin.from("profiles").select("id, first_name, last_name"),
-    admin.from("shops").select("id, owner_id, name, plan, trial_started_at, subscription_status, trial_override"),
+    admin.from("shops").select("id, owner_id, name, plan, trial_started_at, subscription_status, trial_override, trial_paused_at"),
     admin.from("appointments").select("shop_id, price").eq("status", "completed"),
   ]);
 
@@ -39,7 +43,7 @@ export default async function AdminUsersPage() {
     .map(u => {
       const shop = shops[u.id];
       const access = shop?.trial_started_at
-        ? computeAccessStatus(shop as { trial_started_at: string; subscription_status: string | null; trial_override: boolean })
+        ? computeAccessStatus(shop as { trial_started_at: string; subscription_status: string | null; trial_override: boolean; trial_paused_at: string | null })
         : null;
       return {
         id:        u.id,
@@ -52,15 +56,19 @@ export default async function AdminUsersPage() {
         isBanned:  !!(u.banned_until && new Date(u.banned_until) > new Date()),
         accessStatus: access?.status ?? null,
         trialOverride: shop?.trial_override ?? false,
+        trialPaused: !!shop?.trial_paused_at,
       };
     });
 
   return (
     <div style={{ maxWidth: 1200 }}>
       {/* Heading */}
-      <div style={{ marginBottom: 24 }}>
-        <h1 style={{ color: "var(--atext2)", fontSize: 22, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.03em" }}>Users</h1>
-        <p style={{ color: "var(--aw3)", fontSize: 13, margin: 0 }}>{rows.length} total account{rows.length !== 1 ? "s" : ""}</p>
+      <div style={{ marginBottom: 24, display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
+        <div>
+          <h1 style={{ color: "var(--atext2)", fontSize: 22, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.03em" }}>Users</h1>
+          <p style={{ color: "var(--aw3)", fontSize: 13, margin: 0 }}>{rows.length} total account{rows.length !== 1 ? "s" : ""}</p>
+        </div>
+        <RestartAllTrialsButton />
       </div>
 
       {rows.length === 0 ? (
@@ -182,6 +190,23 @@ export default async function AdminUsersPage() {
                                 <RotateCcw size={12} />
                               </button>
                             </form>
+                            <form action={row.trialPaused ? resumeShopTrial : pauseShopTrial}>
+                              <input type="hidden" name="userId" value={row.id} />
+                              <button
+                                type="submit"
+                                title={row.trialPaused ? "Resume trial clock" : "Pause trial clock (freezes remaining time)"}
+                                style={{
+                                  display: "flex", alignItems: "center", justifyContent: "center",
+                                  width: 28, height: 28, borderRadius: 8, cursor: "pointer",
+                                  background: row.trialPaused ? "rgba(139,92,246,0.12)" : "var(--aw04)",
+                                  border: row.trialPaused ? "1px solid rgba(139,92,246,0.3)" : "1px solid var(--aw08)",
+                                  color: row.trialPaused ? "rgb(196,181,253)" : "var(--aw3)", fontFamily: "inherit",
+                                }}
+                              >
+                                {row.trialPaused ? <Play size={12} /> : <Pause size={12} />}
+                              </button>
+                            </form>
+                            <AddTrialDaysForm userId={row.id} />
                             <form action={setTrialOverride}>
                               <input type="hidden" name="userId" value={row.id} />
                               <input type="hidden" name="enabled" value={row.trialOverride ? "false" : "true"} />
