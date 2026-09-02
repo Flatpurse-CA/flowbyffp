@@ -1,5 +1,3 @@
-import { redirect } from "next/navigation";
+import Home3Page from "./home-3/page";
 
-export default function RootPage() {
-  redirect("/home-main");
-}
+export default Home3Page;

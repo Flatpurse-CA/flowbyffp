@@ -22,7 +22,7 @@ export default function HomeMainPage() {
     <div style={{ background: "#0a0a0a", color: "rgb(250,250,250)" }}>
 
       {/* ── Hero block (nav + hero share the purple bg) ── */}
-      <div style={{
+      <div className="hm-hero-block" style={{
         background: "#712AE2",
         position: "relative",
         paddingTop: 0,
@@ -40,7 +40,7 @@ export default function HomeMainPage() {
           width: "100%",
           boxSizing: "border-box",
         }}>
-          <div style={{
+          <div className="hm-nav-inner" style={{
             width: "100%",
             padding: "0 155px",
             height: "100%",
@@ -56,7 +56,7 @@ export default function HomeMainPage() {
             </Link>
 
             {/* Center nav links */}
-            <div style={{ display: "flex", alignItems: "center", gap: 2, position: "absolute", left: "50%", transform: "translateX(-50%)" }}>
+            <div className="hm-nav-links" style={{ display: "flex", alignItems: "center", gap: 2, position: "absolute", left: "50%", transform: "translateX(-50%)" }}>
               {["Features", "Pricing", "Resources", "Offers"].map((item) => (
                 <a
                   key={item}
@@ -95,7 +95,7 @@ export default function HomeMainPage() {
         </nav>
 
         {/* Hero content — two containers */}
-        <div style={{
+        <div className="hm-hero-grid" style={{
           display: "grid",
           gridTemplateColumns: "1fr 1fr",
           alignItems: "stretch",
@@ -103,7 +103,7 @@ export default function HomeMainPage() {
         }}>
 
           {/* Left container — text */}
-          <div style={{
+          <div className="hm-hero-left" style={{
             padding: "96px 64px 96px 155px",
             display: "flex",
             flexDirection: "column",
@@ -141,7 +141,7 @@ export default function HomeMainPage() {
           </div>
 
           {/* Right container — image */}
-          <div style={{
+          <div className="hm-hero-right" style={{
             overflow: "hidden",
             height: "calc(100vh - 83px)",
             background: "#712AE2",
@@ -156,6 +156,7 @@ export default function HomeMainPage() {
                 alt="FlatPurse Flow app"
                 width={650}
                 height={930}
+                className="hm-hero-img"
                 style={{ marginBottom: -160 }}
                 priority
               />
@@ -182,7 +183,7 @@ export default function HomeMainPage() {
       </div>
 
       {/* ── Value section ── */}
-      <section style={{
+      <section className="h3-value-section" style={{
         background: "#f8f4ff",
         padding: "100px 155px 120px",
         position: "relative",

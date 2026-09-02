@@ -882,6 +882,35 @@ body {
 }
 
 
+/* ── Home main landing page (purple hero) ── */
+@media (max-width: 900px) {
+  .hm-hero-block {
+    min-height: auto !important;
+  }
+  .hm-nav-inner {
+    padding: 0 20px !important;
+  }
+  .hm-nav-links {
+    display: none !important;
+  }
+  .hm-hero-grid {
+    grid-template-columns: 1fr !important;
+    min-height: auto !important;
+  }
+  .hm-hero-left {
+    padding: 56px 24px 40px !important;
+  }
+  .hm-hero-right {
+    height: auto !important;
+    padding-top: 0 !important;
+  }
+  .hm-hero-img {
+    width: 80% !important;
+    height: auto !important;
+    margin-bottom: -12% !important;
+  }
+}
+
 @media (max-width: 900px) {
   .h3-bg-blob {
     width: 300% !important;
