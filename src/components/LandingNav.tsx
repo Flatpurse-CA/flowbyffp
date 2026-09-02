@@ -14,7 +14,6 @@ const NAV_LINKS = [
   { key: "home", label: "Home", href: "/" },
   { key: "features", label: "Features", href: "/features" },
   { key: "pricing", label: "Pricing", href: "/pricing" },
-  { key: "resources", label: "Resources", href: "/#resources" },
 ];
 
 export default function LandingNav({ active = "home" }: { active?: string }) {
