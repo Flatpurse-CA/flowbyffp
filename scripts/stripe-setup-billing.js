@@ -6,6 +6,8 @@
 // Usage:  node --env-file=.env.local scripts/stripe-setup-billing.js
 //
 // Prints the Price IDs to paste into .env.local as:
+//   STRIPE_PRICE_STARTER_MONTHLY=...
+//   STRIPE_PRICE_STARTER_ANNUAL=...
 //   STRIPE_PRICE_PRO_MONTHLY=...
 //   STRIPE_PRICE_PRO_ANNUAL=...
 //   STRIPE_PRICE_PRO_PLUS_MONTHLY=...
@@ -21,9 +23,12 @@ if (!key) {
 }
 const stripe = new Stripe(key);
 
+// Amounts must stay in step with src/lib/plans.ts (monthlyPrice / annualPrice),
+// which is what the pricing page and dashboard display. Change both together.
 const PLAN_PRODUCTS = [
-  { planKey: "pro", name: "FlatPurse Flow — Pro", monthly: 59, annual: 588 },
-  { planKey: "pro_plus", name: "FlatPurse Flow — Pro+", monthly: 199, annual: 1980 },
+  { planKey: "starter", name: "FlatPurse Flow — Starter", monthly: 39, annual: 390 },
+  { planKey: "pro", name: "FlatPurse Flow — Pro", monthly: 89, annual: 890 },
+  { planKey: "pro_plus", name: "FlatPurse Flow — Pro+", monthly: 189, annual: 1890 },
 ];
 
 const FOUNDERS_COUPONS = [

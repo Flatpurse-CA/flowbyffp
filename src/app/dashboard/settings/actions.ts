@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { requireShop, getShopContext } from "@/lib/dashboard/shop";
 import { stripe } from "@/lib/stripe";
 import { getRequestOrigin } from "@/lib/requestOrigin";
-import { getPlan, getStripePriceId, type BillingInterval } from "@/lib/plans";
+import { getPlan, getStripePriceId, type BillablePlanKey, type BillingInterval } from "@/lib/plans";
 
 export type BusinessHourRow = { weekday: number; open: boolean; start: string; end: string };
 
@@ -87,7 +87,7 @@ export async function getBillingStatus(): Promise<BillingStatus | null> {
  * itself so the customer sees the real price they're agreeing to — the spot is
  * only actually decremented once the webhook sees payment succeed.
  */
-export async function startCheckout(input: { planKey: "pro" | "pro_plus"; interval: BillingInterval; claimFounders: boolean }): Promise<{ url?: string; error?: string }> {
+export async function startCheckout(input: { planKey: BillablePlanKey; interval: BillingInterval; claimFounders: boolean }): Promise<{ url?: string; error?: string }> {
   const ctx = await getShopContext();
   if (!ctx || ctx.role !== "owner") return { error: "Only the shop owner can manage billing" };
   const { supabase, shopId } = await requireShop();
@@ -170,7 +170,9 @@ export async function openBillingPortal(): Promise<{ url?: string; error?: strin
   // portal to manage yet. Rather than dead-ending with an error, start real
   // Checkout for that plan — this is the actual "add a card" path.
   if (!shop.stripe_customer_id || shop.subscription_status !== "active") {
-    const planKey = shop.plan === "pro_plus" ? "pro_plus" : "pro";
+    // Enterprise is sales-negotiated and has no Price, so it falls back to Pro
+    const planKey: BillablePlanKey =
+      shop.plan === "pro_plus" ? "pro_plus" : shop.plan === "starter" ? "starter" : "pro";
     return startCheckout({
       planKey,
       interval: (shop.billing_interval as BillingInterval | null) ?? "monthly",

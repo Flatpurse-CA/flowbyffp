@@ -195,15 +195,19 @@ export function formatCAD(amount: number): string {
   return `C$${amount.toLocaleString("en-CA")}`;
 }
 
-/** Env var names holding the live Stripe Price IDs, created once by scripts/stripe-setup-billing.ts */
-const STRIPE_PRICE_ENV: Record<"pro" | "pro_plus", Record<BillingInterval, string>> = {
+/** Plans that can be checked out. Enterprise is sales-negotiated, so it has no Price. */
+export type BillablePlanKey = "starter" | "pro" | "pro_plus";
+
+/** Env var names holding the live Stripe Price IDs, created once by scripts/stripe-setup-billing.js */
+const STRIPE_PRICE_ENV: Record<BillablePlanKey, Record<BillingInterval, string>> = {
+  starter:  { monthly: "STRIPE_PRICE_STARTER_MONTHLY",  annual: "STRIPE_PRICE_STARTER_ANNUAL" },
   pro:      { monthly: "STRIPE_PRICE_PRO_MONTHLY",      annual: "STRIPE_PRICE_PRO_ANNUAL" },
   pro_plus: { monthly: "STRIPE_PRICE_PRO_PLUS_MONTHLY", annual: "STRIPE_PRICE_PRO_PLUS_ANNUAL" },
 };
 
-export function getStripePriceId(key: "pro" | "pro_plus", interval: BillingInterval): string {
+export function getStripePriceId(key: BillablePlanKey, interval: BillingInterval): string {
   const envName = STRIPE_PRICE_ENV[key][interval];
   const id = process.env[envName];
-  if (!id) throw new Error(`${envName} is not set, run scripts/stripe-setup-billing.ts and add the printed IDs to .env.local`);
+  if (!id) throw new Error(`${envName} is not set, run scripts/stripe-setup-billing.js and add the printed IDs to .env.local`);
   return id;
 }

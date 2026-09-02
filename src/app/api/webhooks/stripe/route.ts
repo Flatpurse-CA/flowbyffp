@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { stripe } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getStripePriceId, type BillingInterval } from "@/lib/plans";
+import { getStripePriceId, type BillablePlanKey, type BillingInterval } from "@/lib/plans";
 
 export async function POST(req: Request) {
   const signature = req.headers.get("stripe-signature");
@@ -49,7 +49,7 @@ export async function POST(req: Request) {
     const session = event.data.object as Stripe.Checkout.Session;
     if (session.mode === "subscription" && session.metadata?.context === "platform_subscription" && session.subscription) {
       const shopId = session.metadata.shop_id;
-      const planKey = session.metadata.plan_key as "pro" | "pro_plus";
+      const planKey = session.metadata.plan_key as BillablePlanKey;
       const interval = session.metadata.interval as BillingInterval;
       const founderClaim = session.metadata.founder_claim === "true";
       const subscriptionId = typeof session.subscription === "string" ? session.subscription : session.subscription.id;
