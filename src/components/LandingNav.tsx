@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Menu, X, Lock } from "lucide-react";
 
 const INK = "#342448";
@@ -18,6 +19,13 @@ const NAV_LINKS = [
 
 export default function LandingNav({ active = "home" }: { active?: string }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const pathname = usePathname();
+
+  // Close on arrival, not on tap: unmounting the link inside its own click
+  // handler can cancel the navigation on touch browsers.
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [pathname]);
 
   return (
     <nav
@@ -49,20 +57,24 @@ export default function LandingNav({ active = "home" }: { active?: string }) {
         </Link>
 
         <div className="h3-nav-links" style={{ display: "flex", alignItems: "center", gap: 32 }}>
-          {NAV_LINKS.map((l) => (
-            <a
-              key={l.key}
-              href={l.href}
-              style={{
-                fontSize: 16,
-                fontWeight: 500,
-                color: l.key === active ? "#000" : NAV_MUTED,
-                textDecoration: "none",
-              }}
-            >
-              {l.label}
-            </a>
-          ))}
+          {NAV_LINKS.map((l) => {
+            const style = {
+              fontSize: 16,
+              fontWeight: 500,
+              color: l.key === active ? "#000" : NAV_MUTED,
+              textDecoration: "none",
+            } as const;
+
+            return l.href.includes("#") ? (
+              <a key={l.key} href={l.href} style={style}>
+                {l.label}
+              </a>
+            ) : (
+              <Link key={l.key} href={l.href} style={style}>
+                {l.label}
+              </Link>
+            );
+          })}
         </div>
 
         <Link
@@ -156,27 +168,30 @@ export default function LandingNav({ active = "home" }: { active?: string }) {
             padding: "10px 20px 18px",
           }}
         >
-          {NAV_LINKS.map((l) => (
-            <a
-              key={l.key}
-              href={l.href}
-              onClick={() => setMenuOpen(false)}
-              style={{
-                display: "block",
-                padding: "14px 4px",
-                fontSize: 16,
-                fontWeight: 500,
-                color: l.key === active ? "#000" : NAV_MUTED,
-                textDecoration: "none",
-                borderBottom: `1px solid ${BORDER}`,
-              }}
-            >
-              {l.label}
-            </a>
-          ))}
+          {NAV_LINKS.map((l) => {
+            const style = {
+              display: "block",
+              padding: "14px 4px",
+              fontSize: 16,
+              fontWeight: 500,
+              color: l.key === active ? "#000" : NAV_MUTED,
+              textDecoration: "none",
+              borderBottom: `1px solid ${BORDER}`,
+            } as const;
+
+            // A same-page hash never changes the pathname, so it closes itself
+            return l.href.includes("#") ? (
+              <a key={l.key} href={l.href} onClick={() => setMenuOpen(false)} style={style}>
+                {l.label}
+              </a>
+            ) : (
+              <Link key={l.key} href={l.href} style={style}>
+                {l.label}
+              </Link>
+            );
+          })}
           <Link
             href="/signup"
-            onClick={() => setMenuOpen(false)}
             style={{
               display: "flex",
               alignItems: "center",
