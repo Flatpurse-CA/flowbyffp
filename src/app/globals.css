@@ -849,6 +849,19 @@ body {
     linear-gradient(100deg, rgba(51, 6, 122, 0.4) 0%, rgba(239, 234, 255, 0.084) 100%) border-box;
 }
 
+/* Mobile nav swaps the Account button for a padlock + menu toggle */
+.h3-nav-mobile {
+  display: none;
+}
+@media (max-width: 900px) {
+  .h3-account-btn {
+    display: none !important;
+  }
+  .h3-nav-mobile {
+    display: flex !important;
+  }
+}
+
 .h3-br-mobile {
   display: none;
 }
