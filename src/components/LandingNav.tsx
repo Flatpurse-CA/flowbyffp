@@ -37,13 +37,20 @@ export default function LandingNav({ active = "home" }: { active?: string }) {
         background: "#ffffff",
       }}
     >
+      {/* Mirrors the hero's gutter and max-width so the logo and Account
+          button line up with the hero container's edges at every width */}
       <div
-        className="h3-shell"
+        className="h3-nav-gutter"
         style={{
           width: "100%",
-          maxWidth: 1240,
+          padding: "0 20px",
+        }}
+      >
+      <div
+        style={{
+          width: "100%",
+          maxWidth: 1830,
           margin: "0 auto",
-          padding: "0 40px",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
@@ -152,6 +159,7 @@ export default function LandingNav({ active = "home" }: { active?: string }) {
           </button>
         </div>
       </div>
+      </div>
 
       {menuOpen && (
         <div
@@ -166,6 +174,7 @@ export default function LandingNav({ active = "home" }: { active?: string }) {
             borderTop: `1px solid ${BORDER}`,
             boxShadow: "0 12px 32px rgba(17,1,41,0.10)",
             padding: "10px 20px 18px",
+            boxSizing: "border-box",
           }}
         >
           {NAV_LINKS.map((l) => {

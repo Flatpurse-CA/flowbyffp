@@ -16,9 +16,15 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const SITE_URL = "https://flow.flatpurse.com";
+const SITE_DESCRIPTION =
+  "The AI-powered booking and client management platform built for salons and stylists.";
+
 export const metadata: Metadata = {
+  // Link previews need absolute image URLs; without this they resolve to localhost
+  metadataBase: new URL(SITE_URL),
   title: "FlatPurse Flow",
-  description: "The AI-powered booking and client management platform built for salons and stylists.",
+  description: SITE_DESCRIPTION,
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
@@ -26,6 +32,18 @@ export const metadata: Metadata = {
   },
   icons: {
     apple: "/icon-192.png",
+  },
+  openGraph: {
+    type: "website",
+    url: SITE_URL,
+    siteName: "FlatPurse Flow",
+    title: "FlatPurse Flow",
+    description: SITE_DESCRIPTION,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "FlatPurse Flow",
+    description: SITE_DESCRIPTION,
   },
 };
 
