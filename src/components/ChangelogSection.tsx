@@ -27,7 +27,7 @@ const ITEMS = [
 
 export default function ChangelogSection() {
   return (
-    <section style={{ background: "#000", padding: "100px 155px 120px" }}>
+    <section className="cl-section" style={{ background: "#000", padding: "100px 155px 120px" }}>
       <style>{`
         @keyframes sweepLine {
           0%   { transform: translateX(-101%); }
@@ -46,10 +46,19 @@ export default function ChangelogSection() {
         .cl-col:nth-child(2) .cl-fill { animation-delay: 0.3s; }
         .cl-col:nth-child(3) .cl-fill { animation-delay: 0.6s; }
         .cl-col:nth-child(4) .cl-fill { animation-delay: 0.9s; }
+        @media (max-width: 900px) {
+          .cl-section { padding: 60px 24px 80px !important; }
+          .cl-header-row { flex-direction: column !important; align-items: flex-start !important; gap: 20px !important; }
+          .cl-grid { grid-template-columns: 1fr 1fr !important; gap: 32px 24px !important; }
+          .cl-col { padding-right: 0 !important; }
+        }
+        @media (max-width: 560px) {
+          .cl-grid { grid-template-columns: 1fr !important; }
+        }
       `}</style>
 
       {/* Header row */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 64 }}>
+      <div className="cl-header-row" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 64 }}>
         <div>
           <AutoPilotChip theme="dark" words={["Why", "FlatPurse", "Flow"]} />
 
@@ -85,7 +94,7 @@ export default function ChangelogSection() {
       </div>
 
       {/* Timeline + items */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 0 }}>
+      <div className="cl-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 0 }}>
         {ITEMS.map((item, i) => (
           <div key={i} className="cl-col" style={{ paddingRight: i < 3 ? 40 : 0 }}>
             {/* Dot + line */}

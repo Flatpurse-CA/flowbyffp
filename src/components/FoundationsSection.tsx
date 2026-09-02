@@ -88,9 +88,16 @@ export default function FoundationsGrid() {
         .fg-title {
           transition: color 0.25s ease;
         }
+        @media (max-width: 900px) {
+          .fg-grid { grid-template-columns: 1fr 1fr !important; }
+        }
+        @media (max-width: 640px) {
+          .fg-grid { grid-template-columns: 1fr !important; }
+          .fg-grid > div { padding: 32px 24px !important; min-height: auto !important; }
+        }
       `}</style>
 
-      <div style={{
+      <div className="fg-grid" style={{
         display: "grid",
         gridTemplateColumns: "1fr 1fr 1fr",
         gap: 12,

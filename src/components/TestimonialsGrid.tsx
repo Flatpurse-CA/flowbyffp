@@ -71,7 +71,7 @@ export default function TestimonialsGrid() {
   const [featured, ...rest] = TESTIMONIALS;
 
   return (
-    <section style={{ background: "#080808", padding: "100px 155px 120px" }}>
+    <section className="tg-section" style={{ background: "#080808", padding: "100px 155px 120px" }}>
       <style>{`
         .tg-card {
           background: rgba(255,255,255,0.03);
@@ -93,10 +93,21 @@ export default function TestimonialsGrid() {
           flex-direction: column;
           justify-content: space-between;
         }
+        @media (max-width: 900px) {
+          .tg-section { padding: 60px 24px 80px !important; }
+          .tg-header-row { flex-direction: column !important; align-items: flex-start !important; gap: 20px !important; }
+          .tg-header-row p { text-align: left !important; max-width: 100% !important; }
+          .tg-main-grid { grid-template-columns: 1fr !important; }
+          .tg-sub-grid { grid-template-columns: 1fr 1fr !important; }
+        }
+        @media (max-width: 560px) {
+          .tg-sub-grid { grid-template-columns: 1fr !important; }
+          .tg-stat-grid { grid-template-columns: 1fr !important; gap: 24px !important; }
+        }
       `}</style>
 
       {/* Header */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 64 }}>
+      <div className="tg-header-row" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 64 }}>
         <div>
           <AutoPilotChip theme="dark" words={["Real", "shops.", "Real", "results."]} />
           <h2 style={{
@@ -117,7 +128,7 @@ export default function TestimonialsGrid() {
       </div>
 
       {/* Grid */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16 }}>
+      <div className="tg-main-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16 }}>
 
         {/* Featured card — spans 1 col, full height */}
         <div className="tg-featured">
@@ -161,7 +172,7 @@ export default function TestimonialsGrid() {
         </div>
 
         {/* Right two columns — 2-col grid of regular cards */}
-        <div style={{ gridColumn: "span 2", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+        <div className="tg-sub-grid" style={{ gridColumn: "span 2", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
           {rest.map((t) => (
             <div key={t.name} className="tg-card">
               <Stars />
@@ -191,7 +202,7 @@ export default function TestimonialsGrid() {
       </div>
 
       {/* Bottom stat bar */}
-      <div style={{
+      <div className="tg-stat-grid" style={{
         marginTop: 64,
         paddingTop: 40,
         borderTop: "1px solid rgba(255,255,255,0.07)",

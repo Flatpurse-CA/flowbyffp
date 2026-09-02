@@ -76,10 +76,10 @@ export default function TestimonialsSection() {
   return (
     <section style={{ background: "#000000", padding: "100px 0 120px", overflow: "hidden" }}>
       {/* Header */}
-      <div style={{ padding: "0 155px", marginBottom: 64 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", gap: 60 }}>
+      <div className="ts-header-pad" style={{ padding: "0 155px", marginBottom: 64 }}>
+        <div className="ts-header-row" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", gap: 60 }}>
           {/* Left */}
-          <div style={{ flex: "0 0 auto", maxWidth: 560 }}>
+          <div className="ts-header-side" style={{ flex: "0 0 auto", maxWidth: 560 }}>
             <AutoPilotChip theme="dark" words={["Trusted", "by", "128+", "owners."]} />
 
             <h2 style={{
@@ -96,7 +96,7 @@ export default function TestimonialsSection() {
           </div>
 
           {/* Right */}
-          <div style={{ flex: "0 0 auto", maxWidth: 400 }}>
+          <div className="ts-header-side" style={{ flex: "0 0 auto", maxWidth: 400 }}>
             <p style={{ fontSize: 16, color: "rgba(255,255,255,0.45)", lineHeight: 1.7, margin: "0 0 28px" }}>
               From barbershops to beauty lounges, shop owners using FlatPurse Flow recover more revenue and spend less time on admin.
             </p>
@@ -175,9 +175,16 @@ export default function TestimonialsSection() {
           transition: opacity 0.3s ease 0.26s, transform 0.4s cubic-bezier(0.16,1,0.3,1) 0.26s;
         }
         .t-card:hover .t-meta { opacity: 1; transform: translateY(0); }
+        @media (max-width: 900px) {
+          .ts-header-pad { padding: 0 24px !important; }
+          .ts-header-row { flex-direction: column !important; align-items: flex-start !important; gap: 24px !important; }
+          .ts-header-side { max-width: 100% !important; }
+          .ts-cards-row { padding-left: 24px !important; padding-right: 24px !important; }
+        }
       `}</style>
       <div
         ref={scrollRef}
+        className="ts-cards-row"
         style={{
           display: "flex",
           gap: 16,

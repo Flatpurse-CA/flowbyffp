@@ -73,10 +73,15 @@ export default function FeatureTabs() {
           from { transform: translateY(8px); opacity: 0; }
           to   { transform: translateY(0);   opacity: 1; }
         }
+        @media (max-width: 900px) {
+          .ft-outer { padding: 28px 24px !important; }
+          .ft-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
+          .ft-image { position: relative !important; top: 0 !important; }
+        }
       `}</style>
 
       <div style={{ marginTop: 80, width: "100%", textAlign: "left" }}>
-        <div style={{
+        <div className="ft-outer" style={{
           background: "#fff",
           borderRadius: 12,
           willChange: "transform, opacity",
@@ -84,7 +89,7 @@ export default function FeatureTabs() {
           padding: "48px 48px",
           boxShadow: "0 4px 40px rgba(113,42,226,0.06)",
         }}>
-        <div style={{
+        <div className="ft-grid" style={{
           display: "grid",
           gridTemplateColumns: "1fr 1fr",
           gap: 80,
@@ -202,7 +207,7 @@ export default function FeatureTabs() {
           </div>
 
           {/* Right — image panel */}
-          <div style={{
+          <div className="ft-image" style={{
             borderRadius: 10,
             overflow: "hidden",
             aspectRatio: "4 / 5",

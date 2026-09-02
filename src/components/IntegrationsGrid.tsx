@@ -79,7 +79,7 @@ const FAQS = [
 export default function IntegrationsGrid() {
   const [open, setOpen] = useState<number | null>(null);
   return (
-    <section style={{ background: "#fff", padding: "100px 155px 120px", position: "relative" }}>
+    <section className="ig-section" style={{ background: "#fff", padding: "100px 155px 120px", position: "relative" }}>
       {/* Header */}
       <div style={{ textAlign: "center", marginBottom: 64 }}>
         <div style={{
@@ -108,7 +108,7 @@ export default function IntegrationsGrid() {
       </div>
 
       {/* 4×2 Grid */}
-      <div style={{
+      <div className="ig-grid" style={{
         display: "grid",
         gridTemplateColumns: "repeat(4, 1fr)",
         gap: 0,
@@ -200,6 +200,18 @@ export default function IntegrationsGrid() {
         .faq-row:hover .faq-num {
           opacity: 1;
           transform: scale(1.15);
+        }
+        @media (max-width: 900px) {
+          .ig-section { padding: 60px 24px 80px !important; }
+          .ig-grid { grid-template-columns: 1fr 1fr !important; }
+          .ig-cell {
+            padding: 28px 24px !important;
+            border-top: 1px solid rgba(0,0,0,0.08) !important;
+            border-left: 1px solid rgba(0,0,0,0.08) !important;
+          }
+        }
+        @media (max-width: 560px) {
+          .ig-grid { grid-template-columns: 1fr !important; }
         }
       `}</style>
     </section>
