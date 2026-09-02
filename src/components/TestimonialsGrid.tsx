@@ -28,7 +28,7 @@ const TESTIMONIALS = [
   {
     name: "Temi Okafor",
     shop: "The Curl Studio",
-    type: "Hair Salon",
+    type: "Natural Hair",
     quote: "AutoPilot books clients while I sleep. I wake up to a full calendar every single morning.",
     img: "/sd2.jpg",
     featured: false,
@@ -36,7 +36,7 @@ const TESTIMONIALS = [
   {
     name: "Seun Adeyemi",
     shop: "Fade Factory",
-    type: "Barbershop",
+    type: "Grooming Lounge",
     quote: "The AI front desk handles every DM. I haven't had to reply to a booking request in weeks.",
     img: "/sd4.jpg",
     featured: false,
@@ -51,8 +51,8 @@ const TESTIMONIALS = [
   },
   {
     name: "Kola Mensah",
-    shop: "Precision Cuts",
-    type: "Barbershop",
+    shop: "Still Waters Spa",
+    type: "Spa & Wellness",
     quote: "Revenue up 35% in two months. The win-back flow alone paid for the whole year.",
     img: "/sd5.jpg",
     featured: false,
