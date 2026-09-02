@@ -882,6 +882,20 @@ body {
 }
 
 
+/* Scalloped section divider, recolored via mask so it blends into the section below */
+.ff-divider-purple {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1924 / 126;
+  background-color: #712ae2;
+  -webkit-mask-image: url("/ffdoe.svg");
+  mask-image: url("/ffdoe.svg");
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+
 /* ── Home main landing page (purple hero) ── */
 @media (max-width: 900px) {
   .hm-hero-block {

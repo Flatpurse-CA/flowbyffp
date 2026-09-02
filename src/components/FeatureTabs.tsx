@@ -74,13 +74,17 @@ export default function FeatureTabs() {
           to   { transform: translateY(0);   opacity: 1; }
         }
         @media (max-width: 900px) {
+          .ft-wrap { margin-top: 32px !important; }
           .ft-outer { padding: 28px 24px !important; }
+          /* Reserving space for hidden descriptions leaves big gaps on a narrow column */
+          .ft-desc:not(.ft-desc-on) { display: none !important; }
+          .ft-tab { min-height: 0 !important; padding: 14px 0 !important; }
           .ft-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
           .ft-image { position: relative !important; top: 0 !important; }
         }
       `}</style>
 
-      <div style={{ marginTop: 80, width: "100%", textAlign: "left" }}>
+      <div className="ft-wrap" style={{ marginTop: 80, width: "100%", textAlign: "left" }}>
         <div className="ft-outer" style={{
           background: "#fff",
           borderRadius: 12,
@@ -115,6 +119,7 @@ export default function FeatureTabs() {
                 <button
                   key={f.id}
                   onClick={() => setActiveIndex(i)}
+                  className="ft-tab"
                   style={{
                     all: "unset",
                     display: "flex",
@@ -170,7 +175,7 @@ export default function FeatureTabs() {
                       {f.title}
                     </p>
                     {/* Description: opacity only — no max-height, no layout shift */}
-                    <p style={{
+                    <p className={isActive ? "ft-desc ft-desc-on" : "ft-desc"} style={{
                       fontSize: 13.5,
                       color: "rgba(10,10,10,0.55)",
                       lineHeight: 1.65,

@@ -14,6 +14,10 @@ export default function ScrollZoom({ children, minScale = 0.72 }: Props) {
     const el = ref.current;
     if (!el) return;
 
+    // The scale-down leaves dead space above and below on tall mobile content,
+    // since a transform shrinks the paint but not the layout box.
+    const mq = window.matchMedia("(max-width: 900px)");
+
     const onScroll = () => {
       const rect = el.getBoundingClientRect();
       const vh = window.innerHeight;
@@ -30,10 +34,24 @@ export default function ScrollZoom({ children, minScale = 0.72 }: Props) {
       el.style.opacity = String(0.4 + 0.6 * progress);
     };
 
-    window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
+    const apply = () => {
+      if (mq.matches) {
+        window.removeEventListener("scroll", onScroll);
+        el.style.transform = "none";
+        el.style.opacity = "1";
+      } else {
+        window.addEventListener("scroll", onScroll, { passive: true });
+        onScroll();
+      }
+    };
 
-    return () => window.removeEventListener("scroll", onScroll);
+    apply();
+    mq.addEventListener("change", apply);
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      mq.removeEventListener("change", apply);
+    };
   }, [minScale]);
 
   return (

@@ -183,7 +183,7 @@ export default function IntegrationsGrid() {
       </div>
 
       <div style={{ position: "absolute", bottom: 0, left: 0, width: "100%", zIndex: 10, pointerEvents: "none" }}>
-        <img src="/ffdoe.svg" alt="" style={{ width: "100%", display: "block", filter: "brightness(0)" }} />
+        <div className="ff-divider-purple" />
       </div>
 
       <style>{`
