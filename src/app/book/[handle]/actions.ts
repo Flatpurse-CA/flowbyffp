@@ -9,6 +9,7 @@ import { ensureStripeCustomerId } from "@/lib/stripeCustomer";
 import { attributeAutopilotRevenue } from "@/lib/dashboard/autopilotAttribution";
 import { computeAccessStatus } from "@/lib/dashboard/accessStatus";
 import { checkRateLimit } from "@/lib/rateLimit";
+import { fillBusinessHoursDefaults } from "@/lib/dashboard/businessHours";
 
 const SLOT_INTERVAL_MINUTES = 30;
 
@@ -28,12 +29,14 @@ export async function getAvailableSlots(input: {
   const durationMinutes = service.duration_minutes as number;
 
   const weekday = new Date(`${input.date}T00:00:00Z`).getUTCDay();
-  const { data: hoursRow } = await admin
+  const { data: hoursRows } = await admin
     .from("business_hours")
-    .select("open, start_time, end_time")
-    .eq("shop_id", input.shopId)
-    .eq("weekday", weekday)
-    .maybeSingle();
+    .select("weekday, open, start_time, end_time")
+    .eq("shop_id", input.shopId);
+  // No rows at all means the shop has never visited Settings > Hours — fall back
+  // to the same Mon-Sat 9-6 default the settings screen itself shows, rather
+  // than treating an unconfigured shop as closed every day (see page.tsx).
+  const hoursRow = fillBusinessHoursDefaults(hoursRows ?? []).find(r => r.weekday === weekday);
   if (!hoursRow || !hoursRow.open) return [];
 
   let dayStart = shopWallTimeToUTC(input.date, String(hoursRow.start_time).slice(0, 5));

@@ -77,3 +77,29 @@ export async function saveOnboardingTeam(members: { name: string; role: string }
   revalidatePath("/dashboard/team");
   return {};
 }
+
+// Same flow-id -> column mapping as FLOW_COLUMN in dashboard/settings/actions.ts.
+// Onboarding's "react" (30-day reactivation) is that screen's "winback".
+const ONBOARDING_FLOW_COLUMN: Record<string, string> = {
+  noshow: "noshow_recovery_enabled",
+  react: "winback_enabled",
+  filler: "filler_enabled",
+  frontdesk: "frontdesk_enabled",
+  birthday: "birthday_enabled",
+};
+
+export async function saveOnboardingFlows(flows: { id: string; on: boolean }[]): Promise<{ error?: string }> {
+  const { supabase, shopId } = await requireShop();
+  const update: Record<string, boolean> = {};
+  for (const f of flows) {
+    const column = ONBOARDING_FLOW_COLUMN[f.id];
+    if (column) update[column] = f.on;
+  }
+  if (Object.keys(update).length === 0) return {};
+
+  const { error } = await supabase.from("shops").update(update).eq("id", shopId);
+  if (error) return { error: error.message };
+  revalidatePath("/dashboard/settings");
+  revalidatePath("/dashboard/autopilot");
+  return {};
+}

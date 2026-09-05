@@ -14,9 +14,12 @@ export default async function OnboardingPage({
     const { data, error } = await supabase.auth.getUser();
     if (error || !data.user) redirect("/login");
 
-    const email = data.user.email ?? "";
-    const raw = email.split("@")[0];
-    const displayName = raw.charAt(0).toUpperCase() + raw.slice(1);
+    const { data: profile } = await supabase.from("profiles").select("first_name").eq("id", data.user.id).maybeSingle();
+    let displayName = profile?.first_name as string | undefined;
+    if (!displayName) {
+      const raw = (data.user.email ?? "").split("@")[0];
+      displayName = raw.charAt(0).toUpperCase() + raw.slice(1);
+    }
     return <OnboardingFlow displayName={displayName} />;
   }
 

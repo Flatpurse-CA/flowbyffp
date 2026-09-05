@@ -1,6 +1,7 @@
 import { notFound, permanentRedirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getCustomerContext } from "@/lib/dashboard/customer";
+import { fillBusinessHoursDefaults } from "@/lib/dashboard/businessHours";
 import { BookingClient } from "./BookingClient";
 
 export const dynamic = "force-dynamic";
@@ -85,7 +86,7 @@ export default async function BookingPage({ params }: { params: Promise<{ handle
       }}
       services={(services ?? []) as { id: string; name: string; price: number; duration_minutes: number; category: string | null }[]}
       staff={(staff ?? []) as { id: string; full_name: string; role: string | null; color: string }[]}
-      businessHours={(hours ?? []) as { weekday: number; open: boolean; start_time: string; end_time: string }[]}
+      businessHours={fillBusinessHoursDefaults((hours ?? []) as { weekday: number; open: boolean; start_time: string; end_time: string }[])}
       initialCustomer={customer ? { fullName: customer.fullName, email: customer.email } : null}
       reviews={reviews}
       canReview={canReview}

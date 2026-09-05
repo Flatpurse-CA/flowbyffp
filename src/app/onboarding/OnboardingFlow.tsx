@@ -20,7 +20,7 @@ import {
   Check,
 } from "lucide-react";
 import { StepProgress } from "@/components/StepProgress";
-import { checkHandleAvailability, claimHandle, saveOnboardingServices, saveOnboardingTeam } from "./actions";
+import { checkHandleAvailability, claimHandle, saveOnboardingServices, saveOnboardingTeam, saveOnboardingFlows } from "./actions";
 import { logout } from "@/app/dashboard/actions";
 
 const easing = "cubic-bezier(0.16,1,0.3,1)";
@@ -766,6 +766,9 @@ export function OnboardingFlow({ displayName }: { displayName: string }) {
         if (result.error) { setStepError(result.error); return; }
       } else if (step === 3) {
         const result = await saveOnboardingTeam(members.map(m => ({ name: m.name, role: m.role })));
+        if (result.error) { setStepError(result.error); return; }
+      } else if (step === 4) {
+        const result = await saveOnboardingFlows(flows.map(f => ({ id: f.id, on: f.on })));
         if (result.error) { setStepError(result.error); return; }
       }
       setStep((s) => s + 1);
