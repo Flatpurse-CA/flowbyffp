@@ -12,6 +12,8 @@ export type ShopContext = {
   accessStatus: AccessStatus;
   trialEndsAt: Date;
   graceEndsAt: Date;
+  /** null means this owner never finished onboarding (never claimed a handle) — always null for staff. */
+  handle: string | null;
 };
 
 // `auth.getUser()` is a real network round trip to Supabase's Auth server,
@@ -37,13 +39,13 @@ export const getShopContext = cache(async (): Promise<ShopContext | null> => {
 
   const { data: shop } = await supabase
     .from("shops")
-    .select("id, trial_started_at, subscription_status, trial_override, trial_paused_at")
+    .select("id, handle, trial_started_at, subscription_status, trial_override, trial_paused_at")
     .eq("owner_id", user.id)
     .maybeSingle();
 
   if (shop) {
     const { status, trialEndsAt, graceEndsAt } = computeAccessStatus(shop as { trial_started_at: string; subscription_status: string | null; trial_override: boolean; trial_paused_at: string | null });
-    return { shopId: shop.id as string, role: "owner", staffId: null, staffName: null, accessStatus: status, trialEndsAt, graceEndsAt };
+    return { shopId: shop.id as string, role: "owner", staffId: null, staffName: null, accessStatus: status, trialEndsAt, graceEndsAt, handle: (shop.handle as string | null) ?? null };
   }
 
   const { data: staff } = await supabase
@@ -57,7 +59,7 @@ export const getShopContext = cache(async (): Promise<ShopContext | null> => {
     const { status, trialEndsAt, graceEndsAt } = staffShop
       ? computeAccessStatus(staffShop)
       : { status: "inactive" as const, trialEndsAt: new Date(0), graceEndsAt: new Date(0) };
-    return { shopId: staff.shop_id as string, role: "staff", staffId: staff.id as string, staffName: staff.full_name as string, accessStatus: status, trialEndsAt, graceEndsAt };
+    return { shopId: staff.shop_id as string, role: "staff", staffId: staff.id as string, staffName: staff.full_name as string, accessStatus: status, trialEndsAt, graceEndsAt, handle: null };
   }
 
   return null;

@@ -9,6 +9,13 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   const ctx = await getShopContext();
 
+  // An owner who never finished onboarding (most commonly: verified their
+  // email but got bounced by the /signup/verify race fixed in 84a1b7d, or
+  // just closed the tab mid-wizard) has a shop row but no handle. Sending
+  // them here instead of an empty, unconfigured dashboard means logging back
+  // in actually finishes the job instead of leaving them stuck a second way.
+  if (ctx && ctx.role === "owner" && !ctx.handle) redirect("/onboarding");
+
   if (!ctx) {
     return (
       <div style={{ display: "flex", minHeight: "100vh", alignItems: "center", justifyContent: "center", background: "rgb(10,10,12)", padding: "0 24px" }}>
