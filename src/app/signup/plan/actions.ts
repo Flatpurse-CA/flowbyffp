@@ -2,7 +2,7 @@
 
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient, isEmailAlreadyConfirmed } from "@/lib/supabase/admin";
 import { getOnboardingContext } from "@/lib/onboarding";
 import { sendOtpEmail } from "@/lib/resend";
 
@@ -33,7 +33,12 @@ export async function choosePlan(formData: FormData) {
   const cookieStore = await cookies();
   const email = cookieStore.get("onboarding_email")?.value;
 
-  if (email) {
+  // Defense in depth: this normally only runs on a still-unconfirmed onboarding
+  // account, but a stale cached /signup/plan page revisited after the account
+  // was already confirmed (e.g. browser back button) must not be allowed to
+  // trigger generateLink({type:"signup"}) — see isEmailAlreadyConfirmed's
+  // comment for why that deletes the account instead of just resending a code.
+  if (email && !(await isEmailAlreadyConfirmed(email))) {
     const { data: profile } = await admin
       .from("profiles")
       .select("first_name")

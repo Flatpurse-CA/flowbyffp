@@ -2,7 +2,7 @@
 
 import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient, isEmailAlreadyConfirmed } from "@/lib/supabase/admin";
 import { sendOtpEmail } from "@/lib/resend";
 import { checkRateLimit } from "@/lib/rateLimit";
 
@@ -31,6 +31,15 @@ export async function resendCode(email: string): Promise<{ error?: string }> {
   // The password param is required by generateLink's signup type but is only used at
   // initial account creation — passing a throwaway value here does not touch the
   // user's real password (verified directly against the Supabase auth API).
+  // Same trap as createAccount: generateLink({type:"signup"}) on an email that's
+  // already confirmed deletes the account instead of updating it. Someone
+  // stuck on a stale /signup/verify page after already finishing signup in
+  // another tab must never be able to nuke their own live account with a
+  // stray click of "Resend code".
+  if (await isEmailAlreadyConfirmed(email)) {
+    return { error: "This account is already verified — try logging in instead." };
+  }
+
   const admin = createAdminClient();
 
   const { data: linkData, error } = await admin.auth.admin.generateLink({

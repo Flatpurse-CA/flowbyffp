@@ -2,7 +2,7 @@
 
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient, isEmailAlreadyConfirmed } from "@/lib/supabase/admin";
 import { validatePassword } from "@/lib/passwordPolicy";
 
 const ONBOARDING_COOKIE_MAX_AGE = 60 * 30;
@@ -19,6 +19,16 @@ export async function createAccount(formData: FormData) {
   const passwordError = validatePassword(password);
   if (passwordError) {
     redirect(`/signup?error=${encodeURIComponent(passwordError)}`);
+  }
+
+  // generateLink({type:"signup"}) against an email that already has a confirmed
+  // account doesn't update it — it deletes the account (and everything owned by
+  // it: profile, shop, staff, appointments, all of it) and replaces it with a
+  // blank unconfirmed one. Someone re-submitting this form for an email they
+  // already have a real account under — most likely because they forgot and
+  // meant to log in — must never be allowed to hit that path.
+  if (await isEmailAlreadyConfirmed(email)) {
+    redirect(`/login?error=${encodeURIComponent("You already have an account with this email — log in instead.")}`);
   }
 
   const admin = createAdminClient();
