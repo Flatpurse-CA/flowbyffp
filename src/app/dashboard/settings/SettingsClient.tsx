@@ -122,12 +122,15 @@ type Flow = {
   enabled: boolean; channel: string; delay: string;
 };
 
+// channel reflects how each flow's edge function actually sends today (all via
+// Resend email — see supabase/functions/autopilot-{nightly,engine}) except
+// frontdesk, which genuinely uses Twilio SMS when a client texts in.
 const INITIAL_FLOWS: Flow[] = [
-  { key:"rebooking",   name:"Rebooking reminder",   description:"Nudge clients to book when they're due",                  enabled:true,  channel:"SMS",   delay:"28 days after last visit"   },
-  { key:"noshow",      name:"No-show recovery",      description:"Re-engage clients who missed their appointment",          enabled:true,  channel:"SMS",   delay:"2 hours after no-show"      },
+  { key:"rebooking",   name:"Rebooking reminder",   description:"Nudge clients to book when they're due",                  enabled:true,  channel:"Email", delay:"28 days after last visit"   },
+  { key:"noshow",      name:"No-show recovery",      description:"Re-engage clients who missed their appointment",          enabled:true,  channel:"Email", delay:"2 hours after no-show"      },
   { key:"winback",     name:"30-day win-back",        description:"Bring back clients who haven't visited in a month",      enabled:true,  channel:"Email", delay:"30 days of inactivity"      },
-  { key:"birthday",    name:"Birthday offer",         description:"Automatic birthday treat to loyal clients",              enabled:true,  channel:"SMS",   delay:"3 days before birthday"     },
-  { key:"lastminute",  name:"Last-minute slot filler","description":"Fill cancellations with nearby available clients",     enabled:false, channel:"SMS",   delay:"On cancellation"            },
+  { key:"birthday",    name:"Birthday offer",         description:"Automatic birthday treat to loyal clients",              enabled:true,  channel:"Email", delay:"3 days before birthday"     },
+  { key:"lastminute",  name:"Last-minute slot filler","description":"Fill cancellations with nearby available clients",     enabled:false, channel:"Email", delay:"On cancellation"            },
   { key:"frontdesk",   name:"AI front desk",          description:"Instantly respond to client messages 24/7",             enabled:false, channel:"SMS",   delay:"Immediate"                  },
 ];
 
@@ -160,7 +163,7 @@ function buildHourRows(initial: BusinessHourRow[]): HourRow[] {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export function SettingsClient({ shopId, initialBusinessHours, initialStripeConnected, initialBookingUrl, initialBilling, initialFlowFlags, initialNotificationPrefs, initialTaxRate, initialTaxInclusive, initialBusinessProfile, initialProfileImageUrl, initialCoverImageUrl }: { shopId: string | null; initialBusinessHours: BusinessHourRow[]; initialStripeConnected: boolean; initialBookingUrl: string | null; initialBilling: BillingStatus | null; initialFlowFlags: Record<FlowKey, boolean>; initialNotificationPrefs: NotificationPrefs; initialTaxRate: number | null; initialTaxInclusive: boolean; initialBusinessProfile: BusinessProfile; initialProfileImageUrl: string | null; initialCoverImageUrl: string | null }) {
+export function SettingsClient({ shopId, initialBusinessHours, initialStripeConnected, initialBookingUrl, initialBilling, initialFlowFlags, initialNotificationPrefs, initialTaxRate, initialTaxInclusive, initialBusinessProfile, initialProfileImageUrl, initialCoverImageUrl, twilioConfigured }: { shopId: string | null; initialBusinessHours: BusinessHourRow[]; initialStripeConnected: boolean; initialBookingUrl: string | null; initialBilling: BillingStatus | null; initialFlowFlags: Record<FlowKey, boolean>; initialNotificationPrefs: NotificationPrefs; initialTaxRate: number | null; initialTaxInclusive: boolean; initialBusinessProfile: BusinessProfile; initialProfileImageUrl: string | null; initialCoverImageUrl: string | null; twilioConfigured: boolean }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab") as TabLabel | null;
@@ -336,6 +339,7 @@ export function SettingsClient({ shopId, initialBusinessHours, initialStripeConn
   };
 
   const toggleFlow = (key: FlowKey) => {
+    if (key === "frontdesk" && !twilioConfigured) return;
     const next = !flows.find(f => f.key === key)?.enabled;
     setFlows(f => f.map(fl => fl.key === key ? { ...fl, enabled: next } : fl));
     setFlowSaving(key);
@@ -703,26 +707,31 @@ export function SettingsClient({ shopId, initialBusinessHours, initialStripeConn
           <div style={card}>
             <SectionLabel>Automation flows</SectionLabel>
             <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
-              {flows.map((fl, i) => (
+              {flows.map((fl, i) => {
+                const locked = fl.key === "frontdesk" && !twilioConfigured;
+                return (
                 <div key={fl.key} style={{ borderBottom: i < flows.length - 1 ? "1px solid var(--dw04)" : "none" }}>
+
                   {/* Row */}
                   <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "15px 0" }}>
                     {/* Toggle */}
                     <button
                       onClick={() => toggleFlow(fl.key)}
-                      disabled={flowSaving === fl.key}
+                      disabled={flowSaving === fl.key || locked}
                       style={{
-                        width: 38, height: 22, borderRadius: 11, border: "none", cursor: "pointer", flexShrink: 0,
+                        width: 38, height: 22, borderRadius: 11, border: "none", cursor: locked ? "not-allowed" : "pointer", flexShrink: 0,
                         background: fl.enabled ? "rgb(109,40,217)" : "var(--dw1)",
                         position: "relative", transition: "background 0.2s",
-                        opacity: flowSaving === fl.key ? 0.6 : 1,
+                        opacity: flowSaving === fl.key || locked ? 0.5 : 1,
                       }}>
                       <span style={{ position: "absolute", top: 3, left: fl.enabled ? 18 : 3, width: 16, height: 16, borderRadius: "50%", background: "white", transition: "left 0.2s" }} />
                     </button>
 
                     <div style={{ flex: 1 }}>
                       <p style={{ color: fl.enabled ? "var(--dtext)" : "var(--dw35)", fontSize: 13.5, fontWeight: 700, margin: "0 0 2px" }}>{fl.name}</p>
-                      <p style={{ color: "var(--dw3)", fontSize: 12, margin: 0 }}>{fl.description}</p>
+                      <p style={{ color: "var(--dw3)", fontSize: 12, margin: 0 }}>
+                        {locked ? "Requires a connected SMS number — contact support to set this up." : fl.description}
+                      </p>
                     </div>
 
                     <div style={{ textAlign: "right", marginRight: 10 }}>
@@ -779,7 +788,8 @@ export function SettingsClient({ shopId, initialBusinessHours, initialStripeConn
                     </div>
                   )}
                 </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </>

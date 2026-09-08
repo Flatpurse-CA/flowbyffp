@@ -5,6 +5,7 @@ import { getShopContext, getAuthUser } from "@/lib/dashboard/shop";
 import { getRequestOrigin } from "@/lib/requestOrigin";
 import { getBusinessHours, getStripeStatus, getBillingStatus } from "./actions";
 import { SettingsClient } from "./SettingsClient";
+import { twilioConfigured } from "@/lib/twilio";
 
 export const dynamic = "force-dynamic";
 export const fetchCache = "force-no-store";
@@ -73,6 +74,7 @@ export default async function SettingsPage() {
         initialBusinessProfile={initialBusinessProfile}
         initialProfileImageUrl={(shop?.profile_image_url as string | undefined) ?? null}
         initialCoverImageUrl={(shop?.cover_image_url as string | undefined) ?? null}
+        twilioConfigured={twilioConfigured()}
       />
     </Suspense>
   );
