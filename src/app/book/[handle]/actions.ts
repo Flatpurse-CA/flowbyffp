@@ -3,7 +3,8 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getCustomerContext } from "@/lib/dashboard/customer";
 import { shopWallTimeToUTC } from "@/lib/dashboard/shopTime";
-import { sendBookingConfirmationEmail } from "@/lib/resend";
+import { sendBookingConfirmationEmail, sendNewBookingAlertEmail } from "@/lib/resend";
+import { getRequestOrigin } from "@/lib/requestOrigin";
 import { stripe } from "@/lib/stripe";
 import { ensureStripeCustomerId } from "@/lib/stripeCustomer";
 import { attributeAutopilotRevenue } from "@/lib/dashboard/autopilotAttribution";
@@ -117,7 +118,7 @@ export async function createPublicBooking(input: {
 
   const admin = createAdminClient();
 
-  const { data: shop } = await admin.from("shops").select("id, name, street_address, city, province, phone, trial_started_at, subscription_status, trial_override, trial_paused_at").eq("id", input.shopId).maybeSingle();
+  const { data: shop } = await admin.from("shops").select("id, owner_id, name, street_address, city, province, phone, trial_started_at, subscription_status, trial_override, trial_paused_at").eq("id", input.shopId).maybeSingle();
   if (!shop) return { error: "This shop couldn't be found" };
 
   const { status: shopAccessStatus } = computeAccessStatus(shop as { trial_started_at: string; subscription_status: string | null; trial_override: boolean; trial_paused_at: string | null });
@@ -201,6 +202,22 @@ export async function createPublicBooking(input: {
     });
   } catch {
     // Booking already succeeded — a failed confirmation email shouldn't fail the booking itself.
+  }
+
+  try {
+    const { data: ownerRes } = await admin.auth.admin.getUserById(shop.owner_id as string);
+    if (ownerRes?.user?.email) {
+      const origin = await getRequestOrigin();
+      await sendNewBookingAlertEmail(ownerRes.user.email, {
+        clientName: ctx.fullName,
+        serviceName: service.name as string,
+        startsAt: input.startsAt,
+        stylistName,
+        dashboardUrl: `${origin}/dashboard/appointments`,
+      });
+    }
+  } catch {
+    // Non-fatal — the booking already succeeded.
   }
 
   return { appointmentId: inserted.id as string };

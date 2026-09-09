@@ -81,6 +81,7 @@ function statusLabel(dark: boolean): Record<AppointmentStatus, { label: string; 
     pending:   { label: "Pending",   color: dark ? "rgba(255,255,255,0.5)"  : "rgba(0,0,0,0.55)",  bg: dark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.08)" },
     deposit:   { label: "⚠ Deposit", color: "rgb(251,191,36)",                                     bg: "rgba(245,158,11,0.1)"   },
     cancelled: { label: "Cancelled", color: dark ? "rgba(255,255,255,0.25)" : "rgba(0,0,0,0.32)",  bg: dark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.045)" },
+    no_show:   { label: "No-show",   color: "white", bg: "rgb(180,83,9)" },
   };
 }
 const UP_NEXT = { label: "Up next", color: "rgb(139,92,246)", bg: "rgba(109,40,217,0.14)" };
@@ -136,7 +137,7 @@ export function HomeClient(props: OwnerProps | StaffProps) {
 function StaffSchedule({ schedule }: { schedule: AppointmentRow[] }) {
   const { dark, T } = useDashboardTheme();
   const now = new Date();
-  const nextId = schedule.find(a => a.status !== "completed" && a.status !== "cancelled" && new Date(a.starts_at) >= now)?.id;
+  const nextId = schedule.find(a => a.status !== "completed" && a.status !== "cancelled" && a.status !== "no_show" && new Date(a.starts_at) >= now)?.id;
 
   return (
     <div style={cardStyle(dark)}>
@@ -263,7 +264,7 @@ function OwnerPopulated(props: OwnerProps) {
   const topNeed = needsYou[0] ?? null;
   const paymentNeed = needsYou.find(n => n.kind === "payment") ?? null;
   const now = new Date();
-  const nextId = todaySchedule.find(a => a.status !== "completed" && a.status !== "cancelled" && new Date(a.starts_at) >= now)?.id;
+  const nextId = todaySchedule.find(a => a.status !== "completed" && a.status !== "cancelled" && a.status !== "no_show" && new Date(a.starts_at) >= now)?.id;
 
   const primaryText = dark ? "rgb(250,250,250)" : "rgb(12,12,20)";
   const faintChevron = dark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.28)";

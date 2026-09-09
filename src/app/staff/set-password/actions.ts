@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { validatePassword } from "@/lib/passwordPolicy";
+import { sendStaffActivatedEmail } from "@/lib/resend";
 
 export async function setStaffPassword(formData: FormData) {
   const password = formData.get("password") as string;
@@ -24,10 +25,24 @@ export async function setStaffPassword(formData: FormData) {
   }
 
   const admin = createAdminClient();
-  await admin
+  const { data: staff } = await admin
     .from("staff")
     .update({ invite_status: "accepted", accepted_at: new Date().toISOString() })
-    .eq("user_id", userData.user.id);
+    .eq("user_id", userData.user.id)
+    .select("full_name, shop_id")
+    .maybeSingle();
+
+  if (staff && userData.user.email) {
+    const { data: shop } = await admin.from("shops").select("name").eq("id", staff.shop_id).maybeSingle();
+    try {
+      await sendStaffActivatedEmail(userData.user.email, {
+        shopName: (shop?.name as string | undefined) ?? "your shop",
+        firstName: (staff.full_name as string).split(" ")[0],
+      });
+    } catch {
+      // Non-fatal — account is already activated.
+    }
+  }
 
   redirect("/dashboard");
 }

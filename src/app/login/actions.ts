@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getRequestOrigin } from "@/lib/requestOrigin";
-import { sendPasswordResetEmail } from "@/lib/resend";
+import { sendPasswordResetEmail, sendPasswordChangedEmail } from "@/lib/resend";
 import { checkRateLimit } from "@/lib/rateLimit";
 import { validatePassword } from "@/lib/passwordPolicy";
 
@@ -68,5 +68,14 @@ export async function setNewPassword(password: string): Promise<{ error?: string
 
   const { error } = await supabase.auth.updateUser({ password });
   if (error) return { error: error.message };
+
+  if (userData.user.email) {
+    try {
+      await sendPasswordChangedEmail(userData.user.email);
+    } catch {
+      // Non-fatal — password change already succeeded.
+    }
+  }
+
   return {};
 }

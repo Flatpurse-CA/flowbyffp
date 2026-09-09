@@ -8,7 +8,7 @@ export type ClientAppointment = {
   customer_id?: string | null;
   starts_at: string;
   price: number;
-  status: "confirmed" | "pending" | "deposit" | "completed" | "cancelled";
+  status: "confirmed" | "pending" | "deposit" | "completed" | "cancelled" | "no_show";
 };
 
 export type ClientTag = "New" | "Loyal" | "VIP" | "Overdue" | "Churn risk" | null;

@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { requireCustomer } from "@/lib/dashboard/customer";
 import { stripe } from "@/lib/stripe";
 import { ensureStripeCustomerId } from "@/lib/stripeCustomer";
+import { sendBookingCancelledEmail } from "@/lib/resend";
 import type { AppointmentRow } from "@/app/dashboard/appointments/actions";
 
 export async function updateBirthday(dateOfBirth: string): Promise<{ error?: string }> {
@@ -46,13 +47,13 @@ export async function cancelMyBooking(appointmentId: string) {
 
   const { data: appt, error: fetchError } = await admin
     .from("appointments")
-    .select("id, customer_id, status")
+    .select("id, customer_id, status, shop_id, client_email, service_name, starts_at")
     .eq("id", appointmentId)
     .maybeSingle();
 
   if (fetchError || !appt) throw new Error("Booking not found");
   if (appt.customer_id !== customerId) throw new Error("This booking doesn't belong to you");
-  if (appt.status === "cancelled" || appt.status === "completed") throw new Error("This booking can no longer be cancelled");
+  if (appt.status === "cancelled" || appt.status === "completed" || appt.status === "no_show") throw new Error("This booking can no longer be cancelled");
 
   const { error } = await admin
     .from("appointments")
@@ -61,6 +62,22 @@ export async function cancelMyBooking(appointmentId: string) {
 
   if (error) throw new Error(error.message);
   revalidatePath("/customer/account");
+
+  if (appt.client_email) {
+    const { data: shop } = await admin.from("shops").select("name").eq("id", appt.shop_id).maybeSingle();
+    if (shop) {
+      try {
+        await sendBookingCancelledEmail(appt.client_email as string, {
+          shopName: shop.name as string,
+          serviceName: appt.service_name as string,
+          startsAt: appt.starts_at as string,
+          cancelledBy: "you",
+        });
+      } catch {
+        // Non-fatal — the cancellation already succeeded.
+      }
+    }
+  }
 }
 
 export type SavedCard = { id: string; brand: string; last4: string; expMonth: number; expYear: number; isDefault: boolean };

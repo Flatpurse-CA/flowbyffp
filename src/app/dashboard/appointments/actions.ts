@@ -7,8 +7,28 @@ import { requireShop, getCurrentShopId, getShopContext } from "@/lib/dashboard/s
 import { attributeAutopilotRevenue } from "@/lib/dashboard/autopilotAttribution";
 import { stripe } from "@/lib/stripe";
 import { sendSms } from "@/lib/twilio";
+import { getRequestOrigin } from "@/lib/requestOrigin";
+import {
+  sendBookingConfirmedEmail,
+  sendBookingDeclinedEmail,
+  sendBookingCancelledEmail,
+  sendBookingRescheduledEmail,
+  sendReviewRequestEmail,
+  sendNoShowEmail,
+} from "@/lib/resend";
 
-export type AppointmentStatus = "confirmed" | "pending" | "deposit" | "completed" | "cancelled";
+type ShopEmailContext = { name: string; street_address: string | null; city: string | null; province: string | null; phone: string | null; handle: string | null };
+
+async function getShopEmailContext(supabase: Awaited<ReturnType<typeof requireShop>>["supabase"], shopId: string): Promise<ShopEmailContext | null> {
+  const { data } = await supabase
+    .from("shops")
+    .select("name, street_address, city, province, phone, handle")
+    .eq("id", shopId)
+    .maybeSingle();
+  return (data as ShopEmailContext | null) ?? null;
+}
+
+export type AppointmentStatus = "confirmed" | "pending" | "deposit" | "completed" | "cancelled" | "no_show";
 
 export type AppointmentRow = {
   id: string;
@@ -125,14 +145,38 @@ export async function createAppointment(input: {
 export async function rescheduleAppointment(id: string, startsAt: string) {
   const { supabase, shopId } = await requireShop();
 
-  const { error } = await supabase
+  const { data: appt, error } = await supabase
     .from("appointments")
     .update({ starts_at: startsAt, updated_at: new Date().toISOString() })
     .eq("id", id)
-    .eq("shop_id", shopId);
+    .eq("shop_id", shopId)
+    .select("client_email, service_name, duration_minutes, stylist_name")
+    .maybeSingle();
 
   if (error) throw new Error(error.message);
   revalidatePath("/dashboard/appointments");
+
+  if (appt?.client_email) {
+    const shop = await getShopEmailContext(supabase, shopId);
+    if (shop) {
+      try {
+        await sendBookingRescheduledEmail(appt.client_email as string, {
+          appointmentId: id,
+          shopName: shop.name,
+          serviceName: appt.service_name as string,
+          startsAt,
+          durationMinutes: appt.duration_minutes as number,
+          stylistName: appt.stylist_name as string | null,
+          streetAddress: shop.street_address,
+          city: shop.city,
+          province: shop.province,
+          shopPhone: shop.phone,
+        });
+      } catch {
+        // Non-fatal — the reschedule already succeeded.
+      }
+    }
+  }
 }
 
 export async function updateAppointmentDetails(id: string, input: {
@@ -172,27 +216,85 @@ export async function updateAppointmentDetails(id: string, input: {
 export async function confirmAppointment(id: string) {
   const { supabase, shopId } = await requireShop();
 
-  const { error } = await supabase
+  const { data: appt, error } = await supabase
     .from("appointments")
     .update({ status: "confirmed", updated_at: new Date().toISOString() })
     .eq("id", id)
-    .eq("shop_id", shopId);
+    .eq("shop_id", shopId)
+    .select("client_email, service_name, starts_at, duration_minutes, stylist_name")
+    .maybeSingle();
 
   if (error) throw new Error(error.message);
   revalidatePath("/dashboard/appointments");
+
+  if (appt?.client_email) {
+    const shop = await getShopEmailContext(supabase, shopId);
+    if (shop) {
+      try {
+        await sendBookingConfirmedEmail(appt.client_email as string, {
+          appointmentId: id,
+          shopName: shop.name,
+          serviceName: appt.service_name as string,
+          startsAt: appt.starts_at as string,
+          durationMinutes: appt.duration_minutes as number,
+          stylistName: appt.stylist_name as string | null,
+          streetAddress: shop.street_address,
+          city: shop.city,
+          province: shop.province,
+          shopPhone: shop.phone,
+        });
+      } catch {
+        // Non-fatal — the confirmation already succeeded.
+      }
+    }
+  }
 }
 
 export async function cancelAppointment(id: string) {
   const { supabase, shopId } = await requireShop();
 
-  const { error } = await supabase
+  const { data: before } = await supabase
+    .from("appointments")
+    .select("status")
+    .eq("id", id)
+    .eq("shop_id", shopId)
+    .maybeSingle();
+  const wasPending = before?.status === "pending";
+
+  const { data: appt, error } = await supabase
     .from("appointments")
     .update({ status: "cancelled", updated_at: new Date().toISOString() })
     .eq("id", id)
-    .eq("shop_id", shopId);
+    .eq("shop_id", shopId)
+    .select("client_email, service_name, starts_at")
+    .maybeSingle();
 
   if (error) throw new Error(error.message);
   revalidatePath("/dashboard/appointments");
+
+  if (appt?.client_email) {
+    const shop = await getShopEmailContext(supabase, shopId);
+    if (shop) {
+      try {
+        if (wasPending) {
+          await sendBookingDeclinedEmail(appt.client_email as string, {
+            shopName: shop.name,
+            serviceName: appt.service_name as string,
+            startsAt: appt.starts_at as string,
+          });
+        } else {
+          await sendBookingCancelledEmail(appt.client_email as string, {
+            shopName: shop.name,
+            serviceName: appt.service_name as string,
+            startsAt: appt.starts_at as string,
+            cancelledBy: "shop",
+          });
+        }
+      } catch {
+        // Non-fatal — the cancellation already succeeded.
+      }
+    }
+  }
 }
 
 export async function completeAppointment(
@@ -201,7 +303,7 @@ export async function completeAppointment(
 ) {
   const { supabase, shopId } = await requireShop();
 
-  const { error } = await supabase
+  const { data: appt, error } = await supabase
     .from("appointments")
     .update({
       status: "completed",
@@ -212,10 +314,57 @@ export async function completeAppointment(
       updated_at: new Date().toISOString(),
     })
     .eq("id", id)
-    .eq("shop_id", shopId);
+    .eq("shop_id", shopId)
+    .select("client_email")
+    .maybeSingle();
 
   if (error) throw new Error(error.message);
   revalidatePath("/dashboard/appointments");
+
+  if (appt?.client_email) {
+    const shop = await getShopEmailContext(supabase, shopId);
+    if (shop?.handle) {
+      try {
+        const origin = await getRequestOrigin();
+        await sendReviewRequestEmail(appt.client_email as string, {
+          shopName: shop.name,
+          reviewUrl: `${origin}/book/${shop.handle}`,
+        });
+      } catch {
+        // Non-fatal — completion already succeeded.
+      }
+    }
+  }
+}
+
+export async function markNoShow(id: string) {
+  const { supabase, shopId } = await requireShop();
+
+  const { data: appt, error } = await supabase
+    .from("appointments")
+    .update({ status: "no_show", updated_at: new Date().toISOString() })
+    .eq("id", id)
+    .eq("shop_id", shopId)
+    .select("client_email, service_name, starts_at")
+    .maybeSingle();
+
+  if (error) throw new Error(error.message);
+  revalidatePath("/dashboard/appointments");
+
+  if (appt?.client_email) {
+    const shop = await getShopEmailContext(supabase, shopId);
+    if (shop) {
+      try {
+        await sendNoShowEmail(appt.client_email as string, {
+          shopName: shop.name,
+          serviceName: appt.service_name as string,
+          startsAt: appt.starts_at as string,
+        });
+      } catch {
+        // Non-fatal — the no-show mark already succeeded.
+      }
+    }
+  }
 }
 
 // Real Stripe Payment Link, created on the shop's own connected account —

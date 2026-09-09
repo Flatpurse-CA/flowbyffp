@@ -31,6 +31,11 @@ export const metadata: Metadata = {
     title: "Flow",
   },
   icons: {
+    // Setting `apple` here without also setting `icon` stops Next from merging
+    // in the auto-detected app/icon.svg favicon — its metadata resolver only
+    // back-fills the file-convention icon when `metadata.icons` was untouched,
+    // so once we set any key ourselves we have to list both explicitly.
+    icon: "/icon.svg",
     apple: "/icon-192.png",
   },
   openGraph: {

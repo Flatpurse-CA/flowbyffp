@@ -6,10 +6,10 @@ import {
   Plus, Search, Copy, Check, MessageSquare,
   Mail, ExternalLink, Zap, Clock, ChevronRight,
   X, Phone, CreditCard, Banknote, Smartphone,
-  Send, Pencil, Ban, CheckCircle2, StickyNote, SquarePen,
+  Send, Pencil, Ban, CheckCircle2, StickyNote, SquarePen, UserX,
 } from "lucide-react";
 import type { AppointmentRow, AppointmentStatus } from "./actions";
-import { createAppointment, rescheduleAppointment, cancelAppointment, completeAppointment, confirmAppointment, updateAppointmentDetails, sendAppointmentPaymentLink, sendAppointmentReceipt } from "./actions";
+import { createAppointment, rescheduleAppointment, cancelAppointment, completeAppointment, confirmAppointment, markNoShow, updateAppointmentDetails, sendAppointmentPaymentLink, sendAppointmentReceipt } from "./actions";
 import { chargeInPerson } from "@/lib/terminal/nativeBridge";
 import type { StaffRow } from "../team/actions";
 import { tint } from "@/lib/color";
@@ -95,6 +95,7 @@ const STATUS_STYLE: Record<string, { label: string; color: string; bg: string; b
   deposit:   { label: "⚠ Deposit", color: "rgb(248,113,113)", bg: "rgba(239,68,68,0.1)",  border: "rgba(239,68,68,0.2)"   },
   completed: { label: "Completed", color: "rgb(96,165,250)",  bg: "rgba(59,130,246,0.1)", border: "rgba(59,130,246,0.2)"  },
   cancelled: { label: "Cancelled", color: "var(--dw4)", bg: "var(--dw06)", border: "var(--dw1)" },
+  no_show:   { label: "No-show",   color: "white", bg: "rgb(180,83,9)", border: "rgb(180,83,9)" },
 };
 
 const card: React.CSSProperties = {
@@ -701,7 +702,7 @@ function AppointmentDetail({ appt, onClose, onCloseOut, onChanged }: { appt: App
   };
 
   const avatarColor = appt.color;
-  const isDone = status === "completed" || status === "cancelled";
+  const isDone = status === "completed" || status === "cancelled" || status === "no_show";
 
   const doReschedule = async () => {
     setError(null);
@@ -767,6 +768,20 @@ function AppointmentDetail({ appt, onClose, onCloseOut, onChanged }: { appt: App
       onChanged();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Couldn't cancel, try again.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const doNoShow = async () => {
+    setError(null);
+    setBusy(true);
+    try {
+      await markNoShow(appt.id);
+      setStatus("no_show");
+      onChanged();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Couldn't mark as no-show, try again.");
     } finally {
       setBusy(false);
     }
@@ -988,14 +1003,31 @@ function AppointmentDetail({ appt, onClose, onCloseOut, onChanged }: { appt: App
                 <Ban size={13} strokeWidth={2} /> Cancel
               </button>
             </div>
-            <button onClick={onCloseOut} style={{ width: "100%", padding: "13px", borderRadius: 13, border: "none", background: "rgb(52,211,153)", color: "rgb(5,40,20)", fontSize: 13.5, fontWeight: 800, cursor: "pointer" }}>
-              Mark as completed →
-            </button>
+            {error && !confirmCancel && !editing && !rescheduling && <p style={{ color: "rgb(248,113,113)", fontSize: 12, margin: 0 }}>{error}</p>}
+            {status === "pending" ? (
+              <button onClick={onCloseOut} style={{ width: "100%", padding: "13px", borderRadius: 13, border: "none", background: "rgb(52,211,153)", color: "rgb(5,40,20)", fontSize: 13.5, fontWeight: 800, cursor: "pointer" }}>
+                Mark as completed →
+              </button>
+            ) : (
+              <div style={{ display: "flex", gap: 8 }}>
+                <button onClick={onCloseOut} style={{ flex: 2, padding: "13px", borderRadius: 13, border: "none", background: "rgb(52,211,153)", color: "rgb(5,40,20)", fontSize: 13.5, fontWeight: 800, cursor: "pointer" }}>
+                  Mark as completed →
+                </button>
+                <button disabled={busy} onClick={doNoShow} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "13px", borderRadius: 13, border: "none", background: "rgb(180,83,9)", color: "white", fontSize: 12.5, fontWeight: 800, cursor: busy ? "default" : "pointer", opacity: busy ? 0.6 : 1 }}>
+                  <UserX size={13} strokeWidth={2} /> No-show
+                </button>
+              </div>
+            )}
           </div>
         )}
         {status === "cancelled" && (
           <div className="apt-sheet-footer" style={{ padding: "16px 22px 22px", flexShrink: 0, borderTop: "1px solid var(--dw06)" }}>
             <p style={{ color: "var(--dw3)", fontSize: 12, textAlign: "center", margin: 0 }}>This appointment has been cancelled.</p>
+          </div>
+        )}
+        {status === "no_show" && (
+          <div className="apt-sheet-footer" style={{ padding: "16px 22px 22px", flexShrink: 0, borderTop: "1px solid var(--dw06)" }}>
+            <p style={{ color: "var(--dw3)", fontSize: 12, textAlign: "center", margin: 0 }}>This appointment was marked as a no-show.</p>
           </div>
         )}
       </div>

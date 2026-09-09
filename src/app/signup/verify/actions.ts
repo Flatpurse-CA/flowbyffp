@@ -3,7 +3,7 @@
 import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient, isEmailAlreadyConfirmed } from "@/lib/supabase/admin";
-import { sendOtpEmail } from "@/lib/resend";
+import { sendOtpEmail, sendWelcomeEmail } from "@/lib/resend";
 import { checkRateLimit } from "@/lib/rateLimit";
 
 export async function verifyCode(email: string, token: string): Promise<{ error?: string }> {
@@ -12,11 +12,22 @@ export async function verifyCode(email: string, token: string): Promise<{ error?
   }
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.verifyOtp({ email, token, type: "signup" });
+  const { data: verifyData, error } = await supabase.auth.verifyOtp({ email, token, type: "signup" });
   if (error) return { error: error.message };
   const cookieStore = await cookies();
   cookieStore.delete("onboarding_user_id");
   cookieStore.delete("onboarding_email");
+
+  if (verifyData.user) {
+    const admin = createAdminClient();
+    const { data: profile } = await admin.from("profiles").select("first_name").eq("id", verifyData.user.id).maybeSingle();
+    try {
+      await sendWelcomeEmail(email, { firstName: (profile?.first_name as string | undefined) ?? "there" });
+    } catch {
+      // Non-fatal — account is already verified, a failed welcome email shouldn't block anything.
+    }
+  }
+
   return {};
 }
 

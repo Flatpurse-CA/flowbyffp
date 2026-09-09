@@ -16,6 +16,7 @@ const STATUS_LABEL: Record<AppointmentStatus, { label: string; color: string; bg
   pending:   { label: "Pending",   color: "rgb(180,120,10)",     bg: "rgba(245,158,11,0.12)"  },
   deposit:   { label: "Deposit paid", color: "rgb(180,120,10)",  bg: "rgba(245,158,11,0.12)"  },
   cancelled: { label: "Cancelled", color: "var(--cust-text-faint)", bg: "var(--cust-card-border)" },
+  no_show:   { label: "No-show",   color: "white", bg: "rgb(180,83,9)" },
 };
 
 function fmtDate(iso: string) {
@@ -64,7 +65,7 @@ export function AccountClient({ customerName, bookings, dateOfBirth, cards }: { 
   };
 
   const now = new Date();
-  const upcoming = bookings.filter(b => b.status !== "cancelled" && b.status !== "completed" && new Date(b.starts_at) >= now);
+  const upcoming = bookings.filter(b => b.status !== "cancelled" && b.status !== "completed" && b.status !== "no_show" && new Date(b.starts_at) >= now);
   const past = bookings.filter(b => b.status === "completed" || b.status === "cancelled" || new Date(b.starts_at) < now);
 
   const handleCancel = async (id: string) => {
@@ -82,7 +83,7 @@ export function AccountClient({ customerName, bookings, dateOfBirth, cards }: { 
 
   const Row = ({ b }: { b: MyBooking }) => {
     const s = STATUS_LABEL[b.status];
-    const canCancel = b.status !== "cancelled" && b.status !== "completed" && new Date(b.starts_at) >= now;
+    const canCancel = b.status !== "cancelled" && b.status !== "completed" && b.status !== "no_show" && new Date(b.starts_at) >= now;
     return (
       <div style={{ ...card, padding: "16px 18px", display: "flex", alignItems: "center", gap: 14, marginBottom: 10 }}>
         <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(109,40,217,0.08)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>

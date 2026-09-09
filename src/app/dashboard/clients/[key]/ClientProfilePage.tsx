@@ -28,6 +28,7 @@ const STATUS_LABEL: Record<AppointmentStatus, { label: string; color: string; bg
   pending:   { label: "Pending",   color: "var(--dw5)",  bg: "var(--dw06)" },
   deposit:   { label: "⚠ Deposit", color: "rgb(251,191,36)", bg: "rgba(245,158,11,0.1)" },
   cancelled: { label: "Cancelled", color: "var(--dw25)", bg: "var(--dw03)" },
+  no_show:   { label: "No-show",   color: "white", bg: "rgb(180,83,9)" },
 };
 
 const card: React.CSSProperties = {
@@ -77,7 +78,7 @@ export function ClientProfilePage({ client, appointments, engaged }: {
     () => appointments.filter(a => keyFor(a) === client.key).sort((a, b) => new Date(b.starts_at).getTime() - new Date(a.starts_at).getTime()),
     [appointments, client.key],
   );
-  const upcoming = own.find(a => a.status !== "completed" && a.status !== "cancelled" && new Date(a.starts_at) >= now) ?? null;
+  const upcoming = own.find(a => a.status !== "completed" && a.status !== "cancelled" && a.status !== "no_show" && new Date(a.starts_at) >= now) ?? null;
   const past = own.filter(a => a.status === "completed");
   const avgSpend = client.visits > 0 ? client.ltv / client.visits : 0;
   const color = colorFor(client.name);

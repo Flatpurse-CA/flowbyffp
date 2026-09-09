@@ -9,7 +9,7 @@ export type MetricsAppointment = {
   starts_at: string;
   duration_minutes: number;
   price: number;
-  status: "confirmed" | "pending" | "deposit" | "completed" | "cancelled";
+  status: "confirmed" | "pending" | "deposit" | "completed" | "cancelled" | "no_show";
 };
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;

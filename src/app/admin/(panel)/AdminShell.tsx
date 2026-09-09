@@ -7,7 +7,7 @@ import {
   LayoutDashboard, Users, ClipboardList, Store, CreditCard,
   LogOut, ChevronLeft, ChevronRight, Menu, X,
   Sun, Moon, MessageSquare, User as UserIcon, Settings, Mail,
-  BarChart3, GitFork, Zap, ShieldAlert, Flag, FlaskConical, Activity, History,
+  BarChart3, GitFork, Zap, ShieldAlert, Flag, FlaskConical, Activity, History, FileText,
 } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 import { adminLogout } from "@/app/admin/actions";
@@ -21,6 +21,7 @@ const NAV = [
   { icon: Users,           href: "/admin/users",              label: "Users"             },
   { icon: ClipboardList,   href: "/admin/waitlist",           label: "Waitlist"          },
   { icon: Mail,            href: "/admin/emails",             label: "Emails"            },
+  { icon: FileText,        href: "/admin/email-templates",    label: "Email Templates"   },
   { icon: Store,           href: "/admin/shops",              label: "Shops"             },
   { icon: CreditCard,      href: "/admin/plans",              label: "Plans"             },
   { icon: BarChart3,       href: "/admin/analytics",          label: "Analytics"         },

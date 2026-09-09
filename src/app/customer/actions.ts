@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
-import { sendPasswordResetEmail } from "@/lib/resend";
+import { sendPasswordResetEmail, sendWelcomeEmail, sendPasswordChangedEmail } from "@/lib/resend";
 import { getRequestOrigin } from "@/lib/requestOrigin";
 import { validatePassword } from "@/lib/passwordPolicy";
 
@@ -44,6 +44,12 @@ export async function customerSignup(input: { fullName: string; email: string; p
   const supabase = await createClient();
   const { error: signInError } = await supabase.auth.signInWithPassword({ email, password: input.password });
   if (signInError) return { error: signInError.message };
+
+  try {
+    await sendWelcomeEmail(email, { firstName: fullName.split(" ")[0] });
+  } catch {
+    // Non-fatal — account already exists and is signed in.
+  }
 
   return {};
 }
@@ -92,6 +98,15 @@ export async function customerSetNewPassword(password: string): Promise<{ error?
 
   const { error } = await supabase.auth.updateUser({ password });
   if (error) return { error: error.message };
+
+  if (userData.user.email) {
+    try {
+      await sendPasswordChangedEmail(userData.user.email);
+    } catch {
+      // Non-fatal — password change already succeeded.
+    }
+  }
+
   return {};
 }
 
