@@ -122,8 +122,10 @@ export async function startCheckout(input: { planKey: BillablePlanKey; interval:
       mode: "subscription",
       customer: customerId,
       line_items: [{ price: getStripePriceId(input.planKey, input.interval), quantity: 1 }],
-      discounts: applyFoundersDiscount ? [{ coupon: "founders-40-off" }] : undefined,
-      allow_promotion_codes: !applyFoundersDiscount,
+      // Stripe rejects the request if both are present, even with allow_promotion_codes: false.
+      ...(applyFoundersDiscount
+        ? { discounts: [{ coupon: "founders-40-off" }] }
+        : { allow_promotion_codes: true }),
       success_url: `${origin}/dashboard/settings?tab=Billing&checkout=success`,
       cancel_url: `${origin}/dashboard/settings?tab=Billing&checkout=cancelled`,
       metadata: {
