@@ -106,12 +106,9 @@ export const PLANS: Plan[] = [
     badge: "Most Popular",
     perfectFor: "Businesses focused on growth.",
     description: "Everything in Pro, plus advanced AI that improves revenue, profitability and decision-making.",
-    // TEMP: monthly price/label dropped to $10 for a live payment test — real
-    // price is $189 (see the STRIPE_PRICE_PRO_PLUS_MONTHLY comment in .env.local
-    // for the price ID to revert to). Annual is untouched, still C$1890 for real.
-    monthlyPrice: 10,
+    monthlyPrice: 189,
     annualPrice: 1890,
-    priceLabel: "C$10/month or C$157.50/month billed annually",
+    priceLabel: "C$189/month or C$157.50/month billed annually",
     features: [
       "Everything in Pro",
       "Flow Coach™: your AI business consultant",

@@ -109,7 +109,7 @@ export default function Waitlist2Page() {
             fontWeight: 700, letterSpacing: "-0.035em", lineHeight: 1.1,
             margin: "0 0 28px", color: GOLD_B, fontStyle: "italic",
           }}>
-            Get 40% off forever.
+            Get 40% off, then 25% off forever.
           </p>
 
           {/* Sub */}
