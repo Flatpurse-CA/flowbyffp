@@ -1,0 +1,17 @@
+# FlatPurse Flow
+
+> Booking, billing, and revenue autopilot for salons and service businesses in Canada.
+
+FlatPurse Flow is an AI-powered booking and client management platform for solo stylists and multi-location salons. It handles online booking, in-person and online payments (including Tap to Pay and Interac), client CRM, staff scheduling, and automated revenue recovery (no-show recovery, win-backs, an AI Front Desk, and a daily business brief), so shop owners spend less time on admin and keep their calendar full.
+
+## Pages
+
+- [Home](https://flow.flatpurse.com/): Product overview and booking platform pitch.
+- [Features](https://flow.flatpurse.com/features): Full feature breakdown.
+- [Pricing](https://flow.flatpurse.com/pricing): Starter, Pro, Pro+, and Enterprise plans, transaction fees, and the Founders Beta discount (40% off the first 12 months, then 25% off for life, for the first 40 shops).
+- [Sign up](https://flow.flatpurse.com/signup): Start a free trial.
+
+## Notes
+
+- No new-client or marketplace commission on any plan — pricing is a flat monthly fee plus per-transaction card processing fees.
+- Founders Beta pricing is limited to the first 40 businesses and does not reopen once filled.
