@@ -38,7 +38,7 @@ export default function Home3Page() {
       <LandingNav active="home" />
 
       {/* ── Hero ── */}
-      <section style={{ padding: "0 20px" }}>
+      <section style={{ padding: "0 20px", position: "relative" }}>
         <div
           className="h3-hero"
           style={{
@@ -191,6 +191,11 @@ export default function Home3Page() {
               No contracts. No per-booking fees. Cancel anytime
             </span>
           </div>
+        </div>
+
+        {/* Hero bottom divider, recolored to blend into the Value section below */}
+        <div style={{ position: "absolute", bottom: 0, left: 0, width: "100%", zIndex: 10, pointerEvents: "none" }}>
+          <div className="ff-divider-value" />
         </div>
       </section>
 

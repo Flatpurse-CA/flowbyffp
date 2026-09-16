@@ -909,6 +909,20 @@ body {
   mask-repeat: no-repeat;
 }
 
+/* Same scalloped divider, recolored to the Value section's bg so the Hero bottom blends into it */
+.ff-divider-value {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1924 / 126;
+  background-color: #f8f4ff;
+  -webkit-mask-image: url("/ffdoe.svg");
+  mask-image: url("/ffdoe.svg");
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+
 /* ── Home main landing page (purple hero) ── */
 @media (max-width: 900px) {
   .hm-hero-block {

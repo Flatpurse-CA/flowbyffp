@@ -174,11 +174,7 @@ export default function HomeMainPage() {
           zIndex: 10,
           pointerEvents: "none",
         }}>
-          <img
-            src="/ffdoe.svg"
-            alt=""
-            style={{ width: "100%", display: "block" }}
-          />
+          <div className="ff-divider-value" />
         </div>
       </div>
 
