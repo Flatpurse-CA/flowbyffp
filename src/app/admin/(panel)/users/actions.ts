@@ -138,29 +138,36 @@ export async function restartAllTrials() {
 // plus the Enterprise plan, so every plan-gated feature is unlocked and team
 // size is uncapped. No dedicated column — the plan it replaces is kept in the
 // audit log entry so removing Unlimited restores it instead of guessing.
+// The flag is also kept on the auth user's app_metadata so it can be granted
+// before the user has a shop (abandoned signups): applyPendingUnlimited()
+// picks it up when their shop is created.
 export async function setUnlimited(formData: FormData) {
   const { email } = await requireAdmin();
   const userId = formData.get("userId") as string;
   const enabled = formData.get("enabled") === "true";
   const admin = createAdminClient();
 
+  await admin.auth.admin.updateUserById(userId, { app_metadata: { unlimited: enabled } });
+  const { data: shop } = await admin.from("shops").select("plan").eq("owner_id", userId).maybeSingle();
+
   if (enabled) {
-    const { data: shop } = await admin.from("shops").select("plan").eq("owner_id", userId).maybeSingle();
-    if (!shop) return;
-    await admin.from("shops").update({ trial_override: true, plan: "enterprise" }).eq("owner_id", userId);
-    await logAdminAction(email, "enable_unlimited", "user", userId, { previous_plan: shop.plan });
+    if (shop) await admin.from("shops").update({ trial_override: true, plan: "enterprise" }).eq("owner_id", userId);
+    await logAdminAction(email, "enable_unlimited", "user", userId, { previous_plan: shop?.plan ?? null });
   } else {
-    const { data: lastEnable } = await admin
-      .from("admin_audit_log")
-      .select("details")
-      .eq("action", "enable_unlimited")
-      .eq("target_id", userId)
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    const previousPlan = (lastEnable?.details as { previous_plan?: string } | null)?.previous_plan;
-    const plan = previousPlan && previousPlan !== "enterprise" ? previousPlan : "starter";
-    await admin.from("shops").update({ trial_override: false, plan }).eq("owner_id", userId);
+    let plan: string | null = null;
+    if (shop) {
+      const { data: lastEnable } = await admin
+        .from("admin_audit_log")
+        .select("details")
+        .eq("action", "enable_unlimited")
+        .eq("target_id", userId)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      const previousPlan = (lastEnable?.details as { previous_plan?: string | null } | null)?.previous_plan;
+      plan = previousPlan && previousPlan !== "enterprise" ? previousPlan : "starter";
+      await admin.from("shops").update({ trial_override: false, plan }).eq("owner_id", userId);
+    }
     await logAdminAction(email, "disable_unlimited", "user", userId, { restored_plan: plan });
   }
   revalidatePath("/admin/users", "page");

@@ -32,13 +32,15 @@ const ACCESS_STATUS_COLOR: Record<AccessStatus, { fg: string; bg: string }> = {
 export default async function AdminUsersPage() {
   const admin = createAdminClient();
 
-  const [usersRes, profilesRes, shopsRes, apptsRes, adminsRes] = await Promise.all([
+  const [usersRes, profilesRes, shopsRes, apptsRes, adminsRes, staffRes] = await Promise.all([
     admin.auth.admin.listUsers({ perPage: 1000 }),
     admin.from("profiles").select("id, first_name, last_name"),
     admin.from("shops").select("id, owner_id, name, plan, trial_started_at, subscription_status, trial_override, trial_paused_at"),
     admin.from("appointments").select("shop_id, price").eq("status", "completed"),
     admin.from("admin_users").select("email"),
+    admin.from("staff").select("user_id").not("user_id", "is", null),
   ]);
+  const staffUserIds = new Set((staffRes.data ?? []).map(s => s.user_id as string));
   const adminEmails = new Set((adminsRes.data ?? []).map(a => (a.email as string).toLowerCase()));
 
   const users    = usersRes.data?.users ?? [];
@@ -65,7 +67,11 @@ export default async function AdminUsersPage() {
         accessStatus: access?.status ?? null,
         trialOverride: shop?.trial_override ?? false,
         trialPaused: !!shop?.trial_paused_at,
-        unlimited: !!shop?.trial_override && shop?.plan === "enterprise",
+        unlimited: shop ? !!shop.trial_override && shop.plan === "enterprise" : !!u.app_metadata?.unlimited,
+        // No shop yet (signup abandoned before the shop step) — Unlimited is
+        // stored on the account and applied once they create one. Staff log
+        // in under their employer's shop, so Unlimited doesn't apply to them.
+        noShop: !shop && !staffUserIds.has(u.id),
         isRootAdmin: u.email === ROOT_ADMIN_EMAIL,
         isAdmin: u.email === ROOT_ADMIN_EMAIL || adminEmails.has((u.email ?? "").toLowerCase()),
       };
@@ -185,8 +191,16 @@ export default async function AdminUsersPage() {
                         }}>
                           {row.unlimited ? "Unlimited" : row.trialOverride ? "Bypassed" : ACCESS_STATUS_LABEL[row.accessStatus]}
                         </span>
+                      ) : row.noShop && row.unlimited ? (
+                        <span title="Applied when they finish setting up their shop" style={{
+                          fontSize: 10, fontWeight: 700, padding: "3px 9px", borderRadius: 20,
+                          letterSpacing: "0.04em", textTransform: "uppercase",
+                          color: ACCESS_STATUS_COLOR.paused.fg, background: ACCESS_STATUS_COLOR.paused.bg,
+                        }}>
+                          Unlimited (no shop yet)
+                        </span>
                       ) : (
-                        <span style={{ color: "var(--aw18)", fontSize: 12 }}>-</span>
+                        <span style={{ color: "var(--aw18)", fontSize: 12 }}>{row.noShop ? "No shop yet" : "-"}</span>
                       )}
                     </td>
 
@@ -266,6 +280,27 @@ export default async function AdminUsersPage() {
                               </button>
                             </form>
                           </>
+                        )}
+                        {!row.accessStatus && row.noShop && (
+                        <form action={setUnlimited}>
+                          <input type="hidden" name="userId" value={row.id} />
+                          <input type="hidden" name="enabled" value={row.unlimited ? "false" : "true"} />
+                          <button
+                            type="submit"
+                            title={row.unlimited ? "Remove unlimited, restores their previous plan" : "Unlimited: free full access on Enterprise, no payment needed"}
+                            style={{
+                              display: "flex", alignItems: "center", gap: 5,
+                              padding: "5px 10px", borderRadius: 8, cursor: "pointer",
+                              background: row.unlimited ? "var(--astatus-purple-bg)" : "var(--aw04)",
+                              border: row.unlimited ? "1px solid var(--astatus-purple-border)" : "1px solid var(--aw08)",
+                              color: row.unlimited ? "var(--astatus-purple-fg)" : "var(--aw3)",
+                              fontSize: 11, fontWeight: 600, fontFamily: "inherit", whiteSpace: "nowrap",
+                            }}
+                          >
+                            <InfinityIcon size={12} />
+                            {row.unlimited ? "Remove unlimited" : "Unlimited"}
+                          </button>
+                        </form>
                         )}
                         {!row.isRootAdmin && row.email !== "-" && (
                           <form action={row.isAdmin ? removeAdmin : addAdmin}>

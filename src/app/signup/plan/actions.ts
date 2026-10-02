@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { createAdminClient, isEmailAlreadyConfirmed } from "@/lib/supabase/admin";
 import { getOnboardingContext } from "@/lib/onboarding";
 import { sendOtpEmail } from "@/lib/resend";
+import { applyPendingUnlimited } from "@/lib/unlimited";
 
 export async function choosePlan(formData: FormData) {
   const ctx = await getOnboardingContext();
@@ -27,6 +28,9 @@ export async function choosePlan(formData: FormData) {
   if (error) {
     redirect(`/signup/plan?error=${encodeURIComponent(error.message)}`);
   }
+
+  // An admin-granted Unlimited outranks whatever plan was picked here.
+  await applyPendingUnlimited(ctx.userId);
 
   // Verification is the last step of the wizard — send the OTP now, right before
   // handing off to /signup/verify, rather than back at account creation.

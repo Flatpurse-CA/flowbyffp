@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getOnboardingContext } from "@/lib/onboarding";
+import { applyPendingUnlimited } from "@/lib/unlimited";
 
 export async function setupShop(formData: FormData) {
   const ctx = await getOnboardingContext();
@@ -43,6 +44,8 @@ export async function setupShop(formData: FormData) {
   if (error) {
     redirect(`/signup/shop?error=${encodeURIComponent(error.message)}`);
   }
+
+  await applyPendingUnlimited(ctx.userId);
 
   redirect("/signup/plan");
 }
