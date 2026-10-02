@@ -22,11 +22,11 @@ export function OnboardingShell({ children }: { children: React.ReactNode }) {
         }}
       >
         <Image
-          src="/main logo.png"
+          src="/favicon1.png"
           alt="FlatPurse Flow"
-          width={52}
-          height={52}
-          style={{ objectFit: "contain" }}
+          width={44}
+          height={44}
+          style={{ objectFit: "contain", borderRadius: 12 }}
         />
         <ThemeToggle />
       </div>
