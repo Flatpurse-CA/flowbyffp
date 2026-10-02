@@ -3,25 +3,31 @@ import { sendEmail } from "@/lib/resend";
 import { sendSms } from "@/lib/twilio";
 import { getRequestOrigin } from "@/lib/requestOrigin";
 import { generateFrontdeskReply } from "./frontdeskAi";
+import { toE164 } from "@/lib/phone";
 
 export type FrontdeskChannel = "email" | "sms";
 
 // Shared-number model (see 0029_frontdesk_sms.sql): every shop's SMS traffic
 // arrives on the same Twilio number, so an inbound text carries no shop_id —
-// it has to be inferred from who the sender has actually been a client of.
-// Ties (a client of more than one shop) resolve to whichever shop they most
-// recently visited. A phone with no match at all (a cold, never-booked
-// number) can't be resolved — the webhook handles that case itself.
-export async function resolveShopIdForPhone(phone: string): Promise<string | null> {
+// it has to be inferred from which shop the sender has actually booked with.
+// Appointments are the source of truth for client phones (the clients table
+// is never populated). Ties (a client of more than one shop) resolve to the
+// most recent appointment. Phones are compared in E.164 so older appointments
+// saved as typed, e.g. "(780) 555-1234", still match Twilio's "+17805551234".
+// A phone with no match at all (a cold, never-booked number) returns null —
+// the webhook handles that case itself.
+export async function findClientByPhone(phone: string): Promise<{ shopId: string; name: string | null } | null> {
+  const target = toE164(phone);
+  if (!target) return null;
   const admin = createAdminClient();
   const { data } = await admin
-    .from("clients")
-    .select("shop_id, last_visit_at")
-    .eq("phone", phone)
-    .order("last_visit_at", { ascending: false, nullsFirst: false })
-    .limit(1)
-    .maybeSingle();
-  return (data?.shop_id as string | undefined) ?? null;
+    .from("appointments")
+    .select("shop_id, client_name, client_phone")
+    .ilike("client_phone", `%${target.slice(-4)}`)
+    .order("starts_at", { ascending: false })
+    .limit(200);
+  const match = (data ?? []).find(a => toE164(a.client_phone as string | null) === target);
+  return match ? { shopId: match.shop_id as string, name: (match.client_name as string | null) ?? null } : null;
 }
 
 export type HandleInboundResult = { intent: string; outcome: "sent" | "escalated" | "disabled" };

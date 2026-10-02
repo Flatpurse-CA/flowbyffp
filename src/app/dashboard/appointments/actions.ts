@@ -1,5 +1,6 @@
 "use server";
 
+import { normalizePhoneForStorage } from "@/lib/phone";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -122,7 +123,7 @@ export async function createAppointment(input: {
     shop_id: shopId,
     customer_id: customerId,
     client_name: input.clientName,
-    client_phone: input.clientPhone || null,
+    client_phone: normalizePhoneForStorage(input.clientPhone),
     client_email: input.clientEmail || null,
     client_notes: input.notes || null,
     service_name: input.serviceName,
@@ -199,7 +200,7 @@ export async function updateAppointmentDetails(id: string, input: {
     .from("appointments")
     .update({
       client_name: clientName,
-      client_phone: input.clientPhone?.trim() || null,
+      client_phone: normalizePhoneForStorage(input.clientPhone),
       client_email: input.clientEmail?.trim() || null,
       service_name: serviceName,
       price: input.price,

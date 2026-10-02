@@ -1,5 +1,6 @@
 "use server";
 
+import { normalizePhoneForStorage } from "@/lib/phone";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getCustomerContext } from "@/lib/dashboard/customer";
 import { shopWallTimeToUTC } from "@/lib/dashboard/shopTime";
@@ -169,7 +170,7 @@ export async function createPublicBooking(input: {
       shop_id: input.shopId,
       customer_id: ctx.customerId,
       client_name: ctx.fullName,
-      client_phone: ctx.phone,
+      client_phone: normalizePhoneForStorage(ctx.phone),
       client_email: ctx.email,
       client_notes: input.notes || null,
       service_name: service.name,
