@@ -15,6 +15,7 @@ export async function addAdmin(formData: FormData) {
   await admin.from("admin_users").insert({ email, added_by: actingEmail }).select();
   await logAdminAction(actingEmail, "add_admin", "admin_user", email);
   revalidatePath(SETTINGS_PATH);
+  revalidatePath("/admin/users", "page");
 }
 
 export async function removeAdmin(formData: FormData) {
@@ -26,4 +27,5 @@ export async function removeAdmin(formData: FormData) {
   await admin.from("admin_users").delete().eq("email", email);
   await logAdminAction(actingEmail, "remove_admin", "admin_user", email);
   revalidatePath(SETTINGS_PATH);
+  revalidatePath("/admin/users", "page");
 }

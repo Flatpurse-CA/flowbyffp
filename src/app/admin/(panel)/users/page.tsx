@@ -1,6 +1,8 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { banUser, unbanUser, deleteUser, resetShopTrial, setTrialOverride, pauseShopTrial, resumeShopTrial, setUnlimited } from "./actions";
-import { UserX, UserCheck, Trash2, RotateCcw, ShieldCheck, ShieldOff, Pause, Play, Infinity as InfinityIcon } from "lucide-react";
+import { UserX, UserCheck, Trash2, RotateCcw, ShieldCheck, ShieldOff, Pause, Play, Infinity as InfinityIcon, KeyRound } from "lucide-react";
+import { addAdmin, removeAdmin } from "../settings/actions";
+import { ROOT_ADMIN_EMAIL } from "@/lib/admin-guard";
 import { PlanSelect } from "./PlanSelect";
 import { AddTrialDaysForm } from "./AddTrialDaysForm";
 import { RestartAllTrialsButton } from "./RestartAllTrialsButton";
@@ -30,12 +32,14 @@ const ACCESS_STATUS_COLOR: Record<AccessStatus, { fg: string; bg: string }> = {
 export default async function AdminUsersPage() {
   const admin = createAdminClient();
 
-  const [usersRes, profilesRes, shopsRes, apptsRes] = await Promise.all([
+  const [usersRes, profilesRes, shopsRes, apptsRes, adminsRes] = await Promise.all([
     admin.auth.admin.listUsers({ perPage: 1000 }),
     admin.from("profiles").select("id, first_name, last_name"),
     admin.from("shops").select("id, owner_id, name, plan, trial_started_at, subscription_status, trial_override, trial_paused_at"),
     admin.from("appointments").select("shop_id, price").eq("status", "completed"),
+    admin.from("admin_users").select("email"),
   ]);
+  const adminEmails = new Set((adminsRes.data ?? []).map(a => (a.email as string).toLowerCase()));
 
   const users    = usersRes.data?.users ?? [];
   const profiles = Object.fromEntries((profilesRes.data ?? []).map(p => [p.id, p]));
@@ -62,6 +66,8 @@ export default async function AdminUsersPage() {
         trialOverride: shop?.trial_override ?? false,
         trialPaused: !!shop?.trial_paused_at,
         unlimited: !!shop?.trial_override && shop?.plan === "enterprise",
+        isRootAdmin: u.email === ROOT_ADMIN_EMAIL,
+        isAdmin: u.email === ROOT_ADMIN_EMAIL || adminEmails.has((u.email ?? "").toLowerCase()),
       };
     });
 
@@ -117,7 +123,16 @@ export default async function AdminUsersPage() {
                           {initials}
                         </div>
                         <div>
-                          {row.name && <p style={{ color: "var(--atext2)", fontSize: 12.5, fontWeight: 600, margin: "0 0 1px" }}>{row.name}</p>}
+                          {(row.name || row.isAdmin) && (
+                            <p style={{ color: "var(--atext2)", fontSize: 12.5, fontWeight: 600, margin: "0 0 1px", display: "flex", alignItems: "center", gap: 6 }}>
+                              {row.name}
+                              {row.isAdmin && (
+                                <span style={{ fontSize: 9.5, fontWeight: 700, padding: "2px 7px", borderRadius: 20, letterSpacing: "0.04em", textTransform: "uppercase", color: "var(--astatus-purple-fg)", background: "var(--astatus-purple-bg)" }}>
+                                  Admin
+                                </span>
+                              )}
+                            </p>
+                          )}
                           <p style={{ color: "var(--aw42)", fontSize: 11.5, margin: 0 }}>{row.email}</p>
                         </div>
                       </div>
@@ -251,6 +266,26 @@ export default async function AdminUsersPage() {
                               </button>
                             </form>
                           </>
+                        )}
+                        {!row.isRootAdmin && row.email !== "-" && (
+                          <form action={row.isAdmin ? removeAdmin : addAdmin}>
+                            <input type="hidden" name="email" value={row.email} />
+                            <button
+                              type="submit"
+                              title={row.isAdmin ? "Remove admin panel access" : "Give this user admin panel access"}
+                              style={{
+                                display: "flex", alignItems: "center", gap: 5,
+                                padding: "5px 10px", borderRadius: 8, cursor: "pointer",
+                                background: row.isAdmin ? "var(--astatus-purple-bg)" : "var(--aw04)",
+                                border: row.isAdmin ? "1px solid var(--astatus-purple-border)" : "1px solid var(--aw08)",
+                                color: row.isAdmin ? "var(--astatus-purple-fg)" : "var(--aw3)",
+                                fontSize: 11, fontWeight: 600, fontFamily: "inherit", whiteSpace: "nowrap",
+                              }}
+                            >
+                              <KeyRound size={12} />
+                              {row.isAdmin ? "Remove admin" : "Make admin"}
+                            </button>
+                          </form>
                         )}
                         {row.isBanned ? (
                           <form action={unbanUser}>
