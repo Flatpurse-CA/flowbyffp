@@ -330,13 +330,14 @@ export function BookingClient({ shop, services, staff, businessHours, initialCus
       <div style={{ maxWidth: 680, margin: "0 auto", padding: "24px 24px 80px" }}>
         {activeTab === "services" && (
           <>
-            {categories.length > 1 && (
+            {/* Only worth filtering with 2+ real categories ("All" is index 0) */}
+            {categories.length > 2 && (
               <div style={{ display: "flex", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>
                 {categories.map(c => (
                   <button key={c} onClick={() => setCatFilter(c)} style={{
                     padding: "6px 14px", borderRadius: 20,
                     border: `1px solid ${catFilter === c ? ACCENT : "var(--cust-input-border)"}`,
-                    background: catFilter === c ? ACCENT : "white",
+                    background: catFilter === c ? ACCENT : "var(--cust-card-bg)",
                     color: catFilter === c ? "white" : "var(--cust-text-sub)",
                     fontSize: 12.5, fontWeight: catFilter === c ? 700 : 500, cursor: "pointer",
                   }}>
