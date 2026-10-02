@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
-  Clock, CheckCircle2, ChevronLeft, X, MapPin, Lock, CalendarClock, Star, Copy, Check,
+  Clock, CheckCircle2, ChevronLeft, X, MapPin, Lock, CalendarClock, Star, Copy, Check, Phone, Mail,
 } from "lucide-react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
@@ -19,7 +19,7 @@ const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type Shop = { id: string; name: string; city: string; province: string; streetAddress: string | null; stripeConnected: boolean; profileImageUrl: string | null; coverImageUrl: string | null };
+type Shop = { id: string; name: string; city: string; province: string; streetAddress: string | null; stripeConnected: boolean; profileImageUrl: string | null; coverImageUrl: string | null; phone: string | null; email: string | null };
 type Service = { id: string; name: string; price: number; duration_minutes: number; category: string | null };
 type Staff = { id: string; full_name: string; role: string | null; color: string };
 type BusinessHour = { weekday: number; open: boolean; start_time: string; end_time: string };
@@ -471,6 +471,45 @@ export function BookingClient({ shop, services, staff, businessHours, initialCus
             )}
           </div>
         )}
+
+        {/* Always visible (not a tab): Stripe reviews this page as the
+            business's website and looks for contact details and policies. */}
+        <section style={{ marginTop: 40, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 16 }}>
+          <div style={{ background: "var(--cust-card-bg)", border: "1px solid var(--cust-card-border)", borderRadius: 16, padding: "18px 20px" }}>
+            <h2 style={{ color: "var(--cust-text)", fontSize: 15, fontWeight: 800, margin: "0 0 12px" }}>Contact {shop.name}</h2>
+            <div style={{ display: "flex", flexDirection: "column", gap: 9, fontSize: 13.5 }}>
+              {(shop.streetAddress || shop.city) && (
+                <span style={{ color: "var(--cust-text-sub)", display: "flex", gap: 8, alignItems: "flex-start" }}>
+                  <MapPin size={14} style={{ flexShrink: 0, marginTop: 2 }} /> {[shop.streetAddress, shop.city, shop.province].filter(Boolean).join(", ")}
+                </span>
+              )}
+              {shop.phone && (
+                <a href={`tel:${shop.phone}`} style={{ color: "var(--cust-text-sub)", display: "flex", gap: 8, alignItems: "center", textDecoration: "none" }}>
+                  <Phone size={14} /> {shop.phone}
+                </a>
+              )}
+              {shop.email && (
+                <a href={`mailto:${shop.email}`} style={{ color: "var(--cust-text-sub)", display: "flex", gap: 8, alignItems: "center", textDecoration: "none", wordBreak: "break-all" }}>
+                  <Mail size={14} style={{ flexShrink: 0 }} /> {shop.email}
+                </a>
+              )}
+            </div>
+          </div>
+          <div style={{ background: "var(--cust-card-bg)", border: "1px solid var(--cust-card-border)", borderRadius: 16, padding: "18px 20px" }}>
+            <h2 style={{ color: "var(--cust-text)", fontSize: 15, fontWeight: 800, margin: "0 0 12px" }}>Booking policies</h2>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, fontSize: 13, lineHeight: 1.55, color: "var(--cust-text-sub)" }}>
+              <p style={{ margin: 0 }}>
+                <strong style={{ color: "var(--cust-text)" }}>Cancellations:</strong> You can cancel an upcoming booking at any time from your <Link href="/customer/account" style={{ color: ACCENT }}>Flow account</Link>. Please give as much notice as you can so the slot can go to someone else.
+              </p>
+              <p style={{ margin: 0 }}>
+                <strong style={{ color: "var(--cust-text)" }}>Refunds:</strong> For prepaid bookings, refund requests are handled directly by {shop.name}. Contact them using the details here.
+              </p>
+              <p style={{ margin: 0 }}>
+                <strong style={{ color: "var(--cust-text)" }}>Payment issues:</strong> If something looks wrong with a charge, contact {shop.name} first so they can sort it out quickly. Card payments are processed securely by Stripe.
+              </p>
+            </div>
+          </div>
+        </section>
       </div>
 
       {/* Booking flow modal */}

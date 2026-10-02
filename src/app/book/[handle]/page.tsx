@@ -19,7 +19,7 @@ export default async function BookingPage({ params }: { params: Promise<{ handle
 
   const { data: shop } = await admin
     .from("shops")
-    .select("id, name, city, province, street_address, handle, stripe_connected, profile_image_url, cover_image_url")
+    .select("id, name, city, province, street_address, handle, stripe_connected, profile_image_url, cover_image_url, phone, owner_id")
     .eq("handle", handle)
     .maybeSingle();
 
@@ -41,12 +41,13 @@ export default async function BookingPage({ params }: { params: Promise<{ handle
   // Canonicalize the URL casing so links always converge on one URL.
   if (rawHandle !== handle) permanentRedirect(`/book/${handle}`);
 
-  const [{ data: services }, { data: staff }, { data: hours }, customer, { data: reviewsRaw }] = await Promise.all([
+  const [{ data: services }, { data: staff }, { data: hours }, customer, { data: reviewsRaw }, { data: owner }] = await Promise.all([
     admin.from("services").select("id, name, price, duration_minutes, category").eq("shop_id", shop.id).eq("active", true).order("category", { ascending: true }).order("name", { ascending: true }),
     admin.from("staff").select("id, full_name, role, color").eq("shop_id", shop.id).eq("active", true),
     admin.from("business_hours").select("weekday, open, start_time, end_time").eq("shop_id", shop.id),
     getCustomerContext(),
     admin.from("reviews").select("id, rating, comment, created_at, customer_id, customers(full_name)").eq("shop_id", shop.id).order("created_at", { ascending: false }),
+    admin.auth.admin.getUserById(shop.owner_id as string),
   ]);
 
   const reviews = (reviewsRaw ?? []).map(r => {
@@ -83,6 +84,8 @@ export default async function BookingPage({ params }: { params: Promise<{ handle
         stripeConnected: Boolean(shop.stripe_connected),
         profileImageUrl: (shop.profile_image_url as string | null) ?? null,
         coverImageUrl: (shop.cover_image_url as string | null) ?? null,
+        phone: (shop.phone as string | null) ?? null,
+        email: owner.user?.email ?? null,
       }}
       services={(services ?? []) as { id: string; name: string; price: number; duration_minutes: number; category: string | null }[]}
       staff={(staff ?? []) as { id: string; full_name: string; role: string | null; color: string }[]}

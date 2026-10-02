@@ -1,7 +1,9 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireShop, getShopContext } from "@/lib/dashboard/shop";
+import { requireShop, getShopContext, getAuthUser } from "@/lib/dashboard/shop";
+import type Stripe from "stripe";
+import { toE164 } from "@/lib/phone";
 import { stripe } from "@/lib/stripe";
 import { getRequestOrigin } from "@/lib/requestOrigin";
 import { getPlan, getStripePriceId, type BillablePlanKey, type BillingInterval } from "@/lib/plans";
@@ -21,20 +23,56 @@ export async function startStripeOnboarding(): Promise<{ url?: string; error?: s
   if (!ctx || ctx.role !== "owner") return { error: "Only the shop owner can connect Stripe" };
   const { supabase, shopId } = await requireShop();
 
-  const { data: shop } = await supabase.from("shops").select("stripe_account_id, name").eq("id", shopId).maybeSingle();
+  const { data: shop } = await supabase
+    .from("shops")
+    .select("stripe_account_id, name, handle, phone, city, province, business_type")
+    .eq("id", shopId)
+    .maybeSingle();
   if (!shop) return { error: "Shop not found" };
 
   const origin = await getRequestOrigin();
   let accountId = shop.stripe_account_id as string | null;
 
+  // Stripe asks for a business website during onboarding, which most salons
+  // don't have. Prefilling the shop's public booking page (it lists the
+  // services, prices, location, contact details and policies Stripe checks
+  // for) plus category and description means the owner only confirms these
+  // instead of getting stuck. localhost isn't a URL Stripe will accept.
+  const user = await getAuthUser();
+  const businessType = ((shop.business_type as string | null) ?? "").toLowerCase();
+  const location = [shop.city, shop.province].filter(Boolean).join(", ");
+  const supportPhone = toE164(shop.phone as string | null);
+  const businessProfile: Stripe.AccountCreateParams.BusinessProfile = {
+    name: shop.name as string,
+    // 7298 = health and beauty spas, 7230 = barber and beauty shops
+    mcc: businessType.includes("spa") ? "7298" : "7230",
+    product_description: `${businessType ? businessType.charAt(0).toUpperCase() + businessType.slice(1) : "Hair and beauty"} services booked by appointment${location ? ` in ${location}` : ""}.`,
+    ...(shop.handle && origin.startsWith("https://") ? { url: `${origin}/book/${shop.handle}` } : {}),
+    ...(user?.email ? { support_email: user.email } : {}),
+    ...(supportPhone ? { support_phone: supportPhone } : {}),
+  };
+
   try {
     if (!accountId) {
       const account = await stripe().accounts.create({
         type: "express",
-        business_profile: { name: shop.name as string },
+        business_profile: businessProfile,
       });
       accountId = account.id;
       await supabase.from("shops").update({ stripe_account_id: accountId }).eq("id", shopId);
+    } else {
+      // Accounts created before this prefill existed (or by an owner who
+      // abandoned onboarding midway) — fill in whatever's still missing.
+      // Non-fatal: once the owner has submitted details Stripe may reject
+      // platform edits, and that must not block them returning to finish.
+      try {
+        const existing = await stripe().accounts.retrieve(accountId);
+        if (!existing.details_submitted) {
+          await stripe().accounts.update(accountId, { business_profile: businessProfile });
+        }
+      } catch {
+        // ignore — onboarding link below still works
+      }
     }
 
     const accountLink = await stripe().accountLinks.create({
