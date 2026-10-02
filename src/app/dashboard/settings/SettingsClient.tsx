@@ -284,21 +284,49 @@ export function SettingsClient({ shopId, initialBusinessHours, initialStripeConn
 
   const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 
-  const uploadImage = async (kind: "profile" | "cover", file: File) => {
+  // Phone/Mac photos are often HEIC (the storage bucket only accepts
+  // png/jpeg/webp/gif) or several MB (Vercel rejects request bodies over
+  // ~4.5MB before the server action even runs). Re-encoding to a resized
+  // JPEG in the browser fixes both; a format the browser itself can't decode
+  // surfaces as a clear error instead of a silent failure.
+  const prepareImage = async (file: File, kind: "profile" | "cover"): Promise<File> => {
+    const maxSide = kind === "cover" ? 2000 : 800;
+    let bitmap: ImageBitmap;
+    try {
+      bitmap = await createImageBitmap(file);
+    } catch {
+      throw new Error("This photo format isn't supported. Please use a JPG or PNG (on iPhone/Mac, export or screenshot the photo first).");
+    }
+    const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(bitmap.width * scale);
+    canvas.height = Math.round(bitmap.height * scale);
+    canvas.getContext("2d")!.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    bitmap.close();
+    const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, "image/jpeg", 0.85));
+    if (!blob) throw new Error("Couldn't process this image, try a different one.");
+    return new File([blob], `${kind}.jpg`, { type: "image/jpeg" });
+  };
+
+  const uploadImage = async (kind: "profile" | "cover", rawFile: File) => {
     setImageError(null);
-    if (!shopId) return;
-    if (!file.type.startsWith("image/")) {
-      setImageError("Please choose an image file");
+    if (!shopId) {
+      setImageError("Your shop isn't fully set up yet, refresh the page and try again.");
       return;
     }
-    if (file.size > MAX_IMAGE_BYTES) {
-      setImageError("Image must be under 5MB");
+    if (rawFile.type && !rawFile.type.startsWith("image/")) {
+      setImageError("Please choose an image file");
       return;
     }
 
     const setUploading = kind === "profile" ? setUploadingProfile : setUploadingCover;
     setUploading(true);
     try {
+      const file = await prepareImage(rawFile, kind);
+      if (file.size > MAX_IMAGE_BYTES) {
+        setImageError("Image must be under 5MB");
+        return;
+      }
       const formData = new FormData();
       formData.set("kind", kind);
       formData.set("file", file);
