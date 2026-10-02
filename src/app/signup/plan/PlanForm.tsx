@@ -45,12 +45,43 @@ function CheckIcon({ active, isDark }: { active: boolean; isDark: boolean }) {
   );
 }
 
-export function PlanForm({ error, foundersSpotsRemaining }: { error?: string; foundersSpotsRemaining: number }) {
+export function PlanForm({ error, foundersSpotsRemaining, unlimited = false }: { error?: string; foundersSpotsRemaining: number; unlimited?: boolean }) {
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const [selected, setSelected] = useState("starter");
   const [hovered, setHovered] = useState<string | null>(null);
   const plan = PLANS.find((p) => p.id === selected)!;
+
+  // Admin-granted Unlimited account: nothing to choose or pay for, so skip
+  // the pricing grid. choosePlan() applies the Unlimited grant regardless of
+  // the submitted plan, "enterprise" just keeps the form value truthful.
+  if (unlimited) {
+    return (
+      <div style={{ width: "100%", maxWidth: 520 }}>
+        <StepProgress step={3} backHref="/signup/shop" title="You're on Unlimited" />
+        <p style={{ color: "var(--auth-text-sub)", fontSize: 14, lineHeight: 1.6, margin: "8px 0 24px", animation: `0.5s ${easing} 60ms 1 normal both running fp-fade-up` }}>
+          The Flow team has given your account complimentary Unlimited access. Every feature is unlocked and there&apos;s no plan to pick or card to add.
+        </p>
+        {error && (
+          <p style={{ background: "rgb(70,10,10)", color: "rgb(252,165,165)", borderRadius: 8, padding: "10px 14px", fontSize: 13, marginBottom: 20 }}>
+            {error}
+          </p>
+        )}
+        <form action={choosePlan}>
+          <input type="hidden" name="plan" value="enterprise" />
+          <SubmitButton
+            pendingText="Saving…"
+            style={{
+              width: "100%", background: "rgb(109,40,217)", border: "none", color: "white",
+              borderRadius: 8, padding: "12px 0", fontSize: 14, fontWeight: 700, cursor: "pointer",
+            }}
+          >
+            Continue
+          </SubmitButton>
+        </form>
+      </div>
+    );
+  }
 
   return (
     <div style={{ width: "100%", maxWidth: 960 }}>
