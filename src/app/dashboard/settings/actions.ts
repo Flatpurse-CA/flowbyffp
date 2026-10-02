@@ -57,6 +57,8 @@ export type BillingStatus = {
   isFounder: boolean;
   foundersEligible: boolean;
   foundersSpotsRemaining: number;
+  /** Comped by an admin (trial_override): full access, nothing to pay or manage. */
+  unlimited: boolean;
 };
 
 export async function getBillingStatus(): Promise<BillingStatus | null> {
@@ -65,7 +67,7 @@ export async function getBillingStatus(): Promise<BillingStatus | null> {
   const { supabase, shopId } = await requireShop();
 
   const [{ data: shop }, { data: founders }] = await Promise.all([
-    supabase.from("shops").select("plan, subscription_status, billing_interval, is_founder, founder_discount_claimed_at").eq("id", shopId).maybeSingle(),
+    supabase.from("shops").select("plan, subscription_status, billing_interval, is_founder, founder_discount_claimed_at, trial_override").eq("id", shopId).maybeSingle(),
     supabase.from("founders_program").select("spots_remaining").eq("id", true).maybeSingle(),
   ]);
 
@@ -77,6 +79,7 @@ export async function getBillingStatus(): Promise<BillingStatus | null> {
     isFounder: Boolean(shop?.is_founder),
     foundersEligible: !shop?.founder_discount_claimed_at && spotsRemaining > 0,
     foundersSpotsRemaining: spotsRemaining,
+    unlimited: Boolean(shop?.trial_override),
   };
 }
 

@@ -1,6 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-import { banUser, unbanUser, deleteUser, resetShopTrial, setTrialOverride, pauseShopTrial, resumeShopTrial } from "./actions";
-import { UserX, UserCheck, Trash2, RotateCcw, ShieldCheck, ShieldOff, Pause, Play } from "lucide-react";
+import { banUser, unbanUser, deleteUser, resetShopTrial, setTrialOverride, pauseShopTrial, resumeShopTrial, setUnlimited } from "./actions";
+import { UserX, UserCheck, Trash2, RotateCcw, ShieldCheck, ShieldOff, Pause, Play, Infinity as InfinityIcon } from "lucide-react";
 import { PlanSelect } from "./PlanSelect";
 import { AddTrialDaysForm } from "./AddTrialDaysForm";
 import { RestartAllTrialsButton } from "./RestartAllTrialsButton";
@@ -61,6 +61,7 @@ export default async function AdminUsersPage() {
         accessStatus: access?.status ?? null,
         trialOverride: shop?.trial_override ?? false,
         trialPaused: !!shop?.trial_paused_at,
+        unlimited: !!shop?.trial_override && shop?.plan === "enterprise",
       };
     });
 
@@ -167,7 +168,7 @@ export default async function AdminUsersPage() {
                           color: ACCESS_STATUS_COLOR[row.accessStatus].fg,
                           background: ACCESS_STATUS_COLOR[row.accessStatus].bg,
                         }}>
-                          {row.trialOverride ? "Bypassed" : ACCESS_STATUS_LABEL[row.accessStatus]}
+                          {row.unlimited ? "Unlimited" : row.trialOverride ? "Bypassed" : ACCESS_STATUS_LABEL[row.accessStatus]}
                         </span>
                       ) : (
                         <span style={{ color: "var(--aw18)", fontSize: 12 }}>-</span>
@@ -211,6 +212,25 @@ export default async function AdminUsersPage() {
                               </button>
                             </form>
                             <AddTrialDaysForm userId={row.id} />
+                            <form action={setUnlimited}>
+                              <input type="hidden" name="userId" value={row.id} />
+                              <input type="hidden" name="enabled" value={row.unlimited ? "false" : "true"} />
+                              <button
+                                type="submit"
+                                title={row.unlimited ? "Remove unlimited, restores their previous plan" : "Unlimited: free full access on Enterprise, no payment needed"}
+                                style={{
+                                  display: "flex", alignItems: "center", gap: 5,
+                                  padding: "5px 10px", borderRadius: 8, cursor: "pointer",
+                                  background: row.unlimited ? "var(--astatus-purple-bg)" : "var(--aw04)",
+                                  border: row.unlimited ? "1px solid var(--astatus-purple-border)" : "1px solid var(--aw08)",
+                                  color: row.unlimited ? "var(--astatus-purple-fg)" : "var(--aw3)",
+                                  fontSize: 11, fontWeight: 600, fontFamily: "inherit", whiteSpace: "nowrap",
+                                }}
+                              >
+                                <InfinityIcon size={12} />
+                                {row.unlimited ? "Remove unlimited" : "Unlimited"}
+                              </button>
+                            </form>
                             <form action={setTrialOverride}>
                               <input type="hidden" name="userId" value={row.id} />
                               <input type="hidden" name="enabled" value={row.trialOverride ? "false" : "true"} />

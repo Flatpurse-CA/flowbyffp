@@ -99,9 +99,19 @@ export async function POST(req: Request) {
       .from("shops")
       .update({
         subscription_status: canceled ? "canceled" : sub.status,
-        ...(canceled ? { plan: "starter", subscription_id: null, billing_interval: null } : {}),
+        ...(canceled ? { subscription_id: null, billing_interval: null } : {}),
       })
       .eq("stripe_customer_id", customerId);
+
+    // Comped (Unlimited) shops keep their admin-granted plan when an old
+    // subscription ends; everyone else drops back to Starter.
+    if (canceled) {
+      await admin
+        .from("shops")
+        .update({ plan: "starter" })
+        .eq("stripe_customer_id", customerId)
+        .eq("trial_override", false);
+    }
   }
 
   // Disputes on either a platform subscription charge or a shop's own Connect

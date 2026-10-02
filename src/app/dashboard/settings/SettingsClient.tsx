@@ -817,7 +817,19 @@ export function SettingsClient({ shopId, initialBusinessHours, initialStripeConn
       )}
 
       {/* ── Billing ── */}
-      {tab === "Billing" && (
+      {tab === "Billing" && initialBilling?.unlimited && (
+        <div style={{ ...card, background: "rgb(23,14,58)", border: "1px solid rgba(139,92,246,0.25)" }}>
+          <span style={{ fontSize: 10, fontWeight: 700, padding: "3px 9px", borderRadius: 20, background: "rgb(109,40,217)", color: "rgb(255,255,255)", letterSpacing: "0.06em", textTransform: "uppercase" }}>
+            Unlimited
+          </span>
+          <p style={{ color: "rgb(250,250,250)", fontSize: 28, fontWeight: 800, margin: "12px 0 4px", letterSpacing: "-0.04em" }}>Complimentary access</p>
+          <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 13, margin: 0 }}>
+            Your account has every feature unlocked by the Flow team. No payment needed.
+          </p>
+        </div>
+      )}
+
+      {tab === "Billing" && !initialBilling?.unlimited && (
         <>
           {/* Current plan */}
           <div style={{
