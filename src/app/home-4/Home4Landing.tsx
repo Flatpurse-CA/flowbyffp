@@ -623,25 +623,6 @@ export default function Home4Landing({ initialAudience = "owners", onAudienceCha
             ))}
           </div>
         </section>
-
-        {/* ── Closing ── */}
-        <section className="closing">
-          {isClients ? (
-            <>
-              <div className="eyebrow">A LITTLE TIME FOR YOURSELF</div>
-              <h2>Your next great visit.<br /><em>One less thing to organise.</em></h2>
-              <a className="button" href="#booking">How to book your visit <ArrowUpRight className="h4-arrow" size={16} aria-hidden="true" /></a>
-              <p>Start with your salon or barber’s booking link.</p>
-            </>
-          ) : (
-            <>
-              <div className="eyebrow">START YOUR NEXT CHAPTER</div>
-              <h2>Stop letting your client<br />book your competitors.</h2>
-              <p>Start free today. No credit card required. Founders pricing may be available for the first 40 shops: 40% off for 12 months, then 25% off while your subscription stays active.</p>
-              <Link className="button" href="/signup">Start your free trial <ArrowUpRight className="h4-arrow" size={16} aria-hidden="true" /></Link>
-            </>
-          )}
-        </section>
       </main>
     </div>
 
