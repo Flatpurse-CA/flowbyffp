@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { useState } from "react";
 import { CreditCard, MessageCircle, Camera, Calendar, Mail, Smartphone, Zap, Star, ChevronDown } from "lucide-react";
 
@@ -76,7 +77,15 @@ const FAQS = [
   { n: "08", q: "Can I cancel or change my plan anytime?", a: "Absolutely. There are no contracts or lock-in periods. You can upgrade, downgrade, or cancel at any time. If you cancel, you keep access until the end of your billing period." },
 ];
 
-export default function IntegrationsGrid() {
+// extraFaqs: optional questions a page appends to the FAQ (home-5 adds
+// home-4's). Omitted, the FAQ is exactly as before.
+export type ExtraFaq = { q: string; a: ReactNode };
+
+export default function IntegrationsGrid({ extraFaqs = [] }: { extraFaqs?: ExtraFaq[] } = {}) {
+  const faqs: { n: string; q: string; a: ReactNode }[] = [
+    ...FAQS,
+    ...extraFaqs.map((f, i) => ({ n: String(FAQS.length + i + 1).padStart(2, "0"), q: f.q, a: f.a })),
+  ];
   const [open, setOpen] = useState<number | null>(null);
   return (
     <section className="ig-section" style={{ background: "#fff", padding: "100px 155px 120px", position: "relative" }}>
@@ -161,7 +170,7 @@ export default function IntegrationsGrid() {
         <h3 style={{ fontSize: "clamp(24px, 2.5vw, 36px)", fontWeight: 800, letterSpacing: "-0.03em", color: "#0a0a0a", margin: "0 0 48px", textAlign: "center" }}>
           Frequently Asked Questions
         </h3>
-        {FAQS.map((faq, i) => {
+        {faqs.map((faq, i) => {
           const isOpen = open === i;
           return (
             <div key={i} className="faq-row" style={{ borderTop: "1px solid rgba(0,0,0,0.08)", transition: "background 0.2s", borderRadius: 6, margin: "0 -16px", padding: "0 16px" }}>
@@ -173,7 +182,7 @@ export default function IntegrationsGrid() {
                 <span className="faq-q" style={{ flex: 1, fontSize: 15, fontWeight: 500, color: isOpen ? "#0a0a0a" : "rgba(0,0,0,0.6)", letterSpacing: "-0.02em", textAlign: "left", transition: "color 0.2s" }}>{faq.q}</span>
                 <ChevronDown size={17} color="rgba(0,0,0,0.3)" style={{ flexShrink: 0, transform: isOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.3s cubic-bezier(0.16,1,0.3,1)" }} />
               </button>
-              <div style={{ overflow: "hidden", maxHeight: isOpen ? 200 : 0, opacity: isOpen ? 1 : 0, transition: "max-height 0.4s cubic-bezier(0.16,1,0.3,1), opacity 0.3s ease" }}>
+              <div style={{ overflow: "hidden", maxHeight: isOpen ? 400 : 0, opacity: isOpen ? 1 : 0, transition: "max-height 0.4s cubic-bezier(0.16,1,0.3,1), opacity 0.3s ease" }}>
                 <p style={{ fontSize: 14, color: "rgba(0,0,0,0.45)", lineHeight: 1.75, margin: "0 0 24px", paddingLeft: 44 }}>{faq.a}</p>
               </div>
             </div>
@@ -191,6 +200,7 @@ export default function IntegrationsGrid() {
           background: rgba(113,42,226,0.03);
           transform: translateY(-3px);
         }
+        .faq-row p a { color: #712AE2; text-decoration: underline; text-underline-offset: 3px; }
         .faq-row:hover {
           background: rgba(113,42,226,0.03);
         }

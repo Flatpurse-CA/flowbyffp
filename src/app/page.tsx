@@ -1,3 +1,3 @@
-import Home3Page from "./home-3/page";
+import Home5Page from "./home-5/page";
 
-export default Home3Page;
+export default Home5Page;

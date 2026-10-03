@@ -1,12 +1,17 @@
 "use client";
 
+import type { ReactNode } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
 const BRAND_PURPLE = "#712AE2";
 
 
-export default function Footer() {
+// Optional overrides so a page can supply its own CTA banner copy and an
+// extra links row; omitted props keep the footer exactly as before.
+export type FooterCta = { heading: ReactNode; body: ReactNode; href: string; label: ReactNode; eyebrow?: string };
+
+export default function Footer({ cta, children }: { cta?: FooterCta; children?: ReactNode } = {}) {
   return (
     <footer style={{ background: "#060606" }}>
       {/* CTA Banner */}
@@ -21,6 +26,9 @@ export default function Footer() {
         <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.18)", pointerEvents: "none", zIndex: 1 }} />
 
         <div style={{ position: "relative", zIndex: 2, maxWidth: 680, margin: "0 auto" }}>
+          {cta?.eyebrow && (
+            <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.14em", color: "rgba(255,255,255,0.75)", margin: "0 0 16px" }}>{cta.eyebrow}</p>
+          )}
           <h2 className="footer-cta-heading" style={{
             fontSize: "clamp(32px, 4.5vw, 60px)",
             fontWeight: 900,
@@ -29,7 +37,7 @@ export default function Footer() {
             color: "#fff",
             margin: "0 0 20px",
           }}>
-            Stop Letting Your Client<br />Book Your Competitors
+            {cta ? cta.heading : <>Stop Letting Your Client<br />Book Your Competitors</>}
           </h2>
           <p style={{
             fontSize: 16,
@@ -38,9 +46,9 @@ export default function Footer() {
             margin: "0 auto 40px",
             maxWidth: 480,
           }}>
-            Start free today. No credit card required. Auto-enrolled in 40% off for 12 months, then 25% off for life, if you&apos;re one of the first 40 shops.
+            {cta ? cta.body : <>Start free today. No credit card required. Auto-enrolled in 40% off for 12 months, then 25% off for life, if you&apos;re one of the first 40 shops.</>}
           </p>
-          <Link href="/signup" style={{
+          <Link href={cta?.href ?? "/signup"} style={{
             display: "inline-flex", alignItems: "center", justifyContent: "center",
             padding: "16px 36px",
             background: "transparent",
@@ -53,13 +61,14 @@ export default function Footer() {
           }}
             className="footer-cta-btn"
           >
-            Start Your Free Trial
+            {cta ? cta.label : "Start Your Free Trial"}
           </Link>
         </div>
       </div>
 
       {/* Footer body */}
       <div className="footer-body" style={{ padding: "0 155px 0", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
+        {children}
         {/* Bottom bar */}
         <div className="footer-bottom" style={{
           borderTop: "1px solid rgba(255,255,255,0.07)",

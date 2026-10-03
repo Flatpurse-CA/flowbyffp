@@ -52,7 +52,9 @@ const FEATURES = [
 ];
 
 
-export default function FeatureTabs() {
+// fitViewport: opt-in compact sizing so the whole card fits one screen
+// height (used by home-5). Off by default so other pages are unchanged.
+export default function FeatureTabs({ fitViewport = false }: { fitViewport?: boolean } = {}) {
   const [activeIndex, setActiveIndex] = useState(0);
   const feature = FEATURES[activeIndex];
 
@@ -73,6 +75,14 @@ export default function FeatureTabs() {
           from { transform: translateY(8px); opacity: 0; }
           to   { transform: translateY(0);   opacity: 1; }
         }
+        @media (min-width: 901px) {
+          .ft-fit .ft-outer { padding: clamp(24px, 4vh, 48px) 44px !important; }
+          .ft-fit .ft-grid { gap: 56px !important; }
+          /* Only the active tab keeps its description, so rows don't reserve empty space */
+          .ft-fit .ft-desc:not(.ft-desc-on) { display: none !important; }
+          .ft-fit .ft-tab { min-height: 0 !important; padding: clamp(10px, 1.6vh, 18px) 0 !important; }
+          .ft-fit .ft-image { aspect-ratio: auto !important; height: min(calc(100vh - 160px), 680px); top: 80px !important; }
+        }
         @media (max-width: 900px) {
           .ft-wrap { margin-top: 32px !important; }
           .ft-outer { padding: 28px 24px !important; }
@@ -84,7 +94,7 @@ export default function FeatureTabs() {
         }
       `}</style>
 
-      <div className="ft-wrap" style={{ marginTop: 80, width: "100%", textAlign: "left" }}>
+      <div className={`ft-wrap${fitViewport ? " ft-fit" : ""}`} style={{ marginTop: 80, width: "100%", textAlign: "left" }}>
         <div className="ft-outer" style={{
           background: "#fff",
           borderRadius: 12,
