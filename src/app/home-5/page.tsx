@@ -17,7 +17,7 @@ import GradientWaves from "@/components/GradientWaves";
 import { EXTRA_FAQS } from "./extraFaqs";
 import { AudienceProvider, HeroAudienceToggle, HeroCopy, PageSwitch, Home5Main, Home5FooterRow } from "./Home5Landing";
 
-const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600", "700"] });
+const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600", "700"], variable: "--font-inter" });
 
 const H3 = {
   bg: "#ffffff",
@@ -39,6 +39,8 @@ const H3 = {
 export default function Home5Page() {
   return (
     <AudienceProvider>
+    {/* --font-inter lets home-4's Clients page (rendered by PageSwitch) use Inter too */}
+    <div className={inter.variable}>
     <PageSwitch owners={
     <div className={inter.className} style={{ background: H3.bg, color: H3.ink }}>
       {/* ── Nav ── */}
@@ -210,6 +212,7 @@ export default function Home5Page() {
       </Footer>
     </div>
     } />
+    </div>
     </AudienceProvider>
   );
 }

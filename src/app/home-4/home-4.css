@@ -661,3 +661,22 @@
   .h4-page[data-audience="owners"] > header { margin:8px 8px 0;padding:14px calc(6% - 8px) 4px;border-radius:20px 20px 0 0 }
   .h4-page[data-audience="owners"] .hero { border-radius:0 0 20px 20px }
 }
+
+/* ── Clients view: site font (Inter), brand colours, cards with breathing room ── */
+.h4-page[data-audience="clients"],
+.h4-page[data-audience="clients"] h1,
+.h4-page[data-audience="clients"] h2,
+.h4-page[data-audience="clients"] h3 { font-family:var(--font-inter),Inter,system-ui,sans-serif }
+.h4-page[data-audience="clients"] h2,
+.h4-page[data-audience="clients"] h3 { letter-spacing:-0.025em;font-weight:600 }
+.h4-page[data-audience="clients"] h1 { letter-spacing:-0.03em }
+.h4-page[data-audience="clients"] .feature-grid { gap:16px }
+.h4-page[data-audience="clients"] .feature-grid article,
+.h4-page[data-audience="clients"] .feature-grid article+article { background:#fff;border:1px solid rgba(113,42,226,0.12);border-radius:20px;padding:28px }
+.h4-page[data-audience="clients"] .feature-grid article:nth-child(2) { background:#f8f4ff }
+.h4-page[data-audience="clients"] .feature-grid article:nth-child(3) { background:#f1edff }
+.h4-page[data-audience="clients"] .tags span { border-color:rgba(113,42,226,0.25);color:#5406ce;background:#fff }
+@media (max-width:700px) {
+  .h4-page[data-audience="clients"] .feature-grid article,
+  .h4-page[data-audience="clients"] .feature-grid article+article { padding:24px 22px;border-top:1px solid rgba(113,42,226,0.12) }
+}
