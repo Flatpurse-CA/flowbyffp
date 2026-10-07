@@ -6,12 +6,17 @@ import { createClient } from "@/lib/supabase/server";
 import { sendPasswordResetEmail, sendWelcomeEmail, sendPasswordChangedEmail } from "@/lib/resend";
 import { getRequestOrigin } from "@/lib/requestOrigin";
 import { validatePassword } from "@/lib/passwordPolicy";
+import { pgrstQuote } from "@/lib/postgrest";
+import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 
 export async function customerSignup(input: { fullName: string; email: string; phone?: string; password: string }): Promise<{ error?: string }> {
   const fullName = input.fullName.trim();
   const email = input.email.trim();
 
   if (!fullName || !email || !input.password) return { error: "All fields are required" };
+  if (!await checkRateLimit(`customer-signup-ip:${await getClientIp()}`, 5, 60 * 60 * 1000)) {
+    return { error: "Too many attempts, wait a few minutes and try again" };
+  }
   const signupPasswordError = validatePassword(input.password);
   if (signupPasswordError) return { error: signupPasswordError };
 
@@ -38,7 +43,7 @@ export async function customerSignup(input: { fullName: string; email: string; p
   // (e.g. a walk-in a shop entered manually before this person had an
   // account) so it shows up in "My bookings" retroactively, instead of
   // being permanently orphaned from the account that now represents them.
-  const orFilters = [`client_email.eq.${email}`, phone ? `client_phone.eq.${phone}` : null].filter(Boolean).join(",");
+  const orFilters = [`client_email.eq.${pgrstQuote(email)}`, phone ? `client_phone.eq.${pgrstQuote(phone)}` : null].filter(Boolean).join(",");
   await admin.from("appointments").update({ customer_id: customerRow.id }).is("customer_id", null).or(orFilters);
 
   const supabase = await createClient();
@@ -55,6 +60,10 @@ export async function customerSignup(input: { fullName: string; email: string; p
 }
 
 export async function customerLogin(input: { email: string; password: string }): Promise<{ error?: string }> {
+  const ip = await getClientIp();
+  if (!await checkRateLimit(`customer-login:${input.email.trim().toLowerCase()}`, 10, 10 * 60 * 1000) || !await checkRateLimit(`customer-login-ip:${ip}`, 30, 10 * 60 * 1000)) {
+    return { error: "Too many attempts, wait a few minutes and try again" };
+  }
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({ email: input.email, password: input.password });
   if (error) return { error: error.message };
@@ -62,6 +71,8 @@ export async function customerLogin(input: { email: string; password: string }):
 }
 
 export async function customerRequestPasswordReset(email: string): Promise<{ error?: string }> {
+  // Report success when limited, same "don't leak account state" reasoning as below.
+  if (!await checkRateLimit(`customer-reset:${email.trim().toLowerCase()}`, 3, 10 * 60 * 1000)) return {};
   const origin = await getRequestOrigin();
   const admin = createAdminClient();
 

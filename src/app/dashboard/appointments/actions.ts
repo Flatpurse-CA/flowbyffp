@@ -1,6 +1,7 @@
 "use server";
 
 import { normalizePhoneForStorage } from "@/lib/phone";
+import { pgrstQuote } from "@/lib/postgrest";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -112,8 +113,8 @@ export async function createAppointment(input: {
   if (input.clientEmail || input.clientPhone) {
     const admin = createAdminClient();
     const orFilters = [
-      input.clientEmail ? `email.eq.${input.clientEmail}` : null,
-      input.clientPhone ? `phone.eq.${input.clientPhone}` : null,
+      input.clientEmail ? `email.eq.${pgrstQuote(input.clientEmail)}` : null,
+      input.clientPhone ? `phone.eq.${pgrstQuote(input.clientPhone)}` : null,
     ].filter(Boolean).join(",");
     const { data: match } = await admin.from("customers").select("id").or(orFilters).limit(1).maybeSingle();
     customerId = (match?.id as string | undefined) ?? null;

@@ -113,7 +113,7 @@ export async function createPublicBooking(input: {
   const ctx = await getCustomerContext();
   if (!ctx) return { error: "You need to be signed in to book" };
 
-  if (!checkRateLimit(`create-booking:${ctx.customerId}`, 10, 10 * 60 * 1000)) {
+  if (!await checkRateLimit(`create-booking:${ctx.customerId}`, 10, 10 * 60 * 1000)) {
     return { error: "Too many booking attempts — wait a few minutes and try again" };
   }
 

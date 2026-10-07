@@ -7,7 +7,7 @@ import { sendOtpEmail, sendWelcomeEmail } from "@/lib/resend";
 import { checkRateLimit } from "@/lib/rateLimit";
 
 export async function verifyCode(email: string, token: string): Promise<{ error?: string }> {
-  if (!checkRateLimit(`verify-otp:${email.toLowerCase()}`, 8, 10 * 60 * 1000)) {
+  if (!await checkRateLimit(`verify-otp:${email.toLowerCase()}`, 8, 10 * 60 * 1000)) {
     return { error: "Too many attempts — wait a few minutes and try again" };
   }
 
@@ -32,7 +32,7 @@ export async function verifyCode(email: string, token: string): Promise<{ error?
 }
 
 export async function resendCode(email: string): Promise<{ error?: string }> {
-  if (!checkRateLimit(`resend-otp:${email.toLowerCase()}`, 3, 10 * 60 * 1000)) {
+  if (!await checkRateLimit(`resend-otp:${email.toLowerCase()}`, 3, 10 * 60 * 1000)) {
     return { error: "Too many resend attempts — wait a few minutes and try again" };
   }
 

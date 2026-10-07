@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { createAdminClient, isEmailAlreadyConfirmed } from "@/lib/supabase/admin";
 import { validatePassword } from "@/lib/passwordPolicy";
+import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 
 const ONBOARDING_COOKIE_MAX_AGE = 60 * 30;
 
@@ -15,6 +16,9 @@ export async function createAccount(formData: FormData) {
 
   if (!firstName || !lastName || !email || !password) {
     redirect(`/signup?error=${encodeURIComponent("All fields are required")}`);
+  }
+  if (!await checkRateLimit(`signup-ip:${await getClientIp()}`, 5, 60 * 60 * 1000)) {
+    redirect(`/signup?error=${encodeURIComponent("Too many attempts, wait a few minutes and try again")}`);
   }
   const passwordError = validatePassword(password);
   if (passwordError) {

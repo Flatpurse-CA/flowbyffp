@@ -2,6 +2,7 @@
 
 import { createAdminClient } from "@/lib/supabase/admin";
 import { enqueueSubscriber } from "@/lib/email-sequence";
+import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 
 export async function joinWaitlist(
   email: string,
@@ -10,6 +11,10 @@ export async function joinWaitlist(
 ): Promise<{ error: string | null }> {
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return { error: "Please enter a valid email address." };
+  }
+
+  if (!await checkRateLimit(`waitlist-ip:${await getClientIp()}`, 5, 60 * 60 * 1000)) {
+    return { error: "Too many attempts, wait a few minutes and try again" };
   }
 
   const admin = createAdminClient();

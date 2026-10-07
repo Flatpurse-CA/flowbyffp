@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isAdmin } from "@/lib/admin-guard";
+import { pgrstQuote } from "@/lib/postgrest";
 
 type SearchResult = {
   id: string;
@@ -26,7 +27,7 @@ export async function GET(req: NextRequest) {
   const [usersRes, shopsRes, waitlistRes] = await Promise.all([
     admin.auth.admin.listUsers({ perPage: 1000 }),
     admin.from("shops").select("id, name, business_type").ilike("name", `%${q}%`).limit(8),
-    admin.from("waitlist").select("id, email, name").or(`email.ilike.%${q}%,name.ilike.%${q}%`).limit(8),
+    admin.from("waitlist").select("id, email, name").or(`email.ilike.${pgrstQuote(`%${q}%`)},name.ilike.${pgrstQuote(`%${q}%`)}`).limit(8),
   ]);
 
   const results: SearchResult[] = [];

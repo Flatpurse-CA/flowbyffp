@@ -399,6 +399,12 @@ export async function updateBusinessProfile(input: BusinessProfile): Promise<{ e
 }
 
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+const ALLOWED_IMAGE_TYPES: Record<string, string> = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+  "image/gif": "gif",
+};
 
 // The file itself is uploaded here (not client-direct-to-storage) so type and
 // size are actually enforced — a client-side-only check can be bypassed by
@@ -413,10 +419,13 @@ export async function updateShopImage(formData: FormData): Promise<{ error?: str
   const file = formData.get("file") as File | null;
   if (kind !== "profile" && kind !== "cover") return { error: "Invalid image kind" };
   if (!file || file.size === 0) return { error: "No file provided" };
-  if (!file.type.startsWith("image/")) return { error: "Please choose an image file" };
+  // Raster formats only: "image/*" would also admit SVG, which can carry
+  // script and is served publicly from the bucket. Extension comes from the
+  // checked type, never the client-supplied filename.
+  const ext = ALLOWED_IMAGE_TYPES[file.type];
+  if (!ext) return { error: "Please choose a JPG, PNG, WebP or GIF image" };
   if (file.size > MAX_IMAGE_BYTES) return { error: "Image must be under 5MB" };
 
-  const ext = file.name.split(".").pop() || "jpg";
   const path = `${shopId}/${kind}-${Date.now()}.${ext}`;
   const { error: uploadError } = await supabase.storage.from("shop-assets").upload(path, file, { upsert: true, contentType: file.type });
   if (uploadError) return { error: uploadError.message };
