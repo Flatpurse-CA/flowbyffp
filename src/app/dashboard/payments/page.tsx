@@ -43,7 +43,7 @@ export default async function PaymentsPage() {
     new Intl.DateTimeFormat("en-CA", { timeZone: "America/Edmonton", month: "short", day: "numeric" }).format(new Date(iso));
 
   return (
-    <div style={{ maxWidth: 900, display: "flex", flexDirection: "column", gap: 22 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
       <div>
         <h1 style={{ color: "var(--dtext)", fontSize: 22, fontWeight: 800, margin: "0 0 3px", letterSpacing: "-0.03em" }}>Payments</h1>
         <p style={{ color: "var(--dw35)", fontSize: 13, margin: 0 }}>Transaction history from your last 90 days of bookings.</p>
@@ -66,7 +66,7 @@ export default async function PaymentsPage() {
 
       {payments.length === 0 ? (
         <div style={{ ...card, textAlign: "center", padding: "40px 20px" }}>
-          <Wallet size={22} color="var(--dw25)" style={{ marginBottom: 10 }} />
+          <Wallet size={22} color="var(--dw25)" style={{ display: "block", margin: "0 auto 10px" }} />
           <p style={{ color: "var(--dw3)", fontSize: 13, margin: 0 }}>No payments recorded yet — they&apos;ll show up here once a booking is paid or deposited.</p>
         </div>
       ) : (

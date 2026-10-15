@@ -60,7 +60,7 @@ export function DailyBriefClient({ data }: { data: DailyBriefData }) {
               return (
                 <Link key={item.id} href={KIND_HREF[item.kind]} style={{
                   display: "flex", alignItems: "center", gap: 12, textDecoration: "none",
-                  background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.18)",
+                  background: "var(--dcard-l, rgba(239,68,68,0.06))", border: "1px solid rgba(239,68,68,0.18)",
                   borderRadius: 14, padding: "14px 16px",
                 }}>
                   <div style={{ width: 34, height: 34, borderRadius: 10, background: "rgba(239,68,68,0.12)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>

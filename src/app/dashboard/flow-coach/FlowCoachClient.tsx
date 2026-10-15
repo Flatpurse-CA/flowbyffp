@@ -37,7 +37,7 @@ function Card({ c }: { c: FlowCoachCard }) {
       )}
 
       {c.recommendation && (
-        <div style={{ background: "rgba(139,92,246,0.08)", border: "1px solid rgba(139,92,246,0.18)", borderRadius: 10, padding: "10px 12px" }}>
+        <div style={{ background: "var(--dcard-l, rgba(139,92,246,0.08))", border: "1px solid var(--dsel-border-l, rgba(139,92,246,0.18))", borderLeft: "3px solid var(--dsel-border-l, rgba(139,92,246,0.18))", borderRadius: 10, padding: "10px 12px" }}>
           <p style={{ color: "var(--dpurple-text)", fontSize: 12, lineHeight: 1.5, margin: 0 }}>
             <span style={{ fontWeight: 700 }}>Recommendation: </span>{c.recommendation}
           </p>
@@ -47,8 +47,8 @@ function Card({ c }: { c: FlowCoachCard }) {
       {c.impact && (
         <span style={{
           alignSelf: "flex-start", fontSize: 11, fontWeight: 700, padding: "3px 9px", borderRadius: 20,
-          background: c.impact.startsWith("-") ? "rgba(248,113,113,0.12)" : "rgba(52,211,153,0.12)",
-          color: c.impact.startsWith("-") ? "var(--dred-text)" : "var(--dgreen-text)",
+          background: c.impact.startsWith("-") ? "var(--dbadge-red-l, rgba(248,113,113,0.12))" : "var(--dbadge-green-l, rgba(52,211,153,0.12))",
+          color: c.impact.startsWith("-") ? "var(--dsel-text-l, var(--dred-text))" : "var(--dsel-text-l, var(--dgreen-text))",
         }}>
           Expected impact: {c.impact}
         </span>
@@ -102,7 +102,7 @@ export function FlowCoachClient({ data }: { data: FlowCoachData | null }) {
           <p style={{ color: "var(--dw35)", fontSize: 10, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: 0 }}>{healthCard.eyebrow}</p>
           {healthCard.diagnosis && <p style={{ color: "var(--dw5)", fontSize: 13, lineHeight: 1.6, margin: 0 }}>{healthCard.diagnosis}</p>}
           {healthCard.recommendation && (
-            <div style={{ background: "rgba(139,92,246,0.08)", border: "1px solid rgba(139,92,246,0.18)", borderRadius: 10, padding: "10px 12px" }}>
+            <div style={{ background: "var(--dcard-l, rgba(139,92,246,0.08))", border: "1px solid var(--dsel-border-l, rgba(139,92,246,0.18))", borderLeft: "3px solid var(--dsel-border-l, rgba(139,92,246,0.18))", borderRadius: 10, padding: "10px 12px" }}>
               <p style={{ color: "var(--dpurple-text)", fontSize: 12.5, lineHeight: 1.5, margin: 0 }}>
                 <span style={{ fontWeight: 700 }}>Recommendation: </span>{healthCard.recommendation}
               </p>

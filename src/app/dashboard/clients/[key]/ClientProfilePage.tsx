@@ -99,7 +99,7 @@ export function ClientProfilePage({ client, appointments, engaged }: {
         display: "flex", flexDirection: "column", alignItems: "center", gap: 5,
         padding: "10px 12px", borderRadius: 12,
         border: primary ? "none" : "1px solid var(--dw08)",
-        background: primary ? "rgb(109,40,217)" : "var(--dw04)",
+        background: primary ? "rgb(109,40,217)" : "var(--dcard-l, var(--dw04))",
         cursor: disabled ? "default" : "pointer", flex: 1, textDecoration: "none",
         opacity: disabled ? 0.4 : 1, pointerEvents: disabled ? "none" : "auto",
       }}>
@@ -169,7 +169,7 @@ export function ClientProfilePage({ client, appointments, engaged }: {
       }}>
         {statItem("Visits", String(client.visits))}
         <div style={{ width: 1, background: "var(--dsurface3)" }} />
-        {statItem("LTV", fmtPrice(client.ltv), "rgb(52,211,153)")}
+        {statItem("LTV", fmtPrice(client.ltv), "var(--dgreen-text)")}
         <div style={{ width: 1, background: "var(--dsurface3)" }} />
         {statItem("Avg spend", fmtPrice(avgSpend))}
         <div style={{ width: 1, background: "var(--dsurface3)" }} />

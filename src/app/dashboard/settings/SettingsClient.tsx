@@ -11,6 +11,7 @@ import {
 import { updateBusinessHours, startStripeOnboarding, startCheckout, chooseStarterPlan, openBillingPortal, setFlowEnabled, updateNotificationPrefs, updateTaxSettings, updateBusinessProfile, updateShopImage, type BusinessHourRow, type BillingStatus, type BusinessProfile, type FlowKey, type NotificationPrefs } from "./actions";
 import { PLANS, NO_MARKETPLACE_FEE_NOTE, type BillingInterval } from "@/lib/plans";
 import { PROVINCES, computeTax, describeRates, getProvince, type ShopTaxSettings } from "@/lib/tax";
+import { deepen } from "@/lib/dashboard/deepen";
 
 function redirectTo(url: string) {
   window.location.href = url;
@@ -736,7 +737,7 @@ export function SettingsClient({ shopId, initialBusinessHours, initialStripeConn
       {/* ── AutoPilot ── */}
       {tab === "AutoPilot" && (
         <>
-          <div style={{ background: "rgba(139,92,246,0.06)", border: "1px solid rgba(139,92,246,0.18)", borderRadius: 16, padding: "18px 22px", display: "flex", alignItems: "center", gap: 14 }}>
+          <div style={{ background: "var(--dcard-l, rgba(139,92,246,0.06))", border: "1px solid var(--dcard-border-l, rgba(139,92,246,0.18))", borderRadius: 16, padding: "18px 22px", display: "flex", alignItems: "center", gap: 14 }}>
             <Zap size={20} color="var(--dviolet-text)" strokeWidth={2} />
             <div>
               <p style={{ color: "var(--dpurple-text)", fontSize: 13.5, fontWeight: 700, margin: "0 0 2px" }}>AutoPilot is active</p>
@@ -915,9 +916,9 @@ export function SettingsClient({ shopId, initialBusinessHours, initialStripeConn
 
           {/* Founders banner */}
           {initialBilling?.foundersEligible && (
-            <div style={{ background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.25)", borderRadius: 16, padding: "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
+            <div style={{ background: "var(--dbadge-amber-l, rgba(251,191,36,0.08))", border: "1px solid var(--dbadge-amber-l, rgba(251,191,36,0.25))", borderRadius: 16, padding: "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
               <div>
-                <p style={{ color: "var(--damber-text)", fontSize: 13.5, fontWeight: 700, margin: "0 0 2px" }}>Founders Beta: {initialBilling.foundersSpotsRemaining} spots left</p>
+                <p style={{ color: "var(--dsel-text-l, var(--damber-text))", fontSize: 13.5, fontWeight: 700, margin: "0 0 2px" }}>Founders Beta: {initialBilling.foundersSpotsRemaining} spots left</p>
                 <p style={{ color: "var(--dw45)", fontSize: 12.5, margin: 0 }}>40% off your first 12 months on Pro or Pro+, then 25% off forever. Applies automatically at checkout.</p>
               </div>
             </div>
@@ -949,7 +950,7 @@ export function SettingsClient({ shopId, initialBusinessHours, initialStripeConn
               return (
                 <div key={plan.key} style={{ ...card, border: `1px solid ${isCurrent ? plan.color : "var(--dw07)"}`, display: "flex", flexDirection: "column", gap: 10 }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                    <span style={{ fontSize: 11, fontWeight: 700, color: plan.color, letterSpacing: "0.06em", textTransform: "uppercase" }}>{plan.label}</span>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: deepen(plan.color), letterSpacing: "0.06em", textTransform: "uppercase" }}>{plan.label}</span>
                     {plan.badge && <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 20, background: plan.bg, color: plan.color }}>{plan.badge}</span>}
                   </div>
                   <p style={{ color: "var(--dtext)", fontSize: 20, fontWeight: 800, margin: 0 }}>{price}</p>

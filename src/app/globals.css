@@ -318,7 +318,7 @@
   --dst-orange-bg: rgb(234,88,12);  --dst-orange-fg: rgb(255,255,255); --dst-orange-border: rgb(234,88,12);
   --dst-violet-bg: rgb(109,40,217); --dst-violet-fg: rgb(255,255,255); --dst-violet-border: rgb(109,40,217);
 
-  --ddeepen: 42%;
+  --ddeepen: 30%;
 }
 
 /* ── Admin panel content tokens (data-admin-theme on <html>) ──
@@ -1271,3 +1271,10 @@ html[data-portal-theme="light"]:has(main.dashboard-main) .cookie-banner {
 .admin-user-link { display: block; text-decoration: none; color: inherit; min-width: 0; }
 .admin-user-link:hover p:first-child { text-decoration: underline; }
 a.admin-menu-item { text-decoration: none; box-sizing: border-box; }
+
+/* Small tag pills whose colour comes from data (--pill-c): a tinted pastel
+   in dark mode, a solid darkened fill with white text in light mode. */
+[data-portal-theme="light"] .dpill {
+  background: color-mix(in srgb, var(--pill-c), black 38%) !important;
+  color: white !important;
+}

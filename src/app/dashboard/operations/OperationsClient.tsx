@@ -192,7 +192,7 @@ function Overview({ operationsScore, fillRate, retention, revenueGrowthScore, ai
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {opportunities.map(o => (
             <div key={o.tag} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", background: "var(--dsurface1)", borderRadius: 10 }}>
-              <span style={{ fontSize: 9, fontWeight: 800, color: o.color, background: tint(o.color, 0.09), padding: "3px 8px", borderRadius: 20, whiteSpace: "nowrap", letterSpacing: "0.06em" }}>{o.tag}</span>
+              <span className="dpill" style={{ "--pill-c": o.color, fontSize: 9, fontWeight: 800, color: o.color, background: tint(o.color, 0.09), padding: "3px 8px", borderRadius: 20, whiteSpace: "nowrap", letterSpacing: "0.06em" } as React.CSSProperties}>{o.tag}</span>
               <span style={{ color: "var(--dw6)", fontSize: 13, flex: 1 }}>{o.text}</span>
               {o.impact && <span style={{ color: "var(--dgreen-text)", fontSize: 12, fontWeight: 700, whiteSpace: "nowrap" }}>{o.impact}</span>}
             </div>
@@ -260,7 +260,7 @@ function Revenue({ appointments, now, thisMonthRevenue, autopilotRevenue, missed
             </linearGradient>
           </defs>
           <polygon points={area} fill="url(#rev-grad)" />
-          <polyline points={pts} stroke="rgb(139,92,246)" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+          <polyline points={pts} stroke="rgb(139,92,246)" strokeWidth="2" vectorEffect="non-scaling-stroke" fill="none" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
         <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8 }}>
           {days.filter((_, i) => i % 5 === 0).map(d => (
@@ -311,7 +311,7 @@ function TeamModule({ staff, metricsAppts, monthStart, now }: {
             <div key={r.id} style={{ display: "flex", alignItems: "center", gap: 14 }}>
               <div style={{
                 width: 34, height: 34, borderRadius: 10, background: tint(r.color, 0.13), border: `1.5px solid ${tint(r.color, 0.27)}`,
-                display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 800, color: r.color, flexShrink: 0,
+                display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 800, color: deepen(r.color), flexShrink: 0,
               }}>
                 {r.full_name.split(" ").map(w => w[0]).slice(0, 2).join("")}
               </div>
@@ -438,7 +438,7 @@ function AIModule({ opportunities }: { opportunities: ReturnType<typeof computeO
               width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "16px 18px",
               background: "none", border: "none", cursor: "pointer", textAlign: "left",
             }}>
-              <span style={{ fontSize: 9, fontWeight: 800, color: o.color, background: tint(o.color, 0.09), padding: "3px 8px", borderRadius: 20, whiteSpace: "nowrap", letterSpacing: "0.06em" }}>{o.tag}</span>
+              <span className="dpill" style={{ "--pill-c": o.color, fontSize: 9, fontWeight: 800, color: o.color, background: tint(o.color, 0.09), padding: "3px 8px", borderRadius: 20, whiteSpace: "nowrap", letterSpacing: "0.06em" } as React.CSSProperties}>{o.tag}</span>
               <span style={{ color: "var(--dw7)", fontSize: 13, flex: 1 }}>{o.text}</span>
               {o.impact && <span style={{ color: "var(--dgreen-text)", fontSize: 12, fontWeight: 700 }}>{o.impact}</span>}
               <ChevronDown size={15} color="var(--dw3)" style={{ transform: isOpen ? "rotate(180deg)" : "none", transition: "transform 0.15s" }} />
