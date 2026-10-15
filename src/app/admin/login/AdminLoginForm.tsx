@@ -49,13 +49,13 @@ function Form() {
               marginBottom: 20,
               padding: "5px 11px",
               borderRadius: 20,
-              background: "rgba(239,68,68,0.1)",
-              border: "1px solid rgba(239,68,68,0.22)",
+              background: "rgb(220,38,38)",
+              border: "1px solid rgb(220,38,38)",
               animation: fadeUp(0),
             }}
           >
-            <Shield size={11} color="rgb(239,68,68)" />
-            <span style={{ fontSize: 11, fontWeight: 700, color: "rgb(239,68,68)", letterSpacing: "0.1em", textTransform: "uppercase" }}>
+            <Shield size={11} color="white" />
+            <span style={{ fontSize: 11, fontWeight: 700, color: "white", letterSpacing: "0.1em", textTransform: "uppercase" }}>
               Admin Access
             </span>
           </div>
@@ -86,7 +86,7 @@ function Form() {
           </p>
 
           {error && (
-            <p style={{ background: "rgb(70,10,10)", color: "rgb(252,165,165)", borderRadius: 8, padding: "10px 14px", fontSize: 13, marginBottom: 20, animation: fadeUp(80) }}>
+            <p style={{ background: "rgb(220,38,38)", color: "white", borderRadius: 8, padding: "10px 14px", fontSize: 13, marginBottom: 20, animation: fadeUp(80) }}>
               {decodeURIComponent(error)}
             </p>
           )}

@@ -35,10 +35,10 @@ const ICON: Record<NotificationItem["type"], React.ComponentType<{ size?: number
 };
 
 const ICON_COLOR: Record<NotificationItem["type"], string> = {
-  waitlist: "rgb(251,191,36)",
-  shop: "rgb(52,211,153)",
-  user: "rgb(167,139,250)",
-  email_failed: "rgb(248,113,113)",
+  waitlist: "var(--aamber-text)",
+  shop: "var(--agreen-text)",
+  user: "var(--aviolet-text)",
+  email_failed: "var(--ared-text)",
 };
 
 function timeAgo(iso: string): string {

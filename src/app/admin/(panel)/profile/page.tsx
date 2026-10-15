@@ -38,7 +38,7 @@ export default async function AdminProfilePage() {
           background: "rgba(109,40,217,0.18)",
           border: "1px solid rgba(139,92,246,0.3)",
           display: "flex", alignItems: "center", justifyContent: "center",
-          fontSize: 22, fontWeight: 800, color: "rgb(167,139,250)", flexShrink: 0,
+          fontSize: 22, fontWeight: 800, color: "var(--aviolet-text)", flexShrink: 0,
         }}>
           {initial}
         </div>
@@ -69,7 +69,7 @@ export default async function AdminProfilePage() {
             background: "rgba(139,92,246,0.12)",
             display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
           }}>
-            <KeyRound size={16} color="rgb(167,139,250)" strokeWidth={1.8} />
+            <KeyRound size={16} color="var(--aviolet-text)" strokeWidth={1.8} />
           </div>
           <div>
             <p style={{ color: "var(--atext)", fontSize: 14.5, fontWeight: 700, margin: "0 0 2px" }}>Password</p>

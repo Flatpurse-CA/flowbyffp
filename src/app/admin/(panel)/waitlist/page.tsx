@@ -70,9 +70,9 @@ export default async function AdminWaitlistPage() {
 
       {/* ── Stat cards ── */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
-        <StatCard label="Total"     count={total}    Icon={ClipboardList} iconColor="rgb(167,139,250)" iconBg="rgba(109,40,217,0.15)" />
-        <StatCard label="This week" count={thisWeek} Icon={Clock}         iconColor="rgb(251,191,36)"  iconBg="rgba(245,158,11,0.12)" />
-        <StatCard label="Today"     count={today}    Icon={Users}         iconColor="rgb(52,211,153)"  iconBg="rgba(16,185,129,0.12)" />
+        <StatCard label="Total"     count={total}    Icon={ClipboardList} iconColor="var(--aviolet-text)" iconBg="rgba(109,40,217,0.15)" />
+        <StatCard label="This week" count={thisWeek} Icon={Clock}         iconColor="var(--aamber-text)"  iconBg="rgba(245,158,11,0.12)" />
+        <StatCard label="Today"     count={today}    Icon={Users}         iconColor="var(--agreen-text)"  iconBg="rgba(16,185,129,0.12)" />
       </div>
 
       {/* ── Error ── */}

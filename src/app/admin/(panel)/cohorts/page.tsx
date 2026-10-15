@@ -4,9 +4,9 @@ import { computeSignupCohorts } from "@/lib/admin/cohorts";
 
 function cellColor(pct: number | null) {
   if (pct === null) return "var(--aw15)";
-  if (pct >= 60) return "rgb(52,211,153)";
-  if (pct >= 30) return "rgb(251,191,36)";
-  return "rgb(248,113,113)";
+  if (pct >= 60) return "var(--agreen-text)";
+  if (pct >= 30) return "var(--aamber-text)";
+  return "var(--ared-text)";
 }
 
 function cellBg(pct: number | null) {

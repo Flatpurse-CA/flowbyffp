@@ -75,13 +75,13 @@ export default async function AdminAnalyticsPage() {
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5">
-        <StatCard label="MRR" value={formatCAD(totalMRR)} Icon={CreditCard} iconColor="rgb(96,165,250)" iconBg="rgba(59,130,246,0.12)"
+        <StatCard label="MRR" value={formatCAD(totalMRR)} Icon={CreditCard} iconColor="var(--ablue-text)" iconBg="rgba(59,130,246,0.12)"
           subtitle={payingShops > 0 ? `From ${payingShops} paying shop${payingShops !== 1 ? "s" : ""}` : "No paying shops yet"} />
-        <StatCard label="Platform revenue (all-time)" value={formatCAD(totalPlatformRevenue)} Icon={DollarSign} iconColor="rgb(52,211,153)" iconBg="rgba(16,185,129,0.12)"
+        <StatCard label="Platform revenue (all-time)" value={formatCAD(totalPlatformRevenue)} Icon={DollarSign} iconColor="var(--agreen-text)" iconBg="rgba(16,185,129,0.12)"
           subtitle="Completed bookings across all shops" />
-        <StatCard label="Shops" value={String(shops.length)} Icon={Store} iconColor="rgb(167,139,250)" iconBg="rgba(109,40,217,0.15)"
+        <StatCard label="Shops" value={String(shops.length)} Icon={Store} iconColor="var(--aviolet-text)" iconBg="rgba(109,40,217,0.15)"
           subtitle={`${payingShops} paying · ${shops.length - payingShops} free`} />
-        <StatCard label="Avg revenue / shop" value={formatCAD(Math.round(avgRevenuePerShop))} Icon={TrendingUp} iconColor="rgb(251,191,36)" iconBg="rgba(245,158,11,0.12)"
+        <StatCard label="Avg revenue / shop" value={formatCAD(Math.round(avgRevenuePerShop))} Icon={TrendingUp} iconColor="var(--aamber-text)" iconBg="rgba(245,158,11,0.12)"
           subtitle="All-time completed bookings" />
       </div>
 

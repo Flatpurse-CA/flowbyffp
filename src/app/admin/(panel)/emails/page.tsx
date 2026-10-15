@@ -121,12 +121,12 @@ export default async function AdminEmailsPage() {
                       </span>
                     </td>
                     <td style={{ padding: "14px 18px" }}>
-                      <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 13, color: "rgb(52,211,153)" }}>
+                      <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 13, color: "var(--agreen-text)" }}>
                         <CheckCircle size={13} /> {counts.sent}
                       </span>
                     </td>
                     <td style={{ padding: "14px 18px" }}>
-                      <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 13, color: "rgb(251,191,36)" }}>
+                      <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 13, color: "var(--aamber-text)" }}>
                         <Clock size={13} /> {counts.pending}
                       </span>
                     </td>
@@ -161,7 +161,7 @@ export default async function AdminEmailsPage() {
         }}>
           <XCircle size={15} />
           Some sends have failed. Check the{" "}
-          <Link href="/admin/emails/subscribers" style={{ color: "rgb(248,113,113)", fontWeight: 600 }}>
+          <Link href="/admin/emails/subscribers" style={{ color: "var(--ared-text)", fontWeight: 600 }}>
             subscriber queue
           </Link>{" "}
           to retry them.

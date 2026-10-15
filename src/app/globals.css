@@ -377,6 +377,16 @@
 
   --apurple-text: rgb(196,181,253);
 
+  /* Accent text/icon colours: the original pastels in dark, deeper shades of
+     the same hue in light (pastels read washed out on white). Kept separate
+     from the dashboard's --d*-text set so the two themes never leak. */
+  --agreen-text:  rgb(52,211,153);
+  --ared-text:    rgb(248,113,113);
+  --aviolet-text: rgb(167,139,250);
+  --aamber-text:  rgb(251,191,36);
+  --ablue-text:   rgb(96,165,250);
+  --aorange-text: rgb(251,146,60);
+
   /* Status/plan badge pairs — solid fill + white text, no tinted/translucent
      backgrounds (explicit user preference: tints read as washed-out no
      matter how the alpha/contrast is tuned). Border matches the fill so it
@@ -389,9 +399,17 @@
 }
 
 [data-admin-theme="light"] {
+  --agreen-text:  rgb(4,120,87);
+  --ared-text:    rgb(200,30,30);
+  --aviolet-text: rgb(109,40,217);
+  --aamber-text:  rgb(161,98,7);
+  --ablue-text:   rgb(29,78,216);
+  --aorange-text: rgb(194,65,12);
   --atext:  rgb(12,12,20);
   --atext2: rgb(9,9,15);
-  --am1: rgb(244,245,247);
+  /* Card/table fill on every admin page: white so cards lift off the
+     grey page instead of blending into it. */
+  --am1: rgb(255,255,255);
   --am2: rgb(255,255,255);
   --am3: rgb(255,255,255);
   --am4: rgb(250,250,252);
@@ -408,7 +426,7 @@
      enough to read as an intentional, designed surface rather than a
      skeleton/loading state. */
   --aw015: rgba(0,0,0,0.04);
-  --aw02:  rgba(0,0,0,0.05);
+  --aw02:  rgb(248,248,251);
   --aw025: rgba(0,0,0,0.06);
   --aw03:  rgba(0,0,0,0.07);
   --aw04:  rgba(0,0,0,0.08);
@@ -449,6 +467,10 @@
   --astatus-red-fg:    rgb(255,255,255); --astatus-red-bg:    rgb(220,38,38);  --astatus-red-border:    rgb(220,38,38);
   --astatus-green-fg:  rgb(255,255,255); --astatus-green-bg:  rgb(5,150,105);  --astatus-green-border:  rgb(5,150,105);
   --astatus-purple-fg: rgb(255,255,255); --astatus-purple-bg: rgb(124,58,237); --astatus-purple-border: rgb(124,58,237);
+  --acard-l: rgb(255,255,255);
+  --acard-border-l: rgba(0,0,0,0.08);
+  --aavatar-l: 46%;
+  --aavatar-fg: rgb(255,255,255);
 }
 
 /* Native <input type="date"> calendar-icon/popup rendering — was hardcoded to

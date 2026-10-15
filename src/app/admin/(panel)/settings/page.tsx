@@ -19,7 +19,7 @@ function SectionHeader({ Icon, title, subtitle }: { Icon: React.ComponentType<{ 
         background: "rgba(139,92,246,0.12)",
         display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
       }}>
-        <Icon size={16} color="rgb(167,139,250)" strokeWidth={1.8} />
+        <Icon size={16} color="var(--aviolet-text)" strokeWidth={1.8} />
       </div>
       <div>
         <p style={{ color: "var(--atext)", fontSize: 14.5, fontWeight: 700, margin: "0 0 2px" }}>{title}</p>
@@ -56,7 +56,7 @@ export default async function AdminSettingsPage() {
                 width: 30, height: 30, borderRadius: "50%",
                 background: "rgba(109,40,217,0.18)",
                 display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: 11, fontWeight: 700, color: "rgb(167,139,250)",
+                fontSize: 11, fontWeight: 700, color: "var(--aviolet-text)",
               }}>
                 {ROOT_ADMIN_EMAIL.slice(0, 2).toUpperCase()}
               </div>
@@ -93,7 +93,7 @@ export default async function AdminSettingsPage() {
                     display: "flex", alignItems: "center", justifyContent: "center",
                     width: 28, height: 28, borderRadius: 8, cursor: "pointer",
                     background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.18)",
-                    color: "rgb(248,113,113)", fontFamily: "inherit",
+                    color: "var(--ared-text)", fontFamily: "inherit",
                   }}
                 >
                   <UserMinus size={13} />

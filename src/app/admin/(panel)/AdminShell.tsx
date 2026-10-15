@@ -90,10 +90,10 @@ const LIGHT = {
   divider:        "rgba(0,0,0,0.08)",
 };
 
-export function AdminShell({ children, user }: { children: React.ReactNode; user: User }) {
+export function AdminShell({ children, user, initialDark = true }: { children: React.ReactNode; user: User; initialDark?: boolean }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(true);
-  const [dark, setDark] = useState(true);
+  const [dark, setDark] = useState(initialDark);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -128,19 +128,27 @@ export function AdminShell({ children, user }: { children: React.ReactNode; user
     return h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening";
   })();
 
+  // Mirrored into a cookie so the layout can render the right theme on first
+  // paint (initialDark); reading localStorage only after mount flashed dark.
+  const persistTheme = (next: "dark" | "light") => {
+    localStorage.setItem("admin-theme", next);
+    document.cookie = `admin-theme=${next}; path=/; max-age=31536000; samesite=lax`;
+    document.documentElement.setAttribute("data-admin-theme", next);
+  };
+
   useEffect(() => {
+    // One-time sync for admins who only have the older localStorage copy.
     const stored = localStorage.getItem("admin-theme");
-    if (stored === "light") {
-      setDark(false);
-      document.documentElement.setAttribute("data-admin-theme", "light");
-    }
-  }, []);
+    const next = stored === "light" ? "light" : stored === "dark" ? "dark" : initialDark ? "dark" : "light";
+    persistTheme(next);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time sync from storage that the server can't see
+    if ((next === "dark") !== initialDark) setDark(next === "dark");
+  }, [initialDark]);
 
   const toggleDark = () => {
     const next = !dark;
     setDark(next);
-    localStorage.setItem("admin-theme", next ? "dark" : "light");
-    document.documentElement.setAttribute("data-admin-theme", next ? "dark" : "light");
+    persistTheme(next ? "dark" : "light");
   };
 
   useEffect(() => {
@@ -175,7 +183,7 @@ export function AdminShell({ children, user }: { children: React.ReactNode; user
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: T.bg, display: "flex" }}>
+    <div data-admin-theme={dark ? "dark" : "light"} style={{ minHeight: "100vh", background: T.bg, display: "flex" }}>
 
       {/* Mobile drawer backdrop */}
       {isMobile && mobileOpen && (
@@ -509,7 +517,7 @@ export function AdminShell({ children, user }: { children: React.ReactNode; user
                           display: "flex", alignItems: "center", gap: 10,
                           padding: "10px 15px", width: "100%",
                           background: "transparent", border: "none",
-                          color: "rgb(248,113,113)",
+                          color: "var(--ared-text)",
                           fontSize: 13, fontWeight: 500,
                           cursor: "pointer", fontFamily: "inherit",
                           textAlign: "left",

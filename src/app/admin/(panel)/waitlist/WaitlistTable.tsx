@@ -51,11 +51,11 @@ export function WaitlistTable({ entries }: { entries: WaitlistEntry[] }) {
         <div style={{
           display: "flex", alignItems: "center", justifyContent: "space-between",
           padding: "10px 20px",
-          background: "rgba(234,88,12,0.07)",
-          borderBottom: "1px solid rgba(234,88,12,0.15)",
+          background: "var(--acard-l, rgba(234,88,12,0.07))",
+          borderBottom: "1px solid var(--acard-border-l, rgba(234,88,12,0.15))",
         }}>
           <span style={{ color: "var(--aw6)", fontSize: 13 }}>
-            <strong style={{ color: "rgb(251,146,60)" }}>{selected.size}</strong> {selected.size === 1 ? "entry" : "entries"} selected
+            <strong style={{ color: "var(--aorange-text)" }}>{selected.size}</strong> {selected.size === 1 ? "entry" : "entries"} selected
           </span>
           <button
             onClick={handleBulkDelete}
@@ -132,9 +132,9 @@ export function WaitlistTable({ entries }: { entries: WaitlistEntry[] }) {
                   <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                     <div style={{
                       width: 32, height: 32, borderRadius: "50%", flexShrink: 0,
-                      background: `hsl(${(i * 61 + 180) % 360}, 30%, 20%)`,
+                      background: `hsl(${(i * 61 + 180) % 360}, 30%, var(--aavatar-l, 20%))`,
                       display: "flex", alignItems: "center", justifyContent: "center",
-                      fontSize: 11, fontWeight: 700, color: "var(--aw7)",
+                      fontSize: 11, fontWeight: 700, color: "var(--aavatar-fg, var(--aw7))",
                     }}>
                       {initials}
                     </div>

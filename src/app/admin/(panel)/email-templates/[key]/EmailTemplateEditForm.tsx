@@ -112,7 +112,7 @@ export function EmailTemplateEditForm({
           </Field>
         )}
 
-        {error && <p style={{ color: "rgb(248,113,113)", fontSize: 12.5, margin: 0 }}>{error}</p>}
+        {error && <p style={{ color: "var(--ared-text)", fontSize: 12.5, margin: 0 }}>{error}</p>}
 
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
           <button
@@ -129,7 +129,7 @@ export function EmailTemplateEditForm({
           >
             <RotateCcw size={13} /> Reset to default
           </button>
-          {saved && <span style={{ color: "rgb(52,211,153)", fontSize: 12.5, fontWeight: 600 }}>Saved</span>}
+          {saved && <span style={{ color: "var(--agreen-text)", fontSize: 12.5, fontWeight: 600 }}>Saved</span>}
         </div>
       </div>
 
@@ -146,7 +146,7 @@ export function EmailTemplateEditForm({
             <Send size={13} /> {sendingTest ? "Sending…" : "Send test"}
           </button>
         </div>
-        {testResult && <p style={{ color: testResult.startsWith("Failed") ? "rgb(248,113,113)" : "rgb(52,211,153)", fontSize: 12.5, margin: 0 }}>{testResult}</p>}
+        {testResult && <p style={{ color: testResult.startsWith("Failed") ? "var(--ared-text)" : "var(--agreen-text)", fontSize: 12.5, margin: 0 }}>{testResult}</p>}
       </div>
     </div>
   );

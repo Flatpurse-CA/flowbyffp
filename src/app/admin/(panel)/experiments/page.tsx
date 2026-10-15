@@ -111,7 +111,7 @@ export default async function AdminExperimentsPage() {
       {/* Guardrails */}
       <div style={{ ...card, padding: "20px 24px" }}>
         <p style={{ color: "var(--atext)", fontSize: 14, fontWeight: 700, margin: "0 0 14px", display: "flex", alignItems: "center", gap: 8 }}>
-          <ShieldAlert size={16} color="rgb(251,191,36)" /> Guardrail metrics
+          <ShieldAlert size={16} color="var(--aamber-text)" /> Guardrail metrics
         </p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {guardrails.map(g => {
@@ -137,13 +137,13 @@ export default async function AdminExperimentsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-3.5">
         <div style={{ ...card, padding: "18px 20px" }}>
           <p style={{ color: "var(--atext)", fontSize: 13.5, fontWeight: 700, margin: "0 0 10px", display: "flex", alignItems: "center", gap: 7 }}>
-            <Sparkles size={15} color="rgb(167,139,250)" /> Analyst
+            <Sparkles size={15} color="var(--aviolet-text)" /> Analyst
           </p>
           <p style={{ color: "var(--aw55)", fontSize: 12.5, lineHeight: 1.6, margin: 0 }}>{analystText}</p>
         </div>
         <div style={{ ...card, padding: "18px 20px" }}>
           <p style={{ color: "var(--atext)", fontSize: 13.5, fontWeight: 700, margin: "0 0 10px", display: "flex", alignItems: "center", gap: 7 }}>
-            <Lightbulb size={15} color="rgb(251,191,36)" /> Generator
+            <Lightbulb size={15} color="var(--aamber-text)" /> Generator
           </p>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {ideas.map((idea, i) => (
@@ -153,7 +153,7 @@ export default async function AdminExperimentsPage() {
         </div>
         <div style={{ ...card, padding: "18px 20px" }}>
           <p style={{ color: "var(--atext)", fontSize: 13.5, fontWeight: 700, margin: "0 0 10px", display: "flex", alignItems: "center", gap: 7 }}>
-            <Brain size={15} color="rgb(52,211,153)" /> Product Scientist
+            <Brain size={15} color="var(--agreen-text)" /> Product Scientist
           </p>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {strategicBullets.map((b, i) => (

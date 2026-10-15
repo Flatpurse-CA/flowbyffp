@@ -43,9 +43,9 @@ export default async function AdminFeatureUsagePage() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
         {[
-          { label: "Events this month", value: String(totalEvents), Icon: Activity, iconColor: "rgb(167,139,250)", iconBg: "rgba(109,40,217,0.15)" },
-          { label: "Shops using tracked features", value: String(activeShops), Icon: Store, iconColor: "rgb(52,211,153)", iconBg: "rgba(16,185,129,0.12)" },
-          { label: "Adoption rate", value: totalShops > 0 ? `${Math.round((activeShops / totalShops) * 100)}%` : "0%", Icon: Zap, iconColor: "rgb(251,191,36)", iconBg: "rgba(245,158,11,0.12)" },
+          { label: "Events this month", value: String(totalEvents), Icon: Activity, iconColor: "var(--aviolet-text)", iconBg: "rgba(109,40,217,0.15)" },
+          { label: "Shops using tracked features", value: String(activeShops), Icon: Store, iconColor: "var(--agreen-text)", iconBg: "rgba(16,185,129,0.12)" },
+          { label: "Adoption rate", value: totalShops > 0 ? `${Math.round((activeShops / totalShops) * 100)}%` : "0%", Icon: Zap, iconColor: "var(--aamber-text)", iconBg: "rgba(245,158,11,0.12)" },
         ].map(s => (
           <div key={s.label} style={{ ...card, padding: "20px 22px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>

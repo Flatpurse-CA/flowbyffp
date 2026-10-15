@@ -143,7 +143,7 @@ export default async function SubscribersPage({
                         {icon} {send.status}
                       </span>
                       {send.error_message && (
-                        <p style={{ fontSize: 11, color: "rgb(248,113,113)", margin: "4px 0 0" }}>{send.error_message}</p>
+                        <p style={{ fontSize: 11, color: "var(--ared-text)", margin: "4px 0 0" }}>{send.error_message}</p>
                       )}
                     </td>
                     <td style={{ padding: "13px 18px" }}>

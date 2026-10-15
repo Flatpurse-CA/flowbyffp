@@ -20,7 +20,7 @@ export function SendNowButton({ sendId }: { sendId: string }) {
     }
   }
 
-  if (done) return <span style={{ fontSize: 12, color: "rgb(52,211,153)" }}>Sent ✓</span>;
+  if (done) return <span style={{ fontSize: 12, color: "var(--agreen-text)" }}>Sent ✓</span>;
 
   return (
     <div>
@@ -36,7 +36,7 @@ export function SendNowButton({ sendId }: { sendId: string }) {
       }}>
         {loading ? "Sending…" : "Send now"}
       </button>
-      {error && <p style={{ fontSize: 11, color: "rgb(248,113,113)", margin: "4px 0 0" }}>{error}</p>}
+      {error && <p style={{ fontSize: 11, color: "var(--ared-text)", margin: "4px 0 0" }}>{error}</p>}
     </div>
   );
 }

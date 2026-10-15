@@ -73,10 +73,10 @@ export default async function AdminAutoPilotActivityPage() {
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5">
         {[
-          { label: "Events this month", value: String(totalThisMonth), Icon: Zap, iconColor: "rgb(167,139,250)", iconBg: "rgba(109,40,217,0.15)", subtitle: "Across all flows" },
-          { label: "Revenue recovered", value: formatCAD(revenueThisMonth), Icon: DollarSign, iconColor: "rgb(52,211,153)", iconBg: "rgba(16,185,129,0.12)", subtitle: "Attributed to AutoPilot" },
-          { label: "Shops using AutoPilot", value: String(activeShops), Icon: Store, iconColor: "rgb(96,165,250)", iconBg: "rgba(59,130,246,0.12)", subtitle: "Active this month" },
-          { label: "Success rate", value: `${successRate}%`, Icon: CheckCircle2, iconColor: "rgb(251,191,36)", iconBg: "rgba(245,158,11,0.12)", subtitle: `${successCount} of ${totalThisMonth} sent/booked` },
+          { label: "Events this month", value: String(totalThisMonth), Icon: Zap, iconColor: "var(--aviolet-text)", iconBg: "rgba(109,40,217,0.15)", subtitle: "Across all flows" },
+          { label: "Revenue recovered", value: formatCAD(revenueThisMonth), Icon: DollarSign, iconColor: "var(--agreen-text)", iconBg: "rgba(16,185,129,0.12)", subtitle: "Attributed to AutoPilot" },
+          { label: "Shops using AutoPilot", value: String(activeShops), Icon: Store, iconColor: "var(--ablue-text)", iconBg: "rgba(59,130,246,0.12)", subtitle: "Active this month" },
+          { label: "Success rate", value: `${successRate}%`, Icon: CheckCircle2, iconColor: "var(--aamber-text)", iconBg: "rgba(245,158,11,0.12)", subtitle: `${successCount} of ${totalThisMonth} sent/booked` },
         ].map(s => (
           <div key={s.label} style={{ ...card, padding: "22px 24px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
@@ -104,7 +104,7 @@ export default async function AdminAutoPilotActivityPage() {
                     <p style={{ color: "var(--aw7)", fontSize: 13, fontWeight: 600, margin: "0 0 1px" }}>{FLOW_LABELS[flow] ?? flow}</p>
                     <p style={{ color: "var(--aw3)", fontSize: 11.5, margin: 0 }}>{stats.count} event{stats.count !== 1 ? "s" : ""}</p>
                   </div>
-                  <span style={{ color: "rgb(52,211,153)", fontSize: 13, fontWeight: 700 }}>{formatCAD(stats.revenue)}</span>
+                  <span style={{ color: "var(--agreen-text)", fontSize: 13, fontWeight: 700 }}>{formatCAD(stats.revenue)}</span>
                 </div>
               ))}
             </div>

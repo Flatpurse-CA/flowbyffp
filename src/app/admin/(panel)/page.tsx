@@ -102,7 +102,7 @@ export default async function AdminOverviewPage() {
           label="Total Members"
           value={users.length}
           Icon={Users}
-          iconColor="rgb(167,139,250)"
+          iconColor="var(--aviolet-text)"
           iconBg="rgba(109,40,217,0.15)"
           subtitle={newUsers > 0 ? `+${newUsers} this week` : "No new members yet"}
         />
@@ -110,7 +110,7 @@ export default async function AdminOverviewPage() {
           label="Active Shops"
           value={shops.length}
           Icon={Store}
-          iconColor="rgb(52,211,153)"
+          iconColor="var(--agreen-text)"
           iconBg="rgba(16,185,129,0.12)"
           subtitle={newShops > 0 ? `+${newShops} this week` : "No new shops yet"}
         />
@@ -118,7 +118,7 @@ export default async function AdminOverviewPage() {
           label="Waitlist"
           value={waitlist.length}
           Icon={ClipboardList}
-          iconColor="rgb(251,191,36)"
+          iconColor="var(--aamber-text)"
           iconBg="rgba(245,158,11,0.12)"
           subtitle={newWait > 0 ? `+${newWait} this week` : "No new signups yet"}
         />
@@ -126,7 +126,7 @@ export default async function AdminOverviewPage() {
           label="Estimated MRR"
           value={formatCAD(estimatedMRR)}
           Icon={CreditCard}
-          iconColor="rgb(96,165,250)"
+          iconColor="var(--ablue-text)"
           iconBg="rgba(59,130,246,0.12)"
           subtitle={payingShops > 0 ? `From ${payingShops} paying shop${payingShops !== 1 ? "s" : ""} · billing not connected` : "Billing not connected yet"}
         />
