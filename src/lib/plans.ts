@@ -171,7 +171,7 @@ export const PLAN_BG     = Object.fromEntries(PLANS.map(p => [p.key, p.bg]))    
 // colors on the owner-facing dashboard billing page and would go invisible
 // (white-on-white) if repurposed as solid white-on-color fill there too.
 export const ADMIN_PLAN_BADGE: Record<string, { fg: string; bg: string }> = {
-  starter:    { fg: "rgb(255,255,255)", bg: "rgb(100,116,139)" },
+  starter:    { fg: "rgb(255,255,255)", bg: "rgb(71,85,105)" },
   pro:        { fg: "rgb(255,255,255)", bg: "rgb(37,99,235)" },
   pro_plus:   { fg: "rgb(255,255,255)", bg: "rgb(124,58,237)" },
   enterprise: { fg: "rgb(255,255,255)", bg: "rgb(217,119,6)" },

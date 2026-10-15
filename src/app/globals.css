@@ -1229,3 +1229,7 @@ html[data-portal-theme="light"]:has(main.dashboard-main) .cookie-banner {
 .admin-menu-row { display: flex; align-items: center; gap: 7px; padding: 4px 10px; }
 .admin-menu-sep { height: 1px; background: var(--aw07); margin: 4px 2px; }
 .admin-search-input::placeholder { color: var(--aw25); opacity: 1; }
+/* Plan pill select (users/PlanSelect.tsx): options would otherwise inherit
+   the pill's white text and vanish on a white dropdown list. */
+.admin-plan-select option { color: var(--atext); background: var(--am2); }
+.admin-plan-select:focus-visible { box-shadow: 0 0 0 2px var(--am2), 0 0 0 4px rgb(124,58,237); }
