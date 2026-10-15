@@ -39,7 +39,7 @@ const SHOP_TZ = "America/Edmonton";
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 const NOSHOW_GRACE_MS = 30 * 60 * 1000;
-const NOSHOW_LOOKBACK_MS = 24 * MS_PER_DAY;
+const NOSHOW_LOOKBACK_MS = MS_PER_DAY;
 const FILLER_LOOKAHEAD_MS = 48 * 60 * 60 * 1000;
 const FILLER_LOOKBACK_MS = 20 * 60 * 1000; // slightly wider than the 15min cron interval
 
@@ -141,13 +141,11 @@ async function runNoShow(shop: { id: string; name: string; handle: string | null
       // this codebase, so it stays retained automatically).
       const recoveredAmount = a.deposit_amount ?? 0;
 
-      // Reuses the existing 'cancelled' status rather than introducing a new
-      // enum value — getAvailableSlots (src/app/book/[handle]/actions.ts)
-      // already excludes 'cancelled' appointments, so this reopens the slot
-      // with zero query changes. The no-show fact itself isn't lost — it's
-      // recorded distinctly here via flow_key='noshow'.
+      // Same 'no_show' status the manual "No-show" button sets (0040), so
+      // reports count it as a no-show rather than a cancellation. The slot is
+      // already in the past, so availability doesn't need it reopened.
       const { error: updateError } = await supabase
-        .from("appointments").update({ status: "cancelled", updated_at: now.toISOString() }).eq("id", a.id);
+        .from("appointments").update({ status: "no_show", updated_at: now.toISOString() }).eq("id", a.id);
       if (updateError) throw new Error(updateError.message);
 
       const clientId = await findClientId(shop.id, a.client_email, a.client_name);
