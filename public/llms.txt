@@ -1,17 +1,35 @@
 # FlatPurse Flow
 
-> Booking, billing, and revenue autopilot for salons and service businesses in Canada.
+> Booking, payments and AI recovery for salons, barbershops, spas, massage clinics and studios in Canada. Built in Edmonton, Alberta by FlatPurse Inc.
 
-FlatPurse Flow is an AI-powered booking and client management platform for solo stylists and multi-location salons. It handles online booking, in-person and online payments (including Tap to Pay and Interac), client CRM, staff scheduling, and automated revenue recovery (no-show recovery, win-backs, an AI Front Desk, and a daily business brief), so shop owners spend less time on admin and keep their calendar full.
+FlatPurse Flow is booking and client management software with an AI Front Desk, no-show recovery and Tap to Pay on iPhone (credit and Interac). It handles online booking, payments, client CRM, staff scheduling and sales tax for all 13 Canadian provinces and territories. Prices are in CAD and client data is stored in Canada.
+
+## Plans (CAD per month, per location, before tax)
+
+- Starter, C$39: up to 2 team members. Bookings, online booking page, clients, payments and Tap to Pay, reminders, reviews.
+- Pro, C$89: up to 6 team members. Adds AI Front Desk, Daily Brief and client segments.
+- Pro+, C$189: unlimited team members at one location. Adds AutoPilot (No-Show Recovery about an hour after a missed appointment, Last-Minute Slot Filler, win-backs, birthday offers), Flow Coach, Business Health Score and revenue forecasting.
+- Enterprise: custom, 3+ locations.
+- Founders Beta: 40% off year 1, then 25% off for life.
+- Every plan starts with a free 14-day trial of Pro+, no card required.
+
+## Payments
+
+- Card payments are Stripe's standard Canadian rates, paid by the shop's own Stripe account and the same on every plan: 2.7% + 20 cents tapped credit, 30 cents flat for Interac, 2.9% + 30 cents online.
+- No commission on new clients on any plan.
 
 ## Pages
 
-- [Home](https://flow.flatpurse.com/): Product overview and booking platform pitch.
-- [Features](https://flow.flatpurse.com/features): Full feature breakdown.
-- [Pricing](https://flow.flatpurse.com/pricing): Starter, Pro, Pro+, and Enterprise plans, transaction fees, and the Founders Beta discount (40% off the first 12 months, then 25% off for life, for the first 40 shops).
+- [Home](https://flow.flatpurse.com/): Product overview.
+- [Features](https://flow.flatpurse.com/features): Feature breakdown.
+- [AutoPilot](https://flow.flatpurse.com/autopilot): How AutoPilot works.
+- [Pricing](https://flow.flatpurse.com/pricing): Plans and card rates.
+- [Compare Flow vs Fresha, Booksy and Vagaro](https://flow.flatpurse.com/compare/flow-vs-fresha-booksy-vagaro): Feature and commission comparison.
+- [Software by city](https://flow.flatpurse.com/software): Salon, barbershop, spa, massage clinic and tattoo/nail studio software for Edmonton, Calgary, Saskatoon, Winnipeg, Vancouver and Toronto.
+- [Questions](https://flow.flatpurse.com/questions): Answers on software cost, no-shows, GST, commissions, Tap to Pay and win-backs.
+- [Guides](https://flow.flatpurse.com/guides): First-hand guides by founder George Ogunbande on no-show costs, sales tax in every province, marketplace commissions and choosing software.
 - [Sign up](https://flow.flatpurse.com/signup): Start a free trial.
 
 ## Notes
 
-- No new-client or marketplace commission on any plan — pricing is a flat monthly fee plus per-transaction card processing fees.
-- Founders Beta pricing is limited to the first 40 businesses and does not reopen once filled.
+- Founder: George Ogunbande, Founder & CEO, FlatPurse Inc., Edmonton, Alberta.

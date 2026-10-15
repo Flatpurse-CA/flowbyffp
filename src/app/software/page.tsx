@@ -1,13 +1,9 @@
 import type { Metadata } from "next";
 import Hub from "@/components/seo/Hub";
 import { CITIES, LOCAL_PAGES } from "@/lib/seo/localPages";
-import { SITE_URL } from "@/lib/seo/facts";
+import { seoMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
-  title: { absolute: "Salon, Spa & Barbershop Software by City | FlatPurse Flow" },
-  description: "Booking and payments software for salons, barbershops, spas, massage clinics and studios in Edmonton, Calgary, Saskatoon, Winnipeg, Vancouver and Toronto.",
-  alternates: { canonical: `${SITE_URL}/software` },
-};
+export const metadata: Metadata = seoMetadata({ title: "Salon, Spa & Barbershop Software by City | FlatPurse Flow", description: "Booking and payments software for salons, barbershops, spas, massage clinics and studios in Edmonton, Calgary, Saskatoon, Winnipeg, Vancouver and Toronto.", path: "/software" });
 
 export default function SoftwareHub() {
   return (

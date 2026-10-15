@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { LOCAL_PAGES, getLocalPage } from "@/lib/seo/localPages";
-import { RATES, SITE_URL } from "@/lib/seo/facts";
+import { RATES } from "@/lib/seo/facts";
+import { seoMetadata } from "@/lib/seo/metadata";
 import { SeoShell, SeoCta, Related, FounderQuote, faqLd } from "@/components/seo/SeoShell";
 import BlockF from "@/components/seo/BlockF";
 
@@ -17,12 +18,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const page = getLocalPage((await params).slug);
   if (!page) return {};
   const { vertical, city } = page;
-  return {
-    title: { absolute: vertical.titleTag(city.name) },
-    description: vertical.meta(city.name, city.province),
-    alternates: { canonical: `${SITE_URL}/${page.slug}` },
-    openGraph: { title: vertical.titleTag(city.name), description: vertical.meta(city.name, city.province), url: `${SITE_URL}/${page.slug}` },
-  };
+  return seoMetadata({ title: vertical.titleTag(city.name), description: vertical.meta(city.name, city.province), path: `/${page.slug}` });
 }
 
 export default async function LocalPage({ params }: { params: Promise<{ slug: string }> }) {

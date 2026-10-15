@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getArticle, GUIDES, QUESTIONS, type Article } from "@/lib/seo/articles";
 import { FOUNDER, SITE_URL } from "@/lib/seo/facts";
+import { seoMetadata } from "@/lib/seo/metadata";
 import { SeoShell, SeoCta, Related, faqLd, founderPhotoExists } from "./SeoShell";
 import BlockF from "./BlockF";
 
@@ -16,13 +17,7 @@ export function articleParams(kind: Article["kind"]) {
 export function articleMetadata(kind: Article["kind"], slug: string): Metadata {
   const a = getArticle(kind, slug);
   if (!a) return {};
-  const url = `${SITE_URL}${BASE[kind]}/${a.slug}`;
-  return {
-    title: { absolute: a.titleTag },
-    description: a.meta,
-    alternates: { canonical: url },
-    openGraph: { title: a.titleTag, description: a.meta, url, type: "article" },
-  };
+  return seoMetadata({ title: a.titleTag, description: a.meta, path: `${BASE[kind]}/${a.slug}`, type: kind === "guide" ? "article" : "website" });
 }
 
 export function ArticleView({ article: a }: { article: Article }) {

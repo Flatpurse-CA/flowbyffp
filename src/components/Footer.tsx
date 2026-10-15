@@ -76,16 +76,22 @@ export default function Footer({ cta, children }: { cta?: FooterCta; children?: 
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
+          flexWrap: "wrap",
+          gap: 16,
         }}>
           <p style={{ fontSize: 12, color: "rgba(255,255,255,0.25)", margin: 0 }}>
             © 2026 FlatPurse Flow. All rights reserved.
           </p>
-          <div style={{ display: "flex", gap: 24 }}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "10px 24px" }}>
             {[
               { label: "Terms of Service", href: "/terms" },
               { label: "Privacy Policy", href: "/privacy" },
               { label: "Cookie Policy", href: "/cookie-policy" },
               { label: "Refund Policy", href: "/refund-policy" },
+              { label: "Software by city", href: "/software" },
+              { label: "Questions", href: "/questions" },
+              { label: "Guides", href: "/guides" },
+              { label: "Compare", href: "/compare/flow-vs-fresha-booksy-vagaro" },
             ].map(({ label, href }) => (
               <Link key={label} href={href} style={{ fontSize: 12, color: "rgba(255,255,255,0.25)", textDecoration: "none", transition: "color 0.15s" }}
                 onMouseEnter={e => (e.currentTarget.style.color = "rgba(255,255,255,0.6)")}

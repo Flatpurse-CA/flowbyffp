@@ -1,17 +1,13 @@
 import type { Metadata } from "next";
 import { SeoShell, SeoCta, Related } from "@/components/seo/SeoShell";
 import { COMPETITOR_CHECK_DATE, SITE_URL, SOURCES } from "@/lib/seo/facts";
+import { seoMetadata } from "@/lib/seo/metadata";
 
 const URL = `${SITE_URL}/compare/flow-vs-fresha-booksy-vagaro`;
 const TITLE = "Flow vs Fresha vs Booksy vs Vagaro (2026) | FlatPurse Flow";
 const DESCRIPTION = "Compare booking software for Canadian salons: AI Front Desk, no-show recovery, Tap to Pay, new-client commissions and CAD pricing.";
 
-export const metadata: Metadata = {
-  title: { absolute: TITLE },
-  description: DESCRIPTION,
-  alternates: { canonical: URL },
-  openGraph: { title: TITLE, description: DESCRIPTION, url: URL },
-};
+export const metadata: Metadata = seoMetadata({ title: TITLE, description: DESCRIPTION, path: "/compare/flow-vs-fresha-booksy-vagaro" });
 
 // "Not listed" = not in the competitor's published pages and reviews we
 // checked on COMPETITOR_CHECK_DATE. It isn't proof the feature doesn't exist.
