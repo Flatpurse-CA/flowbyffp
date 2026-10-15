@@ -37,10 +37,10 @@
 .h4-page .seo-related a { display:inline-block;padding:9px 14px;border:1px solid var(--line);border-radius:999px;background:#fff;font-size:14px;text-decoration:none !important;color:var(--ink) !important }
 .h4-page .seo-related a:hover { border-color:var(--purple) }
 .h4-page .seo-byline { display:flex;align-items:center;gap:14px;margin:0 0 28px }
-.h4-page .seo-byline img { width:56px;height:56px;border-radius:50%;object-fit:cover }
+.h4-page .seo-byline img { width:56px;height:56px;border-radius:50%;object-fit:cover;object-position:50% 18% }
 .h4-page .seo-byline p { margin:0;font-size:15px }
 .h4-page .seo-bio { margin-top:40px;padding:22px;border:1px solid var(--line);border-radius:12px;background:#fff;display:flex;gap:18px;align-items:flex-start }
-.h4-page .seo-bio img { width:84px;height:84px;border-radius:12px;object-fit:cover;flex-shrink:0 }
+.h4-page .seo-bio img { width:84px;height:84px;border-radius:12px;object-fit:cover;object-position:50% 18%;flex-shrink:0 }
 .h4-page .seo-bio p { font-size:15px;margin:0 }
 .h4-page .seo-hub { display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;list-style:none;padding:0 !important }
 .h4-page .seo-hub a { display:block;padding:14px 16px;border:1px solid var(--line);border-radius:10px;background:#fff;text-decoration:none !important;color:var(--ink) !important;font-size:15px }
