@@ -12,42 +12,42 @@ const FEATURES = [
     title: "01: Smart Booking System",
     description:
       "Give your shop a live booking page clients can use 24/7. They pick a service, choose a barber, pay a deposit, and you get notified, no back and forth, no missed bookings.",
-    image: "/features1.png",
+    image: "/features1.jpg",
   },
   {
     id: "noshows",
     title: "02: No-Show Recovery",
     description:
       "When a client cancels or ghosts, AutoPilot immediately fills that slot from your waitlist and sends a payment link, recovering revenue you would have lost.",
-    image: "/Features2.png",
+    image: "/Features2.jpg",
   },
   {
     id: "frontdesk",
     title: "03: AI Front Desk",
     description:
       "AutoPilot answers client DMs, books appointments, and handles questions around the clock. It only escalates to you when it genuinely needs a human decision.",
-    image: "/feature3.png",
+    image: "/feature3.jpg",
   },
   {
     id: "winback",
     title: "04: Win-Back Automation",
     description:
       "Clients who haven't visited in 30 days get a personalised message automatically. No manual chasing, no forgotten regulars, just returning clients.",
-    image: "/Features4.png",
+    image: "/Features4.jpg",
   },
   {
     id: "rebooking",
     title: "05: Rebooking Reminders",
     description:
       "AutoPilot tracks each client's visit rhythm and nudges them to rebook at exactly the right time, keeping your calendar consistently full without you lifting a finger.",
-    image: "/Features5.png",
+    image: "/Features5.jpg",
   },
   {
     id: "payments",
     title: "06: Payments and Zero Commission",
     description:
       "Collect deposits, tips, and full payments in-app. You keep every dollar you earn, FlatPurse Flow never takes a cut of your revenue.",
-    image: "/features6.png",
+    image: "/features6.jpg",
   },
 ];
 
