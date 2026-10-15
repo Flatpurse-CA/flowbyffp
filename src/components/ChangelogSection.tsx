@@ -141,6 +141,8 @@ export default function ChangelogSection() {
         <div style={{ position: "relative", borderRadius: 10, overflow: "hidden", aspectRatio: "16/9", border: "1px solid rgba(255,255,255,0.08)" }}>
           <iframe
             src="https://drive.google.com/file/d/16kEw9y92fjrpefWpY39HA_DjDehmx9oU/preview"
+            title="FlatPurse Flow walkthrough video"
+            loading="lazy"
             style={{ width: "100%", height: "100%", border: "none", display: "block" }}
             allow="autoplay"
             allowFullScreen
