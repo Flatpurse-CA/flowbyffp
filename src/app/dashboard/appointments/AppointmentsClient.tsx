@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { createPortal } from "react-dom";
 import {
   Plus, Search, Copy, Check, MessageSquare,
   Mail, ExternalLink, Zap, Clock, ChevronRight,
@@ -196,7 +197,9 @@ function NewBookingOverlay({ onClose, onCreated, staff, selfStaffId, initialClie
   const priceNum = parseFloat(price) || 0;
   const depositNum = deposit ? priceNum * 0.25 : 0;
 
-  return (
+  // Portalled to <body>: on iOS the dashboard's scrolling <main> traps
+  // position:fixed children, leaving the header and bottom nav over the sheet.
+  return createPortal(
     <div className="apt-modal-overlay" style={{
       position: "fixed", inset: 0, zIndex: 300,
       background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)",
@@ -394,7 +397,8 @@ function NewBookingOverlay({ onClose, onCreated, staff, selfStaffId, initialClie
         </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 
@@ -480,7 +484,9 @@ function CloseOutModal({ appt, onClose, onCompleted, stripeTerminalLocationId }:
     outline: "none", boxSizing: "border-box",
   };
 
-  return (
+  // Portalled to <body>: on iOS the dashboard's scrolling <main> traps
+  // position:fixed children, leaving the header and bottom nav over the sheet.
+  return createPortal(
     <div className="apt-modal-overlay" style={{
       position: "fixed", inset: 0, zIndex: 320,
       background: "rgba(0,0,0,0.75)", backdropFilter: "blur(6px)",
@@ -671,7 +677,8 @@ function CloseOutModal({ appt, onClose, onCompleted, stripeTerminalLocationId }:
           </>
         )}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 
@@ -787,7 +794,9 @@ function AppointmentDetail({ appt, onClose, onCloseOut, onChanged }: { appt: App
     }
   };
 
-  return (
+  // Portalled to <body>: on iOS the dashboard's scrolling <main> traps
+  // position:fixed children, leaving the header and bottom nav over the sheet.
+  return createPortal(
     <div className="apt-modal-overlay" style={{
       position: "fixed", inset: 0, zIndex: 310,
       background: "rgba(0,0,0,0.75)", backdropFilter: "blur(6px)",
@@ -1031,7 +1040,8 @@ function AppointmentDetail({ appt, onClose, onCloseOut, onChanged }: { appt: App
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 

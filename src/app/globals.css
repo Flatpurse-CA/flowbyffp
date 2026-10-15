@@ -772,6 +772,21 @@ body {
     padding: 18px 18px 20px !important;
     flex: 1 1 auto !important;
     min-height: 0;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+  }
+  /* iOS gives native date inputs an intrinsic min-width wider than the sheet,
+     which pushed the form sideways and let it drift while scrolling. */
+  .dash-date-input {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    -webkit-appearance: none;
+    appearance: none;
+    min-height: 44px;
+  }
+  .dash-date-input::-webkit-date-and-time-value {
+    text-align: left;
   }
   .nb-summary {
     width: 100% !important;
