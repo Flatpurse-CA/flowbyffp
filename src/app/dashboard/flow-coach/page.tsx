@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation";
 import { getShopContext } from "@/lib/dashboard/shop";
 import { logFeatureUsage } from "@/lib/featureUsage";
-import { getFlowCoachData, getShopPlan } from "./actions";
+import { getFlowCoachData } from "./actions";
+import { shopHasFeature } from "@/lib/dashboard/plan";
 import { FlowCoachClient, FlowCoachUpsell } from "./FlowCoachClient";
 
 export const dynamic = "force-dynamic";
@@ -25,8 +26,7 @@ export default async function FlowCoachPage() {
 
   if (ctx.role !== "owner") redirect("/dashboard");
 
-  const plan = await getShopPlan();
-  if (plan !== "pro_plus" && plan !== "enterprise") {
+  if (!(await shopHasFeature(ctx.shopId, "flow_coach"))) {
     return <FlowCoachUpsell />;
   }
 

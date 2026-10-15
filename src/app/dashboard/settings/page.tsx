@@ -6,6 +6,7 @@ import { getRequestOrigin } from "@/lib/requestOrigin";
 import { getBusinessHours, getStripeStatus, getBillingStatus } from "./actions";
 import { SettingsClient } from "./SettingsClient";
 import { twilioConfigured } from "@/lib/twilio";
+import { shopTaxSettings } from "@/lib/tax";
 
 export const dynamic = "force-dynamic";
 export const fetchCache = "force-no-store";
@@ -20,7 +21,7 @@ export default async function SettingsPage() {
   const { data: shop } = user
     ? await supabase
         .from("shops")
-        .select("handle, frontdesk_enabled, noshow_recovery_enabled, filler_enabled, winback_enabled, reminders_enabled, birthday_enabled, notification_prefs, tax_rate, tax_inclusive, name, business_type, bio, city, province, postal_code, phone, profile_image_url, cover_image_url")
+        .select("handle, frontdesk_enabled, noshow_recovery_enabled, filler_enabled, winback_enabled, reminders_enabled, birthday_enabled, notification_prefs, tax_inclusive, province_code, tax_registered, tax_number, pst_on_services, name, business_type, bio, city, province, postal_code, phone, profile_image_url, cover_image_url")
         .eq("owner_id", user.id)
         .maybeSingle()
     : { data: null };
@@ -69,8 +70,7 @@ export default async function SettingsPage() {
         initialBilling={initialBilling}
         initialFlowFlags={initialFlowFlags}
         initialNotificationPrefs={initialNotificationPrefs}
-        initialTaxRate={(shop?.tax_rate as number | null | undefined) ?? null}
-        initialTaxInclusive={Boolean(shop?.tax_inclusive)}
+        initialTax={{ ...shopTaxSettings(shop ?? {}), taxNumber: (shop?.tax_number as string | null | undefined) ?? "" }}
         initialBusinessProfile={initialBusinessProfile}
         initialProfileImageUrl={(shop?.profile_image_url as string | undefined) ?? null}
         initialCoverImageUrl={(shop?.cover_image_url as string | undefined) ?? null}

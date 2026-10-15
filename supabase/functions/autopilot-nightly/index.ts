@@ -28,6 +28,7 @@
 
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { Resend } from "npm:resend";
+import { SHOP_PLAN_COLUMNS, shopHasFeature, type ShopPlanFields } from "../_shared/planAccess.ts";
 
 const supabase = createClient(
   Deno.env.get("SUPABASE_URL")!,
@@ -349,7 +350,7 @@ Deno.serve(async () => {
 
   const { data: shops, error } = await supabase
     .from("shops")
-    .select("id, name, handle, winback_enabled, reminders_enabled, birthday_enabled")
+    .select(`id, name, handle, winback_enabled, reminders_enabled, birthday_enabled, ${SHOP_PLAN_COLUMNS}`)
     .eq("stripe_connected", true);
 
   if (error) return new Response(JSON.stringify({ error: error.message }), { status: 500 });
@@ -362,6 +363,8 @@ Deno.serve(async () => {
       // Client-segmentation refresh is bookkeeping, not customer-facing
       // outreach — it stays unconditional regardless of flow toggles.
       clientsRefreshed += await refreshClients(shop.id, now);
+      // Outreach below is AutoPilot, a Pro+ feature (the free trial counts as Pro+).
+      if (!shopHasFeature(shop as unknown as ShopPlanFields, "autopilot", now)) continue;
       if (shop.winback_enabled) winbackSent += await runWinback(shop, now);
       if (shop.reminders_enabled) remindersSent += await runReminders(shop, now);
       if (shop.birthday_enabled) birthdaySent += await runBirthdays(shop, now);

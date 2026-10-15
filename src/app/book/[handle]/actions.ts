@@ -12,6 +12,7 @@ import { attributeAutopilotRevenue } from "@/lib/dashboard/autopilotAttribution"
 import { computeAccessStatus } from "@/lib/dashboard/accessStatus";
 import { checkRateLimit } from "@/lib/rateLimit";
 import { fillBusinessHoursDefaults } from "@/lib/dashboard/businessHours";
+import { computeTax, shopTaxSettings, type TaxBreakdown } from "@/lib/tax";
 
 const SLOT_INTERVAL_MINUTES = 30;
 
@@ -224,46 +225,66 @@ export async function createPublicBooking(input: {
   return { appointmentId: inserted.id as string };
 }
 
-export async function createPaymentIntent(input: {
-  appointmentId: string; depositOnly: boolean;
-}): Promise<{ clientSecret?: string; amount?: number; error?: string }> {
-  const ctx = await getCustomerContext();
-  if (!ctx) return { error: "You need to be signed in to pay" };
+// Card payments are direct charges on the shop's own connected account: the
+// shop pays Stripe's fees, Flow takes no application fee, and Stripe carries
+// fraud and chargeback losses (see startStripeOnboarding's controller
+// settings). Cards are saved on the platform customer so a client can reuse
+// them at any shop, then cloned onto the shop's account for each charge.
 
+type PayableAppointment = { id: string; shopId: string; stripeAccountId: string; amount: number; tax: TaxBreakdown | null };
+
+async function loadPayableAppointment(appointmentId: string, customerId: string, depositOnly: boolean): Promise<PayableAppointment | { error: string }> {
   const admin = createAdminClient();
-
   const { data: appt } = await admin
     .from("appointments")
-    .select("id, shop_id, customer_id, price")
-    .eq("id", input.appointmentId)
+    .select("id, shop_id, customer_id, price, service_name")
+    .eq("id", appointmentId)
     .maybeSingle();
-  if (!appt || appt.customer_id !== ctx.customerId) return { error: "Booking not found" };
+  if (!appt || appt.customer_id !== customerId) return { error: "Booking not found" };
 
   const { data: shop } = await admin
     .from("shops")
-    .select("stripe_account_id, stripe_connected")
+    .select("stripe_account_id, stripe_connected, province, province_code, tax_registered, pst_on_services, tax_inclusive")
     .eq("id", appt.shop_id)
     .maybeSingle();
   if (!shop?.stripe_connected || !shop.stripe_account_id) return { error: "This shop isn't set up for online payments" };
 
+  const price = Number(appt.price);
+  if (depositOnly) {
+    // Deposits aren't taxed; tax is charged on the final bill.
+    return { id: appt.id as string, shopId: appt.shop_id as string, stripeAccountId: shop.stripe_account_id as string, amount: Math.ceil(price * 0.2 * 100) / 100, tax: null };
+  }
+  const { data: exempt } = await admin.from("services").select("id").eq("shop_id", appt.shop_id).eq("name", appt.service_name).eq("tax_exempt", true).limit(1);
+  const tax = computeTax(shopTaxSettings(shop), [{ amount: price, kind: "service", exempt: Boolean(exempt?.length) }]);
+  return { id: appt.id as string, shopId: appt.shop_id as string, stripeAccountId: shop.stripe_account_id as string, amount: tax.total, tax };
+}
+
+/** What the client will be charged, with tax lines, for the pay step's summary. */
+export async function getAmountDue(input: { appointmentId: string; depositOnly: boolean }): Promise<{ amount?: number; tax?: TaxBreakdown | null; error?: string }> {
+  const ctx = await getCustomerContext();
+  if (!ctx) return { error: "You need to be signed in to pay" };
+  const payable = await loadPayableAppointment(input.appointmentId, ctx.customerId, input.depositOnly);
+  if ("error" in payable) return { error: payable.error };
+  return { amount: payable.amount, tax: payable.tax };
+}
+
+/** Starts saving a new card on the client's platform customer; the charge happens in payWithSavedCard once it's saved. */
+export async function startNewCardSetup(input: { appointmentId: string }): Promise<{ clientSecret?: string; error?: string }> {
+  const ctx = await getCustomerContext();
+  if (!ctx) return { error: "You need to be signed in to pay" };
+  const payable = await loadPayableAppointment(input.appointmentId, ctx.customerId, false);
+  if ("error" in payable) return { error: payable.error };
+
+  const admin = createAdminClient();
   const stripeCustomerId = await ensureStripeCustomerId(admin, ctx.customerId, ctx.email, ctx.fullName);
-
-  const fullAmount = Number(appt.price);
-  const amount = input.depositOnly ? Math.ceil(fullAmount * 0.2 * 100) / 100 : fullAmount;
-
   try {
-    const intent = await stripe().paymentIntents.create({
-      amount: Math.round(amount * 100),
-      currency: "cad",
+    const setup = await stripe().setupIntents.create({
       customer: stripeCustomerId,
-      // Saves the card to the customer's account (surfaces in "Payment methods" and
-      // as a quick-pay option on their next booking) without requiring a checkbox.
-      setup_future_usage: "off_session",
-      transfer_data: { destination: shop.stripe_account_id },
-      metadata: { appointment_id: appt.id },
-      automatic_payment_methods: { enabled: true },
+      usage: "off_session",
+      payment_method_types: ["card"],
+      metadata: { appointment_id: payable.id },
     });
-    return { clientSecret: intent.client_secret ?? undefined, amount };
+    return { clientSecret: setup.client_secret ?? undefined };
   } catch (e) {
     return { error: e instanceof Error ? e.message : "Couldn't start payment" };
   }
@@ -271,26 +292,14 @@ export async function createPaymentIntent(input: {
 
 export async function payWithSavedCard(input: {
   appointmentId: string; paymentMethodId: string; depositOnly: boolean;
-}): Promise<{ success?: boolean; requiresActionClientSecret?: string; error?: string }> {
+}): Promise<{ success?: boolean; requiresActionClientSecret?: string; stripeAccount?: string; error?: string }> {
   const ctx = await getCustomerContext();
   if (!ctx) return { error: "You need to be signed in to pay" };
 
+  const payable = await loadPayableAppointment(input.appointmentId, ctx.customerId, input.depositOnly);
+  if ("error" in payable) return { error: payable.error };
+
   const admin = createAdminClient();
-
-  const { data: appt } = await admin
-    .from("appointments")
-    .select("id, shop_id, customer_id, price")
-    .eq("id", input.appointmentId)
-    .maybeSingle();
-  if (!appt || appt.customer_id !== ctx.customerId) return { error: "Booking not found" };
-
-  const { data: shop } = await admin
-    .from("shops")
-    .select("stripe_account_id, stripe_connected")
-    .eq("id", appt.shop_id)
-    .maybeSingle();
-  if (!shop?.stripe_connected || !shop.stripe_account_id) return { error: "This shop isn't set up for online payments" };
-
   const { data: customerRow } = await admin.from("customers").select("stripe_customer_id").eq("id", ctx.customerId).maybeSingle();
   const stripeCustomerId = customerRow?.stripe_customer_id as string | undefined;
   if (!stripeCustomerId) return { error: "No saved card found" };
@@ -298,25 +307,34 @@ export async function payWithSavedCard(input: {
   const pm = await stripe().paymentMethods.retrieve(input.paymentMethodId);
   if (pm.customer !== stripeCustomerId) return { error: "This card doesn't belong to you" };
 
-  const fullAmount = Number(appt.price);
-  const amount = input.depositOnly ? Math.ceil(fullAmount * 0.2 * 100) / 100 : fullAmount;
-
   try {
-    await stripe().paymentIntents.create({
-      amount: Math.round(amount * 100),
-      currency: "cad",
-      customer: stripeCustomerId,
-      payment_method: input.paymentMethodId,
-      off_session: true,
-      confirm: true,
-      transfer_data: { destination: shop.stripe_account_id },
-      metadata: { appointment_id: appt.id },
-    });
-    return { success: true };
+    const cloned = await stripe().paymentMethods.create(
+      { customer: stripeCustomerId, payment_method: input.paymentMethodId },
+      { stripeAccount: payable.stripeAccountId },
+    );
+    const intent = await stripe().paymentIntents.create(
+      {
+        amount: Math.round(payable.amount * 100),
+        currency: "cad",
+        payment_method: cloned.id,
+        payment_method_types: ["card"],
+        confirm: true,
+        metadata: {
+          appointment_id: payable.id,
+          ...(payable.tax ? { tax_amount: payable.tax.tax.toFixed(2) } : {}),
+        },
+      },
+      { stripeAccount: payable.stripeAccountId },
+    );
+    if (intent.status === "requires_action" && intent.client_secret) {
+      return { requiresActionClientSecret: intent.client_secret, stripeAccount: payable.stripeAccountId };
+    }
+    if (intent.status === "succeeded" || intent.status === "processing") return { success: true };
+    return { error: "Payment could not be completed" };
   } catch (e) {
     const stripeErr = e as { payment_intent?: { client_secret?: string | null }; message?: string };
     if (stripeErr.payment_intent?.client_secret) {
-      return { requiresActionClientSecret: stripeErr.payment_intent.client_secret };
+      return { requiresActionClientSecret: stripeErr.payment_intent.client_secret, stripeAccount: payable.stripeAccountId };
     }
     return { error: stripeErr.message ?? "Payment failed" };
   }

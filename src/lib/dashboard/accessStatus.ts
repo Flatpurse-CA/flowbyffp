@@ -1,4 +1,5 @@
-const TRIAL_DAYS = 7;
+// Keep in step with supabase/functions/_shared/planAccess.ts.
+export const TRIAL_DAYS = 14;
 const GRACE_DAYS = 7;
 const DAY_MS = 24 * 60 * 60 * 1000;
 

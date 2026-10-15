@@ -1,5 +1,7 @@
 "use server";
 
+import { shopTaxSettings, type ShopTaxSettings } from "@/lib/tax";
+
 import { requireShop, getCurrentShopId } from "@/lib/dashboard/shop";
 import { stripe } from "@/lib/stripe";
 import type { AppointmentRow } from "../appointments/actions";
@@ -11,8 +13,7 @@ export type OperationsData = {
   appointments: AppointmentRow[];
   staff: StaffRow[];
   autopilotRevenueThisMonth: number;
-  taxRate: number | null;
-  taxInclusive: boolean;
+  taxSettings: ShopTaxSettings;
   stripeConnected: boolean;
   nextPayout: NextPayout;
 };
@@ -20,7 +21,7 @@ export type OperationsData = {
 export async function getOperationsData(): Promise<OperationsData> {
   const shopId = await getCurrentShopId();
   if (!shopId) {
-    return { appointments: [], staff: [], autopilotRevenueThisMonth: 0, taxRate: null, taxInclusive: false, stripeConnected: false, nextPayout: null };
+    return { appointments: [], staff: [], autopilotRevenueThisMonth: 0, taxSettings: shopTaxSettings({}), stripeConnected: false, nextPayout: null };
   }
 
   const { supabase } = await requireShop();
@@ -55,7 +56,7 @@ export async function getOperationsData(): Promise<OperationsData> {
       .gte("created_at", monthStart.toISOString()),
     supabase
       .from("shops")
-      .select("tax_rate, tax_inclusive, stripe_connected, stripe_account_id")
+      .select("province, province_code, tax_registered, pst_on_services, tax_inclusive, stripe_connected, stripe_account_id")
       .eq("id", shopId)
       .maybeSingle(),
   ]);
@@ -79,8 +80,7 @@ export async function getOperationsData(): Promise<OperationsData> {
     appointments: (apptsRes.data ?? []) as AppointmentRow[],
     staff: (staffRes.data ?? []) as StaffRow[],
     autopilotRevenueThisMonth,
-    taxRate: (shopRes.data?.tax_rate as number | null | undefined) ?? null,
-    taxInclusive: Boolean(shopRes.data?.tax_inclusive),
+    taxSettings: shopTaxSettings(shopRes.data ?? {}),
     stripeConnected: Boolean(shopRes.data?.stripe_connected),
     nextPayout,
   };

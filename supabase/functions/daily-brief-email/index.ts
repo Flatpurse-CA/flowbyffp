@@ -6,6 +6,7 @@
 
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { Resend } from "npm:resend";
+import { SHOP_PLAN_COLUMNS, shopHasFeature, type ShopPlanFields } from "../_shared/planAccess.ts";
 
 const supabase = createClient(
   Deno.env.get("SUPABASE_URL")!,
@@ -109,7 +110,7 @@ Deno.serve(async () => {
 
   const { data: shops, error } = await supabase
     .from("shops")
-    .select("id, owner_id, name, daily_brief_email_enabled")
+    .select(`id, owner_id, name, daily_brief_email_enabled, ${SHOP_PLAN_COLUMNS}`)
     .eq("daily_brief_email_enabled", true);
 
   if (error) return new Response(JSON.stringify({ error: error.message }), { status: 500 });
@@ -119,6 +120,8 @@ Deno.serve(async () => {
   const errors: string[] = [];
 
   for (const shop of shops ?? []) {
+    // The Daily Brief is a Pro feature (the free trial counts as Pro+).
+    if (!shopHasFeature(shop as unknown as ShopPlanFields, "daily_brief", now)) continue;
     try {
       const { data: apptsRaw } = await supabase
         .from("appointments")

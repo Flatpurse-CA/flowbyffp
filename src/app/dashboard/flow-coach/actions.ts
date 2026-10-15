@@ -5,14 +5,6 @@ import { computeFlowCoach, type FlowCoachData } from "@/lib/dashboard/flowCoach"
 import type { AppointmentRow } from "../appointments/actions";
 import type { StaffRow } from "../team/actions";
 
-export async function getShopPlan(): Promise<string> {
-  const shopId = await getCurrentShopId();
-  if (!shopId) return "starter";
-  const { supabase } = await requireShop();
-  const { data } = await supabase.from("shops").select("plan").eq("id", shopId).maybeSingle();
-  return (data?.plan as string) ?? "starter";
-}
-
 export async function getFlowCoachData(): Promise<FlowCoachData | null> {
   const shopId = await getCurrentShopId();
   if (!shopId) return null;

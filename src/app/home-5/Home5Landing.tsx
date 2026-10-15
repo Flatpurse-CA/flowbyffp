@@ -160,7 +160,7 @@ export function Home5Main() {
                 <div className="h5-icon" style={{ color: "#fff", background: "rgba(255,255,255,0.12)" }}><Tag size={22} strokeWidth={1.6} /></div>
                 <Chip>ROOM TO GROW</Chip>
                 <h2>Plans from C$39/month.</h2>
-                <p>Compare Starter, Pro and Pro+ to find the right fit.<br />Card processing and platform fees apply.</p>
+                <p>Compare Starter, Pro and Pro+ to find the right fit.<br />Card processing fees apply.</p>
                 <Link className="h5-pill-btn" href="/pricing">Compare plans &amp; fees →</Link>
               </article>
             </ScrollReveal>

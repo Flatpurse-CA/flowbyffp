@@ -23,6 +23,7 @@
 
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { Resend } from "npm:resend";
+import { SHOP_PLAN_COLUMNS, shopHasFeature, type ShopPlanFields } from "../_shared/planAccess.ts";
 
 const supabase = createClient(
   Deno.env.get("SUPABASE_URL")!,
@@ -38,7 +39,8 @@ const SITE_URL = Deno.env.get("SITE_URL") ?? "https://flowbyffp.vercel.app";
 const SHOP_TZ = "America/Edmonton";
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
-const NOSHOW_GRACE_MS = 30 * 60 * 1000;
+// Rebook message goes out about an hour after a missed appointment.
+const NOSHOW_GRACE_MS = 60 * 60 * 1000;
 const NOSHOW_LOOKBACK_MS = MS_PER_DAY;
 const FILLER_LOOKAHEAD_MS = 48 * 60 * 60 * 1000;
 const FILLER_LOOKBACK_MS = 20 * 60 * 1000; // slightly wider than the 15min cron interval
@@ -271,7 +273,7 @@ Deno.serve(async () => {
 
   const { data: shops, error } = await supabase
     .from("shops")
-    .select("id, name, handle, noshow_recovery_enabled, filler_enabled")
+    .select(`id, name, handle, noshow_recovery_enabled, filler_enabled, ${SHOP_PLAN_COLUMNS}`)
     .eq("stripe_connected", true);
 
   if (error) return new Response(JSON.stringify({ error: error.message }), { status: 500 });
@@ -280,6 +282,8 @@ Deno.serve(async () => {
   const errors: string[] = [];
 
   for (const shop of shops ?? []) {
+    // AutoPilot is a Pro+ feature (the free trial counts as Pro+).
+    if (!shopHasFeature(shop as unknown as ShopPlanFields, "autopilot", now)) continue;
     try {
       if (shop.noshow_recovery_enabled) noshowSent += await runNoShow(shop, now);
       if (shop.filler_enabled) fillerSent += await runFiller(shop, now);

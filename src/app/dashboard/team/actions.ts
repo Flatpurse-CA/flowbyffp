@@ -1,5 +1,7 @@
 "use server";
 
+import { getEffectivePlan } from "@/lib/dashboard/plan";
+import { getPlan } from "@/lib/plans";
 import { revalidatePath } from "next/cache";
 import { requireShop, getCurrentShopId, getShopContext } from "@/lib/dashboard/shop";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -100,6 +102,16 @@ export async function inviteStaff(input: { fullName: string; role?: string; emai
 
   const { supabase, shopId } = await requireShop();
   const email = input.email.trim();
+
+  // Plan staff limits (Starter 2, Pro 6, Pro+ unlimited). The owner counts
+  // as a team member, and reactivating someone counts the same as adding.
+  const limit = getPlan(await getEffectivePlan(shopId)).teamMemberLimit;
+  if (limit !== null) {
+    const { count } = await supabase.from("staff").select("id", { count: "exact", head: true }).eq("shop_id", shopId).eq("active", true).not("email", "ilike", email);
+    if ((count ?? 0) + 1 >= limit) {
+      throw new Error(`Your plan includes up to ${limit} team members, including you. Upgrade in Settings > Billing to add more.`);
+    }
+  }
 
   // staff.user_id has a unique index, so re-inserting a row for an email that's already
   // linked to a staff record (this shop or another) would crash with a raw Postgres

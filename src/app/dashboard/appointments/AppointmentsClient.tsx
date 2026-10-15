@@ -15,6 +15,7 @@ import { chargeInPerson } from "@/lib/terminal/nativeBridge";
 import type { StaffRow } from "../team/actions";
 import { tint } from "@/lib/color";
 import { deepen } from "@/lib/dashboard/deepen";
+import { computeTax, type ShopTaxSettings } from "@/lib/tax";
 
 // ─── Timezone-aware formatting (shop is Edmonton-based) ───────────────────────
 
@@ -407,7 +408,7 @@ function NewBookingOverlay({ onClose, onCreated, staff, selfStaffId, initialClie
 
 const GRATUITY_PRESETS = [0, 15, 18, 20];
 
-function CloseOutModal({ appt, onClose, onCompleted, stripeTerminalLocationId }: { appt: ApptRecord; onClose: () => void; onCompleted: () => void; stripeTerminalLocationId?: string | null }) {
+function CloseOutModal({ appt, onClose, onCompleted, stripeTerminalLocationId, taxSettings, taxExempt }: { appt: ApptRecord; onClose: () => void; onCompleted: () => void; stripeTerminalLocationId?: string | null; taxSettings: ShopTaxSettings; taxExempt: boolean }) {
   const [gratuityPct, setGratuityPct] = useState<number | "custom">(18);
   const [customTip, setCustomTip] = useState("");
   const [method, setMethod] = useState<"tap" | "link" | "card" | "cash" | null>(null);
@@ -417,9 +418,12 @@ function CloseOutModal({ appt, onClose, onCompleted, stripeTerminalLocationId }:
 
   const baseNum = parseFloat(appt.price.replace(/[^0-9.]/g, "")) || 0;
   const depositNum = appt.depositAmount ? parseFloat(appt.depositAmount.replace(/[^0-9.]/g, "")) || 0 : 0;
-  const subtotal = Math.max(0, baseNum - depositNum);
-  const tipAmount = gratuityPct === "custom" ? (parseFloat(customTip) || 0) : (baseNum * gratuityPct / 100);
-  const total = subtotal + tipAmount;
+  // Tax is on the full service price (the deposit was collected untaxed), then
+  // the deposit comes off what's owed. Tips are never taxed.
+  const tax = computeTax(taxSettings, [{ amount: baseNum, kind: "service", exempt: taxExempt }]);
+  const subtotal = Math.max(0, tax.total - depositNum);
+  const tipAmount = gratuityPct === "custom" ? (parseFloat(customTip) || 0) : (tax.subtotal * gratuityPct / 100);
+  const total = Math.round((subtotal + tipAmount) * 100) / 100;
   const fmtMoney = (n: number) => `C$${n.toFixed(2)}`;
 
   const sendReceiptIfRequested = async () => {
@@ -588,8 +592,14 @@ function CloseOutModal({ appt, onClose, onCompleted, stripeTerminalLocationId }:
                 <div style={{ background: "var(--dsurface2)", border: "1px solid var(--dw08)", borderRadius: 14, padding: "14px 16px", marginBottom: 18, display: "flex", flexDirection: "column", gap: 7 }}>
                   <div style={{ display: "flex", justifyContent: "space-between" }}>
                     <span style={{ color: "var(--dw4)", fontSize: 12.5 }}>Service</span>
-                    <span style={{ color: "var(--dw7)", fontSize: 12.5 }}>{appt.price}</span>
+                    <span style={{ color: "var(--dw7)", fontSize: 12.5 }}>{fmtMoney(tax.subtotal)}</span>
                   </div>
+                  {tax.lines.map(l => (
+                    <div key={l.label} style={{ display: "flex", justifyContent: "space-between" }}>
+                      <span style={{ color: "var(--dw4)", fontSize: 12.5 }}>{l.label} ({l.rate}%){taxSettings.inclusive ? ", included" : ""}</span>
+                      <span style={{ color: "var(--dw7)", fontSize: 12.5 }}>{fmtMoney(l.amount)}</span>
+                    </div>
+                  ))}
                   {depositNum > 0 && (
                     <div style={{ display: "flex", justifyContent: "space-between" }}>
                       <span style={{ color: "var(--dw4)", fontSize: 12.5 }}>Deposit already paid</span>
@@ -1409,7 +1419,7 @@ const STATUS_FILTER_TITLE: Record<BookingsStatusFilter, string> = {
   pending: "Pending Bookings",
 };
 
-export function AppointmentsClient({ initialAppointments, bookingUrl, staff, selfStaffId, statusFilter, stripeTerminalLocationId }: { initialAppointments: AppointmentRow[]; bookingUrl: string | null; staff: StaffRow[]; selfStaffId?: string | null; statusFilter?: BookingsStatusFilter; stripeTerminalLocationId?: string | null }) {
+export function AppointmentsClient({ initialAppointments, bookingUrl, staff, selfStaffId, statusFilter, stripeTerminalLocationId, taxSettings, taxExemptServices }: { initialAppointments: AppointmentRow[]; bookingUrl: string | null; staff: StaffRow[]; selfStaffId?: string | null; statusFilter?: BookingsStatusFilter; stripeTerminalLocationId?: string | null; taxSettings: ShopTaxSettings; taxExemptServices: string[] }) {
   const router = useRouter();
   const [, startTransition] = useTransition();
   const [view, setView]           = useState<View>("Day");
@@ -1515,6 +1525,8 @@ export function AppointmentsClient({ initialAppointments, bookingUrl, staff, sel
           onClose={() => setClosingOut(false)}
           onCompleted={() => { setClosingOut(false); setSelectedId(null); refresh(); }}
           stripeTerminalLocationId={stripeTerminalLocationId}
+          taxSettings={taxSettings}
+          taxExempt={taxExemptServices.includes(selectedAppt.service)}
         />
       )}
     </div>

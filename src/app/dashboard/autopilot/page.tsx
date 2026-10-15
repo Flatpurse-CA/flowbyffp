@@ -3,6 +3,8 @@ import { getShopContext } from "@/lib/dashboard/shop";
 import { logFeatureUsage } from "@/lib/featureUsage";
 import { getAutopilotState } from "./actions";
 import { AutoPilotClient } from "./AutoPilotClient";
+import { shopHasFeature } from "@/lib/dashboard/plan";
+import PlanUpsell from "@/components/PlanUpsell";
 
 export const dynamic = "force-dynamic";
 export const fetchCache = "force-no-store";
@@ -32,10 +34,14 @@ export default async function AutoPilotPage() {
           AutoPilot is paused
         </h1>
         <p style={{ color: "var(--dw45)", fontSize: 13.5, lineHeight: 1.6, margin: 0 }}>
-          Your trial ended, so no-show recovery, win-backs, and the AI Front Desk are paused. Add a card to turn AutoPilot back on.
+          Your trial ended, so no-show recovery, win-backs and the AI Front Desk are paused. Add a card to turn them back on.
         </p>
       </div>
     );
+  }
+
+  if (!(await shopHasFeature(ctx.shopId, "autopilot"))) {
+    return <PlanUpsell feature="AutoPilot" plan="Pro+" body="Upgrade to Pro+ for No-Show Recovery, the Last-Minute Slot Filler, 30-day win-backs and birthday offers, running on their own." />;
   }
 
   await logFeatureUsage("autopilot_viewed", ctx.shopId);

@@ -4,6 +4,7 @@ import { getRequestOrigin } from "@/lib/requestOrigin";
 import { listAppointments } from "./actions";
 import { listStaff } from "../team/actions";
 import { AppointmentsClient, type BookingsStatusFilter } from "./AppointmentsClient";
+import { shopTaxSettings } from "@/lib/tax";
 
 export async function BookingsPageContent({ statusFilter }: { statusFilter?: BookingsStatusFilter }) {
   const ctx = await getShopContext();
@@ -22,7 +23,10 @@ export async function BookingsPageContent({ statusFilter }: { statusFilter?: Boo
   }
 
   const supabase = await createClient();
-  const { data: shop } = await supabase.from("shops").select("handle, stripe_terminal_location_id").eq("id", ctx.shopId).maybeSingle();
+  const [{ data: shop }, { data: exemptServices }] = await Promise.all([
+    supabase.from("shops").select("handle, stripe_terminal_location_id, province, province_code, tax_registered, pst_on_services, tax_inclusive").eq("id", ctx.shopId).maybeSingle(),
+    supabase.from("services").select("name").eq("shop_id", ctx.shopId).eq("tax_exempt", true),
+  ]);
 
   const now = new Date();
   const rangeStart = new Date(now);
@@ -45,6 +49,8 @@ export async function BookingsPageContent({ statusFilter }: { statusFilter?: Boo
       selfStaffId={ctx.staffId}
       statusFilter={statusFilter}
       stripeTerminalLocationId={(shop?.stripe_terminal_location_id as string | null) ?? null}
+      taxSettings={shopTaxSettings(shop ?? {})}
+      taxExemptServices={(exemptServices ?? []).map(s => s.name as string)}
     />
   );
 }

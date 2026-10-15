@@ -40,7 +40,10 @@ export async function POST(req: Request) {
     {
       amount: Math.round(amount * 100),
       currency,
-      payment_method_types: ["card_present"],
+      // Interac debit taps in Canada; Stripe captures those automatically on
+      // authorization, so the capture route treats an already-succeeded
+      // intent as done.
+      payment_method_types: currency === "cad" ? ["card_present", "interac_present"] : ["card_present"],
       capture_method: "manual",
       metadata: appointmentId ? { appointment_id: appointmentId } : undefined,
     },

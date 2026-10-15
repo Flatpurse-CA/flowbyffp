@@ -31,6 +31,15 @@ export type Plan = {
 };
 
 /** No tier charges a new-client or marketplace commission — a deliberate difference from competitors like Fresha. */
+/**
+ * Card rates are Stripe's standard Canadian pricing, paid by the shop's own
+ * Stripe account and the same on every plan. Flow takes no cut of card
+ * payments: in person it's 2.7% + 5¢ plus 15¢ per Tap to Pay authorization;
+ * Interac is 15¢ plus the same 15¢.
+ */
+export const CARD_FEE = "2.7% + 20¢ tapped in person · 2.9% + 30¢ online (Stripe's standard rates, paid to Stripe)";
+export const INTERAC_FEE = "30¢ flat per tap";
+
 export const NO_MARKETPLACE_FEE_NOTE = "No new-client or marketplace commission on any plan.";
 
 export const PLANS: Plan[] = [
@@ -44,18 +53,18 @@ export const PLANS: Plan[] = [
     annualPrice: 390,
     priceLabel: "C$39/month or C$32.50/month billed annually",
     features: [
-      "Home Dashboard & booking calendar",
-      "Full POS, payments & Tap to Pay",
+      "Bookings, calendar & online booking page",
+      "Payments & Tap to Pay on iPhone",
       "Client CRM & appointment history",
-      "Reviews & business settings",
+      "Appointment reminders & reviews",
       "Up to 2 Team Members",
     ],
     teamMemberLimit: 2,
     bookingLimitPerMonth: null,
     annualMonthlyEquivalent: 32.5,
     annualSavingsLabel: "Save $78/yr",
-    cardFee: "2.7% + $0.05 + C$0.10/txn platform fee (in-person) · 2.9% + $0.30 + C$0.20/txn (online)",
-    interacFee: "1% + $0.30",
+    cardFee: CARD_FEE,
+    interacFee: INTERAC_FEE,
     smsIncluded: "None: pay-as-you-go",
     smsOverageRate: "$0.05/message",
     support: "Community",
@@ -80,17 +89,17 @@ export const PLANS: Plan[] = [
     priceLabel: "C$89/month or C$74.17/month billed annually",
     features: [
       "Everything in Starter",
-      "AutoPilot: no-show recovery, win-backs, AI Front Desk",
+      "AI Front Desk: answers clients and books appointments",
       "Daily Brief: morning business summary",
       "Client segmentation & churn-risk alerts",
-      "Up to 10 Team Members",
+      "Up to 6 Team Members",
     ],
-    teamMemberLimit: 10,
+    teamMemberLimit: 6,
     bookingLimitPerMonth: null,
     annualMonthlyEquivalent: 74.17,
     annualSavingsLabel: "Save $178/yr",
-    cardFee: "2.7% + $0.05 + C$0.07/txn platform fee (in-person) · 2.9% + $0.30 + C$0.15/txn (online)",
-    interacFee: "1% + $0.30",
+    cardFee: CARD_FEE,
+    interacFee: INTERAC_FEE,
     smsIncluded: "500/month",
     smsOverageRate: "$0.04/message",
     support: "Standard",
@@ -111,17 +120,18 @@ export const PLANS: Plan[] = [
     priceLabel: "C$189/month or C$157.50/month billed annually",
     features: [
       "Everything in Pro",
+      "AutoPilot: no-show recovery, last-minute slot filler, win-backs, birthday offers",
       "Flow Coach™: your AI business consultant",
-      "Business Health Score & revenue forecasting",
-      "Staffing & retention insights",
-      "Up to 25 Team Members",
+      "Business Health Score, revenue forecasting, staffing & retention insights",
+      "Priority support & dedicated onboarding",
+      "Unlimited Team Members at one location",
     ],
-    teamMemberLimit: 25,
+    teamMemberLimit: null,
     bookingLimitPerMonth: null,
     annualMonthlyEquivalent: 157.5,
     annualSavingsLabel: "Save $378/yr",
-    cardFee: "2.7% + $0.05 + C$0.05/txn platform fee (in-person) · 2.9% + $0.30 + C$0.10/txn (online)",
-    interacFee: "1% + $0.30",
+    cardFee: CARD_FEE,
+    interacFee: INTERAC_FEE,
     smsIncluded: "1,000/month",
     smsOverageRate: "$0.035/message",
     support: "Priority",
@@ -151,8 +161,8 @@ export const PLANS: Plan[] = [
     bookingLimitPerMonth: null,
     annualMonthlyEquivalent: null,
     annualSavingsLabel: null,
-    cardFee: "2.7% + $0.05 (platform fee waived) · 2.9% + $0.30 (online, waived)",
-    interacFee: "Negotiated",
+    cardFee: CARD_FEE,
+    interacFee: INTERAC_FEE,
     smsIncluded: "500/location/month",
     smsOverageRate: "$0.03/message (negotiable)",
     support: "Dedicated SLA",

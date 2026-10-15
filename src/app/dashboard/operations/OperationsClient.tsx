@@ -1,5 +1,7 @@
 "use client";
 
+import { computeTax, describeRates } from "@/lib/tax";
+
 import { useMemo, useState } from "react";
 import { TrendingUp, TrendingDown, Users, ChevronDown } from "lucide-react";
 import type { OperationsData } from "./actions";
@@ -491,14 +493,15 @@ function Finance({ data }: { data: OperationsData }) {
   const netLastMonth = sumNet(lastMonthAppts);
   const netDeltaPct = netLastMonth > 0 ? ((netThisMonth - netLastMonth) / netLastMonth) * 100 : null;
 
-  const taxRate = data.taxRate ?? 0;
-  // Revenue net of tax, so GST owing is computed on the actual taxable amount
-  // whether prices are entered tax-inclusive or tax is added at checkout.
-  const gstOwing = data.taxRate == null ? null : thisMonthAppts.reduce((s, a) => {
-    const paid = Number(a.paid_amount ?? 0);
-    const taxable = data.taxInclusive ? paid / (1 + taxRate / 100) : paid;
-    return s + taxable * (taxRate / 100);
-  }, 0);
+  // GST34 covers GST/HST only; PST, RST and QST are filed with the province.
+  // Uses the tax recorded at close-out, falling back to the shop's current
+  // settings for bookings completed before tax was recorded.
+  const federalLabels = new Set(["GST", "HST"]);
+  const breakdownFor = (a: AppointmentRow) => a.tax_breakdown ?? computeTax(data.taxSettings, [{ amount: Number(a.paid_amount ?? a.price), kind: "service" }]);
+  const hasProvince = Boolean(data.taxSettings.provinceCode);
+  const taxableThisMonth = thisMonthAppts.reduce((s, a) => s + breakdownFor(a).subtotal, 0);
+  const gstOwing = !hasProvince ? null : thisMonthAppts.reduce((s, a) => s + breakdownFor(a).lines.filter(l => federalLabels.has(l.label)).reduce((t, l) => t + l.amount, 0), 0);
+  const rateLabel = describeRates(data.taxSettings);
 
   const fmtDate = (iso: string) => new Intl.DateTimeFormat("en-CA", { timeZone: "America/Edmonton", month: "short", day: "numeric" }).format(new Date(iso));
 
@@ -512,8 +515,8 @@ function Finance({ data }: { data: OperationsData }) {
 
   const exportGst34 = () => downloadCsv(
     `gst34-report-${now.toISOString().slice(0, 10)}.csv`,
-    [["Period", "Taxable revenue", `GST/HST rate (${taxRate}%)`, "GST/HST owing"],
-      [monthStart.toISOString().slice(0, 10), fmtPrice(netThisMonth), `${taxRate}%`, gstOwing != null ? fmtPrice(gstOwing) : "-"]],
+    [["Period", "Taxable revenue", "Rates", "GST/HST owing"],
+      [monthStart.toISOString().slice(0, 10), fmtPrice(taxableThisMonth), rateLabel, gstOwing != null ? fmtPrice(gstOwing) : "-"]],
   );
 
   const exportAccountantSummary = () => downloadCsv(
@@ -538,7 +541,7 @@ function Finance({ data }: { data: OperationsData }) {
           value={data.nextPayout ? fmtPrice(data.nextPayout.amount) : "-"}
           sub={data.nextPayout ? `Arriving ${fmtDate(data.nextPayout.arrivalDate)}` : data.stripeConnected ? "No pending payout" : "Stripe not connected"}
         />
-        <KPITile label="GST owing" value={gstOwing != null ? fmtPrice(gstOwing) : "-"} sub={data.taxRate == null ? "Set a tax rate in Settings" : "This month"} positive={false} />
+        <KPITile label="GST owing" value={gstOwing != null ? fmtPrice(gstOwing) : "-"} sub={!hasProvince ? "Set your province in Settings" : "This month"} positive={false} />
         <KPITile label="Net this month" value={fmtPrice(netThisMonth)} sub={netDeltaPct != null ? `${netDeltaPct >= 0 ? "+" : ""}${netDeltaPct.toFixed(1)}% vs last` : "No data last month"} />
       </div>
       <div style={card}>

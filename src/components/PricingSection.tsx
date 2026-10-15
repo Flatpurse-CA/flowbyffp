@@ -16,7 +16,7 @@ const PLANS = [
     priceSuffix: "/mo",
     subtitle: "Year 1 · then C$29.25/mo forever",
     description: "Solo businesses getting started",
-    features: ["Home Dashboard & booking calendar", "Full POS, payments & Tap to Pay", "Client CRM & appointment history", "Up to 2 team members"],
+    features: ["Bookings, calendar & online booking page", "Payments & Tap to Pay on iPhone", "Client CRM, reminders & reviews", "Up to 2 team members"],
     cta: "Start Free Trial",
     href: "/signup",
     gradient: "radial-gradient(140% 60% at 50% 100%, rgb(109,40,217) 0%, rgb(76,29,149) 28%, rgb(30,10,60) 58%, rgba(9,9,11,0) 85%)",
@@ -31,7 +31,7 @@ const PLANS = [
     priceSuffix: "/mo",
     subtitle: "Year 1 · then C$66.75/mo forever",
     description: "Run your business",
-    features: ["AutoPilot — no-show recovery, win-backs, AI Front Desk", "Daily Brief — morning business summary", "Client segmentation & churn-risk alerts", "Up to 10 team members"],
+    features: ["AI Front Desk: answers clients and books appointments", "Daily Brief: morning business summary", "Client segmentation & churn-risk alerts", "Up to 6 team members"],
     cta: "Get started with Pro",
     href: "/signup",
     gradient: "radial-gradient(140% 60% at 50% 100%, rgb(109,40,217) 0%, rgb(76,29,149) 28%, rgb(30,10,60) 58%, rgba(9,9,11,0) 85%)",
@@ -46,7 +46,7 @@ const PLANS = [
     priceSuffix: "/mo",
     subtitle: "Year 1 · then C$141.75/mo forever",
     description: "Grow your business",
-    features: ["Flow Coach™ — your AI business consultant", "Business Health Score & revenue forecasting", "Staffing & retention insights", "Up to 25 team members"],
+    features: ["AutoPilot: no-show recovery, slot filler, win-backs, birthday offers", "Flow Coach™: your AI business consultant", "Business Health Score & revenue forecasting", "Unlimited team members at one location"],
     cta: "Get started with Pro+",
     href: "/signup",
     gradient: "radial-gradient(140% 60% at 50% 100%, rgb(109,40,217) 0%, rgb(76,29,149) 28%, rgb(30,10,60) 58%, rgba(9,9,11,0) 85%)",
@@ -308,6 +308,9 @@ export default function PricingSection() {
           maxWidth: 480,
         }}>
           Beta members are pre-qualified. Founders pricing is locked in for as long as your subscription stays active; cancel and you lose it for good.
+        </p>
+        <p style={{ fontSize: 13.5, color: "rgba(255,255,255,0.5)", lineHeight: 1.7, margin: "-12px auto 28px", maxWidth: 560 }}>
+          Every plan starts with a free 14-day trial of Pro+, no card required. Card payments are Stripe&apos;s standard rates, paid by your shop to Stripe and the same on every plan: 2.7% + 20¢ tapped, 30¢ flat for Interac, 2.9% + 30¢ online. Flow never takes a commission on a new client.
         </p>
         <a href="/signup" style={{
           display: "inline-flex", alignItems: "center", gap: 8,

@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, Search, Trash2 } from "lucide-react";
-import { createService, toggleServiceActive, deleteService, type ServiceRow } from "./actions";
+import { createService, toggleServiceActive, deleteService, setServiceTaxExempt, type ServiceRow } from "./actions";
 
 const CATEGORY_SUGGESTIONS = ["Cuts", "Colour", "Treatments", "Braids"];
 
@@ -72,6 +72,15 @@ export function ServicesClient({ services }: { services: ServiceRow[] }) {
   const handleToggle = async (s: ServiceRow) => {
     try {
       await toggleServiceActive(s.id, !s.active);
+      refresh();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Couldn't update that service");
+    }
+  };
+
+  const handleTaxToggle = async (s: ServiceRow) => {
+    try {
+      await setServiceTaxExempt(s.id, !s.tax_exempt);
       refresh();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Couldn't update that service");
@@ -187,17 +196,17 @@ export function ServicesClient({ services }: { services: ServiceRow[] }) {
         Object.entries(grouped).map(([category, list]) => (
           <div key={category}>
             <p style={{ color: "var(--dw35)", fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", margin: "0 0 10px" }}>{category}</p>
-            <ServiceTable rows={list} onToggle={handleToggle} onRemove={handleRemove} />
+            <ServiceTable rows={list} onToggle={handleToggle} onTaxToggle={handleTaxToggle} onRemove={handleRemove} />
           </div>
         ))
       ) : (
-        <ServiceTable rows={filtered} onToggle={handleToggle} onRemove={handleRemove} />
+        <ServiceTable rows={filtered} onToggle={handleToggle} onTaxToggle={handleTaxToggle} onRemove={handleRemove} />
       )}
     </div>
   );
 }
 
-function ServiceTable({ rows, onToggle, onRemove }: { rows: ServiceRow[]; onToggle: (s: ServiceRow) => void; onRemove: (id: string) => void }) {
+function ServiceTable({ rows, onToggle, onTaxToggle, onRemove }: { rows: ServiceRow[]; onToggle: (s: ServiceRow) => void; onTaxToggle: (s: ServiceRow) => void; onRemove: (id: string) => void }) {
   return (
     <>
       <div className="services-table-wrap" style={{ background: "var(--dsurface1)", border: "1px solid var(--dw07)", borderRadius: 14, overflow: "hidden", marginBottom: 16 }}>
@@ -226,6 +235,7 @@ function ServiceTable({ rows, onToggle, onRemove }: { rows: ServiceRow[]; onTogg
                   </span>
                 </td>
                 <td style={{ padding: "14px 8px", color: "var(--dw4)", fontSize: 12.5 }}>{formatMinutes(s.duration_minutes)}</td>
+                <td style={{ padding: "14px 8px" }}><TaxChip s={s} onClick={() => onTaxToggle(s)} /></td>
                 <td style={{ padding: "14px 18px", color: "var(--dtext)", fontSize: 14, fontWeight: 800, letterSpacing: "-0.02em" }}>C${s.price}</td>
                 <td style={{ padding: "14px 18px", textAlign: "right" }}>
                   <button onClick={() => onRemove(s.id)} style={{ background: "none", border: "none", color: "rgba(239,68,68,0.5)", cursor: "pointer", padding: 5, borderRadius: 7 }}><Trash2 size={13} /></button>
@@ -259,6 +269,7 @@ function ServiceTable({ rows, onToggle, onRemove }: { rows: ServiceRow[]; onTogg
               <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                 <span style={{ fontSize: 11, fontWeight: 600, padding: "3px 9px", borderRadius: 20, background: c.bg, color: c.text }}>{cat}</span>
                 <span style={{ color: "var(--dw4)", fontSize: 12.5 }}>{formatMinutes(s.duration_minutes)}</span>
+                <TaxChip s={s} onClick={() => onTaxToggle(s)} />
                 <span style={{ color: "var(--dtext)", fontSize: 14, fontWeight: 800, letterSpacing: "-0.02em", marginLeft: "auto" }}>C${s.price}</span>
               </div>
             </div>
@@ -266,5 +277,23 @@ function ServiceTable({ rows, onToggle, onRemove }: { rows: ServiceRow[]; onTogg
         })}
       </div>
     </>
+  );
+}
+
+/** Taxable by default; an owner can mark a service exempt (e.g. massage by a regulated therapist). */
+function TaxChip({ s, onClick }: { s: ServiceRow; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      title={s.tax_exempt ? "No sales tax is charged on this service. Click to make it taxable." : "Sales tax is charged on this service. Click to mark it exempt."}
+      style={{
+        fontSize: 11, fontWeight: 600, padding: "3px 9px", borderRadius: 20, cursor: "pointer", whiteSpace: "nowrap",
+        border: "1px solid var(--dw1)", background: s.tax_exempt ? "var(--dsurface3)" : "transparent",
+        color: s.tax_exempt ? "var(--dtext)" : "var(--dw4)",
+      }}
+    >
+      {s.tax_exempt ? "Tax exempt" : "Taxable"}
+    </button>
   );
 }

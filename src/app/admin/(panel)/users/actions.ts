@@ -1,6 +1,10 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import { headers } from "next/headers";
+import { loadAccounts, needsShopSetup, type Account } from "@/lib/admin/accounts";
+import { sendShopSetupReminderEmail } from "@/lib/resend";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { requireAdmin, logAdminAction } from "@/lib/admin-guard";
 
@@ -10,7 +14,7 @@ export async function banUser(formData: FormData) {
   const admin = createAdminClient();
   await admin.auth.admin.updateUserById(userId, { ban_duration: "876600h" });
   await logAdminAction(email, "ban_user", "user", userId);
-  revalidatePath("/admin/users", "page");
+  revalidatePath("/admin/users", "layout");
 }
 
 export async function unbanUser(formData: FormData) {
@@ -19,7 +23,7 @@ export async function unbanUser(formData: FormData) {
   const admin = createAdminClient();
   await admin.auth.admin.updateUserById(userId, { ban_duration: "none" });
   await logAdminAction(email, "unban_user", "user", userId);
-  revalidatePath("/admin/users", "page");
+  revalidatePath("/admin/users", "layout");
 }
 
 export async function deleteUser(formData: FormData) {
@@ -28,7 +32,10 @@ export async function deleteUser(formData: FormData) {
   const admin = createAdminClient();
   await admin.auth.admin.deleteUser(userId);
   await logAdminAction(email, "delete_user", "user", userId);
-  revalidatePath("/admin/users", "page");
+  revalidatePath("/admin/users", "layout");
+  // Deleting from a profile page: that page no longer exists, go back to the list.
+  const back = formData.get("redirectTo");
+  if (typeof back === "string" && back.startsWith("/admin/users")) redirect(back);
 }
 
 export async function changeUserPlan(formData: FormData) {
@@ -41,7 +48,7 @@ export async function changeUserPlan(formData: FormData) {
   revalidatePath("/admin/users", "page");
 }
 
-// Resets the 7-day-trial + 7-day-grace clock to start now. Does not touch
+// Resets the 14-day-trial + 7-day-grace clock to start now. Does not touch
 // created_at (the real signup date, used for cohorts/joined-date display) —
 // trial_started_at is a separate field precisely so this action doesn't
 // distort that history.
@@ -171,4 +178,56 @@ export async function setUnlimited(formData: FormData) {
     await logAdminAction(email, "disable_unlimited", "user", userId, { restored_plan: plan });
   }
   revalidatePath("/admin/users", "page");
+}
+
+// ─── "Finish setting up your shop" reminders ─────────────────────────────────
+// For owners who signed up (verified email, owner profile) but never created a
+// shop. Logging in sends them straight to /signup/shop (dashboard layout).
+
+const REMINDER_COOLDOWN_MS = 3 * 24 * 60 * 60 * 1000;
+
+async function loginUrl(): Promise<string> {
+  const h = await headers();
+  const host = h.get("host") ?? "flow.flatpurse.com";
+  return `${host.startsWith("localhost") ? "http" : "https"}://${host}/login`;
+}
+
+async function remind(a: Account, url: string): Promise<boolean> {
+  const firstName = a.name?.split(" ")[0] || "there";
+  try {
+    const { error } = await sendShopSetupReminderEmail(a.user.email!, { firstName, loginUrl: url });
+    if (error) return false;
+  } catch {
+    return false;
+  }
+  const admin = createAdminClient();
+  await admin.auth.admin.updateUserById(a.user.id, {
+    app_metadata: { ...a.user.app_metadata, setup_reminder_sent_at: new Date().toISOString() },
+  });
+  return true;
+}
+
+export async function sendSetupReminder(formData: FormData): Promise<void> {
+  const { email } = await requireAdmin();
+  const userId = formData.get("userId") as string;
+  const account = (await loadAccounts()).find(a => a.user.id === userId);
+  if (!account || !needsShopSetup(account)) return;
+  const ok = await remind(account, await loginUrl());
+  await logAdminAction(email, "send_setup_reminder", "user", userId, { ok });
+  revalidatePath("/admin/users", "layout");
+}
+
+export async function sendSetupRemindersToAll(): Promise<{ sent: number; skipped: number; failed: number }> {
+  const { email } = await requireAdmin();
+  const url = await loginUrl();
+  const now = Date.now();
+  let sent = 0, skipped = 0, failed = 0;
+  for (const a of (await loadAccounts()).filter(needsShopSetup)) {
+    // Skip anyone reminded recently, so a double click can't spam people.
+    if (a.setupReminderSentAt && now - new Date(a.setupReminderSentAt).getTime() < REMINDER_COOLDOWN_MS) { skipped++; continue; }
+    if (await remind(a, url)) sent++; else failed++;
+  }
+  await logAdminAction(email, "send_setup_reminders_bulk", "user", null, { sent, skipped, failed });
+  revalidatePath("/admin/users", "layout");
+  return { sent, skipped, failed };
 }

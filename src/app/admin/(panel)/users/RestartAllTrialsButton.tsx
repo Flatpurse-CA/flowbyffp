@@ -14,7 +14,7 @@ export function RestartAllTrialsButton() {
       type="button"
       disabled={pending}
       onClick={async () => {
-        if (!confirm("Restart the trial clock for every user on the platform? This resets everyone's remaining trial+grace window to a fresh 7+7 days as of right now.")) return;
+        if (!confirm("Restart the trial clock for every user on the platform? This resets everyone's remaining trial+grace window to a fresh 14-day trial plus 7-day grace as of right now.")) return;
         setPending(true);
         await restartAllTrials();
         setPending(false);

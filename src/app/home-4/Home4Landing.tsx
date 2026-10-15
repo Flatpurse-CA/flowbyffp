@@ -104,12 +104,12 @@ const CLIENT_FEATURES = [
 const OWNER_FAQ: { q: string; a: React.ReactNode }[] = [
   { q: "What is FlatPurse Flow?", a: "Flow is a booking and revenue management platform for independent salons and barbershops. It brings booking, payments, reminders, and client follow-ups together." },
   { q: "What does AutoPilot handle?", a: "AutoPilot helps with appointment reminders, cancellation recovery, rebooking, win-back messages, and client booking questions. Compare plans for the features included." },
-  { q: "Is there really zero commission?", a: <>Flow charges a subscription and no marketplace commission. Card processing and per-transaction platform fees apply. <Link href="/pricing">See the fee schedule</Link>.</> },
+  { q: "Is there really zero commission?", a: <>Flow charges a subscription and no marketplace commission. Card processing fees apply, at Stripe's standard rates. <Link href="/pricing">See the fee schedule</Link>.</> },
   { q: "Can I cancel or change my plan?", a: "You can upgrade, downgrade, or cancel your plan. After cancellation, access continues until the end of your billing period. Founders discounts are subject to the offer terms." },
   { q: "Does Flow actually work for a business like mine?", a: <>Flow is designed for independent salons and barbershops. The walkthrough shows an example workflow with demo data, not verified customer results. <a href="#demo">Request a personal demo</a> to explore how it fits your services, team and booking process.</> },
   { q: "What happens when a client cancels?", a: "With the relevant AutoPilot flows enabled, Flow can contact clients to help fill an opening. A replacement booking depends on client availability and response; it is not guaranteed. Watch the simulation above for an example." },
   { q: "How hard is switching to Flow?", a: "You’ll need to set up your services, staff, booking availability and payment settings. Before switching, contact us to confirm which client records can be imported from your current system and what setup help is available." },
-  { q: "Which plan includes AutoPilot?", a: <>Starter begins at C$39/month for booking, client management and payments. Pro starts at C$89/month and adds AutoPilot and AI Front Desk. Pro+ starts at C$189/month and adds Flow Coach and business insights. Card processing and platform fees apply. <Link href="/pricing">Compare all features and fees</Link>.</> },
+  { q: "Which plan includes AutoPilot?", a: <>Starter begins at C$39/month for booking, client management and payments. Pro starts at C$89/month and adds AI Front Desk and the Daily Brief. Pro+ starts at C$189/month and adds AutoPilot, Flow Coach and business insights. Card processing fees apply. <Link href="/pricing">Compare all features and fees</Link>.</> },
   { q: "What happens after I click Start free trial?", a: <>You’ll go to Flow’s signup page to create your account. No credit card is required to get started. Confirm the current trial duration, included features and any beta offer during signup, or <a href="#demo">ask us before joining</a>.</> },
 ];
 
@@ -479,7 +479,7 @@ export default function Home4Landing({ initialAudience = "owners", onAudienceCha
             <div>
               <div className="eyebrow">ROOM TO GROW</div>
               <h2>Plans from C$39/month.</h2>
-              <p>Compare Starter, Pro and Pro+ to find the right fit.<br />Card processing and platform fees apply.</p>
+              <p>Compare Starter, Pro and Pro+ to find the right fit.<br />Card processing fees apply.</p>
             </div>
             <Link className="button outline" href="/pricing">Compare plans &amp; fees →</Link>
           </section>

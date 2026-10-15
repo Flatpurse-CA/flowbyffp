@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { updateBusinessHours, startStripeOnboarding, startCheckout, chooseStarterPlan, openBillingPortal, setFlowEnabled, updateNotificationPrefs, updateTaxSettings, updateBusinessProfile, updateShopImage, type BusinessHourRow, type BillingStatus, type BusinessProfile, type FlowKey, type NotificationPrefs } from "./actions";
 import { PLANS, NO_MARKETPLACE_FEE_NOTE, type BillingInterval } from "@/lib/plans";
+import { PROVINCES, computeTax, describeRates, getProvince, type ShopTaxSettings } from "@/lib/tax";
 
 function redirectTo(url: string) {
   window.location.href = url;
@@ -163,7 +164,7 @@ function buildHourRows(initial: BusinessHourRow[]): HourRow[] {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export function SettingsClient({ shopId, initialBusinessHours, initialStripeConnected, initialBookingUrl, initialBilling, initialFlowFlags, initialNotificationPrefs, initialTaxRate, initialTaxInclusive, initialBusinessProfile, initialProfileImageUrl, initialCoverImageUrl, twilioConfigured }: { shopId: string | null; initialBusinessHours: BusinessHourRow[]; initialStripeConnected: boolean; initialBookingUrl: string | null; initialBilling: BillingStatus | null; initialFlowFlags: Record<FlowKey, boolean>; initialNotificationPrefs: NotificationPrefs; initialTaxRate: number | null; initialTaxInclusive: boolean; initialBusinessProfile: BusinessProfile; initialProfileImageUrl: string | null; initialCoverImageUrl: string | null; twilioConfigured: boolean }) {
+export function SettingsClient({ shopId, initialBusinessHours, initialStripeConnected, initialBookingUrl, initialBilling, initialFlowFlags, initialNotificationPrefs, initialTax, initialBusinessProfile, initialProfileImageUrl, initialCoverImageUrl, twilioConfigured }: { shopId: string | null; initialBusinessHours: BusinessHourRow[]; initialStripeConnected: boolean; initialBookingUrl: string | null; initialBilling: BillingStatus | null; initialFlowFlags: Record<FlowKey, boolean>; initialNotificationPrefs: NotificationPrefs; initialTax: ShopTaxSettings & { taxNumber: string }; initialBusinessProfile: BusinessProfile; initialProfileImageUrl: string | null; initialCoverImageUrl: string | null; twilioConfigured: boolean }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab") as TabLabel | null;
@@ -187,8 +188,9 @@ export function SettingsClient({ shopId, initialBusinessHours, initialStripeConn
   const [savingHours, setSavingHours] = useState(false);
   const [hoursSaved, setHoursSaved]   = useState(false);
   const [expandedFlow, setExpandedFlow] = useState<FlowKey | null>(null);
-  const [taxRate, setTaxRate]         = useState(initialTaxRate !== null ? String(initialTaxRate) : "");
-  const [taxInclusive, setTaxInclusive] = useState(initialTaxInclusive);
+  const [tax, setTax]                 = useState(initialTax);
+  const taxProvince = getProvince(tax.provinceCode);
+  const taxPreview = computeTax(tax, [{ amount: 120, kind: "service" }]);
   const [savingTax, setSavingTax]     = useState(false);
   const [taxSaved, setTaxSaved]       = useState(false);
   const [taxError, setTaxError]       = useState<string | null>(null);
@@ -386,8 +388,7 @@ export function SettingsClient({ shopId, initialBusinessHours, initialStripeConn
     setTaxSaved(false);
     setTaxError(null);
     try {
-      const parsed = taxRate.trim() === "" ? null : parseFloat(taxRate);
-      const result = await updateTaxSettings({ taxRate: parsed !== null && !Number.isNaN(parsed) ? parsed : null, taxInclusive });
+      const result = await updateTaxSettings(tax);
       if (result.error) {
         setTaxError(result.error);
         return;
@@ -400,8 +401,7 @@ export function SettingsClient({ shopId, initialBusinessHours, initialStripeConn
   };
 
   const discardTax = () => {
-    setTaxRate(initialTaxRate !== null ? String(initialTaxRate) : "");
-    setTaxInclusive(initialTaxInclusive);
+    setTax(initialTax);
     setTaxError(null);
   };
 
@@ -671,50 +671,62 @@ export function SettingsClient({ shopId, initialBusinessHours, initialStripeConn
             <SectionLabel>Tax settings</SectionLabel>
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
               <div>
-                <label style={{ color: "var(--dw38)", fontSize: 12, fontWeight: 600, display: "block", marginBottom: 6 }}>Tax rate (%)</label>
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <input
-                    type="number" value={taxRate} min="0" max="30" step="0.1"
-                    onChange={e => setTaxRate(e.target.value)}
-                    style={{ width: 100, background: "var(--dsurface3)", border: "1px solid var(--dw09)", borderRadius: 10, padding: "10px 13px", color: "var(--dtext)", fontSize: 15, fontWeight: 700, outline: "none" }}
-                  />
-                  <span style={{ color: "var(--dw3)", fontSize: 13 }}>%  (Ontario HST = 13%)</span>
-                </div>
+                <label style={{ color: "var(--dw38)", fontSize: 12, fontWeight: 600, display: "block", marginBottom: 6 }}>Province or territory</label>
+                <select
+                  value={tax.provinceCode ?? ""}
+                  onChange={e => setTax(t => ({ ...t, provinceCode: e.target.value || null, pstOnServices: false }))}
+                  style={{ width: "100%", background: "var(--dsurface3)", border: "1px solid var(--dw09)", borderRadius: 10, padding: "10px 13px", color: "var(--dtext)", fontSize: 14, fontWeight: 600, outline: "none" }}
+                >
+                  <option value="">Choose where you provide services</option>
+                  {PROVINCES.map(p => <option key={p.code} value={p.code}>{p.name}</option>)}
+                </select>
+                {taxProvince && <p style={{ color: "var(--dw35)", fontSize: 12, margin: "8px 0 0", lineHeight: 1.5 }}>{taxProvince.note}</p>}
               </div>
 
-              <Field label="Business registration number (GST/HST)" value="123456789 RT0001" placeholder="e.g. 123456789 RT0001" />
-              <Field label="Legal business name" value="FlatPurse Flow Inc." />
+              <TaxToggle
+                title="Registered for GST/HST"
+                body="Turn off if you're a small supplier (under C$30,000 of taxable revenue in four consecutive quarters) and haven't registered. No tax is charged while this is off."
+                on={tax.registered}
+                onToggle={() => setTax(t => ({ ...t, registered: !t.registered }))}
+              />
 
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 0", borderTop: "1px solid var(--dw05)" }}>
-                <div>
-                  <p style={{ color: "var(--dtext)", fontSize: 13.5, fontWeight: 600, margin: "0 0 2px" }}>Tax-inclusive pricing</p>
-                  <p style={{ color: "var(--dw35)", fontSize: 12, margin: 0 }}>Service prices shown already include tax (no tax added at checkout)</p>
-                </div>
-                <button onClick={() => setTaxInclusive(v => !v)} style={{
-                  width: 42, height: 24, borderRadius: 12, border: "none", cursor: "pointer", flexShrink: 0,
-                  background: taxInclusive ? "rgb(109,40,217)" : "var(--dw12)",
-                  position: "relative", transition: "background 0.2s",
-                }}>
-                  <span style={{ position: "absolute", top: 4, left: taxInclusive ? 20 : 4, width: 16, height: 16, borderRadius: "50%", background: "white", transition: "left 0.2s" }} />
-                </button>
-              </div>
+              {tax.registered && (
+                <Field label="GST/HST registration number" value={tax.taxNumber} placeholder="e.g. 123456789 RT0001" onChange={v => setTax(t => ({ ...t, taxNumber: v }))} />
+              )}
+
+              {tax.registered && taxProvince?.pstOnServicesConfigurable && (
+                <TaxToggle
+                  title={`Charge ${taxProvince.components.find(c => c.kind === "provincial")?.label} on services`}
+                  body="Off by default: in this province the provincial tax always applies to retail products but only to some services. Turn on if it applies to yours."
+                  on={tax.pstOnServices}
+                  onToggle={() => setTax(t => ({ ...t, pstOnServices: !t.pstOnServices }))}
+                />
+              )}
+
+              <TaxToggle
+                title="Tax-inclusive pricing"
+                body="Service prices already include tax. Tax is shown on receipts but not added at checkout."
+                on={tax.inclusive}
+                onToggle={() => setTax(t => ({ ...t, inclusive: !t.inclusive }))}
+              />
             </div>
           </div>
 
           {/* Tax preview */}
-          <div style={{ ...card, background: "rgba(52,211,153,0.04)", border: "1px solid rgba(52,211,153,0.12)" }}>
+          <div style={{ ...card, background: "var(--dsurface2)", border: "1px solid var(--dw08)" }}>
             <SectionLabel>Preview</SectionLabel>
-            <p style={{ color: "var(--dw4)", fontSize: 12.5, margin: "0 0 12px" }}>How a C$120 Highlights service would appear on receipts:</p>
+            <p style={{ color: "var(--dw4)", fontSize: 12.5, margin: "0 0 12px" }}>How a C$120 service would appear on receipts ({describeRates(tax)}):</p>
             {[
-              { label: "Service",  value: "C$120.00",  color: undefined       },
-              { label: `HST (${taxRate}%)`, value: taxInclusive ? "Included" : `C$${(120 * parseFloat(taxRate||"0") / 100).toFixed(2)}`, color: undefined },
-              { label: "Total",    value: taxInclusive ? "C$120.00" : `C$${(120 * (1 + parseFloat(taxRate||"0") / 100)).toFixed(2)}`, color: "var(--dgreen-text)" },
+              { label: "Service", value: `C$${taxPreview.subtotal.toFixed(2)}`, strong: false },
+              ...taxPreview.lines.map(l => ({ label: `${l.label} (${l.rate}%)${tax.inclusive ? ", included" : ""}`, value: `C$${l.amount.toFixed(2)}`, strong: false })),
+              { label: "Total", value: `C$${taxPreview.total.toFixed(2)}`, strong: true },
             ].map(r => (
               <div key={r.label} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid var(--dw04)" }}>
                 <span style={{ color: "var(--dw45)", fontSize: 13 }}>{r.label}</span>
-                <span style={{ color: r.color ?? "var(--dtext)", fontSize: 13, fontWeight: r.color ? 800 : 600 }}>{r.value}</span>
+                <span style={{ color: r.strong ? "var(--dgreen-text)" : "var(--dtext)", fontSize: 13, fontWeight: r.strong ? 800 : 600 }}>{r.value}</span>
               </div>
             ))}
+            <p style={{ color: "var(--dw3)", fontSize: 11.5, margin: "12px 0 0", lineHeight: 1.5 }}>Deposits aren&apos;t taxed; tax is charged on the final bill. Tips are never taxed. General information, not tax advice: confirm your obligations with your accountant.</p>
           </div>
 
           <SaveBar onSave={saveTax} onDiscard={discardTax} saving={savingTax} saved={taxSaved} error={taxError} />
@@ -974,6 +986,24 @@ export function SettingsClient({ shopId, initialBusinessHours, initialStripeConn
           <p style={{ color: "var(--dw3)", fontSize: 11.5, textAlign: "center", margin: 0 }}>{NO_MARKETPLACE_FEE_NOTE}</p>
         </>
       )}
+    </div>
+  );
+}
+
+function TaxToggle({ title, body, on, onToggle }: { title: string; body: string; on: boolean; onToggle: () => void }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, padding: "14px 0", borderTop: "1px solid var(--dw05)" }}>
+      <div>
+        <p style={{ color: "var(--dtext)", fontSize: 13.5, fontWeight: 600, margin: "0 0 2px" }}>{title}</p>
+        <p style={{ color: "var(--dw35)", fontSize: 12, margin: 0, lineHeight: 1.5 }}>{body}</p>
+      </div>
+      <button type="button" role="switch" aria-checked={on} aria-label={title} onClick={onToggle} style={{
+        width: 42, height: 24, borderRadius: 12, border: "none", cursor: "pointer", flexShrink: 0,
+        background: on ? "rgb(109,40,217)" : "var(--dw12)",
+        position: "relative", transition: "background 0.2s",
+      }}>
+        <span style={{ position: "absolute", top: 4, left: on ? 20 : 4, width: 16, height: 16, borderRadius: "50%", background: "white", transition: "left 0.2s" }} />
+      </button>
     </div>
   );
 }

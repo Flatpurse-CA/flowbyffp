@@ -7,6 +7,7 @@ import { toE164 } from "@/lib/phone";
 import { stripe } from "@/lib/stripe";
 import { getRequestOrigin } from "@/lib/requestOrigin";
 import { getPlan, getStripePriceId, type BillablePlanKey, type BillingInterval } from "@/lib/plans";
+import { effectiveRate, getProvince, normalizeProvince, type ShopTaxSettings } from "@/lib/tax";
 
 export type BusinessHourRow = { weekday: number; open: boolean; start: string; end: string };
 
@@ -52,14 +53,36 @@ export async function startStripeOnboarding(): Promise<{ url?: string; error?: s
     ...(supportPhone ? { support_phone: supportPhone } : {}),
   };
 
+  // The shop pays Stripe's fees on its own direct charges and Stripe carries
+  // fraud and chargeback losses; Flow takes no cut of card payments.
+  const createAccount = async () => {
+    const account = await stripe().accounts.create({
+      country: "CA",
+      controller: {
+        fees: { payer: "account" },
+        losses: { payments: "stripe" },
+        requirement_collection: "stripe",
+        stripe_dashboard: { type: "express" },
+      },
+      capabilities: { card_payments: { requested: true }, transfers: { requested: true } },
+      business_profile: businessProfile,
+    });
+    await supabase.from("shops").update({ stripe_account_id: account.id }).eq("id", shopId);
+    return account.id;
+  };
+
   try {
+    if (accountId) {
+      // Accounts created with type=express before this change leave Flow
+      // paying the fees, and controller settings can't be changed later. If
+      // the owner never finished onboarding, start them on a correct account.
+      const existing = await stripe().accounts.retrieve(accountId);
+      if (existing.controller?.fees?.payer !== "account" && !existing.details_submitted) {
+        accountId = null;
+      }
+    }
     if (!accountId) {
-      const account = await stripe().accounts.create({
-        type: "express",
-        business_profile: businessProfile,
-      });
-      accountId = account.id;
-      await supabase.from("shops").update({ stripe_account_id: accountId }).eq("id", shopId);
+      accountId = await createAccount();
     } else {
       // Accounts created before this prefill existed (or by an owner who
       // abandoned onboarding midway) — fill in whatever's still missing.
@@ -281,12 +304,28 @@ export async function updateNotificationPrefs(prefs: NotificationPrefs): Promise
   return {};
 }
 
-export async function updateTaxSettings(input: { taxRate: number | null; taxInclusive: boolean }): Promise<{ error?: string }> {
+export async function updateTaxSettings(input: ShopTaxSettings & { taxNumber: string }): Promise<{ error?: string }> {
   const ctx = await getShopContext();
   if (!ctx || ctx.role !== "owner") return { error: "Only the shop owner can change tax settings" };
+  const province = getProvince(input.provinceCode);
+  if (input.provinceCode && !province) return { error: "Choose a province or territory from the list" };
   const { supabase, shopId } = await requireShop();
 
-  const { error } = await supabase.from("shops").update({ tax_rate: input.taxRate, tax_inclusive: input.taxInclusive }).eq("id", shopId);
+  const settings: ShopTaxSettings = {
+    provinceCode: province?.code ?? null,
+    registered: input.registered,
+    pstOnServices: Boolean(province?.pstOnServicesConfigurable) && input.pstOnServices,
+    inclusive: input.inclusive,
+  };
+  const { error } = await supabase.from("shops").update({
+    province_code: settings.provinceCode,
+    tax_registered: settings.registered,
+    pst_on_services: settings.pstOnServices,
+    tax_inclusive: settings.inclusive,
+    tax_number: input.taxNumber.trim().slice(0, 40) || null,
+    // Kept for older readers that expect a single number.
+    tax_rate: effectiveRate(settings),
+  }).eq("id", shopId);
   if (error) return { error: error.message };
   revalidatePath("/dashboard/settings");
   return {};
@@ -380,6 +419,8 @@ export async function updateBusinessProfile(input: BusinessProfile): Promise<{ e
       bio: input.bio.trim(),
       city: input.city.trim(),
       province: input.province.trim(),
+      // Keep the tax province in step when the typed province is recognisable.
+      ...(normalizeProvince(input.province) ? { province_code: normalizeProvince(input.province) } : {}),
       postal_code: input.postalCode.trim(),
       phone: input.phone.trim(),
     })

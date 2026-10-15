@@ -1,3 +1,4 @@
+import { shopHasFeature } from "@/lib/dashboard/plan";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendEmail } from "@/lib/resend";
 import { sendSms } from "@/lib/twilio";
@@ -112,8 +113,11 @@ export async function handleInboundMessage(input: {
     return { intent: "complaint", outcome: "escalated" };
   }
 
-  if (!shop.frontdesk_enabled) {
-    await notifyOwner("AI Front Desk is turned off for your shop, reply directly from Settings > AutoPilot.");
+  const frontdeskOn = shop.frontdesk_enabled && (await shopHasFeature(shop.id as string, "frontdesk"));
+  if (!frontdeskOn) {
+    await notifyOwner(shop.frontdesk_enabled
+      ? "AI Front Desk is part of Pro. Reply directly, or upgrade in Settings > Billing."
+      : "AI Front Desk is turned off for your shop, reply directly from Settings > AutoPilot.");
     await admin.from("autopilot_events").insert({
       shop_id: shop.id, flow_key: "frontdesk",
       client_id: client?.id ?? null, client_email: input.fromEmail ?? null, client_name: input.fromName,

@@ -33,6 +33,8 @@ export async function POST(req: Request) {
   }
 
   try {
+    const current = await stripe().paymentIntents.retrieve(paymentIntentId, {}, { stripeAccount: stripeAccountId });
+    if (current.status === "succeeded") return NextResponse.json({ status: current.status });
     const captured = await stripe().paymentIntents.capture(paymentIntentId, {}, { stripeAccount: stripeAccountId });
     return NextResponse.json({ status: captured.status });
   } catch (err) {

@@ -1,5 +1,7 @@
 "use server";
 
+import { computeTax, shopTaxSettings, type TaxBreakdown } from "@/lib/tax";
+
 import { normalizePhoneForStorage } from "@/lib/phone";
 import { pgrstQuote } from "@/lib/postgrest";
 import { revalidatePath } from "next/cache";
@@ -51,6 +53,8 @@ export type AppointmentRow = {
   payment_method: string | null;
   paid_amount: number | null;
   completed_at: string | null;
+  tax_amount?: number | null;
+  tax_breakdown?: TaxBreakdown | null;
 };
 
 export async function hasAnyAppointments(): Promise<boolean> {
@@ -305,10 +309,24 @@ export async function completeAppointment(
 ) {
   const { supabase, shopId } = await requireShop();
 
+  // Record the tax on the full service price from the shop's own settings,
+  // not from whatever the client screen sent.
+  const [{ data: shopTax }, { data: current }] = await Promise.all([
+    supabase.from("shops").select("province, province_code, tax_registered, pst_on_services, tax_inclusive").eq("id", shopId).maybeSingle(),
+    supabase.from("appointments").select("price, service_name").eq("id", id).eq("shop_id", shopId).maybeSingle(),
+  ]);
+  let taxFields: { tax_amount: number; tax_breakdown: TaxBreakdown } | Record<string, never> = {};
+  if (shopTax && current) {
+    const { data: exempt } = await supabase.from("services").select("id").eq("shop_id", shopId).eq("name", current.service_name).eq("tax_exempt", true).limit(1);
+    const breakdown = computeTax(shopTaxSettings(shopTax), [{ amount: Number(current.price), kind: "service", exempt: Boolean(exempt?.length) }]);
+    taxFields = { tax_amount: breakdown.tax, tax_breakdown: breakdown };
+  }
+
   const { data: appt, error } = await supabase
     .from("appointments")
     .update({
       status: "completed",
+      ...taxFields,
       tip_amount: input.tipAmount,
       payment_method: input.paymentMethod,
       paid_amount: input.paidAmount,

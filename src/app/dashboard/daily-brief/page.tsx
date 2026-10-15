@@ -3,6 +3,8 @@ import { getShopContext } from "@/lib/dashboard/shop";
 import { logFeatureUsage } from "@/lib/featureUsage";
 import { getDailyBriefData } from "./actions";
 import { DailyBriefClient } from "./DailyBriefClient";
+import { shopHasFeature } from "@/lib/dashboard/plan";
+import PlanUpsell from "@/components/PlanUpsell";
 
 export const dynamic = "force-dynamic";
 export const fetchCache = "force-no-store";
@@ -22,6 +24,10 @@ export default async function DailyBriefPage() {
         </p>
       </div>
     );
+  }
+
+  if (!(await shopHasFeature(ctx.shopId, "daily_brief"))) {
+    return <PlanUpsell feature="The Daily Brief" plan="Pro" body="Upgrade to Pro for a morning summary of today's bookings, yesterday's revenue and what needs your attention." />;
   }
 
   await logFeatureUsage("daily_brief_viewed", ctx.shopId);

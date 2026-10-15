@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
-import { getAvailableSlots, createPublicBooking, createPaymentIntent, payWithSavedCard, submitReview, deleteReview } from "./actions";
+import { getAvailableSlots, createPublicBooking, startNewCardSetup, getAmountDue, payWithSavedCard, submitReview, deleteReview } from "./actions";
 import { customerLogin, customerSignup } from "../../customer/actions";
 import { listMyPaymentMethods, type SavedCard } from "../../customer/account/actions";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -16,6 +16,19 @@ import { tint } from "@/lib/color";
 const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
   ? loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
   : null;
+
+// Charges live on the shop's own Stripe account, so 3D Secure has to be
+// confirmed through a Stripe.js instance scoped to that account.
+async function confirmOnShopAccount(clientSecret: string, stripeAccount: string): Promise<string | null> {
+  const key = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+  if (!key) return "Payments aren't configured on this deployment.";
+  const shopStripe = await loadStripe(key, { stripeAccount });
+  if (!shopStripe) return "Couldn't load payments";
+  const { error, paymentIntent } = await shopStripe.confirmCardPayment(clientSecret);
+  if (error) return error.message ?? "Payment failed";
+  if (paymentIntent && (paymentIntent.status === "succeeded" || paymentIntent.status === "processing")) return null;
+  return "Payment could not be completed";
+}
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -178,9 +191,9 @@ export function BookingClient({ shop, services, staff, businessHours, initialCus
       const cards = await listMyPaymentMethods();
       setSavedCards(cards);
       if (cards.length === 0) {
-        const pi = await createPaymentIntent({ appointmentId: res.appointmentId, depositOnly: false });
-        if (pi.clientSecret) setInitialClientSecret(pi.clientSecret);
-        else setPayError(pi.error ?? "Couldn't start payment");
+        const setup = await startNewCardSetup({ appointmentId: res.appointmentId });
+        if (setup.clientSecret) setInitialClientSecret(setup.clientSecret);
+        else setPayError(setup.error ?? "Couldn't start payment");
       }
       setBooking(false);
       setStep("pay");
@@ -808,16 +821,28 @@ function PayStep({ service, appointmentId, savedCards, initialClientSecret, init
   const [loadingIntent, setLoadingIntent] = useState(false);
   const [payingId, setPayingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(initialError);
+  const [amountDue, setAmountDue] = useState<{ amount: number; taxLabel: string } | null>(null);
+
+  useEffect(() => {
+    if (!appointmentId) return;
+    let cancelled = false;
+    getAmountDue({ appointmentId, depositOnly: false }).then(res => {
+      if (cancelled || res.amount == null) return;
+      const taxLabel = res.tax?.lines.length ? res.tax.lines.map(l => `${l.label} C$${l.amount.toFixed(2)}`).join(" + ") : "";
+      setAmountDue({ amount: res.amount, taxLabel });
+    });
+    return () => { cancelled = true; };
+  }, [appointmentId]);
 
   const startNewCard = async () => {
     setMode("new");
     setError(null);
     if (clientSecret || !appointmentId) return;
     setLoadingIntent(true);
-    const pi = await createPaymentIntent({ appointmentId, depositOnly: false });
+    const setup = await startNewCardSetup({ appointmentId });
     setLoadingIntent(false);
-    if (pi.error || !pi.clientSecret) { setError(pi.error ?? "Couldn't start payment"); return; }
-    setClientSecret(pi.clientSecret);
+    if (setup.error || !setup.clientSecret) { setError(setup.error ?? "Couldn't start payment"); return; }
+    setClientSecret(setup.clientSecret);
   };
 
   const payWithCard = async (paymentMethodId: string) => {
@@ -826,14 +851,11 @@ function PayStep({ service, appointmentId, savedCards, initialClientSecret, init
     setError(null);
     const res = await payWithSavedCard({ appointmentId, paymentMethodId, depositOnly: false });
     if (res.success) { onPaid(); return; }
-    if (res.requiresActionClientSecret) {
-      const stripeJs = await stripePromise;
-      if (!stripeJs) { setPayingId(null); setError("Payments aren't configured on this deployment."); return; }
-      const { error: confirmError, paymentIntent } = await stripeJs.confirmCardPayment(res.requiresActionClientSecret);
+    if (res.requiresActionClientSecret && res.stripeAccount) {
+      const confirmError = await confirmOnShopAccount(res.requiresActionClientSecret, res.stripeAccount);
       setPayingId(null);
-      if (confirmError) { setError(confirmError.message ?? "Payment failed"); return; }
-      if (paymentIntent && (paymentIntent.status === "succeeded" || paymentIntent.status === "processing")) { onPaid(); return; }
-      setError("Payment could not be completed");
+      if (confirmError) { setError(confirmError); return; }
+      onPaid();
       return;
     }
     setPayingId(null);
@@ -847,7 +869,10 @@ function PayStep({ service, appointmentId, savedCards, initialClientSecret, init
       </button>
       <div>
         <h2 style={{ color: "var(--cust-text)", fontSize: 20, fontWeight: 800, margin: "0 0 2px" }}>Pay for your booking</h2>
-        <p style={{ color: "var(--cust-text-sub)", fontSize: 14, margin: 0 }}>{service.name} · C${service.price}</p>
+        <p style={{ color: "var(--cust-text-sub)", fontSize: 14, margin: 0 }}>
+          {service.name} · {amountDue ? `C$${amountDue.amount.toFixed(2)}` : `C$${service.price}`}
+        </p>
+        {amountDue?.taxLabel && <p style={{ color: "var(--cust-text-faint)", fontSize: 12.5, margin: "2px 0 0" }}>Includes {amountDue.taxLabel}</p>}
       </div>
 
       {error && (
@@ -882,7 +907,7 @@ function PayStep({ service, appointmentId, savedCards, initialClientSecret, init
 
       {mode === "new" && !loadingIntent && clientSecret && stripePromise && (
         <Elements stripe={stripePromise} options={{ clientSecret }}>
-          <PayForm onPaid={onPaid} />
+          <PayForm appointmentId={appointmentId} onPaid={onPaid} />
         </Elements>
       )}
 
@@ -895,7 +920,7 @@ function PayStep({ service, appointmentId, savedCards, initialClientSecret, init
   );
 }
 
-function PayForm({ onPaid }: { onPaid: () => void }) {
+function PayForm({ appointmentId, onPaid }: { appointmentId: string | null; onPaid: () => void }) {
   const stripe = useStripe();
   const elements = useElements();
   const [submitting, setSubmitting] = useState(false);
@@ -903,12 +928,27 @@ function PayForm({ onPaid }: { onPaid: () => void }) {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!stripe || !elements) return;
+    if (!stripe || !elements || !appointmentId) return;
     setSubmitting(true);
     setError(null);
-    const { error: confirmError } = await stripe.confirmPayment({ elements, redirect: "if_required" });
+    // Save the card first, then charge it on the shop's own account.
+    const { error: setupError, setupIntent } = await stripe.confirmSetup({ elements, redirect: "if_required" });
+    if (setupError || !setupIntent?.payment_method) {
+      setSubmitting(false);
+      setError(setupError?.message ?? "Couldn't save your card");
+      return;
+    }
+    const paymentMethodId = typeof setupIntent.payment_method === "string" ? setupIntent.payment_method : setupIntent.payment_method.id;
+    const res = await payWithSavedCard({ appointmentId, paymentMethodId, depositOnly: false });
+    if (res.requiresActionClientSecret && res.stripeAccount) {
+      const confirmError = await confirmOnShopAccount(res.requiresActionClientSecret, res.stripeAccount);
+      setSubmitting(false);
+      if (confirmError) { setError(confirmError); return; }
+      onPaid();
+      return;
+    }
     setSubmitting(false);
-    if (confirmError) { setError(confirmError.message ?? "Payment failed"); return; }
+    if (!res.success) { setError(res.error ?? "Payment failed"); return; }
     onPaid();
   };
 

@@ -10,6 +10,7 @@ export type ServiceRow = {
   duration_minutes: number;
   category: string | null;
   active: boolean;
+  tax_exempt: boolean;
 };
 
 async function requireOwner() {
@@ -24,7 +25,7 @@ export async function listServices(): Promise<ServiceRow[]> {
   const { supabase, shopId } = await requireShop();
   const { data } = await supabase
     .from("services")
-    .select("id, name, price, duration_minutes, category, active")
+    .select("id, name, price, duration_minutes, category, active, tax_exempt")
     .eq("shop_id", shopId)
     .order("category", { ascending: true })
     .order("name", { ascending: true });
@@ -49,6 +50,17 @@ export async function toggleServiceActive(id: string, active: boolean) {
   const { error } = await supabase
     .from("services")
     .update({ active, updated_at: new Date().toISOString() })
+    .eq("id", id)
+    .eq("shop_id", shopId);
+  if (error) throw new Error(error.message);
+  revalidatePath("/dashboard/services");
+}
+
+export async function setServiceTaxExempt(id: string, taxExempt: boolean) {
+  const { supabase, shopId } = await requireOwner();
+  const { error } = await supabase
+    .from("services")
+    .update({ tax_exempt: taxExempt, updated_at: new Date().toISOString() })
     .eq("id", id)
     .eq("shop_id", shopId);
   if (error) throw new Error(error.message);
