@@ -2,6 +2,41 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { MapPin } from "lucide-react";
 import { ADMIN_PLAN_BADGE, planLabel, formatCAD } from "@/lib/plans";
 import { sumRevenueByShop } from "@/lib/admin/shopRevenue";
+import { computeAccessStatus, type AccessStatus } from "@/lib/dashboard/accessStatus";
+
+const BADGE: Record<"green" | "amber" | "red" | "blue" | "purple", { fg: string; bg: string }> = {
+  green:  { fg: "var(--astatus-green-fg)",  bg: "var(--astatus-green-bg)" },
+  amber:  { fg: "var(--astatus-amber-fg)",  bg: "var(--astatus-amber-bg)" },
+  red:    { fg: "var(--astatus-red-fg)",    bg: "var(--astatus-red-bg)" },
+  blue:   { fg: "var(--astatus-blue-fg)",   bg: "var(--astatus-blue-bg)" },
+  purple: { fg: "var(--astatus-purple-fg)", bg: "var(--astatus-purple-bg)" },
+};
+const TRIAL_BADGE: Record<AccessStatus, { label: string; tone: keyof typeof BADGE }> = {
+  trialing: { label: "Trialing",   tone: "blue" },
+  grace:    { label: "Grace",      tone: "amber" },
+  inactive: { label: "Locked out", tone: "red" },
+  active:   { label: "Active",     tone: "green" },
+  paused:   { label: "Paused",     tone: "purple" },
+};
+
+// Billing column: the Stripe subscription status when there is one,
+// otherwise where the shop sits in its free trial, so the column is never
+// just a wall of dashes for shops that haven't added a card.
+function billingBadge(shop: { plan: string; subscription_status: string | null; trial_started_at: string | null; trial_override: boolean; trial_paused_at: string | null }): { label: string; tone: keyof typeof BADGE } | null {
+  if (shop.subscription_status) {
+    const s = shop.subscription_status;
+    return { label: s.replace(/_/g, " "), tone: s === "active" ? "green" : s === "trialing" ? "blue" : s === "canceled" ? "red" : "amber" };
+  }
+  if (shop.trial_override && shop.plan === "enterprise") return { label: "Comped", tone: "purple" };
+  if (shop.trial_override) return { label: "Bypassed", tone: "purple" };
+  if (!shop.trial_started_at) return null;
+  return TRIAL_BADGE[computeAccessStatus({ trial_started_at: shop.trial_started_at, subscription_status: null, trial_override: false, trial_paused_at: shop.trial_paused_at }).status];
+}
+
+const pill: React.CSSProperties = {
+  display: "inline-block", whiteSpace: "nowrap", fontSize: 10, fontWeight: 700, padding: "3px 9px",
+  borderRadius: 20, letterSpacing: "0.04em", textTransform: "capitalize",
+};
 
 export default async function AdminShopsPage() {
   const admin = createAdminClient();
@@ -21,6 +56,9 @@ export default async function AdminShopsPage() {
     province: string;
     plan: string;
     subscription_status: string | null;
+    trial_started_at: string | null;
+    trial_override: boolean;
+    trial_paused_at: string | null;
     created_at: string;
   }[];
 
@@ -31,7 +69,7 @@ export default async function AdminShopsPage() {
   const revenueByShop = sumRevenueByShop((apptsRes.data ?? []) as { shop_id: string; price: number }[]);
 
   return (
-    <div style={{ maxWidth: 1100 }}>
+    <div>
       {/* Heading */}
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ color: "var(--atext2)", fontSize: 22, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.03em" }}>Shops</h1>
@@ -75,18 +113,18 @@ export default async function AdminShopsPage() {
                       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                         <div style={{
                           width: 32, height: 32, borderRadius: 9, flexShrink: 0,
-                          background: `hsl(${(i * 53 + 260) % 360}, 35%, 20%)`,
+                          background: `hsl(${(i * 53 + 260) % 360}, 35%, var(--aavatar-l, 20%))`,
                           display: "flex", alignItems: "center", justifyContent: "center",
-                          fontSize: 11, fontWeight: 700, color: "var(--aw85)",
+                          fontSize: 11, fontWeight: 700, color: "var(--aavatar-fg, var(--aw85))",
                         }}>
                           {initials}
                         </div>
-                        <span style={{ color: "var(--atext2)", fontSize: 13, fontWeight: 600 }}>{shop.name}</span>
+                        <span style={{ color: "var(--atext2)", fontSize: 13, fontWeight: 600, whiteSpace: "nowrap" }}>{shop.name}</span>
                       </div>
                     </td>
 
                     {/* Type */}
-                    <td style={{ padding: "13px 18px", color: "var(--aw45)", fontSize: 12.5 }}>
+                    <td style={{ padding: "13px 18px", color: "var(--aw45)", fontSize: 12.5, whiteSpace: "nowrap" }}>
                       {shop.business_type}
                     </td>
 
@@ -99,35 +137,25 @@ export default async function AdminShopsPage() {
                     </td>
 
                     {/* Owner email */}
-                    <td style={{ padding: "13px 18px", color: "var(--aw42)", fontSize: 12, maxWidth: 180, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    <td style={{ padding: "13px 18px", color: "var(--aw42)", fontSize: 12, maxWidth: 260, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                       {emailMap[shop.owner_id] ?? "-"}
                     </td>
 
                     {/* Plan */}
                     <td style={{ padding: "13px 18px" }}>
-                      <span style={{
-                        fontSize: 10, fontWeight: 700, padding: "3px 9px", borderRadius: 20,
-                        letterSpacing: "0.04em", textTransform: "capitalize",
-                        color: planColor, background: planBg,
-                      }}>
+                      <span style={{ ...pill, color: planColor, background: planBg }}>
                         {planLabel(shop.plan)}
                       </span>
                     </td>
 
                     {/* Billing status */}
                     <td style={{ padding: "13px 18px" }}>
-                      {shop.subscription_status ? (
-                        <span style={{
-                          fontSize: 10, fontWeight: 700, padding: "3px 9px", borderRadius: 20,
-                          letterSpacing: "0.04em", textTransform: "capitalize",
-                          color: shop.subscription_status === "active" ? "var(--astatus-green-fg)" : "var(--astatus-amber-fg)",
-                          background: shop.subscription_status === "active" ? "var(--astatus-green-bg)" : "var(--astatus-amber-bg)",
-                        }}>
-                          {shop.subscription_status}
-                        </span>
-                      ) : (
-                        <span style={{ color: "var(--aw2)", fontSize: 12 }}>-</span>
-                      )}
+                      {(() => {
+                        const b = billingBadge(shop);
+                        return b
+                          ? <span style={{ ...pill, color: BADGE[b.tone].fg, background: BADGE[b.tone].bg }}>{b.label}</span>
+                          : <span style={{ color: "var(--aw2)", fontSize: 12 }}>-</span>;
+                      })()}
                     </td>
 
                     {/* Revenue */}
