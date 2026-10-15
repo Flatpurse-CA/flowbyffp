@@ -491,6 +491,19 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* The <body> colour follows the public-site theme (ffp-theme). Inside the
+   admin panel or owner dashboard it must follow THAT panel's theme instead,
+   otherwise a light site theme shows a white strip above a dark panel when
+   the page rubber-band scrolls or while it loads. */
+body:has(.admin-root[data-admin-theme="dark"]),
+body:has(.dash-root[data-portal-theme="dark"]) {
+  background: rgb(10,10,12) !important;
+}
+body:has(.admin-root[data-admin-theme="light"]),
+body:has(.dash-root[data-portal-theme="light"]) {
+  background: rgb(246,246,250) !important;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);

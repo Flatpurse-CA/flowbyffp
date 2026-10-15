@@ -183,7 +183,7 @@ export function AdminShell({ children, user, initialDark = true }: { children: R
   };
 
   return (
-    <div data-admin-theme={dark ? "dark" : "light"} style={{ minHeight: "100vh", background: T.bg, display: "flex" }}>
+    <div className="admin-root" data-admin-theme={dark ? "dark" : "light"} style={{ minHeight: "100vh", background: T.bg, display: "flex" }}>
 
       {/* Mobile drawer backdrop */}
       {isMobile && mobileOpen && (

@@ -123,7 +123,7 @@ export function DashboardThemeProvider({ children, initialDark = true }: { child
     <DashboardThemeContext.Provider value={{ dark, T: dark ? DARK : LIGHT, toggle }}>
       {/* Scopes the theme tokens for the server render, before the <html>
           attribute is set; display: contents keeps it out of the layout. */}
-      <div data-portal-theme={dark ? "dark" : "light"} style={{ display: "contents" }}>
+      <div className="dash-root" data-portal-theme={dark ? "dark" : "light"} style={{ display: "contents" }}>
         {children}
       </div>
     </DashboardThemeContext.Provider>
