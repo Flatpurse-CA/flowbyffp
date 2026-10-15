@@ -1233,3 +1233,37 @@ html[data-portal-theme="light"]:has(main.dashboard-main) .cookie-banner {
    the pill's white text and vanish on a white dropdown list. */
 .admin-plan-select option { color: var(--atext); background: var(--am2); }
 .admin-plan-select:focus-visible { box-shadow: 0 0 0 2px var(--am2), 0 0 0 4px rgb(124,58,237); }
+
+/* Admin header dropdowns (InboxButton, NotificationsBell) */
+.admin-header-dropdown {
+  position: absolute; top: calc(100% + 10px); right: 0; z-index: 200;
+  width: min(340px, calc(100vw - 24px)); overflow: hidden; border-radius: 14px;
+  background: var(--am2); border: 1px solid var(--aw08);
+  box-shadow: 0 16px 44px rgba(0,0,0,0.45);
+}
+[data-admin-theme="light"] .admin-header-dropdown { box-shadow: 0 16px 40px rgba(17,12,46,0.14); }
+.admin-header-dropdown-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 13px 15px; border-bottom: 1px solid var(--aw07);
+}
+.admin-header-dropdown-head p { margin: 0; font-size: 13px; font-weight: 700; color: var(--atext2); }
+.admin-header-dropdown-count {
+  font-size: 10.5px; font-weight: 700; padding: 2px 8px; border-radius: 20px;
+  background: var(--astatus-purple-bg); color: var(--astatus-purple-fg);
+}
+.admin-header-dropdown-empty { margin: 0; padding: 28px 15px; text-align: center; font-size: 12.5px; color: var(--aw35); }
+.admin-header-dropdown-item {
+  display: flex; align-items: center; gap: 10px; padding: 10px 15px; text-decoration: none;
+}
+.admin-header-dropdown-item:hover { background: var(--aw04); }
+.admin-header-dropdown-item.unread .admin-header-dropdown-title { color: var(--atext2); font-weight: 700; }
+.admin-header-dropdown-title { margin: 0 0 1px; font-size: 12.5px; font-weight: 600; color: var(--aw65); }
+.admin-header-dropdown-sub { margin: 0; font-size: 11.5px; color: var(--aw35); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.admin-header-dropdown-time { flex-shrink: 0; white-space: nowrap; font-size: 10.5px; color: var(--aw35); }
+.admin-header-dropdown-dot { flex-shrink: 0; width: 7px; height: 7px; border-radius: 50%; background: rgb(124,58,237); }
+.admin-header-dropdown-foot {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 11px 15px; border-top: 1px solid var(--aw07);
+  font-size: 12px; font-weight: 600; color: var(--aviolet-text); text-decoration: none;
+}
+.admin-header-dropdown-foot:hover { background: var(--aw04); }

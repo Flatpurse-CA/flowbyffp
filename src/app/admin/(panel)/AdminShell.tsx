@@ -6,12 +6,13 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Users, ClipboardList, Store, CreditCard,
   LogOut, ChevronLeft, ChevronRight, Menu, X,
-  Sun, Moon, MessageSquare, User as UserIcon, Settings, Mail,
+  Sun, Moon, User as UserIcon, Settings, Mail, Inbox,
   BarChart3, GitFork, Zap, ShieldAlert, Flag, FlaskConical, Activity, History, FileText,
 } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 import { adminLogout } from "@/app/admin/actions";
 import { NotificationsBell } from "./NotificationsBell";
+import { InboxButton } from "./InboxButton";
 import { AdminSearch } from "./AdminSearch";
 
 const PURPLE = "rgb(139,92,246)";
@@ -20,6 +21,7 @@ const NAV = [
   { icon: LayoutDashboard, href: "/admin",                    label: "Overview"          },
   { icon: Users,           href: "/admin/users",              label: "Users"             },
   { icon: ClipboardList,   href: "/admin/waitlist",           label: "Waitlist"          },
+  { icon: Inbox,           href: "/admin/demo-requests",      label: "Demo Requests"     },
   { icon: Mail,            href: "/admin/emails",             label: "Emails"            },
   { icon: FileText,        href: "/admin/email-templates",    label: "Email Templates"   },
   { icon: Store,           href: "/admin/shops",              label: "Shops"             },
@@ -397,17 +399,8 @@ export function AdminShell({ children, user, initialDark = true }: { children: R
 
           {/* Action icons */}
           <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
-            {!isMobile && (
-              <div style={{ position: "relative" }}>
-                <button style={headerIconBtn}><MessageSquare size={16} strokeWidth={1.6} /></button>
-                <span style={hdBadge}>3</span>
-              </div>
-            )}
-            <NotificationsBell
-              headerIconBtn={headerIconBtn}
-              badgeStyle={hdBadge}
-              T={{ dropBg: T.dropBg, dropBorder: T.dropBorder, text: T.text, textMuted: T.textMuted, dropItem: T.dropItem, dropHover: T.dropHover }}
-            />
+            <InboxButton headerIconBtn={headerIconBtn} badgeStyle={hdBadge} />
+            <NotificationsBell headerIconBtn={headerIconBtn} badgeStyle={hdBadge} />
 
             {/* Theme + Avatar grouped */}
             <div style={{

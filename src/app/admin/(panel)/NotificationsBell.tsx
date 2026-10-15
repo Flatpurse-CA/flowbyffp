@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
-import { Bell, ClipboardList, Store, Users, XCircle } from "lucide-react";
+import { Bell, ClipboardList, Store, Users, XCircle, ArrowRight } from "lucide-react";
 
 type NotificationItem = {
   id: string;
@@ -53,15 +53,18 @@ function timeAgo(iso: string): string {
 }
 
 export function NotificationsBell({
-  headerIconBtn, badgeStyle, T,
+  headerIconBtn, badgeStyle,
 }: {
   headerIconBtn: React.CSSProperties;
   badgeStyle: React.CSSProperties;
-  T: { dropBg: string; dropBorder: string; text: string; textMuted: string; dropItem: string; dropHover: string; dim?: string };
 }) {
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState<NotificationItem[]>([]);
-  const [lastSeen, setLastSeen] = useState<string | null>(null);
+  const [seenAt, setSeenAt] = useState<string | null>(null);
+  // Snapshot of seenAt from before this open, so items that were unread
+  // keep their dot while the dropdown is showing even though opening it
+  // marks everything read.
+  const [unreadSince, setUnreadSince] = useState<string | null>(null);
   const ref = useRef<HTMLDivElement>(null);
 
   const load = useCallback(async () => {
@@ -71,13 +74,14 @@ export function NotificationsBell({
       const data = await res.json();
       const prefs = readNotificationPrefs();
       setItems((data.items ?? []).filter((it: NotificationItem) => prefs[it.type]));
+      setSeenAt(data.seenAt ?? null);
     } catch {
-      // silently ignore — bell just shows nothing
+      // Network blip: keep showing the last known state.
     }
   }, []);
 
   useEffect(() => {
-    setLastSeen(localStorage.getItem("admin-notifications-seen"));
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- initial fetch, then poll
     load();
     const interval = setInterval(load, 60000);
     return () => clearInterval(interval);
@@ -92,80 +96,72 @@ export function NotificationsBell({
     return () => document.removeEventListener("mousedown", handler);
   }, [open]);
 
-  const unreadCount = lastSeen
-    ? items.filter(it => new Date(it.createdAt).getTime() > new Date(lastSeen).getTime()).length
-    : items.length;
+  const isUnread = (it: NotificationItem, since: string | null) =>
+    !since || new Date(it.createdAt).getTime() > new Date(since).getTime();
+  const unreadCount = items.filter(it => isUnread(it, seenAt)).length;
+
+  const markSeen = async () => {
+    setSeenAt(new Date().toISOString());
+    try {
+      const res = await fetch("/api/admin/notifications", { method: "POST" });
+      if (res.ok) setSeenAt((await res.json()).seenAt);
+    } catch {
+      // Badge stays cleared locally; next poll reconciles with the server.
+    }
+  };
 
   const toggle = () => {
     const next = !open;
     setOpen(next);
     if (next) {
-      const now = new Date().toISOString();
-      localStorage.setItem("admin-notifications-seen", now);
-      setLastSeen(now);
+      setUnreadSince(seenAt);
+      if (unreadCount > 0) markSeen();
     }
   };
 
   return (
     <div ref={ref} style={{ position: "relative" }}>
-      <button style={headerIconBtn} onClick={toggle}>
+      <button
+        style={headerIconBtn}
+        onClick={toggle}
+        title="Notifications"
+        aria-label={`Notifications${unreadCount ? `, ${unreadCount} unread` : ""}`}
+        aria-expanded={open}
+      >
         <Bell size={16} strokeWidth={1.6} />
       </button>
       {unreadCount > 0 && <span style={badgeStyle}>{unreadCount > 9 ? "9+" : unreadCount}</span>}
 
       {open && (
-        <div style={{
-          position: "absolute", top: "calc(100% + 10px)", right: 0,
-          width: 320,
-          background: T.dropBg,
-          border: `1px solid ${T.dropBorder}`,
-          borderRadius: 14,
-          boxShadow: "0 12px 40px rgba(0,0,0,0.4)",
-          overflow: "hidden",
-          zIndex: 200,
-        }}>
-          <div style={{ padding: "13px 15px", borderBottom: `1px solid ${T.dropBorder}` }}>
-            <p style={{ color: T.text, fontSize: 13, fontWeight: 700, margin: 0 }}>Notifications</p>
+        <div className="admin-header-dropdown">
+          <div className="admin-header-dropdown-head">
+            <p>Notifications</p>
           </div>
-          <div style={{ maxHeight: 340, overflowY: "auto" }}>
+          <div style={{ maxHeight: 360, overflowY: "auto" }}>
             {items.length === 0 ? (
-              <div style={{ padding: "28px 15px", textAlign: "center" }}>
-                <p style={{ color: T.textMuted, fontSize: 12.5, margin: 0 }}>Nothing new</p>
-              </div>
+              <p className="admin-header-dropdown-empty">Nothing new</p>
             ) : (
               items.map(it => {
                 const Icon = ICON[it.type];
+                const unread = isUnread(it, unreadSince);
                 return (
-                  <Link
-                    key={it.id}
-                    href={it.href}
-                    onClick={() => setOpen(false)}
-                    style={{
-                      display: "flex", alignItems: "flex-start", gap: 10,
-                      padding: "10px 15px",
-                      textDecoration: "none",
-                    }}
-                    onMouseEnter={e => (e.currentTarget.style.background = T.dropHover)}
-                    onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
-                  >
+                  <Link key={it.id} href={it.href} onClick={() => setOpen(false)}
+                    className={`admin-header-dropdown-item${unread ? " unread" : ""}`}>
                     <Icon size={14} strokeWidth={1.8} color={ICON_COLOR[it.type]} />
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ color: T.dropItem, fontSize: 12.5, fontWeight: 600, margin: "0 0 1px" }}>{it.title}</p>
-                      <p style={{
-                        color: T.textMuted, fontSize: 11.5, margin: 0,
-                        overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-                      }}>
-                        {it.subtitle}
-                      </p>
+                      <p className="admin-header-dropdown-title">{it.title}</p>
+                      <p className="admin-header-dropdown-sub">{it.subtitle}</p>
                     </div>
-                    <span style={{ color: T.textMuted, fontSize: 10.5, flexShrink: 0, whiteSpace: "nowrap" }}>
-                      {timeAgo(it.createdAt)}
-                    </span>
+                    <span className="admin-header-dropdown-time">{timeAgo(it.createdAt)}</span>
+                    {unread && <span className="admin-header-dropdown-dot" style={{ marginLeft: 2 }} />}
                   </Link>
                 );
               })
             )}
           </div>
+          <Link href="/admin/settings" onClick={() => setOpen(false)} className="admin-header-dropdown-foot">
+            Notification settings <ArrowRight size={13} />
+          </Link>
         </div>
       )}
     </div>

@@ -79,5 +79,26 @@ export async function GET() {
 
   items.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
-  return NextResponse.json({ items: items.slice(0, 20) });
+  // "Last seen" lives on the admin's own account (not localStorage) so the
+  // badge is the same on every device they use.
+  const seenAt = (authData.user?.app_metadata?.admin_notifications_seen_at as string | undefined) ?? null;
+
+  return NextResponse.json({ items: items.slice(0, 20), seenAt });
+}
+
+export async function POST() {
+  const supabase = await createClient();
+  const { data: authData } = await supabase.auth.getUser();
+  const user = authData.user;
+  if (!user || !(await isAdmin(user.email))) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const seenAt = new Date().toISOString();
+  const admin = createAdminClient();
+  const { error } = await admin.auth.admin.updateUserById(user.id, {
+    app_metadata: { ...user.app_metadata, admin_notifications_seen_at: seenAt },
+  });
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  return NextResponse.json({ seenAt });
 }
