@@ -2,9 +2,9 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import Link from "next/link";
-import { X, ArrowUpRight, ArrowDown, MapPin, Tag } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { ArrowUpRight, ArrowDown, MapPin, Tag } from "lucide-react";
 import ScrollReveal from "@/components/ScrollReveal";
-import { requestDemo } from "../home-4/actions";
 import Home4Landing from "../home-4/Home4Landing";
 import "../home-4/home-4.css";
 import "./home-5.css";
@@ -37,112 +37,28 @@ const AudienceContext = createContext<{ audience: Audience; setAudience: (a: Aud
 
 /**
  * Shares the Shop owners / Clients choice across the home-4 blocks added into
- * home-3, and owns the demo-request popup: any link to "#demo" on the page
- * (hero button, FAQ answers) opens it instead of scrolling to a section.
+ * home-3. Any link to "#demo" on the page (hero button, FAQ answers) goes to
+ * the /demo walkthrough page instead of scrolling to a section.
  */
 export function AudienceProvider({ children }: { children: React.ReactNode }) {
   const [audience, setAudience] = useState<Audience>("owners");
-  const [demoOpen, setDemoOpen] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
       const link = (e.target as HTMLElement | null)?.closest?.('a[href="#demo"]');
       if (!link) return;
       e.preventDefault();
-      setDemoOpen(true);
+      router.push("/demo");
     };
     document.addEventListener("click", onClick);
     return () => document.removeEventListener("click", onClick);
-  }, []);
+  }, [router]);
 
   return (
     <AudienceContext.Provider value={{ audience, setAudience }}>
       {children}
-      {demoOpen && <DemoModal onClose={() => setDemoOpen(false)} />}
     </AudienceContext.Provider>
-  );
-}
-
-/** home-4's demo request (copy + form), shown as a popup. */
-function DemoModal({ onClose }: { onClose: () => void }) {
-  const [demo, setDemo] = useState({ name: "", email: "", business: "", phone: "", website: "", marketing: false });
-  const [demoStatus, setDemoStatus] = useState<{ submitting: boolean; message: string; isError: boolean }>({ submitting: false, message: "", isError: false });
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
-    document.addEventListener("keydown", onKey);
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = prevOverflow;
-    };
-  }, [onClose]);
-
-  async function handleDemoSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    if (!e.currentTarget.reportValidity()) return;
-    setDemoStatus({ submitting: true, message: "", isError: false });
-    try {
-      const { error } = await requestDemo(demo.name, demo.email, demo.business, demo.phone, demo.website, demo.marketing);
-      if (error) {
-        setDemoStatus({ submitting: false, message: error, isError: true });
-      } else {
-        setDemo({ name: "", email: "", business: "", phone: "", website: "", marketing: false });
-        setDemoStatus({ submitting: false, message: "Thank you — your demo request has been saved. We’ll use your details to follow up.", isError: false });
-      }
-    } catch {
-      setDemoStatus({ submitting: false, message: "We couldn’t save your request. Please try again or email support@flatpurse.com.", isError: true });
-    }
-  }
-
-  return (
-    <div className="h5-page h5-modal-backdrop" onClick={onClose}>
-      <div className="h5-modal" role="dialog" aria-modal="true" aria-labelledby="demo-heading" onClick={(e) => e.stopPropagation()}>
-        <button type="button" className="h5-modal-close" onClick={onClose} aria-label="Close">
-          <X size={18} />
-        </button>
-        <div className="h5-demo-copy">
-          <Chip>LET’S TALK ABOUT YOUR SHOP</Chip>
-          <h2 id="demo-heading">See what Flow<br /><em>could do for you.</em></h2>
-          <p>Tell us a little about your business. We’ll use these details to contact you about a personal walkthrough.</p>
-          <p className="h5-demo-help">Prefer email? <a href="mailto:support@flatpurse.com">support@flatpurse.com</a></p>
-        </div>
-          <form className="h5-form h5-modal-form" onSubmit={handleDemoSubmit}>
-          <h3>Request your personal demo</h3>
-          <div className="h5-fields">
-            <label>Your name
-              <input name="name" autoFocus required autoComplete="name" maxLength={100} value={demo.name} onChange={(e) => setDemo((d) => ({ ...d, name: e.target.value }))} disabled={demoStatus.submitting} />
-            </label>
-            <label>Email address
-              <input name="email" type="email" required autoComplete="email" maxLength={254} value={demo.email} onChange={(e) => setDemo((d) => ({ ...d, email: e.target.value }))} disabled={demoStatus.submitting} />
-            </label>
-            <label>Business name
-              <input name="business" required autoComplete="organization" maxLength={150} value={demo.business} onChange={(e) => setDemo((d) => ({ ...d, business: e.target.value }))} disabled={demoStatus.submitting} />
-            </label>
-            <label><span className="h5-label">Phone <span>(optional)</span></span>
-              <input name="phone" type="tel" autoComplete="tel" maxLength={40} value={demo.phone} onChange={(e) => setDemo((d) => ({ ...d, phone: e.target.value }))} disabled={demoStatus.submitting} />
-            </label>
-          </div>
-          <div className="h5-trap" aria-hidden="true">
-            <label>Website
-              <input name="website" tabIndex={-1} autoComplete="off" value={demo.website} onChange={(e) => setDemo((d) => ({ ...d, website: e.target.value }))} />
-            </label>
-          </div>
-          <label className="h5-check">
-            <input name="marketing" type="checkbox" checked={demo.marketing} onChange={(e) => setDemo((d) => ({ ...d, marketing: e.target.checked }))} disabled={demoStatus.submitting} />
-            <span>I’d also like occasional Flow product updates and offers. Optional.</span>
-          </label>
-          <p className="h5-privacy">We’ll use your details to respond to this request. Marketing updates are optional. <Link href="/privacy">Privacy policy</Link>.</p>
-          <button className="h3-cta-btn h5-submit" type="submit" disabled={demoStatus.submitting}>
-            <svg viewBox="0 0 24 24" className="h3-cta-sparkle"><path d={SPARKLE} /></svg>
-            <span className="h3-cta-text">{demoStatus.submitting ? "Saving your request…" : "Request my demo"}</span>
-          </button>
-          <p role="status" aria-live="polite" className="h5-status" style={demoStatus.isError ? { color: "#b42318" } : undefined}>{demoStatus.message}</p>
-          <noscript>Please email <a href="mailto:support@flatpurse.com">support@flatpurse.com</a> to request a demo.</noscript>
-        </form>
-      </div>
-    </div>
   );
 }
 
