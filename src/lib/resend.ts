@@ -82,7 +82,8 @@ export type EmailTemplateKey =
   | "otp" | "password_reset" | "staff_invite" | "booking_request_received"
   | "welcome" | "password_changed" | "booking_confirmed" | "booking_declined"
   | "booking_cancelled" | "booking_rescheduled" | "appointment_reminder"
-  | "no_show" | "review_request" | "new_booking_alert" | "staff_activated";
+  | "no_show" | "review_request" | "new_booking_alert" | "staff_activated"
+  | "shop_setup_reminder";
 
 export type EmailTemplateContent = { subject: string; heading: string; body: string; cta_label: string | null };
 
@@ -102,6 +103,7 @@ export const EMAIL_TEMPLATE_INFO: Record<EmailTemplateKey, { label: string; desc
   review_request:            { label: "Review request",            description: "Sent to the client after their appointment is completed.",        tokens: ["shopName"],                                        hasCta: true  },
   new_booking_alert:         { label: "New booking alert",         description: "Sent to the shop owner whenever a client books online.",          tokens: ["clientName", "serviceName", "stylistLine"],        hasCta: true  },
   staff_activated:           { label: "Staff account activated",   description: "Sent to a staff member after they set their password.",           tokens: ["firstName", "shopName"],                           hasCta: false },
+  shop_setup_reminder:       { label: "Finish shop setup reminder", description: "Sent from admin to owners who signed up but never created their shop.", tokens: ["firstName"],                                  hasCta: true  },
 };
 
 const DEFAULT_TEMPLATES: Record<EmailTemplateKey, EmailTemplateContent> = {
@@ -194,6 +196,12 @@ const DEFAULT_TEMPLATES: Record<EmailTemplateKey, EmailTemplateContent> = {
     heading: "Hi {{firstName}}, you're in",
     body: "Your account is active — you can now log in and see your bookings at {{shopName}}.",
     cta_label: null,
+  },
+  shop_setup_reminder: {
+    subject: "Your shop on FlatPurse Flow is almost ready",
+    heading: "Hi {{firstName}}, let's finish your shop",
+    body: "You created a FlatPurse Flow account but haven't set up your shop yet. It only takes a couple of minutes: add your shop details, pick a plan, and your booking page goes live.\n\nLog in with the email and password you signed up with and you'll go straight to setup.",
+    cta_label: "Finish setting up",
   },
 };
 
@@ -515,6 +523,8 @@ async function buildPreview(key: EmailTemplateKey): Promise<{ subject: string; h
       });
     case "staff_activated":
       return renderTemplate(key, { firstName: "Jordan", shopName: "Luxe Hair Studio" });
+    case "shop_setup_reminder":
+      return renderTemplate(key, { firstName: "Jordan" }, { ctaUrl: "https://flow.flatpurse.com/login" });
   }
 }
 
@@ -525,4 +535,9 @@ export async function previewEmailTemplate(key: EmailTemplateKey): Promise<{ sub
 export async function sendTestEmailTemplate(key: EmailTemplateKey, to: string) {
   const { subject, html } = await buildPreview(key);
   return send({ to, subject: `[TEST] ${subject}`, html });
+}
+
+export async function sendShopSetupReminderEmail(to: string, input: { firstName: string; loginUrl: string }) {
+  const { subject, html } = await renderTemplate("shop_setup_reminder", { firstName: input.firstName }, { ctaUrl: input.loginUrl });
+  return send({ to, subject, html });
 }

@@ -1,73 +1,62 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-import { ROOT_ADMIN_EMAIL } from "@/lib/admin-guard";
-import { RestartAllTrialsButton } from "./RestartAllTrialsButton";
-import { UsersTable } from "./UsersTable";
+import { loadAccounts, needsShopSetup } from "@/lib/admin/accounts";
 import { sumRevenueByShop } from "@/lib/admin/shopRevenue";
 import { computeAccessStatus } from "@/lib/dashboard/accessStatus";
+import { RestartAllTrialsButton } from "./RestartAllTrialsButton";
+import { SetupRemindersButton } from "./SetupRemindersButton";
+import { UsersSectionHeader } from "./UsersSectionHeader";
+import { UsersTable } from "./UsersTable";
 
-export default async function AdminUsersPage() {
+// Owners: everyone who signed up to run a shop, including those who never
+// got as far as creating one. Clients and team members have their own pages.
+export default async function AdminOwnersPage() {
   const admin = createAdminClient();
-
-  const [usersRes, profilesRes, shopsRes, apptsRes, adminsRes, staffRes] = await Promise.all([
-    admin.auth.admin.listUsers({ perPage: 1000 }),
-    admin.from("profiles").select("id, first_name, last_name"),
-    admin.from("shops").select("id, owner_id, name, plan, trial_started_at, subscription_status, trial_override, trial_paused_at"),
+  const [accounts, apptsRes] = await Promise.all([
+    loadAccounts(),
     admin.from("appointments").select("shop_id, price").eq("status", "completed"),
-    admin.from("admin_users").select("email"),
-    admin.from("staff").select("user_id").not("user_id", "is", null),
   ]);
-  const staffUserIds = new Set((staffRes.data ?? []).map(s => s.user_id as string));
-  const adminEmails = new Set((adminsRes.data ?? []).map(a => (a.email as string).toLowerCase()));
-
-  const users    = usersRes.data?.users ?? [];
-  const profiles = Object.fromEntries((profilesRes.data ?? []).map(p => [p.id, p]));
-  const shops    = Object.fromEntries((shopsRes.data ?? []).map(s => [s.owner_id, s]));
   const revenueByShop = sumRevenueByShop((apptsRes.data ?? []) as { shop_id: string; price: number }[]);
 
-  const rows = users
-    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-    .map(u => {
-      const shop = shops[u.id];
-      const access = shop?.trial_started_at
-        ? computeAccessStatus(shop as { trial_started_at: string; subscription_status: string | null; trial_override: boolean; trial_paused_at: string | null })
-        : null;
-      return {
-        id:        u.id,
-        email:     u.email ?? "-",
-        name:      profiles[u.id] ? `${profiles[u.id].first_name} ${profiles[u.id].last_name}` : null,
-        shopName:  shop?.name ?? null,
-        plan:      shop?.plan ?? null,
-        revenue:   shop ? revenueByShop[shop.id] ?? 0 : null,
-        createdAt: u.created_at,
-        isBanned:  !!(u.banned_until && new Date(u.banned_until) > new Date()),
-        accessStatus: access?.status ?? null,
-        trialOverride: shop?.trial_override ?? false,
-        trialPaused: !!shop?.trial_paused_at,
-        unlimited: shop ? !!shop.trial_override && shop.plan === "enterprise" : !!u.app_metadata?.unlimited,
-        // No shop yet (signup abandoned before the shop step) — Unlimited is
-        // stored on the account and applied once they create one. Staff log
-        // in under their employer's shop, so Unlimited doesn't apply to them.
-        noShop: !shop && !staffUserIds.has(u.id),
-        isRootAdmin: u.email === ROOT_ADMIN_EMAIL,
-        isAdmin: u.email === ROOT_ADMIN_EMAIL || adminEmails.has((u.email ?? "").toLowerCase()),
-      };
-    });
+  const owners = accounts.filter(a => a.kind === "owner");
+  const rows = owners.map(a => {
+    const shop = a.shop;
+    const access = shop?.trial_started_at
+      ? computeAccessStatus({ trial_started_at: shop.trial_started_at, subscription_status: shop.subscription_status, trial_override: shop.trial_override, trial_paused_at: shop.trial_paused_at })
+      : null;
+    return {
+      id: a.user.id,
+      email: a.user.email ?? "-",
+      name: a.name,
+      shopName: shop?.name ?? null,
+      plan: shop?.plan ?? null,
+      revenue: shop ? revenueByShop[shop.id] ?? 0 : null,
+      createdAt: a.user.created_at,
+      isBanned: a.isBanned,
+      accessStatus: access?.status ?? null,
+      trialOverride: shop?.trial_override ?? false,
+      trialPaused: !!shop?.trial_paused_at,
+      // No shop yet: Unlimited is stored on the account and applied once they create one.
+      unlimited: shop ? !!shop.trial_override && shop.plan === "enterprise" : !!a.user.app_metadata?.unlimited,
+      noShop: !shop,
+      isRootAdmin: a.isRootAdmin,
+      isAdmin: a.isAdmin,
+      emailConfirmed: a.emailConfirmed,
+      needsSetup: needsShopSetup(a),
+      setupReminderSentAt: a.setupReminderSentAt,
+    };
+  });
+  const withoutShop = owners.filter(a => !a.shop).length;
 
   return (
     <div>
-      {/* Heading */}
-      <div style={{ marginBottom: 24, display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
-        <div>
-          <h1 style={{ color: "var(--atext2)", fontSize: 22, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.03em" }}>Users</h1>
-          <p style={{ color: "var(--aw3)", fontSize: 13, margin: 0 }}>{rows.length} total account{rows.length !== 1 ? "s" : ""}</p>
-        </div>
-        <RestartAllTrialsButton />
-      </div>
-
+      <UsersSectionHeader
+        active="owner"
+        accounts={accounts}
+        subtitle={`${owners.length} shop owner${owners.length !== 1 ? "s" : ""}${withoutShop ? ` · ${withoutShop} haven't set up a shop yet` : ""}`}
+        actions={<><SetupRemindersButton eligible={owners.filter(needsShopSetup).length} /><RestartAllTrialsButton /></>}
+      />
       {rows.length === 0 ? (
-        <div style={{ padding: "48px 0", textAlign: "center", color: "var(--aw25)", fontSize: 14 }}>
-          No users yet.
-        </div>
+        <div style={{ padding: "48px 0", textAlign: "center", color: "var(--aw25)", fontSize: 14 }}>No owners yet.</div>
       ) : (
         <UsersTable rows={rows} />
       )}

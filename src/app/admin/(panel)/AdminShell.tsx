@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { Fragment, useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -16,6 +16,14 @@ import { InboxButton } from "./InboxButton";
 import { AdminSearch } from "./AdminSearch";
 
 const PURPLE = "rgb(139,92,246)";
+
+// Users has its own sub-menu: owners, clients and team members sign in
+// through different flows, so each gets its own list.
+const USERS_SUBNAV = [
+  { href: "/admin/users",         label: "Owners"  },
+  { href: "/admin/users/clients", label: "Clients" },
+  { href: "/admin/users/team",    label: "Team"    },
+];
 
 const NAV = [
   { icon: LayoutDashboard, href: "/admin",                    label: "Overview"          },
@@ -300,8 +308,8 @@ export function AdminShell({ children, user, initialDark = true }: { children: R
           {NAV.map(({ icon: Icon, href, label }) => {
             const active = isActive(href, pathname);
             return (
+              <Fragment key={href}>
               <Link
-                key={href}
                 href={href}
                 title={!asideExpanded ? label : undefined}
                 onClick={() => isMobile && setMobileOpen(false)}
@@ -323,6 +331,31 @@ export function AdminShell({ children, user, initialDark = true }: { children: R
                 <Icon size={17} strokeWidth={active ? 2.1 : 1.7} style={{ flexShrink: 0 }} />
                 {asideExpanded && <span style={{ flex: 1, whiteSpace: "nowrap" }}>{label}</span>}
               </Link>
+              {href === "/admin/users" && asideExpanded && active && (
+                <div style={{ display: "flex", flexDirection: "column", gap: 1, margin: "2px 0 4px 29px", paddingLeft: 10, borderLeft: `1px solid ${T.divider}` }}>
+                  {USERS_SUBNAV.map(sub => {
+                    const subActive = sub.href === "/admin/users"
+                      ? pathname === "/admin/users"
+                      : pathname.startsWith(sub.href);
+                    return (
+                      <Link
+                        key={sub.href}
+                        href={sub.href}
+                        onClick={() => isMobile && setMobileOpen(false)}
+                        style={{
+                          padding: "7px 10px", borderRadius: 8, fontSize: 13, textDecoration: "none",
+                          fontWeight: subActive ? 600 : 500,
+                          color: subActive ? T.text : T.inactiveText,
+                          background: subActive ? T.dropHover : "transparent",
+                        }}
+                      >
+                        {sub.label}
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
+              </Fragment>
             );
           })}
         </nav>

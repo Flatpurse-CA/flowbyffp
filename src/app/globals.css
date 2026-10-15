@@ -1267,3 +1267,7 @@ html[data-portal-theme="light"]:has(main.dashboard-main) .cookie-banner {
   font-size: 12px; font-weight: 600; color: var(--aviolet-text); text-decoration: none;
 }
 .admin-header-dropdown-foot:hover { background: var(--aw04); }
+/* Admin Users: clickable user cell → profile; menu items rendered as links */
+.admin-user-link { display: block; text-decoration: none; color: inherit; min-width: 0; }
+.admin-user-link:hover p:first-child { text-decoration: underline; }
+a.admin-menu-item { text-decoration: none; box-sizing: border-box; }

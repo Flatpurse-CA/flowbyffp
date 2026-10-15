@@ -1,5 +1,6 @@
-import { banUser, unbanUser, deleteUser, resetShopTrial, setTrialOverride, pauseShopTrial, resumeShopTrial, setUnlimited } from "./actions";
-import { UserX, UserCheck, Trash2, RotateCcw, ShieldCheck, ShieldOff, Pause, Play, Infinity as InfinityIcon, KeyRound } from "lucide-react";
+import Link from "next/link";
+import { banUser, unbanUser, deleteUser, resetShopTrial, setTrialOverride, pauseShopTrial, resumeShopTrial, setUnlimited, sendSetupReminder } from "./actions";
+import { UserX, UserCheck, Trash2, RotateCcw, ShieldCheck, ShieldOff, Pause, Play, Infinity as InfinityIcon, KeyRound, Send, UserRound } from "lucide-react";
 import { addAdmin, removeAdmin } from "../settings/actions";
 import { PlanSelect } from "./PlanSelect";
 import { AddTrialDaysForm } from "./AddTrialDaysForm";
@@ -21,6 +22,9 @@ export type UserRow = {
   trialPaused: boolean;
   unlimited: boolean;
   noShop: boolean;
+  emailConfirmed: boolean;
+  needsSetup: boolean;
+  setupReminderSentAt: string | null;
   isRootAdmin: boolean;
   isAdmin: boolean;
 };
@@ -49,6 +53,11 @@ const actionBtn: React.CSSProperties = {
   padding: "0 10px", borderRadius: 8, cursor: "pointer",
   fontSize: 11.5, fontWeight: 600, fontFamily: "inherit", whiteSpace: "nowrap",
 };
+
+function daysAgo(iso: string): string {
+  const days = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
+  return days <= 0 ? "today" : days === 1 ? "yesterday" : `${days}d ago`;
+}
 
 export function UsersTable({ rows }: { rows: UserRow[] }) {
   return (
@@ -87,7 +96,7 @@ export function UsersTable({ rows }: { rows: UserRow[] }) {
                     }}>
                       {initials}
                     </div>
-                    <div>
+                    <Link href={`/admin/users/${row.id}`} className="admin-user-link">
                       {(row.name || row.isAdmin) && (
                         <p style={{ color: "var(--atext2)", fontSize: 12.5, fontWeight: 600, margin: "0 0 1px", display: "flex", alignItems: "center", gap: 6, whiteSpace: "nowrap", maxWidth: 230 }}>
                           <span title={row.name ?? undefined} style={{ overflow: "hidden", textOverflow: "ellipsis" }}>{row.name}</span>
@@ -99,7 +108,7 @@ export function UsersTable({ rows }: { rows: UserRow[] }) {
                         </p>
                       )}
                       <p title={row.email} style={{ color: "var(--aw42)", fontSize: 11.5, margin: 0, maxWidth: 230, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{row.email}</p>
-                    </div>
+                    </Link>
                   </div>
                 </td>
 
@@ -159,7 +168,14 @@ export function UsersTable({ rows }: { rows: UserRow[] }) {
                       Unlimited (no shop yet)
                     </span>
                   ) : (
-                    <span style={{ color: "var(--aw18)", fontSize: 12 }}>{row.noShop ? "No shop yet" : "-"}</span>
+                    row.noShop ? (
+                      <div>
+                        <span style={{ color: "var(--aw45)", fontSize: 12 }}>{row.emailConfirmed ? "No shop yet" : "Email not verified"}</span>
+                        {row.setupReminderSentAt && (
+                          <p style={{ color: "var(--aw3)", fontSize: 11, margin: "2px 0 0", whiteSpace: "nowrap" }}>Reminded {daysAgo(row.setupReminderSentAt)}</p>
+                        )}
+                      </div>
+                    ) : <span style={{ color: "var(--aw18)", fontSize: 12 }}>-</span>
                   )}
                 </td>
 
@@ -226,6 +242,16 @@ export function UsersTable({ rows }: { rows: UserRow[] }) {
                           <div className="admin-menu-sep" />
                         </>
                       )}
+                      {row.needsSetup && (
+                        <>
+                          <form action={sendSetupReminder}>
+                            <input type="hidden" name="userId" value={row.id} />
+                            <button type="submit" className="admin-menu-item"><Send size={13} /> Send setup reminder</button>
+                          </form>
+                          <div className="admin-menu-sep" />
+                        </>
+                      )}
+                      <Link href={`/admin/users/${row.id}`} className="admin-menu-item"><UserRound size={13} /> View profile</Link>
                       {!row.isRootAdmin && row.email !== "-" && (
                         <form action={row.isAdmin ? removeAdmin : addAdmin}>
                           <input type="hidden" name="email" value={row.email} />

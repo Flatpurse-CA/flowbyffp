@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { getAuthUser, getShopContext } from "@/lib/dashboard/shop";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { getUnreadCount } from "./messages/actions";
 import { DashboardShell } from "./DashboardShell";
 
@@ -16,6 +17,15 @@ export default async function DashboardLayout({ children }: { children: React.Re
   // them here instead of an empty, unconfigured dashboard means logging back
   // in actually finishes the job instead of leaving them stuck a second way.
   if (ctx && ctx.role === "owner" && !ctx.handle) redirect("/onboarding");
+
+  // Same idea one step earlier: an owner who signed up (has an owner profile)
+  // but never created a shop goes straight to shop setup. This is where the
+  // admin "finish setting up your shop" reminder email lands them.
+  if (!ctx) {
+    const admin = createAdminClient();
+    const { data: profile } = await admin.from("profiles").select("id").eq("id", user.id).maybeSingle();
+    if (profile) redirect("/signup/shop");
+  }
 
   if (!ctx) {
     return (
