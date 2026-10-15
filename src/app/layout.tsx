@@ -75,7 +75,7 @@ export default function RootLayout({
         {/* Inline script runs before paint — sets data-theme from localStorage with no flash */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('ffp-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})()`,
+            __html: `(function(){try{var t=localStorage.getItem('ffp-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);var p=localStorage.getItem('portal-theme');if(p==='light'||p==='dark')document.documentElement.setAttribute('data-portal-theme',p);}catch(e){}})()`,
           }}
         />
         <ThemeProvider>{children}</ThemeProvider>

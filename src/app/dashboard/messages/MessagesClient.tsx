@@ -5,6 +5,7 @@ import { Send, MessageSquare, ChevronLeft } from "lucide-react";
 import type { ConversationSummary, MessageRow } from "./actions";
 import { getOrCreateConversation, listMessages, sendMessage, markConversationRead } from "./actions";
 import { tint } from "@/lib/color";
+import { deepen } from "@/lib/dashboard/deepen";
 
 function initialsFor(name: string) {
   return name.trim().split(/\s+/).map(w => w[0]?.toUpperCase() ?? "").slice(0, 2).join("") || "?";
@@ -96,7 +97,7 @@ export function MessagesClient({ role, conversations, initialConversationId, ini
           </button>
           <div style={{
             width: 34, height: 34, borderRadius: 10, background: tint(selected.staffColor, 0.13), border: `1.5px solid ${tint(selected.staffColor, 0.27)}`,
-            display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 800, color: selected.staffColor, flexShrink: 0,
+            display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 800, color: deepen(selected.staffColor), flexShrink: 0,
           }}>
             {initialsFor(selected.staffName)}
           </div>
@@ -185,13 +186,13 @@ export function MessagesClient({ role, conversations, initialConversationId, ini
                 style={{
                   width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "10px 10px",
                   borderRadius: 10, border: "none", cursor: "pointer", textAlign: "left",
-                  background: selectedStaffId === c.staffId ? "rgba(109,40,217,0.18)" : "transparent",
+                  background: selectedStaffId === c.staffId ? "var(--drow-sel-l, rgba(109,40,217,0.18))" : "transparent",
                   marginBottom: 2,
                 }}
               >
                 <div style={{
                   width: 36, height: 36, borderRadius: 10, background: tint(c.staffColor, 0.13), border: `1.5px solid ${tint(c.staffColor, 0.27)}`,
-                  display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 800, color: c.staffColor, flexShrink: 0,
+                  display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 800, color: deepen(c.staffColor), flexShrink: 0,
                 }}>
                   {initialsFor(c.staffName)}
                 </div>

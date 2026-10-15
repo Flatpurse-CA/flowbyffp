@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Plus, Search, Zap, ChevronRight } from "lucide-react";
 import { type DerivedClient, type ClientTag } from "@/lib/dashboard/clients";
 import { tint } from "@/lib/color";
+import { deepen } from "@/lib/dashboard/deepen";
 
 const CHURN_DOT: Record<string, string> = {
   "Churn risk": "rgb(248,113,113)",
@@ -14,11 +15,11 @@ const CHURN_DOT: Record<string, string> = {
 const CHURN_DOT_DEFAULT = "rgb(52,211,153)";
 
 const TAG_STYLE: Record<NonNullable<ClientTag>, { color: string; bg: string }> = {
-  VIP:          { color: "rgb(251,191,36)",  bg: "rgba(245,158,11,0.12)" },
-  Loyal:        { color: "rgb(96,165,250)",  bg: "rgba(59,130,246,0.1)"  },
-  "New":        { color: "rgb(52,211,153)",  bg: "rgba(16,185,129,0.1)"  },
-  Overdue:      { color: "rgb(251,146,60)",  bg: "rgba(249,115,22,0.1)"  },
-  "Churn risk": { color: "rgb(248,113,113)", bg: "rgba(239,68,68,0.1)"   },
+  VIP:          { color: "var(--dst-amber-fg)", bg: "var(--dst-amber-bg)" },
+  Loyal:        { color: "var(--dst-blue-fg)", bg: "var(--dst-blue-bg)" },
+  "New":        { color: "var(--dst-green-fg)", bg: "var(--dst-green-bg)" },
+  Overdue:      { color: "var(--dst-orange-fg)", bg: "var(--dst-orange-bg)" },
+  "Churn risk": { color: "var(--dst-red-fg)", bg: "var(--dst-red-bg)" },
 };
 
 const FILTER_CHIPS: Array<"All" | NonNullable<ClientTag>> = ["All", "VIP", "Loyal", "New", "Overdue", "Churn risk"];
@@ -96,9 +97,9 @@ export function ClientsClient({ clients, engagedNames }: {
       <div className="clients-kpi-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12 }}>
         {[
           { label: "Total clients", value: String(clients.length), sub: undefined, color: undefined },
-          { label: "Total LTV",     value: fmtPrice(totalLTV), sub: "all time", color: "rgb(52,211,153)" },
-          { label: "Churn risk",    value: String(highChurn), sub: highChurn > 0 ? "need attention" : "all clear", color: "rgb(248,113,113)" },
-          { label: "On AutoPilot",  value: String(onAutoPilot), sub: "AI engaged", color: "rgb(167,139,250)" },
+          { label: "Total LTV",     value: fmtPrice(totalLTV), sub: "all time", color: "var(--dgreen-text)" },
+          { label: "Churn risk",    value: String(highChurn), sub: highChurn > 0 ? "need attention" : "all clear", color: "var(--dred-text)" },
+          { label: "On AutoPilot",  value: String(onAutoPilot), sub: "AI engaged", color: "var(--dviolet-text)" },
         ].map(s => (
           <div key={s.label} style={{ ...card, padding: "16px 18px" }}>
             <p style={{ color: "var(--dw35)", fontSize: 10, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 6px" }}>{s.label}</p>
@@ -160,7 +161,7 @@ export function ClientsClient({ clients, engagedNames }: {
                   <td style={{ padding: "13px 18px" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
                       <div style={{ position: "relative", flexShrink: 0 }}>
-                        <div style={{ width: 36, height: 36, borderRadius: "50%", background: tint(color, 0.09), border: `1.5px solid ${tint(color, 0.2)}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 800, color }}>
+                        <div style={{ width: 36, height: 36, borderRadius: "50%", background: tint(color, 0.09), border: `1.5px solid ${tint(color, 0.2)}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 800, color: deepen(color) }}>
                           {initialsFor(c.name)}
                         </div>
                         <span style={{ position: "absolute", bottom: 0, right: 0, width: 9, height: 9, borderRadius: "50%", background: c.tag ? (CHURN_DOT[c.tag] ?? CHURN_DOT_DEFAULT) : CHURN_DOT_DEFAULT, border: "1.5px solid var(--dring)" }} />
@@ -177,14 +178,14 @@ export function ClientsClient({ clients, engagedNames }: {
                   <td style={{ padding: "13px 18px" }}>
                     <div style={{ display: "flex", gap: 14 }}>
                       <span style={{ color: "var(--dw5)", fontSize: 12.5 }}><span style={{ color: "var(--dtext)", fontWeight: 700 }}>{c.visits}</span> visits</span>
-                      <span style={{ color: "var(--dw5)", fontSize: 12.5 }}><span style={{ color: "rgb(52,211,153)", fontWeight: 700 }}>{fmtPrice(c.ltv)}</span></span>
+                      <span style={{ color: "var(--dw5)", fontSize: 12.5 }}><span style={{ color: "var(--dgreen-text)", fontWeight: 700 }}>{fmtPrice(c.ltv)}</span></span>
                       <span style={{ color: "var(--dw35)", fontSize: 12.5 }}>{fmtDaysAgo(c.daysSinceLastVisit)}</span>
                     </div>
                   </td>
                   <td style={{ padding: "13px 18px", color: "var(--dtext)", fontSize: 13, fontWeight: 600 }}>{fmtPrice(avgSpend)}</td>
                   <td style={{ padding: "13px 18px" }}>
                     {engaged
-                      ? <span style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 10, fontWeight: 700, padding: "3px 9px", borderRadius: 20, color: "rgb(167,139,250)", background: "rgba(109,40,217,0.12)", width: "fit-content" }}><Zap size={9} strokeWidth={2.5} /> ON</span>
+                      ? <span style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 10, fontWeight: 700, padding: "3px 9px", borderRadius: 20, color: "var(--dsel-text-l, var(--dviolet-text))", background: "var(--dbadge-violet-l, rgba(109,40,217,0.12))", width: "fit-content" }}><Zap size={9} strokeWidth={2.5} /> ON</span>
                       : <span style={{ fontSize: 10, fontWeight: 700, padding: "3px 9px", borderRadius: 20, color: "var(--dw2)", background: "var(--dsurface2)" }}>OFF</span>}
                   </td>
                   <td style={{ padding: "13px 18px" }}>
@@ -208,7 +209,7 @@ export function ClientsClient({ clients, engagedNames }: {
           return (
             <div key={c.key} onClick={() => router.push(`/dashboard/clients/${encodeURIComponent(c.key)}`)} style={{ ...card, padding: "14px 16px", display: "flex", alignItems: "center", gap: 12, cursor: "pointer" }}>
               <div style={{ position: "relative", flexShrink: 0 }}>
-                <div style={{ width: 40, height: 40, borderRadius: "50%", background: tint(color, 0.09), border: `1.5px solid ${tint(color, 0.2)}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 800, color }}>
+                <div style={{ width: 40, height: 40, borderRadius: "50%", background: tint(color, 0.09), border: `1.5px solid ${tint(color, 0.2)}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 800, color: deepen(color) }}>
                   {initialsFor(c.name)}
                 </div>
                 <span style={{ position: "absolute", bottom: 0, right: 0, width: 10, height: 10, borderRadius: "50%", background: c.tag ? (CHURN_DOT[c.tag] ?? CHURN_DOT_DEFAULT) : CHURN_DOT_DEFAULT, border: "1.5px solid var(--dring)" }} />
@@ -216,7 +217,7 @@ export function ClientsClient({ clients, engagedNames }: {
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 2 }}>
                   <p style={{ color: "var(--dtext)", fontSize: 13.5, fontWeight: 700, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.name}</p>
-                  {engaged && <Zap size={11} color="rgb(167,139,250)" style={{ flexShrink: 0 }} />}
+                  {engaged && <Zap size={11} color="var(--dviolet-text)" style={{ flexShrink: 0 }} />}
                 </div>
                 <p style={{ color: "var(--dw35)", fontSize: 11.5, margin: 0 }}>{c.visits} visits · {fmtPrice(c.ltv)} · {fmtDaysAgo(c.daysSinceLastVisit)}</p>
               </div>

@@ -48,7 +48,7 @@ function Card({ c }: { c: FlowCoachCard }) {
         <span style={{
           alignSelf: "flex-start", fontSize: 11, fontWeight: 700, padding: "3px 9px", borderRadius: 20,
           background: c.impact.startsWith("-") ? "rgba(248,113,113,0.12)" : "rgba(52,211,153,0.12)",
-          color: c.impact.startsWith("-") ? "rgb(248,113,113)" : "rgb(52,211,153)",
+          color: c.impact.startsWith("-") ? "var(--dred-text)" : "var(--dgreen-text)",
         }}>
           Expected impact: {c.impact}
         </span>
@@ -78,7 +78,7 @@ export function FlowCoachClient({ data }: { data: FlowCoachData | null }) {
     <div style={{ maxWidth: 1280, margin: "0 auto", display: "flex", flexDirection: "column", gap: 22 }}>
       <div>
         <h1 style={{ color: "var(--dtext)", fontSize: 22, fontWeight: 800, margin: "0 0 3px", letterSpacing: "-0.03em", display: "flex", alignItems: "center", gap: 8 }}>
-          <Compass size={20} color="rgb(167,139,250)" strokeWidth={2} /> Flow Coach™
+          <Compass size={20} color="var(--dviolet-text)" strokeWidth={2} /> Flow Coach™
         </h1>
         <p style={{ color: "var(--dw35)", fontSize: 13, margin: 0 }}>Your AI business advisor: what changed, why, and what to do about it.</p>
       </div>
@@ -132,7 +132,7 @@ export function FlowCoachUpsell() {
   return (
     <div style={{ maxWidth: 480, margin: "100px auto 0", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }}>
       <div style={{ width: 52, height: 52, borderRadius: "50%", background: "rgba(139,92,246,0.12)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <Lock size={22} color="rgb(167,139,250)" strokeWidth={1.8} />
+        <Lock size={22} color="var(--dviolet-text)" strokeWidth={1.8} />
       </div>
       <h1 style={{ color: "var(--dtext)", fontSize: 19, fontWeight: 800, margin: 0, letterSpacing: "-0.02em" }}>
         Flow Coach™ is a Pro+ feature

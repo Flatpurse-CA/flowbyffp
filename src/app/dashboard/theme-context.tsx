@@ -88,29 +88,44 @@ const DashboardThemeContext = createContext<{ dark: boolean; T: DashboardTheme; 
   toggle: () => {},
 });
 
-export function DashboardThemeProvider({ children }: { children: ReactNode }) {
-  const [dark, setDark] = useState(true);
+// The choice is mirrored into a cookie so the server layout can render the
+// right theme on first paint (initialDark). Reading localStorage only after
+// mount meant light-mode users saw the whole dashboard flash dark on every
+// page load.
+function persistTheme(next: "dark" | "light") {
+  localStorage.setItem("portal-theme", next);
+  document.cookie = `portal-theme=${next}; path=/; max-age=31536000; samesite=lax`;
+  document.documentElement.setAttribute("data-portal-theme", next);
+}
+
+export function DashboardThemeProvider({ children, initialDark = true }: { children: ReactNode; initialDark?: boolean }) {
+  const [dark, setDark] = useState(initialDark);
 
   useEffect(() => {
+    // Existing users only have the localStorage copy until their first visit
+    // after the cookie was introduced; sync it across once.
     const stored = localStorage.getItem("portal-theme");
-    if (stored === "light") {
-      setDark(false);
-      document.documentElement.setAttribute("data-portal-theme", "light");
-    }
-  }, []);
+    const next = stored === "light" ? "light" : stored === "dark" ? "dark" : initialDark ? "dark" : "light";
+    persistTheme(next);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time sync from storage that the server can't see
+    if ((next === "dark") !== initialDark) setDark(next === "dark");
+  }, [initialDark]);
 
   const toggle = () => {
     setDark(prev => {
       const next = !prev;
-      localStorage.setItem("portal-theme", next ? "dark" : "light");
-      document.documentElement.setAttribute("data-portal-theme", next ? "dark" : "light");
+      persistTheme(next ? "dark" : "light");
       return next;
     });
   };
 
   return (
     <DashboardThemeContext.Provider value={{ dark, T: dark ? DARK : LIGHT, toggle }}>
-      {children}
+      {/* Scopes the theme tokens for the server render, before the <html>
+          attribute is set; display: contents keeps it out of the layout. */}
+      <div data-portal-theme={dark ? "dark" : "light"} style={{ display: "contents" }}>
+        {children}
+      </div>
     </DashboardThemeContext.Provider>
   );
 }

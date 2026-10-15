@@ -128,9 +128,9 @@ function SidebarNav({ open, pathname, T, tabs }: { open: boolean; pathname: stri
   );
 }
 
-export function DashboardShell(props: { children: React.ReactNode; user: User; role: ShopRole; staffName: string | null; unreadCount: number; accessStatus?: "trialing" | "grace" | "inactive" | "active" | "paused" }) {
+export function DashboardShell({ initialDark, ...props }: { children: React.ReactNode; user: User; role: ShopRole; staffName: string | null; unreadCount: number; accessStatus?: "trialing" | "grace" | "inactive" | "active" | "paused"; initialDark?: boolean }) {
   return (
-    <DashboardThemeProvider>
+    <DashboardThemeProvider initialDark={initialDark}>
       <DashboardShellInner {...props} />
     </DashboardThemeProvider>
   );
@@ -560,7 +560,7 @@ function DashboardShellInner({ children, user, role, staffName, unreadCount, acc
                     <form action={logout}>
                       <button
                         type="submit"
-                        style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 15px", width: "100%", background: "transparent", border: "none", color: "rgb(248,113,113)", fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: "inherit", textAlign: "left" }}
+                        style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 15px", width: "100%", background: "transparent", border: "none", color: "var(--dred-text)", fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: "inherit", textAlign: "left" }}
                         onMouseEnter={e => (e.currentTarget.style.background = "rgba(239,68,68,0.08)")}
                         onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
                       >

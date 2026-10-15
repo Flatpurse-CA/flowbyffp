@@ -54,7 +54,7 @@ export default async function ProfilePage() {
           background: "rgba(109,40,217,0.18)",
           border: "1px solid rgba(139,92,246,0.3)",
           display: "flex", alignItems: "center", justifyContent: "center",
-          fontSize: 22, fontWeight: 800, color: "rgb(167,139,250)", flexShrink: 0,
+          fontSize: 22, fontWeight: 800, color: "var(--dviolet-text)", flexShrink: 0,
         }}>
           {initial}
         </div>
@@ -65,7 +65,7 @@ export default async function ProfilePage() {
               <span style={{
                 display: "inline-flex", alignItems: "center", gap: 4,
                 fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 20,
-                color: "rgb(251,191,36)", background: "rgba(245,158,11,0.1)",
+                color: "var(--damber-text)", background: "rgba(245,158,11,0.1)",
                 letterSpacing: "0.04em", textTransform: "uppercase",
               }}>
                 <ShieldCheck size={10} /> Owner
@@ -85,7 +85,7 @@ export default async function ProfilePage() {
             background: "rgba(139,92,246,0.12)",
             display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
           }}>
-            <KeyRound size={16} color="rgb(167,139,250)" strokeWidth={1.8} />
+            <KeyRound size={16} color="var(--dviolet-text)" strokeWidth={1.8} />
           </div>
           <div>
             <p style={{ color: "var(--dtext)", fontSize: 14.5, fontWeight: 700, margin: "0 0 2px" }}>Password</p>

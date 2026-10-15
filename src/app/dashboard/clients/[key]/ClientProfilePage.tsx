@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import type { AppointmentRow, AppointmentStatus } from "../../appointments/actions";
 import { keyFor, type DerivedClient, type ClientTag } from "@/lib/dashboard/clients";
+import { deepen } from "@/lib/dashboard/deepen";
 
 const TAG_FILL: Record<NonNullable<ClientTag>, string> = {
   VIP:          "rgb(217,119,6)",
@@ -24,9 +25,9 @@ const CHURN_DOT_DEFAULT = "rgb(52,211,153)";
 
 const STATUS_LABEL: Record<AppointmentStatus, { label: string; color: string; bg: string }> = {
   completed: { label: "Done",      color: "var(--dw35)", bg: "var(--dw05)" },
-  confirmed: { label: "Confirmed", color: "rgb(52,211,153)", bg: "rgba(16,185,129,0.1)" },
+  confirmed: { label: "Confirmed", color: "var(--dst-green-fg)", bg: "var(--dst-green-bg)" },
   pending:   { label: "Pending",   color: "var(--dw5)",  bg: "var(--dw06)" },
-  deposit:   { label: "⚠ Deposit", color: "rgb(251,191,36)", bg: "rgba(245,158,11,0.1)" },
+  deposit:   { label: "⚠ Deposit", color: "var(--dst-amber-fg)", bg: "var(--dst-amber-bg)" },
   cancelled: { label: "Cancelled", color: "var(--dw25)", bg: "var(--dw03)" },
   no_show:   { label: "No-show",   color: "white", bg: "rgb(180,83,9)" },
 };
@@ -123,7 +124,7 @@ export function ClientProfilePage({ client, appointments, engaged }: {
           <div style={{ position: "relative", flexShrink: 0 }}>
             <div style={{
               width: 56, height: 56, borderRadius: "50%",
-              background: color,
+              background: deepen(color),
               display: "flex", alignItems: "center", justifyContent: "center",
               fontSize: 18, fontWeight: 800, color: "white",
             }}>
@@ -224,7 +225,7 @@ export function ClientProfilePage({ client, appointments, engaged }: {
             </div>
           )}
 
-          <div style={{ background: "rgb(109,40,217)", borderRadius: 14, padding: "14px 16px" }}>
+          <div data-portal-theme="dark" style={{ background: "rgb(109,40,217)", borderRadius: 14, padding: "14px 16px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
               <Zap size={13} color="white" />
               <span style={{ color: "rgba(255,255,255,0.7)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em" }}>Insight</span>
@@ -254,7 +255,7 @@ export function ClientProfilePage({ client, appointments, engaged }: {
             <div style={{ ...card, padding: "14px 16px" }}>
               <p style={{ color: "var(--dw35)", fontSize: 10, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", margin: "0 0 10px" }}>Revenue</p>
               {[
-                { label: "Lifetime value", value: fmtPrice(client.ltv), color: "rgb(52,211,153)" },
+                { label: "Lifetime value", value: fmtPrice(client.ltv), color: "var(--dgreen-text)" },
                 { label: "Avg per visit",  value: fmtPrice(avgSpend) },
                 { label: "Rebooks every",  value: client.avgIntervalDays ? `~${Math.round(client.avgIntervalDays)}d` : "N/A" },
               ].map(r => (
@@ -289,7 +290,7 @@ export function ClientProfilePage({ client, appointments, engaged }: {
                       <p style={{ color: "var(--dw32)", fontSize: 11.5, margin: 0 }}>{fmtDate(v.starts_at)}{v.stylist_name ? ` · ${v.stylist_name}` : ""}</p>
                     </div>
                     <div style={{ textAlign: "right", flexShrink: 0 }}>
-                      <p style={{ color: "rgb(52,211,153)", fontSize: 13, fontWeight: 700, margin: "0 0 2px" }}>{fmtPrice(Number(v.price))}</p>
+                      <p style={{ color: "var(--dgreen-text)", fontSize: 13, fontWeight: 700, margin: "0 0 2px" }}>{fmtPrice(Number(v.price))}</p>
                       {v.tip_amount ? <p style={{ color: "var(--dw25)", fontSize: 11, margin: 0 }}>+{fmtPrice(Number(v.tip_amount))} tip</p> : <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 7px", borderRadius: 20, color: s.color, background: s.bg }}>{s.label}</span>}
                     </div>
                   </div>

@@ -8,10 +8,10 @@ import { createService, toggleServiceActive, deleteService, type ServiceRow } fr
 const CATEGORY_SUGGESTIONS = ["Cuts", "Colour", "Treatments", "Braids"];
 
 const CATEGORY_PALETTE = [
-  { bg: "rgba(96,165,250,0.12)",  text: "rgb(96,165,250)"  },
-  { bg: "rgba(251,146,60,0.12)",  text: "rgb(251,146,60)"  },
-  { bg: "rgba(52,211,153,0.12)",  text: "rgb(52,211,153)"  },
-  { bg: "rgba(167,139,250,0.12)", text: "rgb(167,139,250)" },
+  { bg: "var(--dst-blue-bg)",   text: "var(--dst-blue-fg)"   },
+  { bg: "var(--dst-orange-bg)", text: "var(--dst-orange-fg)" },
+  { bg: "var(--dst-green-bg)",  text: "var(--dst-green-fg)"  },
+  { bg: "var(--dst-violet-bg)", text: "var(--dst-violet-fg)" },
 ];
 function colorForCategory(cat: string) {
   let hash = 0;
@@ -128,7 +128,7 @@ export function ServicesClient({ services }: { services: ServiceRow[] }) {
       </div>
 
       {error && (
-        <div style={{ padding: "10px 14px", borderRadius: 10, background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", color: "rgb(248,113,113)", fontSize: 12.5 }}>
+        <div style={{ padding: "10px 14px", borderRadius: 10, background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", color: "var(--dred-text)", fontSize: 12.5 }}>
           {error}
         </div>
       )}
@@ -167,7 +167,7 @@ export function ServicesClient({ services }: { services: ServiceRow[] }) {
       <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
         <div style={{ display: "flex", gap: 2, background: "var(--dsurface2)", border: "1px solid var(--dw07)", borderRadius: 11, padding: 3, flexWrap: "wrap" }}>
           {CATEGORIES.map((c) => (
-            <button key={c} onClick={() => setCat(c)} style={{ padding: "6px 14px", borderRadius: 8, border: "none", cursor: "pointer", fontSize: 12, fontWeight: cat === c ? 700 : 500, background: cat === c ? "rgba(109,40,217,0.45)" : "transparent", color: cat === c ? "var(--dpurple-text)" : "var(--dw4)", transition: "all 0.15s" }}>
+            <button key={c} onClick={() => setCat(c)} style={{ padding: "6px 14px", borderRadius: 8, border: "none", cursor: "pointer", fontSize: 12, fontWeight: cat === c ? 700 : 500, background: cat === c ? "var(--dsel-bg-l, rgba(109,40,217,0.45))" : "transparent", color: cat === c ? "var(--dsel-text-l, var(--dpurple-text))" : "var(--dw4)", transition: "all 0.15s" }}>
               {c}
             </button>
           ))}

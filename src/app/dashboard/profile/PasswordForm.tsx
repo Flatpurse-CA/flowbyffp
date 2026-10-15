@@ -33,12 +33,12 @@ function Form() {
   return (
     <form action={updateOwnPassword} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
       {error && (
-        <p style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", color: "rgb(248,113,113)", borderRadius: 10, padding: "10px 14px", fontSize: 12.5, margin: 0 }}>
+        <p style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", color: "var(--dred-text)", borderRadius: 10, padding: "10px 14px", fontSize: 12.5, margin: 0 }}>
           {decodeURIComponent(error)}
         </p>
       )}
       {success && (
-        <p style={{ background: "rgba(16,185,129,0.1)", border: "1px solid rgba(52,211,153,0.2)", color: "rgb(52,211,153)", borderRadius: 10, padding: "10px 14px", fontSize: 12.5, margin: 0 }}>
+        <p style={{ background: "rgba(16,185,129,0.1)", border: "1px solid rgba(52,211,153,0.2)", color: "var(--dgreen-text)", borderRadius: 10, padding: "10px 14px", fontSize: 12.5, margin: 0 }}>
           Password updated.
         </p>
       )}

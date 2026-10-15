@@ -82,7 +82,7 @@ export default function HelpPage() {
             style={{ ...card, padding: "18px 18px", textAlign: "left", cursor: "pointer", transition: "border-color 0.15s" }}
           >
             <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(109,40,217,0.18)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 12 }}>
-              <Icon size={16} strokeWidth={1.8} color="rgb(167,139,250)" />
+              <Icon size={16} strokeWidth={1.8} color="var(--dviolet-text)" />
             </div>
             <p style={{ color: "var(--dtext)", fontSize: 13.5, fontWeight: 700, margin: "0 0 4px" }}>{title}</p>
             <p style={{ color: "var(--dw35)", fontSize: 12, margin: 0 }}>{desc}</p>
@@ -126,7 +126,7 @@ export default function HelpPage() {
       {/* Contact support */}
       <div style={{ ...card, padding: "24px 26px", display: "flex", alignItems: "center", gap: 20 }}>
         <div style={{ width: 48, height: 48, borderRadius: 14, background: "rgba(109,40,217,0.2)", border: "1px solid rgba(139,92,246,0.25)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-          <MessageCircle size={22} strokeWidth={1.6} color="rgb(167,139,250)" />
+          <MessageCircle size={22} strokeWidth={1.6} color="var(--dviolet-text)" />
         </div>
         <div style={{ flex: 1 }}>
           <p style={{ color: "var(--dtext)", fontSize: 14, fontWeight: 700, margin: "0 0 3px" }}>Still need help?</p>

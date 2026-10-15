@@ -255,7 +255,7 @@ export function VerifyForm({ email, initialError }: { email: string; initialErro
             width: 600,
             height: 300,
             background:
-              "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(80,60,200,0.12) 0%, transparent 70%)",
+              "var(--auth-glow, radial-gradient(ellipse 80% 60% at 50% 0%, rgba(80,60,200,0.12) 0%, transparent 70%))",
             pointerEvents: "none",
           }}
         />

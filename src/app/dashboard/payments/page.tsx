@@ -18,11 +18,11 @@ function fmtPrice(n: number) {
 }
 
 const STATUS_COLOR: Record<string, { fg: string; bg: string }> = {
-  completed: { fg: "rgb(52,211,153)", bg: "rgba(16,185,129,0.1)" },
-  deposit:   { fg: "rgb(251,191,36)", bg: "rgba(245,158,11,0.1)" },
-  confirmed: { fg: "rgb(96,165,250)", bg: "rgba(59,130,246,0.1)" },
+  completed: { fg: "var(--dst-green-fg)", bg: "var(--dst-green-bg)" },
+  deposit:   { fg: "var(--dst-amber-fg)", bg: "var(--dst-amber-bg)" },
+  confirmed: { fg: "var(--dst-blue-fg)", bg: "var(--dst-blue-bg)" },
   pending:   { fg: "var(--dw45)",     bg: "var(--dw06)" },
-  cancelled: { fg: "rgb(248,113,113)", bg: "rgba(239,68,68,0.1)" },
+  cancelled: { fg: "var(--dst-red-fg)", bg: "var(--dst-red-bg)" },
 };
 
 export default async function PaymentsPage() {

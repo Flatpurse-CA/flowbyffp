@@ -181,6 +181,57 @@
      down to the app's own solid brand purple, which is already proven
      legible on white (it's the primary button fill). */
   --dpurple-text: rgb(196,181,253);
+
+  /* Accent TEXT/ICON colours. Dark values are the pastel literals the
+     dashboard always used; light mode swaps in deeper shades of the same hue,
+     since the pastels read as washed out (under 2:1) on white. */
+  --dgreen-text:  rgb(52,211,153);
+  --dred-text:    rgb(248,113,113);
+  --dviolet-text: rgb(167,139,250);
+  --damber-text:  rgb(251,191,36);
+  --dblue-text:   rgb(96,165,250);
+  --dorange-text: rgb(251,146,60);
+
+  /* Selected pill / active toggle. Used as var(--dsel-bg-l, <original dark
+     value>), so dark mode keeps its exact per-component look; only light mode
+     defines these (a solid fill instead of a translucent tint on white).
+     Reset to initial here so a [data-portal-theme="dark"] subtree inside a
+     light page falls back to the dark values too. */
+  --dsel-bg-l: initial;
+  --dsel-border-l: initial;
+  --dsel-text-l: initial;
+  --drow-sel-l: initial;
+  --dsel-red-l: initial;
+  --dbadge-green-l: initial;
+  --dbadge-amber-l: initial;
+  --dbadge-red-l: initial;
+  --dbadge-violet-l: initial;
+  --dcard-l: initial;
+  --dcard-border-l: initial;
+  --dalert-btn-l: initial;
+  --dalert-amber-btn-fg-l: initial;
+
+  /* Status badges: solid fill in light mode. */
+  --dbadge-red-bg:      rgba(239,68,68,0.1);
+  --dbadge-red-border:  rgba(239,68,68,0.2);
+  --dbadge-red-text:    rgb(248,113,113);
+
+  /* Dialog depth: the black glow suits dark but reads as a smudge on white.
+     Light-only overrides, same var(--x-l, <dark original>) pattern. */
+  --dshadow-l: initial;
+  --dscrim-l: initial;
+
+  /* Status badge fills: dark keeps the original tint, light is solid + white. */
+  --dst-green-bg: rgba(16,185,129,0.1);  --dst-green-fg: rgb(52,211,153);  --dst-green-border: rgba(16,185,129,0.2);
+  --dst-amber-bg: rgba(245,158,11,0.1);  --dst-amber-fg: rgb(251,191,36);  --dst-amber-border: rgba(245,158,11,0.2);
+  --dst-red-bg:   rgba(239,68,68,0.1);   --dst-red-fg:   rgb(248,113,113); --dst-red-border:   rgba(239,68,68,0.2);
+  --dst-blue-bg:  rgba(59,130,246,0.1);  --dst-blue-fg:  rgb(96,165,250);  --dst-blue-border:  rgba(59,130,246,0.2);
+  --dst-orange-bg: rgba(249,115,22,0.1); --dst-orange-fg: rgb(251,146,60); --dst-orange-border: rgba(249,115,22,0.2);
+  --dst-violet-bg: rgba(139,92,246,0.12); --dst-violet-fg: rgb(167,139,250); --dst-violet-border: rgba(139,92,246,0.25);
+
+  /* Palette colours (avatars, category tags, KPI icons) used as text are
+     mixed toward black by this much, so pastels stay legible on white. */
+  --ddeepen: 0%;
 }
 
 [data-portal-theme="light"] {
@@ -196,9 +247,11 @@
   --dsurface3: rgb(243,243,247);
 
   --dw015: rgba(0,0,0,0.035);
-  --dw02:  rgba(0,0,0,0.04);
+  /* --dw02/--dw03 are only ever used as fills (unselected pills, tabs):
+     solid white reads crisper than a grey wash on a white sheet. */
+  --dw02:  rgb(255,255,255);
   --dw025: rgba(0,0,0,0.045);
-  --dw03:  rgba(0,0,0,0.05);
+  --dw03:  rgb(246,246,249);
   --dw04:  rgba(0,0,0,0.06);
   --dw05:  rgba(0,0,0,0.07);
   --dw06:  rgba(0,0,0,0.08);
@@ -226,6 +279,46 @@
   --dw85:  rgba(0,0,0,0.74);
 
   --dpurple-text: rgb(109,40,217);
+
+  --dgreen-text:  rgb(4,120,87);
+  --dred-text:    rgb(200,30,30);
+  --dviolet-text: rgb(109,40,217);
+  --damber-text:  rgb(161,98,7);
+  --dblue-text:   rgb(29,78,216);
+  --dorange-text: rgb(194,65,12);
+
+  --dsel-bg-l:     rgb(109,40,217);
+  --dsel-border-l: rgb(109,40,217);
+  --dsel-text-l:   rgb(255,255,255);
+  --drow-sel-l:    rgb(241,236,255);
+  --dsel-red-l:    rgb(220,38,38);
+  /* Small status pills: solid fill + white text */
+  --dbadge-green-l:  rgb(5,150,105);
+  --dbadge-amber-l:  rgb(217,119,6);
+  --dbadge-red-l:    rgb(220,38,38);
+  --dbadge-violet-l: rgb(109,40,217);
+  /* Tinted info cards/strips become plain cards */
+  --dcard-l:        rgb(255,255,255);
+  --dcard-border-l: rgba(0,0,0,0.1);
+  /* Button sitting on a solid alert block */
+  --dalert-btn-l:   rgb(255,255,255);
+  --dalert-amber-btn-fg-l: rgb(180,83,9);
+
+  --dbadge-red-bg:      rgb(220,38,38);
+  --dbadge-red-border:  rgb(220,38,38);
+  --dbadge-red-text:    rgb(255,255,255);
+
+  --dshadow-l: 0 20px 60px rgba(17,12,46,0.16);
+  --dscrim-l:  rgba(17,12,46,0.4);
+
+  --dst-green-bg: rgb(5,150,105);   --dst-green-fg: rgb(255,255,255);  --dst-green-border: rgb(5,150,105);
+  --dst-amber-bg: rgb(217,119,6);   --dst-amber-fg: rgb(255,255,255);  --dst-amber-border: rgb(217,119,6);
+  --dst-red-bg:   rgb(220,38,38);   --dst-red-fg:   rgb(255,255,255);  --dst-red-border:   rgb(220,38,38);
+  --dst-blue-bg:  rgb(37,99,235);   --dst-blue-fg:  rgb(255,255,255);  --dst-blue-border:  rgb(37,99,235);
+  --dst-orange-bg: rgb(234,88,12);  --dst-orange-fg: rgb(255,255,255); --dst-orange-border: rgb(234,88,12);
+  --dst-violet-bg: rgb(109,40,217); --dst-violet-fg: rgb(255,255,255); --dst-violet-border: rgb(109,40,217);
+
+  --ddeepen: 42%;
 }
 
 /* ── Admin panel content tokens (data-admin-theme on <html>) ──
@@ -452,6 +545,16 @@ body {
   bottom: 24px;
   width: calc(100% - 40px);
 }
+/* Light card inside the light-mode dashboard; the black banner read as a
+   leftover from dark mode there. Public pages keep the original. */
+html[data-portal-theme="light"]:has(main.dashboard-main) .cookie-banner {
+  --cookie-bg: rgb(255,255,255);
+  --cookie-border: rgba(0,0,0,0.1);
+  --cookie-shadow: 0 12px 40px rgba(17,12,46,0.14);
+  --cookie-text: rgba(0,0,0,0.65);
+  --cookie-btn-bg: rgb(255,255,255);
+  --cookie-btn-text: rgba(0,0,0,0.7);
+}
 .cookie-banner-actions {
   display: flex;
   gap: 8px;
@@ -500,6 +603,11 @@ body {
   [data-theme="light"] .auth-mobile-gradient {
     display: none;
   }
+}
+
+/* Purple haze behind auth forms suits dark; on white it reads as a smudge. */
+[data-theme="light"] {
+  --auth-glow: none;
 }
 
 /* CSS Grid tracks default to a minimum size based on their content — a `1fr`
@@ -1059,4 +1167,12 @@ body {
     padding-left: 20px !important;
     padding-right: 20px !important;
   }
+}
+
+/* Tinted hero cards turn into solid brand purple in light mode. The element
+   itself is marked data-portal-theme="dark" so its contents keep the
+   white-on-colour treatment; the light ancestor still matches here. */
+[data-portal-theme="light"] .dhero-solid {
+  background: rgb(109,40,217) !important;
+  border-color: rgb(109,40,217) !important;
 }

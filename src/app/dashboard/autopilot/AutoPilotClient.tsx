@@ -6,27 +6,27 @@ import type { AutopilotState, FlowKey } from "./actions";
 
 const FLOWS: { id: FlowKey; icon: typeof Zap; color: string; bg: string; name: string; desc: string }[] = [
   {
-    id: "noshow", icon: RotateCcw, color: "rgb(248,113,113)", bg: "rgba(239,68,68,0.1)",
+    id: "noshow", icon: RotateCcw, color: "var(--dred-text)", bg: "rgba(239,68,68,0.1)",
     name: "No-show Recovery", desc: "Rebooks cancelled slots automatically within 30 min of a no-show.",
   },
   {
-    id: "filler", icon: Calendar, color: "rgb(251,191,36)", bg: "rgba(245,158,11,0.1)",
+    id: "filler", icon: Calendar, color: "var(--damber-text)", bg: "rgba(245,158,11,0.1)",
     name: "Last-Minute Slot Filler", desc: "Sends payment links to your waitlist when a gap opens up.",
   },
   {
-    id: "winback", icon: Zap, color: "rgb(167,139,250)", bg: "rgba(139,92,246,0.1)",
+    id: "winback", icon: Zap, color: "var(--dviolet-text)", bg: "rgba(139,92,246,0.1)",
     name: "30-Day Win-Back", desc: "Brings back lapsed clients who haven't booked in 30 days.",
   },
   {
-    id: "frontdesk", icon: MessageSquare, color: "rgb(96,165,250)", bg: "rgba(59,130,246,0.1)",
+    id: "frontdesk", icon: MessageSquare, color: "var(--dblue-text)", bg: "rgba(59,130,246,0.1)",
     name: "AI Front Desk", desc: "Answers DMs and books 24/7. Escalates when human touch is needed.",
   },
   {
-    id: "reminders", icon: Clock, color: "rgb(52,211,153)", bg: "rgba(16,185,129,0.1)",
+    id: "reminders", icon: Clock, color: "var(--dgreen-text)", bg: "rgba(16,185,129,0.1)",
     name: "Rebooking Reminders", desc: "Nudges clients at their usual rebook interval, before they go elsewhere.",
   },
   {
-    id: "birthday", icon: Gift, color: "rgb(251,146,60)", bg: "rgba(249,115,22,0.1)",
+    id: "birthday", icon: Gift, color: "var(--dorange-text)", bg: "rgba(249,115,22,0.1)",
     name: "Birthday & Occasion Offers", desc: "Per-client automated offers on birthdays and anniversaries.",
   },
 ];
@@ -51,7 +51,7 @@ export function AutoPilotClient({ state }: { state: AutopilotState }) {
 
         {/* Waiting hero */}
         <div style={{
-          background: "rgba(139,92,246,0.06)", border: "1px solid rgba(139,92,246,0.18)",
+          background: "var(--dcard-l, rgba(139,92,246,0.06))", border: "1px solid var(--dcard-border-l, rgba(139,92,246,0.18))",
           borderRadius: 20, padding: "40px 36px", textAlign: "center", marginBottom: 32,
         }}>
           <div style={{
@@ -60,7 +60,7 @@ export function AutoPilotClient({ state }: { state: AutopilotState }) {
             display: "flex", alignItems: "center", justifyContent: "center",
             margin: "0 auto 20px",
           }}>
-            <Zap size={28} color="rgb(167,139,250)" strokeWidth={2} />
+            <Zap size={28} color="var(--dviolet-text)" strokeWidth={2} />
           </div>
           <h1 style={{ color: "var(--dtext)", fontSize: 26, fontWeight: 800, margin: "0 0 10px", letterSpacing: "-0.03em" }}>
             Your AI team is ready to work
@@ -126,7 +126,7 @@ export function AutoPilotClient({ state }: { state: AutopilotState }) {
     <div style={{ maxWidth: 1280, margin: "0 auto", display: "flex", flexDirection: "column", gap: 22 }}>
 
       {/* Hero */}
-      <div style={{
+      <div className="dhero-solid" data-portal-theme="dark" style={{
         background: "rgba(109,40,217,0.22)",
         border: "1px solid rgba(139,92,246,0.25)", borderRadius: 20, padding: "28px 32px",
         display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 20,
@@ -134,7 +134,7 @@ export function AutoPilotClient({ state }: { state: AutopilotState }) {
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
             <div style={{ width: 8, height: 8, borderRadius: "50%", background: "rgb(52,211,153)", boxShadow: "0 0 0 4px rgba(16,185,129,0.2)" }} />
-            <span style={{ color: "rgb(52,211,153)", fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" }}>
+            <span style={{ color: "var(--dgreen-text)", fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" }}>
               AutoPilot live
             </span>
           </div>
@@ -182,7 +182,7 @@ export function AutoPilotClient({ state }: { state: AutopilotState }) {
                     {stats.count} action{stats.count === 1 ? "" : "s"} · {fmtPrice(stats.revenue)} contributed
                   </p>
                 </div>
-                <span style={{ fontSize: 10, fontWeight: 700, color: "rgb(52,211,153)", background: "rgba(16,185,129,0.1)", padding: "4px 10px", borderRadius: 20 }}>
+                <span style={{ fontSize: 10, fontWeight: 700, color: "var(--dsel-text-l, var(--dgreen-text))", background: "var(--dbadge-green-l, rgba(16,185,129,0.1))", padding: "4px 10px", borderRadius: 20 }}>
                   Running
                 </span>
               </div>
@@ -199,11 +199,11 @@ export function AutoPilotClient({ state }: { state: AutopilotState }) {
           <span style={{ color: "var(--dw5)", fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" }}>AI Front Desk today</span>
           <div style={{ display: "flex", gap: 20 }}>
             <div>
-              <p style={{ color: "rgb(96,165,250)", fontSize: 22, fontWeight: 800, margin: "0 0 2px" }}>{state.frontDeskToday.handled}</p>
+              <p style={{ color: "var(--dblue-text)", fontSize: 22, fontWeight: 800, margin: "0 0 2px" }}>{state.frontDeskToday.handled}</p>
               <p style={{ color: "var(--dw35)", fontSize: 11, margin: 0 }}>Handled</p>
             </div>
             <div>
-              <p style={{ color: "rgb(251,191,36)", fontSize: 22, fontWeight: 800, margin: "0 0 2px" }}>{state.frontDeskToday.escalated}</p>
+              <p style={{ color: "var(--damber-text)", fontSize: 22, fontWeight: 800, margin: "0 0 2px" }}>{state.frontDeskToday.escalated}</p>
               <p style={{ color: "var(--dw35)", fontSize: 11, margin: 0 }}>Escalated to you</p>
             </div>
           </div>
@@ -232,7 +232,7 @@ export function AutoPilotClient({ state }: { state: AutopilotState }) {
                   <p style={{ color: "var(--dw7)", fontSize: 12, margin: "0 0 3px", lineHeight: 1.4 }}>{ev.event_text}</p>
                   <div style={{ display: "flex", justifyContent: "space-between" }}>
                     <span style={{ color: "var(--dw25)", fontSize: 11 }}>{timeAgo(ev.created_at)}</span>
-                    {ev.amount != null && <span style={{ color: "rgb(52,211,153)", fontSize: 11, fontWeight: 700 }}>+{fmtPrice(Number(ev.amount))}</span>}
+                    {ev.amount != null && <span style={{ color: "var(--dgreen-text)", fontSize: 11, fontWeight: 700 }}>+{fmtPrice(Number(ev.amount))}</span>}
                   </div>
                 </div>
               </div>

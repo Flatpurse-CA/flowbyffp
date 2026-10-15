@@ -131,7 +131,7 @@ export function AccountClient({ customerName, bookings, dateOfBirth, cards }: { 
         </div>
 
         {error && (
-          <div style={{ padding: "10px 14px", borderRadius: 10, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", color: "rgb(185,28,28)", fontSize: 12.5, marginBottom: 16 }}>
+          <div style={{ padding: "10px 14px", borderRadius: 10, background: "rgb(220,38,38)", border: "1px solid rgb(220,38,38)", color: "white", fontSize: 12.5, marginBottom: 16 }}>
             {error}
           </div>
         )}

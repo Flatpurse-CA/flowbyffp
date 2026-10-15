@@ -8,6 +8,7 @@ import { inviteStaff, inviteExistingStaff, resendInvite, archiveStaff, getStaffH
 import type { AppointmentRow } from "../appointments/actions";
 import { computeStaffUtilization, computeRebookTrend, type MetricsAppointment } from "@/lib/dashboard/metrics";
 import { tint } from "@/lib/color";
+import { deepen } from "@/lib/dashboard/deepen";
 
 const PERIODS = ["This week", "This month", "90 days"] as const;
 type Period = typeof PERIODS[number];
@@ -35,7 +36,7 @@ function TrendChart({ data, avg, declining }: { data: number[]; avg: number; dec
   const pts = data.map((v, i) => `${x(i)},${y(v)}`).join(" ");
   const area = `0,${H} ` + pts + ` ${W},${H}`;
   const avgY = y(avg);
-  const color = declining ? "rgb(248,113,113)" : "rgb(52,211,153)";
+  const color = declining ? "var(--dred-text)" : "var(--dgreen-text)";
 
   return (
     <svg viewBox="0 0 100 48" preserveAspectRatio="none" style={{ width: "100%", height: 64 }}>
@@ -85,14 +86,14 @@ function AddStaffModal({ onClose, onCreated }: { onClose: () => void; onCreated:
   return (
     <div style={{
       position: "fixed", inset: 0, zIndex: 300,
-      background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)",
+      background: "var(--dscrim-l, rgba(0,0,0,0.7))", backdropFilter: "blur(4px)",
       display: "flex", alignItems: "center", justifyContent: "center",
     }} onClick={onClose}>
       <div style={{
         background: "var(--dm1)", border: "1px solid var(--dw1)",
         borderRadius: 22, width: "100%", maxWidth: 420,
         padding: "28px 28px 24px", margin: 20,
-        boxShadow: "0 24px 80px rgba(0,0,0,0.7)",
+        boxShadow: "var(--dshadow-l, 0 24px 80px rgba(0,0,0,0.7))",
       }} onClick={e => e.stopPropagation()}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
           <h2 style={{ color: "var(--dtext)", fontSize: 18, fontWeight: 800, margin: 0, letterSpacing: "-0.02em" }}>
@@ -116,7 +117,7 @@ function AddStaffModal({ onClose, onCreated }: { onClose: () => void; onCreated:
             <label style={{ color: "var(--dw4)", fontSize: 12, fontWeight: 500, display: "block", marginBottom: 7 }}>Role (optional)</label>
             <input value={role} onChange={e => setRole(e.target.value)} placeholder="e.g. Senior Stylist" style={inputStyle} />
           </div>
-          {error && <p style={{ color: "rgb(248,113,113)", fontSize: 12.5, margin: 0 }}>{error}</p>}
+          {error && <p style={{ color: "var(--dred-text)", fontSize: 12.5, margin: 0 }}>{error}</p>}
           <button onClick={handleSubmit} disabled={submitting} style={{
             padding: "12px 18px", borderRadius: 12, border: "none",
             background: "rgb(109,40,217)", color: "white", fontSize: 14, fontWeight: 700,
@@ -144,14 +145,14 @@ function AddEmailModal({ staffId, staffName, onClose, onSent }: { staffId: strin
   return (
     <div style={{
       position: "fixed", inset: 0, zIndex: 300,
-      background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)",
+      background: "var(--dscrim-l, rgba(0,0,0,0.7))", backdropFilter: "blur(4px)",
       display: "flex", alignItems: "center", justifyContent: "center",
     }} onClick={onClose}>
       <div style={{
         background: "var(--dm1)", border: "1px solid var(--dw1)",
         borderRadius: 22, width: "100%", maxWidth: 420,
         padding: "28px 28px 24px", margin: 20,
-        boxShadow: "0 24px 80px rgba(0,0,0,0.7)",
+        boxShadow: "var(--dshadow-l, 0 24px 80px rgba(0,0,0,0.7))",
       }} onClick={e => e.stopPropagation()}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
           <h2 style={{ color: "var(--dtext)", fontSize: 18, fontWeight: 800, margin: 0, letterSpacing: "-0.02em" }}>
@@ -167,7 +168,7 @@ function AddEmailModal({ staffId, staffName, onClose, onSent }: { staffId: strin
             <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="them@example.com" style={inputStyle} />
             <p style={{ color: "var(--dw3)", fontSize: 11, margin: "6px 0 0" }}>They&apos;ll get an email to set up their own login, scoped to their own bookings.</p>
           </div>
-          {error && <p style={{ color: "rgb(248,113,113)", fontSize: 12.5, margin: 0 }}>{error}</p>}
+          {error && <p style={{ color: "var(--dred-text)", fontSize: 12.5, margin: 0 }}>{error}</p>}
           <button
             onClick={async () => {
               if (!email.trim()) { setError("Email is required."); return; }
@@ -304,7 +305,7 @@ function StaffHoursCard({ staffId }: { staffId: string }) {
         })}
       </div>
       <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 10, marginTop: 14 }}>
-        {saved && <span style={{ color: "rgb(52,211,153)", fontSize: 11.5, fontWeight: 600 }}>Saved</span>}
+        {saved && <span style={{ color: "var(--dgreen-text)", fontSize: 11.5, fontWeight: 600 }}>Saved</span>}
         <button onClick={save} disabled={saving} style={{
           padding: "8px 18px", borderRadius: 9, background: "rgb(109,40,217)", border: "none",
           color: "white", fontSize: 12, fontWeight: 700, cursor: saving ? "default" : "pointer", opacity: saving ? 0.6 : 1,
@@ -426,7 +427,7 @@ export function TeamClient({ staff, appointments }: { staff: StaffRow[]; appoint
         </div>
 
         {resendError && (
-          <p style={{ color: "rgb(248,113,113)", fontSize: 12.5, margin: 0 }}>{resendError}</p>
+          <p style={{ color: "var(--dred-text)", fontSize: 12.5, margin: 0 }}>{resendError}</p>
         )}
 
         {/* Staff cards */}
@@ -453,7 +454,7 @@ export function TeamClient({ staff, appointments }: { staff: StaffRow[]; appoint
                 background: tint(row.color, 0.13),
                 border: `1.5px solid ${tint(row.color, 0.27)}`,
                 display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: 16, fontWeight: 800, color: row.color, flexShrink: 0,
+                fontSize: 16, fontWeight: 800, color: deepen(row.color), flexShrink: 0,
               }}>
                 {initialsFor(row.full_name)}
               </div>
@@ -464,8 +465,8 @@ export function TeamClient({ staff, appointments }: { staff: StaffRow[]; appoint
                   {row.role && <span style={{ color: "var(--dw3)", fontSize: 12 }}>{row.role}</span>}
                   {row.invite_status === "pending" && (
                     <span style={{
-                      fontSize: 10, fontWeight: 700, color: "rgb(251,191,36)",
-                      background: "rgba(245,158,11,0.1)", padding: "2px 8px", borderRadius: 20,
+                      fontSize: 10, fontWeight: 700, color: "var(--dsel-text-l, var(--damber-text))",
+                      background: "var(--dbadge-amber-l, rgba(245,158,11,0.1))", padding: "2px 8px", borderRadius: 20,
                     }}>
                       Invite pending
                     </span>
@@ -482,7 +483,7 @@ export function TeamClient({ staff, appointments }: { staff: StaffRow[]; appoint
                     <span style={{
                       display: "flex", alignItems: "center", gap: 4,
                       fontSize: 10, fontWeight: 700,
-                      color: "rgb(248,113,113)", background: "rgba(239,68,68,0.1)",
+                      color: "var(--dsel-text-l, var(--dred-text))", background: "var(--dbadge-red-l, rgba(239,68,68,0.1))",
                       padding: "2px 8px", borderRadius: 20,
                     }}>
                       <AlertTriangle size={9} /> Rebook rate dropping
@@ -494,7 +495,7 @@ export function TeamClient({ staff, appointments }: { staff: StaffRow[]; appoint
                     <span style={{ color: "var(--dtext)", fontWeight: 600 }}>{row.bookings}</span> bookings · {period.toLowerCase()}
                   </span>
                   <span style={{ color: "var(--dw4)", fontSize: 12 }}>
-                    <span style={{ color: "rgb(52,211,153)", fontWeight: 600 }}>{fmtPrice(row.revenue)}</span> revenue
+                    <span style={{ color: "var(--dgreen-text)", fontWeight: 600 }}>{fmtPrice(row.revenue)}</span> revenue
                   </span>
                   <span style={{ color: "var(--dw4)", fontSize: 12 }}>
                     <span style={{ color: "var(--dtext)", fontWeight: 600 }}>{row.utilizationPct}%</span> utilized
@@ -516,7 +517,7 @@ export function TeamClient({ staff, appointments }: { staff: StaffRow[]; appoint
                       position: "absolute", top: "calc(100% + 4px)", right: 0, zIndex: 10,
                       background: "var(--dm3)", border: "1px solid var(--dw1)",
                       borderRadius: 10, overflow: "hidden", minWidth: 140,
-                      boxShadow: "0 12px 32px rgba(0,0,0,0.5)",
+                      boxShadow: "var(--dshadow-l, 0 12px 32px rgba(0,0,0,0.5))",
                     }}
                   >
                     {row.invite_status === "pending" && (
@@ -537,7 +538,7 @@ export function TeamClient({ staff, appointments }: { staff: StaffRow[]; appoint
                     )}
                     <button onClick={() => handleArchive(row.id)} style={{
                       display: "block", width: "100%", textAlign: "left", padding: "9px 14px",
-                      background: "none", border: "none", color: "rgb(248,113,113)", fontSize: 12.5, cursor: "pointer",
+                      background: "none", border: "none", color: "var(--dred-text)", fontSize: 12.5, cursor: "pointer",
                     }}>
                       Remove from team
                     </button>
@@ -587,8 +588,8 @@ export function TeamClient({ staff, appointments }: { staff: StaffRow[]; appoint
                 <button key={p} onClick={() => setPeriod(p)} style={{
                   flex: 1, padding: "5px 0", borderRadius: 7, border: "none", cursor: "pointer",
                   fontSize: 11, fontWeight: period === p ? 700 : 500,
-                  background: period === p ? "rgba(139,92,246,0.35)" : "transparent",
-                  color: period === p ? "var(--dpurple-text)" : "var(--dw35)",
+                  background: period === p ? "var(--dsel-bg-l, rgba(139,92,246,0.35))" : "transparent",
+                  color: period === p ? "var(--dsel-text-l, var(--dpurple-text))" : "var(--dw35)",
                 }}>
                   {p}
                 </button>
@@ -620,13 +621,13 @@ export function TeamClient({ staff, appointments }: { staff: StaffRow[]; appoint
             {selectedRow.trend.declining && (
               <div style={{
                 display: "flex", alignItems: "center", gap: 8,
-                background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)",
+                background: "var(--dbadge-red-l, rgba(239,68,68,0.08))", border: "1px solid var(--dbadge-red-l, rgba(239,68,68,0.2))",
                 borderRadius: 10, padding: "10px 14px", marginBottom: 14,
               }}>
-                <AlertTriangle size={14} color="rgb(248,113,113)" />
+                <AlertTriangle size={14} color="var(--dsel-text-l, var(--dred-text))" />
                 <div>
-                  <p style={{ color: "rgb(248,113,113)", fontSize: 12, fontWeight: 700, margin: 0 }}>Needs attention</p>
-                  <p style={{ color: "rgba(248,113,113,0.7)", fontSize: 11, margin: 0 }}>Rebook rate dropping</p>
+                  <p style={{ color: "var(--dsel-text-l, var(--dred-text))", fontSize: 12, fontWeight: 700, margin: 0 }}>Needs attention</p>
+                  <p style={{ color: "var(--dsel-text-l, rgba(248,113,113,0.7))", fontSize: 11, margin: 0 }}>Rebook rate dropping</p>
                 </div>
               </div>
             )}
@@ -635,8 +636,8 @@ export function TeamClient({ staff, appointments }: { staff: StaffRow[]; appoint
                 8-week rebook trend
               </p>
               {selectedRow.trend.declining
-                ? <TrendingDown size={14} color="rgb(248,113,113)" />
-                : <TrendingUp size={14} color="rgb(52,211,153)" />
+                ? <TrendingDown size={14} color="var(--dred-text)" />
+                : <TrendingUp size={14} color="var(--dgreen-text)" />
               }
             </div>
             <TrendChart

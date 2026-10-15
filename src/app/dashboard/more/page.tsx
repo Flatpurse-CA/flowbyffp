@@ -29,10 +29,10 @@ function Row({ icon: Icon, label, sub, href, badge, danger, formAction }: {
         background: danger ? "rgba(239,68,68,0.1)" : "rgba(139,92,246,0.14)",
         display: "flex", alignItems: "center", justifyContent: "center",
       }}>
-        <Icon size={17} strokeWidth={1.8} color={danger ? "rgb(248,113,113)" : "var(--dpurple-text)"} />
+        <Icon size={17} strokeWidth={1.8} color={danger ? "var(--dred-text)" : "var(--dpurple-text)"} />
       </div>
       <div style={{ flex: 1, textAlign: "left" }}>
-        <div style={{ fontSize: 14, fontWeight: 600, color: danger ? "rgb(248,113,113)" : "var(--dtext2)" }}>{label}</div>
+        <div style={{ fontSize: 14, fontWeight: 600, color: danger ? "var(--dred-text)" : "var(--dtext2)" }}>{label}</div>
         {sub && <div style={{ fontSize: 12, color: "var(--dw4)", marginTop: 1 }}>{sub}</div>}
       </div>
       {badge != null && badge > 0 && (

@@ -288,7 +288,7 @@ export function BookingClient({ shop, services, staff, businessHours, initialCus
               <button onClick={() => setActiveTab("reviews")} style={{
                 display: "flex", alignItems: "center", gap: 5, fontSize: 12, fontWeight: 700,
                 padding: "3px 10px", borderRadius: 20, border: "none", cursor: "pointer",
-                background: "rgba(245,158,11,0.1)", color: "rgb(180,120,10)",
+                background: "rgb(217,119,6)", color: "white",
               }}>
                 <Star size={11} fill="currentColor" /> {avgRating.toFixed(1)} ({reviews.length})
               </button>
@@ -706,7 +706,7 @@ function AccountStep({ onBack, onAuthed }: { onBack: () => void; onAuthed: (c: C
         <p style={{ color: "var(--cust-text-sub)", fontSize: 14, margin: 0 }}>Your time slot is held while you do this.</p>
       </div>
 
-      {error && <div style={{ padding: "10px 13px", borderRadius: 10, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", color: "rgb(185,28,28)", fontSize: 12.5 }}>{error}</div>}
+      {error && <div style={{ padding: "10px 13px", borderRadius: 10, background: "rgb(220,38,38)", border: "1px solid rgb(220,38,38)", color: "white", fontSize: 12.5 }}>{error}</div>}
 
       {mode === "signup" && (
         <div>
@@ -783,7 +783,7 @@ function ConfirmStep({ service, staffName, time, customer, notes, setNotes, erro
         </span>
       </div>
 
-      {error && <div style={{ padding: "10px 13px", borderRadius: 10, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", color: "rgb(185,28,28)", fontSize: 12.5 }}>{error}</div>}
+      {error && <div style={{ padding: "10px 13px", borderRadius: 10, background: "rgb(220,38,38)", border: "1px solid rgb(220,38,38)", color: "white", fontSize: 12.5 }}>{error}</div>}
 
       <button onClick={onConfirm} disabled={submitting} style={{
         padding: "15px", borderRadius: 14, border: "none", background: ACCENT, color: "white",
@@ -851,7 +851,7 @@ function PayStep({ service, appointmentId, savedCards, initialClientSecret, init
       </div>
 
       {error && (
-        <div style={{ padding: "10px 13px", borderRadius: 10, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", color: "rgb(185,28,28)", fontSize: 12.5 }}>
+        <div style={{ padding: "10px 13px", borderRadius: 10, background: "rgb(220,38,38)", border: "1px solid rgb(220,38,38)", color: "white", fontSize: 12.5 }}>
           {error}. Your booking was still created and is waiting for the shop to confirm; you can pay later or contact them directly.
         </div>
       )}
@@ -887,7 +887,7 @@ function PayStep({ service, appointmentId, savedCards, initialClientSecret, init
       )}
 
       {mode === "new" && !loadingIntent && clientSecret && !stripePromise && (
-        <div style={{ padding: "10px 13px", borderRadius: 10, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", color: "rgb(185,28,28)", fontSize: 12.5 }}>
+        <div style={{ padding: "10px 13px", borderRadius: 10, background: "rgb(220,38,38)", border: "1px solid rgb(220,38,38)", color: "white", fontSize: 12.5 }}>
           Payments aren&apos;t configured on this deployment (missing publishable key). Your booking was still created.
         </div>
       )}
@@ -937,7 +937,7 @@ function DoneStep({ service, time, shop, appointmentId, onDone }: { service: Ser
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 20, textAlign: "center", padding: "20px 0" }}>
       <div style={{ width: 80, height: 80, borderRadius: "50%", background: "rgba(52,211,153,0.12)", border: "2px solid rgba(52,211,153,0.3)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <CheckCircle2 size={40} color="rgb(52,211,153)" strokeWidth={1.5} />
+        <CheckCircle2 size={40} color="rgb(5,150,105)" strokeWidth={1.5} />
       </div>
       <div>
         <h2 style={{ color: "var(--cust-text)", fontSize: 24, fontWeight: 800, margin: "0 0 6px", letterSpacing: "-0.02em" }}>Booking requested!</h2>
@@ -965,7 +965,7 @@ function DoneStep({ service, time, shop, appointmentId, onDone }: { service: Ser
               onClick={() => { navigator.clipboard.writeText(appointmentId); setCopied(true); setTimeout(() => setCopied(false), 1500); }}
               style={{ background: "none", border: "none", color: "var(--cust-text-sub)", cursor: "pointer", display: "flex", alignItems: "center", gap: 4, fontSize: 11, padding: 0 }}
             >
-              {copied ? <><Check size={12} color="rgb(52,211,153)" /> Copied</> : <><Copy size={12} /> Copy</>}
+              {copied ? <><Check size={12} color="rgb(5,150,105)" /> Copied</> : <><Copy size={12} /> Copy</>}
             </button>
           </div>
         )}

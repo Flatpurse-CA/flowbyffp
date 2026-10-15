@@ -8,6 +8,7 @@ import { computeStaffUtilization, computeHealthScore, type MetricsAppointment } 
 import { deriveClients, type ClientAppointment } from "@/lib/dashboard/clients";
 import { computeOpportunities } from "@/lib/dashboard/opportunities";
 import { tint } from "@/lib/color";
+import { deepen } from "@/lib/dashboard/deepen";
 
 const MODULES = ["Overview", "Revenue", "Team", "Clients", "AI", "Finance"] as const;
 type Module = typeof MODULES[number];
@@ -32,7 +33,7 @@ function KPITile({ label, value, sub, positive }: { label: string; value: string
     <div style={{ ...card, padding: "16px 18px" }}>
       <p style={{ color: "var(--dw35)", fontSize: 10, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 6px" }}>{label}</p>
       <p style={{ color: "var(--dtext)", fontSize: 22, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.03em" }}>{value}</p>
-      <p style={{ color: positive === false ? "rgb(248,113,113)" : "rgb(52,211,153)", fontSize: 11, margin: 0, display: "flex", alignItems: "center", gap: 3 }}>
+      <p style={{ color: positive === false ? "var(--dred-text)" : "var(--dgreen-text)", fontSize: 11, margin: 0, display: "flex", alignItems: "center", gap: 3 }}>
         {positive === false ? <TrendingDown size={11} /> : <TrendingUp size={11} />} {sub}
       </p>
     </div>
@@ -191,7 +192,7 @@ function Overview({ operationsScore, fillRate, retention, revenueGrowthScore, ai
             <div key={o.tag} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", background: "var(--dsurface1)", borderRadius: 10 }}>
               <span style={{ fontSize: 9, fontWeight: 800, color: o.color, background: tint(o.color, 0.09), padding: "3px 8px", borderRadius: 20, whiteSpace: "nowrap", letterSpacing: "0.06em" }}>{o.tag}</span>
               <span style={{ color: "var(--dw6)", fontSize: 13, flex: 1 }}>{o.text}</span>
-              {o.impact && <span style={{ color: "rgb(52,211,153)", fontSize: 12, fontWeight: 700, whiteSpace: "nowrap" }}>{o.impact}</span>}
+              {o.impact && <span style={{ color: "var(--dgreen-text)", fontSize: 12, fontWeight: 700, whiteSpace: "nowrap" }}>{o.impact}</span>}
             </div>
           ))}
         </div>
@@ -278,7 +279,7 @@ function Revenue({ appointments, now, thisMonthRevenue, autopilotRevenue, missed
                 <div style={{ flex: 1, height: 6, background: "var(--dsurface3)", borderRadius: 3 }}>
                   <div style={{ height: "100%", width: `${(s.revenue / maxServiceRevenue) * 100}%`, borderRadius: 3, background: "rgb(139,92,246)" }} />
                 </div>
-                <span style={{ color: "rgb(52,211,153)", fontSize: 12, fontWeight: 700, width: 72, textAlign: "right", flexShrink: 0 }}>{fmtPrice(s.revenue)}</span>
+                <span style={{ color: "var(--dgreen-text)", fontSize: 12, fontWeight: 700, width: 72, textAlign: "right", flexShrink: 0 }}>{fmtPrice(s.revenue)}</span>
               </div>
             ))}
           </div>
@@ -293,7 +294,7 @@ function TeamModule({ staff, metricsAppts, monthStart, now }: {
   staff: OperationsData["staff"]; metricsAppts: MetricsAppointment[]; monthStart: Date; now: Date;
 }) {
   if (staff.length === 0) {
-    return <Placeholder icon={<Users size={28} color="rgb(167,139,250)" />} title="Team" desc="Add team members on the Team page to see per-staff efficiency here." />;
+    return <Placeholder icon={<Users size={28} color="var(--dviolet-text)" />} title="Team" desc="Add team members on the Team page to see per-staff efficiency here." />;
   }
 
   const rows = staff.map(s => ({ ...s, ...computeStaffUtilization(metricsAppts, s.id, monthStart, now) }))
@@ -317,7 +318,7 @@ function TeamModule({ staff, metricsAppts, monthStart, now }: {
                 <div style={{ height: "100%", width: `${r.utilizationPct}%`, borderRadius: 3, background: r.utilizationPct > 85 ? "rgb(52,211,153)" : r.utilizationPct > 65 ? "rgb(251,191,36)" : "rgb(248,113,113)" }} />
               </div>
               <span style={{ color: "var(--dw5)", fontSize: 12, width: 44, textAlign: "right", flexShrink: 0 }}>{r.utilizationPct}%</span>
-              <span style={{ color: "rgb(52,211,153)", fontSize: 12, fontWeight: 700, width: 72, textAlign: "right", flexShrink: 0 }}>{fmtPrice(r.revenue)}</span>
+              <span style={{ color: "var(--dgreen-text)", fontSize: 12, fontWeight: 700, width: 72, textAlign: "right", flexShrink: 0 }}>{fmtPrice(r.revenue)}</span>
             </div>
           ))}
         </div>
@@ -336,10 +337,10 @@ function ClientsModule({ clients, appointments, now, retention }: {
   clients: ReturnType<typeof deriveClients>; appointments: ClientAppointment[]; now: Date; retention: number;
 }) {
   const segments = [
-    { label: "VIP", count: clients.filter(c => c.tag === "VIP").length, color: "rgb(251,191,36)" },
-    { label: "Loyal", count: clients.filter(c => c.tag === "Loyal").length, color: "rgb(52,211,153)" },
-    { label: "Overdue", count: clients.filter(c => c.tag === "Overdue").length, color: "rgb(96,165,250)" },
-    { label: "Churn risk", count: clients.filter(c => c.tag === "Churn risk").length, color: "rgb(248,113,113)" },
+    { label: "VIP", count: clients.filter(c => c.tag === "VIP").length, color: "var(--damber-text)" },
+    { label: "Loyal", count: clients.filter(c => c.tag === "Loyal").length, color: "var(--dgreen-text)" },
+    { label: "Overdue", count: clients.filter(c => c.tag === "Overdue").length, color: "var(--dblue-text)" },
+    { label: "Churn risk", count: clients.filter(c => c.tag === "Churn risk").length, color: "var(--dred-text)" },
   ];
 
   // 8 rolling weekly buckets: is each completed visit the client's first ever, or a repeat?
@@ -389,7 +390,7 @@ function ClientsModule({ clients, appointments, now, retention }: {
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
           {segments.map(s => (
             <div key={s.label} style={{ ...card, padding: "14px 16px" }}>
-              <p style={{ color: s.color, fontSize: 10, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", margin: "0 0 6px" }}>{s.label}</p>
+              <p style={{ color: deepen(s.color), fontSize: 10, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", margin: "0 0 6px" }}>{s.label}</p>
               <p style={{ color: "var(--dtext)", fontSize: 26, fontWeight: 800, margin: 0, letterSpacing: "-0.03em" }}>{s.count}</p>
             </div>
           ))}
@@ -437,7 +438,7 @@ function AIModule({ opportunities }: { opportunities: ReturnType<typeof computeO
             }}>
               <span style={{ fontSize: 9, fontWeight: 800, color: o.color, background: tint(o.color, 0.09), padding: "3px 8px", borderRadius: 20, whiteSpace: "nowrap", letterSpacing: "0.06em" }}>{o.tag}</span>
               <span style={{ color: "var(--dw7)", fontSize: 13, flex: 1 }}>{o.text}</span>
-              {o.impact && <span style={{ color: "rgb(52,211,153)", fontSize: 12, fontWeight: 700 }}>{o.impact}</span>}
+              {o.impact && <span style={{ color: "var(--dgreen-text)", fontSize: 12, fontWeight: 700 }}>{o.impact}</span>}
               <ChevronDown size={15} color="var(--dw3)" style={{ transform: isOpen ? "rotate(180deg)" : "none", transition: "transform 0.15s" }} />
             </button>
             {isOpen && (
@@ -527,7 +528,7 @@ function Finance({ data }: { data: OperationsData }) {
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
       {!data.stripeConnected && (
         <div style={{ ...card, display: "flex", alignItems: "center", gap: 10 }}>
-          <span style={{ fontSize: 10, fontWeight: 800, color: "rgb(251,191,36)", background: "rgba(245,158,11,0.12)", padding: "4px 10px", borderRadius: 20 }}>NO PAYOUT DATA</span>
+          <span style={{ fontSize: 10, fontWeight: 800, color: "var(--dsel-text-l, var(--damber-text))", background: "var(--dbadge-amber-l, rgba(245,158,11,0.12))", padding: "4px 10px", borderRadius: 20 }}>NO PAYOUT DATA</span>
           <span style={{ color: "var(--dw5)", fontSize: 12.5 }}>Connect Stripe in Settings to see real payout figures. Revenue/GST below are already real, computed from your bookings.</span>
         </div>
       )}

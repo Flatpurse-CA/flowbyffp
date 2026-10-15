@@ -112,7 +112,7 @@ export function PaymentMethodsSection({ cards }: { cards: SavedCard[] }) {
             <span style={{ color: "var(--cust-text-faint)", fontWeight: 400 }}>exp {c.expMonth}/{String(c.expYear).slice(-2)}</span>
           </span>
           {c.isDefault ? (
-            <span style={{ fontSize: 10.5, fontWeight: 700, color: "rgb(21,128,86)", background: "rgba(16,185,129,0.12)", padding: "3px 8px", borderRadius: 20 }}>Default</span>
+            <span style={{ fontSize: 10.5, fontWeight: 700, color: "white", background: "rgb(5,150,105)", padding: "3px 8px", borderRadius: 20 }}>Default</span>
           ) : (
             <button onClick={() => handleSetDefault(c.id)} disabled={busyId === c.id} title="Make default" style={{
               width: 28, height: 28, borderRadius: 8, border: "1px solid var(--cust-card-border)", background: "transparent",

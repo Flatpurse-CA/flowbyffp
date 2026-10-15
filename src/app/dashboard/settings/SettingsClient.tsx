@@ -89,9 +89,9 @@ function SaveBar({ onSave, onDiscard, saving, saved, error }: {
 } = {}) {
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8 }}>
-      {error && <span style={{ color: "rgb(248,113,113)", fontSize: 12.5 }}>{error}</span>}
+      {error && <span style={{ color: "var(--dred-text)", fontSize: 12.5 }}>{error}</span>}
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-        {saved && <span style={{ color: "rgb(52,211,153)", fontSize: 12.5, fontWeight: 600 }}>Saved</span>}
+        {saved && <span style={{ color: "var(--dgreen-text)", fontSize: 12.5, fontWeight: 600 }}>Saved</span>}
         <button onClick={onDiscard} style={{ padding: "10px 20px", borderRadius: 10, background: "var(--dsurface3)", border: "1px solid var(--dw09)", color: "var(--dw45)", fontSize: 13, cursor: "pointer" }}>Discard</button>
         <button onClick={onSave} disabled={saving} style={{ padding: "10px 24px", borderRadius: 10, background: "rgb(109,40,217)", border: "none", color: "white", fontSize: 13, fontWeight: 700, cursor: saving ? "default" : "pointer", opacity: saving ? 0.6 : 1 }}>
           {saving ? "Saving…" : "Save changes"}
@@ -438,10 +438,10 @@ export function SettingsClient({ shopId, initialBusinessHours, initialStripeConn
             onClick={() => setTab(label)}
             style={{
               display: "flex", alignItems: "center", gap: 6, padding: "8px 15px",
-              borderRadius: 10, border: `1px solid ${tab === label ? "rgba(139,92,246,0.4)" : "var(--dw08)"}`,
+              borderRadius: 10, border: `1px solid ${tab === label ? "var(--dsel-border-l, rgba(139,92,246,0.4))" : "var(--dw08)"}`,
               cursor: "pointer", fontSize: 12.5, fontWeight: tab === label ? 700 : 500,
-              background: tab === label ? "rgba(109,40,217,0.15)" : "var(--dw03)",
-              color: tab === label ? "var(--dpurple-text)" : "var(--dw4)",
+              background: tab === label ? "var(--dsel-bg-l, rgba(109,40,217,0.15))" : "var(--dw03)",
+              color: tab === label ? "var(--dsel-text-l, var(--dpurple-text))" : "var(--dw4)",
               transition: "all 0.15s",
             }}
           >
@@ -498,7 +498,7 @@ export function SettingsClient({ shopId, initialBusinessHours, initialStripeConn
                 <input ref={profileFileRef} type="file" accept="image/*" style={{ display: "none" }} onChange={e => { const f = e.target.files?.[0]; if (f) uploadImage("profile", f); e.target.value = ""; }} />
               </div>
             </div>
-            {imageError && <p style={{ color: "rgb(248,113,113)", fontSize: 12, margin: "10px 0 0" }}>{imageError}</p>}
+            {imageError && <p style={{ color: "var(--dred-text)", fontSize: 12, margin: "10px 0 0" }}>{imageError}</p>}
           </div>
 
           <div style={card}>
@@ -550,7 +550,7 @@ export function SettingsClient({ shopId, initialBusinessHours, initialStripeConn
                   borderRadius: 10, cursor: "pointer", fontSize: 13, transition: "all 0.2s", whiteSpace: "nowrap",
                   background: copied ? "rgba(52,211,153,0.12)" : "var(--dw06)",
                   border: `1px solid ${copied ? "rgba(52,211,153,0.3)" : "var(--dw1)"}`,
-                  color: copied ? "rgb(52,211,153)" : "var(--dw5)",
+                  color: copied ? "var(--dgreen-text)" : "var(--dw5)",
                 }}>
                   {copied ? <Check size={13} /> : <Copy size={13} />}
                   {copied ? "Copied!" : "Copy link"}
@@ -595,7 +595,7 @@ export function SettingsClient({ shopId, initialBusinessHours, initialStripeConn
                 <p style={{ color: "var(--dw45)", fontSize: 13, margin: "0 0 14px", lineHeight: 1.6 }}>
                   Connect Stripe to accept real card payments on your booking page and unlock AutoPilot.
                 </p>
-                {stripeError && <p style={{ color: "rgb(248,113,113)", fontSize: 12.5, margin: "0 0 12px" }}>{stripeError}</p>}
+                {stripeError && <p style={{ color: "var(--dred-text)", fontSize: 12.5, margin: "0 0 12px" }}>{stripeError}</p>}
                 <button onClick={connectStripe} disabled={connectingStripe} style={{
                   padding: "10px 20px", borderRadius: 10, border: "none",
                   background: "rgb(109,40,217)", color: "white", fontSize: 13, fontWeight: 700,
@@ -652,7 +652,7 @@ export function SettingsClient({ shopId, initialBusinessHours, initialStripeConn
           </div>
 
           <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 10 }}>
-            {hoursSaved && <span style={{ color: "rgb(52,211,153)", fontSize: 12.5, fontWeight: 600 }}>Saved</span>}
+            {hoursSaved && <span style={{ color: "var(--dgreen-text)", fontSize: 12.5, fontWeight: 600 }}>Saved</span>}
             <button onClick={saveBusinessHours} disabled={savingHours} style={{
               padding: "10px 24px", borderRadius: 10, border: "none",
               background: "rgb(109,40,217)", color: "white", fontSize: 13, fontWeight: 700,
@@ -708,7 +708,7 @@ export function SettingsClient({ shopId, initialBusinessHours, initialStripeConn
             {[
               { label: "Service",  value: "C$120.00",  color: undefined       },
               { label: `HST (${taxRate}%)`, value: taxInclusive ? "Included" : `C$${(120 * parseFloat(taxRate||"0") / 100).toFixed(2)}`, color: undefined },
-              { label: "Total",    value: taxInclusive ? "C$120.00" : `C$${(120 * (1 + parseFloat(taxRate||"0") / 100)).toFixed(2)}`, color: "rgb(52,211,153)" },
+              { label: "Total",    value: taxInclusive ? "C$120.00" : `C$${(120 * (1 + parseFloat(taxRate||"0") / 100)).toFixed(2)}`, color: "var(--dgreen-text)" },
             ].map(r => (
               <div key={r.label} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid var(--dw04)" }}>
                 <span style={{ color: "var(--dw45)", fontSize: 13 }}>{r.label}</span>
@@ -725,7 +725,7 @@ export function SettingsClient({ shopId, initialBusinessHours, initialStripeConn
       {tab === "AutoPilot" && (
         <>
           <div style={{ background: "rgba(139,92,246,0.06)", border: "1px solid rgba(139,92,246,0.18)", borderRadius: 16, padding: "18px 22px", display: "flex", alignItems: "center", gap: 14 }}>
-            <Zap size={20} color="rgb(167,139,250)" strokeWidth={2} />
+            <Zap size={20} color="var(--dviolet-text)" strokeWidth={2} />
             <div>
               <p style={{ color: "var(--dpurple-text)", fontSize: 13.5, fontWeight: 700, margin: "0 0 2px" }}>AutoPilot is active</p>
               <p style={{ color: "var(--dw38)", fontSize: 12.5, margin: 0 }}>Configure each flow below, changes take effect immediately.</p>
@@ -898,14 +898,14 @@ export function SettingsClient({ shopId, initialBusinessHours, initialStripeConn
           </div>
 
           {billingError && (
-            <p style={{ color: "rgb(248,113,113)", fontSize: 12.5, margin: 0 }}>{billingError}</p>
+            <p style={{ color: "var(--dred-text)", fontSize: 12.5, margin: 0 }}>{billingError}</p>
           )}
 
           {/* Founders banner */}
           {initialBilling?.foundersEligible && (
             <div style={{ background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.25)", borderRadius: 16, padding: "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
               <div>
-                <p style={{ color: "rgb(251,191,36)", fontSize: 13.5, fontWeight: 700, margin: "0 0 2px" }}>Founders Beta: {initialBilling.foundersSpotsRemaining} spots left</p>
+                <p style={{ color: "var(--damber-text)", fontSize: 13.5, fontWeight: 700, margin: "0 0 2px" }}>Founders Beta: {initialBilling.foundersSpotsRemaining} spots left</p>
                 <p style={{ color: "var(--dw45)", fontSize: 12.5, margin: 0 }}>40% off your first 12 months on Pro or Pro+, then 25% off forever. Applies automatically at checkout.</p>
               </div>
             </div>
@@ -916,9 +916,9 @@ export function SettingsClient({ shopId, initialBusinessHours, initialStripeConn
             {(["monthly", "annual"] as BillingInterval[]).map(iv => (
               <button key={iv} onClick={() => setBillingInterval(iv)} style={{
                 padding: "7px 16px", borderRadius: 20, cursor: "pointer", fontSize: 12.5, fontWeight: 700,
-                border: `1px solid ${billingInterval === iv ? "rgba(139,92,246,0.4)" : "var(--dw08)"}`,
-                background: billingInterval === iv ? "rgba(109,40,217,0.15)" : "var(--dw03)",
-                color: billingInterval === iv ? "var(--dpurple-text)" : "var(--dw4)",
+                border: `1px solid ${billingInterval === iv ? "var(--dsel-border-l, rgba(139,92,246,0.4))" : "var(--dw08)"}`,
+                background: billingInterval === iv ? "var(--dsel-bg-l, rgba(109,40,217,0.15))" : "var(--dw03)",
+                color: billingInterval === iv ? "var(--dsel-text-l, var(--dpurple-text))" : "var(--dw4)",
               }}>
                 {iv === "monthly" ? "Monthly" : "Annual"}
               </button>

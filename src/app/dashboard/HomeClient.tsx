@@ -11,6 +11,7 @@ import type { AutopilotState } from "./autopilot/actions";
 import type { NeedsYouCard } from "./daily-brief/actions";
 import { useDashboardTheme } from "./theme-context";
 import { tint } from "@/lib/color";
+import { deepen } from "@/lib/dashboard/deepen";
 
 // ─── Animated counter ─────────────────────────────────────────────────────────
 function AnimCount({ target, prefix = "", suffix = "", duration = 1400 }: {
@@ -37,7 +38,7 @@ function AnimCount({ target, prefix = "", suffix = "", duration = 1400 }: {
 }
 
 // ─── Pulse ring ───────────────────────────────────────────────────────────────
-function PulseRing({ color = "rgb(52,211,153)", size = 10 }: { color?: string; size?: number }) {
+function PulseRing({ color = "var(--dgreen-text)", size = 10 }: { color?: string; size?: number }) {
   return (
     <span style={{ position: "relative", display: "inline-flex", alignItems: "center", justifyContent: "center", width: size, height: size }}>
       <span style={{
@@ -77,18 +78,18 @@ function fmtTime(iso: string) {
 function statusLabel(dark: boolean): Record<AppointmentStatus, { label: string; color: string; bg: string }> {
   return {
     completed: { label: "Done",      color: dark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.43)", bg: dark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.07)" },
-    confirmed: { label: "Confirmed", color: "rgb(52,211,153)",                                     bg: "rgba(16,185,129,0.1)"   },
+    confirmed: { label: "Confirmed", color: "var(--dst-green-fg)", bg: "var(--dst-green-bg)"},
     pending:   { label: "Pending",   color: dark ? "rgba(255,255,255,0.5)"  : "rgba(0,0,0,0.55)",  bg: dark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.08)" },
-    deposit:   { label: "⚠ Deposit", color: "rgb(251,191,36)",                                     bg: "rgba(245,158,11,0.1)"   },
+    deposit:   { label: "⚠ Deposit", color: "var(--dst-amber-fg)", bg: "var(--dst-amber-bg)"},
     cancelled: { label: "Cancelled", color: dark ? "rgba(255,255,255,0.25)" : "rgba(0,0,0,0.32)",  bg: dark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.045)" },
     no_show:   { label: "No-show",   color: "white", bg: "rgb(180,83,9)" },
   };
 }
-const UP_NEXT = { label: "Up next", color: "rgb(139,92,246)", bg: "rgba(109,40,217,0.14)" };
+const UP_NEXT = { label: "Up next", color: "var(--dst-violet-fg)", bg: "var(--dst-violet-bg)" };
 
 function cardStyle(dark: boolean): React.CSSProperties {
   return {
-    background: dark ? "rgba(255,255,255,0.025)" : "rgba(0,0,0,0.02)",
+    background: dark ? "rgba(255,255,255,0.025)" : "rgb(255,255,255)",
     border: dark ? "1px solid rgba(255,255,255,0.07)" : "1px solid rgba(0,0,0,0.09)",
     borderRadius: 18,
     overflow: "hidden",
@@ -118,9 +119,9 @@ export function HomeClient(props: OwnerProps | StaffProps) {
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <p style={{ color: dark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.48)", fontSize: 13, margin: 0 }}>{dateStr}</p>
-        <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 12px", borderRadius: 30, background: "rgba(52,211,153,0.1)", border: "1px solid rgba(52,211,153,0.2)" }}>
-          <PulseRing size={7} />
-          <span style={{ fontSize: 11.5, fontWeight: 700, color: "rgb(52,211,153)" }}>Live</span>
+        <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 12px", borderRadius: 30, background: "var(--dbadge-green-l, rgba(52,211,153,0.1))", border: "1px solid var(--dbadge-green-l, rgba(52,211,153,0.2))" }}>
+          <PulseRing size={7} color="var(--dsel-text-l, var(--dgreen-text))" />
+          <span style={{ fontSize: 11.5, fontWeight: 700, color: "var(--dsel-text-l, var(--dgreen-text))" }}>Live</span>
         </div>
       </div>
 
@@ -173,7 +174,7 @@ function ScheduleRow({ row, isUpNext }: { row: AppointmentRow; isUpNext: boolean
         width: 34, height: 34, borderRadius: "50%", flexShrink: 0,
         background: tint(color, 0.13), border: `1.5px solid ${tint(color, 0.27)}`,
         display: "flex", alignItems: "center", justifyContent: "center",
-        fontSize: 11, fontWeight: 800, color,
+        fontSize: 11, fontWeight: 800, color: deepen(color),
       }}>
         {initialsFor(row.client_name)}
       </div>
@@ -184,7 +185,7 @@ function ScheduleRow({ row, isUpNext }: { row: AppointmentRow; isUpNext: boolean
       <span className="schedule-row-badge" style={{ fontSize: 10.5, fontWeight: 700, padding: "3px 9px", borderRadius: 20, color: s.color, background: s.bg, whiteSpace: "nowrap", flexShrink: 0 }}>
         {s.label}
       </span>
-      <span style={{ color: "rgb(52,211,153)", fontSize: 13, fontWeight: 700, flexShrink: 0, minWidth: 46, textAlign: "right" }}>
+      <span style={{ color: "var(--dgreen-text)", fontSize: 13, fontWeight: 700, flexShrink: 0, minWidth: 46, textAlign: "right" }}>
         {fmtPrice(Number(row.price))}
       </span>
     </div>
@@ -200,12 +201,12 @@ function EmptyState() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
       {/* Compact AutoPilot balance card — bold solid fill, no gradient */}
-      <div style={{
+      <div data-portal-theme="dark" style={{
         background: "rgb(109,40,217)",
         borderRadius: 20, padding: "20px 24px",
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-          <PulseRing color="rgb(52,211,153)" size={7} />
+          <PulseRing color="var(--dgreen-text)" size={7} />
           <span style={{ color: "rgb(180,246,214)", fontSize: 10.5, fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase" }}>
             AutoPilot is watching
           </span>
@@ -274,7 +275,7 @@ function OwnerPopulated(props: OwnerProps) {
     <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
 
       {/* Hero: AutoPilot — bold solid fill, no gradient */}
-      <div style={{
+      <div data-portal-theme="dark" style={{
         background: "rgb(109,40,217)",
         borderRadius: 20, padding: "22px 24px",
         position: "relative",
@@ -322,7 +323,7 @@ function OwnerPopulated(props: OwnerProps) {
           <div style={{ ...card, padding: "20px 20px 18px", cursor: "pointer" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
               <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(139,92,246,0.12)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <CalendarDays size={17} color="rgb(167,139,250)" strokeWidth={1.8} />
+                <CalendarDays size={17} color="var(--dviolet-text)" strokeWidth={1.8} />
               </div>
               <ChevronRight size={15} color={faintChevron} />
             </div>
@@ -336,7 +337,7 @@ function OwnerPopulated(props: OwnerProps) {
           <div style={{ ...card, padding: "20px 20px 18px", cursor: "pointer", border: needsYou.length > 0 ? "1px solid rgba(248,113,113,0.22)" : card.border }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
               <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(239,68,68,0.1)", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
-                <AlertTriangle size={17} color="rgb(248,113,113)" strokeWidth={1.8} />
+                <AlertTriangle size={17} color="var(--dred-text)" strokeWidth={1.8} />
                 {needsYou.length > 0 && (
                   <span style={{ position: "absolute", top: -4, right: -4, minWidth: 16, height: 16, borderRadius: 8, background: "rgb(239,68,68)", color: "white", fontSize: 9, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center" }}>
                     {needsYou.length}
@@ -346,7 +347,7 @@ function OwnerPopulated(props: OwnerProps) {
               <ChevronRight size={15} color={faintChevron} />
             </div>
             <p style={{ color: labelColor, fontSize: 10, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 6px" }}>NEEDS YOUR EYES</p>
-            <p style={{ color: needsYou.length > 0 ? "rgb(248,113,113)" : primaryText, fontSize: 28, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.04em" }}>{needsYou.length}</p>
+            <p style={{ color: needsYou.length > 0 ? "var(--dred-text)" : primaryText, fontSize: 28, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.04em" }}>{needsYou.length}</p>
             <p style={{ color: labelColor, fontSize: 12, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{topNeed ? topNeed.text : "All clear"}</p>
           </div>
         </Link>
@@ -355,13 +356,13 @@ function OwnerPopulated(props: OwnerProps) {
           <div style={{ ...card, padding: "20px 20px 18px", cursor: "pointer" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
               <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(59,130,246,0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <BarChart2 size={17} color="rgb(96,165,250)" strokeWidth={1.8} />
+                <BarChart2 size={17} color="var(--dblue-text)" strokeWidth={1.8} />
               </div>
               <ChevronRight size={15} color={faintChevron} />
             </div>
             <p style={{ color: labelColor, fontSize: 10, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 6px" }}>THIS MONTH</p>
             <p style={{ color: primaryText, fontSize: 28, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.04em" }}>{fmtPrice(monthRevenue)}</p>
-            <p style={{ color: monthRevenueDeltaPct == null ? labelColor : monthRevenueDeltaPct >= 0 ? "rgb(52,211,153)" : "rgb(248,113,113)", fontSize: 12, margin: 0 }}>
+            <p style={{ color: monthRevenueDeltaPct == null ? labelColor : monthRevenueDeltaPct >= 0 ? "var(--dgreen-text)" : "var(--dred-text)", fontSize: 12, margin: 0 }}>
               {monthRevenueDeltaPct == null ? "No data last month" : `${monthRevenueDeltaPct >= 0 ? "+" : ""}${monthRevenueDeltaPct}% vs last month`}
             </p>
           </div>
@@ -374,18 +375,18 @@ function OwnerPopulated(props: OwnerProps) {
         <div style={card}>
           <div style={{ padding: "18px 20px 14px", borderBottom: dark ? "1px solid rgba(255,255,255,0.05)" : "1px solid rgba(0,0,0,0.07)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <p style={{ color: primaryText, fontSize: 15, fontWeight: 700, margin: 0 }}>Today&apos;s Schedule</p>
-            <Link href="/dashboard/appointments" style={{ display: "flex", alignItems: "center", gap: 4, color: "rgb(167,139,250)", fontSize: 12, fontWeight: 600, textDecoration: "none" }}>
+            <Link href="/dashboard/appointments" style={{ display: "flex", alignItems: "center", gap: 4, color: "var(--dviolet-text)", fontSize: 12, fontWeight: 600, textDecoration: "none" }}>
               View all <ChevronRight size={13} />
             </Link>
           </div>
 
           {paymentNeed && (
-            <div style={{ margin: "12px 16px 0", padding: "11px 14px", background: "rgba(245,158,11,0.07)", border: "1px solid rgba(245,158,11,0.2)", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+            <div style={{ margin: "12px 16px 0", padding: "11px 14px", background: "var(--dbadge-amber-l, rgba(245,158,11,0.07))", border: "1px solid var(--dbadge-amber-l, rgba(245,158,11,0.2))", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
               <div style={{ display: "flex", alignItems: "flex-start", gap: 9 }}>
-                <AlertTriangle size={14} color="rgb(251,191,36)" strokeWidth={2} style={{ flexShrink: 0, marginTop: 1 }} />
-                <p style={{ color: dark ? "rgba(255,255,255,0.6)" : "rgba(0,0,0,0.65)", fontSize: 12.5, margin: 0, lineHeight: 1.5 }}>{paymentNeed.text}</p>
+                <AlertTriangle size={14} color="var(--dsel-text-l, var(--damber-text))" strokeWidth={2} style={{ flexShrink: 0, marginTop: 1 }} />
+                <p style={{ color: dark ? "rgba(255,255,255,0.6)" : "rgb(255,255,255)", fontWeight: dark ? 400 : 600, fontSize: 12.5, margin: 0, lineHeight: 1.5 }}>{paymentNeed.text}</p>
               </div>
-              <Link href="/dashboard/daily-brief" style={{ padding: "7px 13px", borderRadius: 9, flexShrink: 0, background: "rgb(245,158,11)", color: "rgb(10,8,0)", fontSize: 12, fontWeight: 700, whiteSpace: "nowrap", textDecoration: "none" }}>
+              <Link href="/dashboard/daily-brief" style={{ padding: "7px 13px", borderRadius: 9, flexShrink: 0, background: "var(--dalert-btn-l, rgb(245,158,11))", color: "var(--dalert-amber-btn-fg-l, rgb(10,8,0))", fontSize: 12, fontWeight: 700, whiteSpace: "nowrap", textDecoration: "none" }}>
                 View
               </Link>
             </div>
@@ -410,9 +411,9 @@ function OwnerPopulated(props: OwnerProps) {
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {[
                 { label: "+ New booking",  href: "/dashboard/appointments", color: "rgb(109,40,217)",                                     text: "white" },
-                { label: "Go to Clients",  href: "/dashboard/clients",      color: dark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)",  text: dark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.68)" },
-                { label: "View AutoPilot", href: "/dashboard/autopilot",    color: dark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)",  text: dark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.68)" },
-                { label: "View Team",      href: "/dashboard/team",         color: dark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)",  text: dark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.68)" },
+                { label: "Go to Clients",  href: "/dashboard/clients",      color: dark ? "rgba(255,255,255,0.05)" : "rgb(255,255,255)",  text: dark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.78)" },
+                { label: "View AutoPilot", href: "/dashboard/autopilot",    color: dark ? "rgba(255,255,255,0.05)" : "rgb(255,255,255)",  text: dark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.78)" },
+                { label: "View Team",      href: "/dashboard/team",         color: dark ? "rgba(255,255,255,0.05)" : "rgb(255,255,255)",  text: dark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.78)" },
               ].map(a => (
                 <Link key={a.label} href={a.href} style={{ display: "block", padding: "10px 14px", borderRadius: 10, background: a.color, border: dark ? "1px solid rgba(255,255,255,0.07)" : "1px solid rgba(0,0,0,0.09)", color: a.text, fontSize: 13, fontWeight: 700, textDecoration: "none", textAlign: "center" }}>
                   {a.label}
@@ -421,16 +422,16 @@ function OwnerPopulated(props: OwnerProps) {
             </div>
           </div>
 
-          <div style={{ background: "rgba(139,92,246,0.06)", border: "1px solid rgba(139,92,246,0.2)", borderRadius: 14, padding: "16px 18px" }}>
+          <div style={{ background: "var(--dcard-l, rgba(139,92,246,0.06))", border: "1px solid var(--dcard-border-l, rgba(139,92,246,0.2))", borderRadius: 14, padding: "16px 18px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
-              <PulseRing size={6} color="rgb(167,139,250)" />
+              <PulseRing size={6} color="var(--dviolet-text)" />
               <span style={{ color: labelColor, fontSize: 10, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase" }}>Needs your attention</span>
             </div>
             <p style={{ color: dark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.68)", fontSize: 12.5, margin: "0 0 10px", lineHeight: 1.55 }}>
               {topNeed ? topNeed.text : "You're all caught up. Nothing needs your attention right now."}
             </p>
             {topNeed && (
-              <Link href="/dashboard/daily-brief" style={{ display: "inline-block", padding: "7px 14px", borderRadius: 9, border: "1px solid rgba(139,92,246,0.3)", background: "rgba(139,92,246,0.1)", color: "rgb(167,139,250)", fontSize: 12, fontWeight: 700, textDecoration: "none" }}>
+              <Link href="/dashboard/daily-brief" style={{ display: "inline-block", padding: "7px 14px", borderRadius: 9, border: "1px solid var(--dsel-border-l, rgba(139,92,246,0.3))", background: "var(--dcard-l, rgba(139,92,246,0.1))", color: "var(--dviolet-text)", fontSize: 12, fontWeight: 700, textDecoration: "none" }}>
                 View details →
               </Link>
             )}

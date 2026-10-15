@@ -1,4 +1,5 @@
 import { TrendingUp, TrendingDown, Zap, DollarSign, Users, CalendarDays } from "lucide-react";
+import { deepen } from "@/lib/dashboard/deepen";
 
 // ─── SVG Line Chart ───────────────────────────────────────────────────────────
 
@@ -94,7 +95,7 @@ export default function ReportsPage() {
         </div>
         <div className="reports-period-switch" style={{ display: "flex", gap: 2, background: "var(--dsurface2)", border: "1px solid var(--dw07)", borderRadius: 10, padding: 3 }}>
           {["30 days", "6 months", "12 months"].map((p, i) => (
-            <button key={p} style={{ padding: "6px 14px", borderRadius: 7, border: "none", cursor: "pointer", fontSize: 12, fontWeight: i === 2 ? 700 : 400, background: i === 2 ? "rgba(109,40,217,0.4)" : "transparent", color: i === 2 ? "var(--dpurple-text)" : "var(--dw38)" }}>
+            <button key={p} style={{ padding: "6px 14px", borderRadius: 7, border: "none", cursor: "pointer", fontSize: 12, fontWeight: i === 2 ? 700 : 400, background: i === 2 ? "var(--dsel-bg-l, rgba(109,40,217,0.4))" : "transparent", color: i === 2 ? "var(--dsel-text-l, var(--dpurple-text))" : "var(--dw38)" }}>
               {p}
             </button>
           ))}
@@ -113,11 +114,11 @@ export default function ReportsPage() {
             <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 12 }}>
               <p style={{ color: "var(--dw38)", fontSize: 12, margin: 0 }}>{label}</p>
               <div style={{ width: 32, height: 32, borderRadius: 9, background: bg, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <Icon size={15} strokeWidth={1.8} color={c} />
+                <Icon size={15} strokeWidth={1.8} color={deepen(c)} />
               </div>
             </div>
             <p style={{ color: "var(--dtext)", fontSize: 28, fontWeight: 800, margin: "0 0 6px", letterSpacing: "-0.04em", lineHeight: 1 }}>{value}</p>
-            <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 7px", borderRadius: 20, color: up ? "rgb(52,211,153)" : "rgb(248,113,113)", background: up ? "rgba(16,185,129,0.1)" : "rgba(239,68,68,0.1)", display: "inline-flex", alignItems: "center", gap: 3 }}>
+            <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 7px", borderRadius: 20, color: up ? "var(--dsel-text-l, var(--dgreen-text))" : "var(--dsel-text-l, var(--dred-text))", background: up ? "var(--dbadge-green-l, rgba(16,185,129,0.1))" : "var(--dbadge-red-l, rgba(239,68,68,0.1))", display: "inline-flex", alignItems: "center", gap: 3 }}>
               {up ? <TrendingUp size={9} /> : <TrendingDown size={9} />}
               {change}
             </span>
@@ -135,9 +136,9 @@ export default function ReportsPage() {
               <p style={{ color: "var(--dtext)", fontSize: 14, fontWeight: 700, margin: "0 0 3px" }}>Revenue performance</p>
               <p style={{ color: "var(--dw3)", fontSize: 12, margin: 0 }}>Monthly revenue Jul 2025 – Jun 2026</p>
             </div>
-            <p style={{ color: "rgb(52,211,153)", fontSize: 22, fontWeight: 800, margin: 0, letterSpacing: "-0.03em" }}>C${totalRevenue.toLocaleString()}</p>
+            <p style={{ color: "var(--dgreen-text)", fontSize: 22, fontWeight: 800, margin: 0, letterSpacing: "-0.03em" }}>C${totalRevenue.toLocaleString()}</p>
           </div>
-          <LineChart data={MONTHLY_REVENUE} labels={MONTH_LABELS} color="rgb(52,211,153)" />
+          <LineChart data={MONTHLY_REVENUE} labels={MONTH_LABELS} color="var(--dgreen-text)" />
         </div>
 
         {/* Top services */}
@@ -173,9 +174,9 @@ export default function ReportsPage() {
         {/* Fixed dark-purple card regardless of theme — text below stays literal
             white, not var(--dtext), since that token would go near-black in
             light mode and disappear against this permanently-dark surface. */}
-        <div style={{ ...card, background: "rgb(23,14,58)", border: "1px solid rgba(139,92,246,0.2)" }}>
+        <div data-portal-theme="dark" style={{ ...card, background: "rgb(23,14,58)", border: "1px solid rgba(139,92,246,0.2)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 18 }}>
-            <Zap size={16} strokeWidth={2} color="rgb(167,139,250)" />
+            <Zap size={16} strokeWidth={2} color="var(--dviolet-text)" />
             <p style={{ color: "rgb(250,250,250)", fontSize: 14, fontWeight: 700, margin: 0 }}>AutoPilot impact</p>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>

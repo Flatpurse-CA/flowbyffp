@@ -64,7 +64,7 @@ export function DailyBriefClient({ data }: { data: DailyBriefData }) {
                   borderRadius: 14, padding: "14px 16px",
                 }}>
                   <div style={{ width: 34, height: 34, borderRadius: 10, background: "rgba(239,68,68,0.12)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                    <Icon size={16} color="rgb(248,113,113)" strokeWidth={2} />
+                    <Icon size={16} color="var(--dred-text)" strokeWidth={2} />
                   </div>
                   <span style={{ color: "var(--dw75)", fontSize: 13.5, flex: 1 }}>{item.text}</span>
                 </Link>
