@@ -3,8 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
-import { loadAccounts, needsShopSetup, type Account } from "@/lib/admin/accounts";
-import { sendShopSetupReminderEmail } from "@/lib/resend";
+import { loadAccounts, needsShopSetup } from "@/lib/admin/accounts";
+import { sendReminder } from "@/lib/admin/setupReminders";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { requireAdmin, logAdminAction } from "@/lib/admin-guard";
 
@@ -181,8 +181,9 @@ export async function setUnlimited(formData: FormData) {
 }
 
 // ─── "Finish setting up your shop" reminders ─────────────────────────────────
-// For owners who signed up (verified email, owner profile) but never created a
-// shop. Logging in sends them straight to /signup/shop (dashboard layout).
+// Manual sends from the admin Users page. The same email also goes out
+// automatically (src/lib/admin/setupReminders.ts, daily cron); both share
+// sendReminder() so the count and last-sent time stay in one place.
 
 const REMINDER_COOLDOWN_MS = 3 * 24 * 60 * 60 * 1000;
 
@@ -192,27 +193,12 @@ async function loginUrl(): Promise<string> {
   return `${host.startsWith("localhost") ? "http" : "https"}://${host}/login`;
 }
 
-async function remind(a: Account, url: string): Promise<boolean> {
-  const firstName = a.name?.split(" ")[0] || "there";
-  try {
-    const { error } = await sendShopSetupReminderEmail(a.user.email!, { firstName, loginUrl: url });
-    if (error) return false;
-  } catch {
-    return false;
-  }
-  const admin = createAdminClient();
-  await admin.auth.admin.updateUserById(a.user.id, {
-    app_metadata: { ...a.user.app_metadata, setup_reminder_sent_at: new Date().toISOString() },
-  });
-  return true;
-}
-
 export async function sendSetupReminder(formData: FormData): Promise<void> {
   const { email } = await requireAdmin();
   const userId = formData.get("userId") as string;
   const account = (await loadAccounts()).find(a => a.user.id === userId);
   if (!account || !needsShopSetup(account)) return;
-  const ok = await remind(account, await loginUrl());
+  const ok = await sendReminder(account, await loginUrl());
   await logAdminAction(email, "send_setup_reminder", "user", userId, { ok });
   revalidatePath("/admin/users", "layout");
 }
@@ -225,7 +211,7 @@ export async function sendSetupRemindersToAll(): Promise<{ sent: number; skipped
   for (const a of (await loadAccounts()).filter(needsShopSetup)) {
     // Skip anyone reminded recently, so a double click can't spam people.
     if (a.setupReminderSentAt && now - new Date(a.setupReminderSentAt).getTime() < REMINDER_COOLDOWN_MS) { skipped++; continue; }
-    if (await remind(a, url)) sent++; else failed++;
+    if (await sendReminder(a, url)) sent++; else failed++;
   }
   await logAdminAction(email, "send_setup_reminders_bulk", "user", null, { sent, skipped, failed });
   revalidatePath("/admin/users", "layout");

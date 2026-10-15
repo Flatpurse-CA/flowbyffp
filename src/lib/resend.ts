@@ -538,6 +538,9 @@ export async function sendTestEmailTemplate(key: EmailTemplateKey, to: string) {
 }
 
 export async function sendShopSetupReminderEmail(to: string, input: { firstName: string; loginUrl: string }) {
-  const { subject, html } = await renderTemplate("shop_setup_reminder", { firstName: input.firstName }, { ctaUrl: input.loginUrl });
+  const { subject, html } = await renderTemplate("shop_setup_reminder", { firstName: input.firstName }, {
+    ctaUrl: input.loginUrl,
+    footerHtml: `<p style="color: #999; font-size: 12px; margin-top: 24px;">You're getting this because you created a FlatPurse Flow account. We'll send at most three reminders. If you'd rather not get them, just reply to this email and we'll stop.</p>`,
+  });
   return send({ to, subject, html });
 }
