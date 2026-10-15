@@ -1,12 +1,12 @@
 "use client";
 
 import { useRef } from "react";
-import { Plus } from "lucide-react";
+import { CalendarPlus } from "lucide-react";
 import { addTrialDays } from "./actions";
 
-// Small inline "+N days" control — submits, then clears back to a blank
-// input so it's ready for the next adjustment instead of showing a stale
-// number that looks like a running total.
+// "+N days" control, shown as a row in the Users table's actions menu.
+// Submits, then clears back to a blank input so it's ready for the next
+// adjustment instead of showing a stale number that looks like a running total.
 export function AddTrialDaysForm({ userId }: { userId: string }) {
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -14,33 +14,31 @@ export function AddTrialDaysForm({ userId }: { userId: string }) {
     <form
       action={addTrialDays}
       onSubmit={() => setTimeout(() => { if (inputRef.current) inputRef.current.value = ""; }, 0)}
-      style={{ display: "flex", alignItems: "center", gap: 3 }}
+      className="admin-menu-row"
     >
       <input type="hidden" name="userId" value={userId} />
+      <CalendarPlus size={13} style={{ flexShrink: 0, color: "var(--aw45)" }} />
       <input
         ref={inputRef}
         name="days"
         type="number"
-        placeholder="days"
+        placeholder="± days"
         title="Add (or remove, with a negative number) days from the trial"
         style={{
-          width: 46, height: 28, borderRadius: 8, textAlign: "center",
-          background: "var(--aw04)", border: "1px solid var(--aw08)",
-          color: "var(--atext2)", fontSize: 11.5, fontFamily: "inherit",
-          outline: "none",
+          flex: 1, minWidth: 0, height: 28, borderRadius: 7, padding: "0 8px",
+          background: "var(--asurface1)", border: "1px solid var(--aw08)",
+          color: "var(--atext2)", fontSize: 12, fontFamily: "inherit", outline: "none",
         }}
       />
       <button
         type="submit"
-        title="Add days to trial"
         style={{
-          display: "flex", alignItems: "center", justifyContent: "center",
-          width: 28, height: 28, borderRadius: 8, cursor: "pointer",
-          background: "var(--aw04)", border: "1px solid var(--aw08)",
-          color: "var(--aw3)", fontFamily: "inherit",
+          height: 28, padding: "0 10px", borderRadius: 7, cursor: "pointer", border: "none",
+          background: "var(--astatus-purple-bg)", color: "var(--astatus-purple-fg)",
+          fontSize: 11.5, fontWeight: 600, fontFamily: "inherit", whiteSpace: "nowrap",
         }}
       >
-        <Plus size={12} />
+        Add
       </button>
     </form>
   );

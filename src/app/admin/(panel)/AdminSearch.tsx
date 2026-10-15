@@ -96,6 +96,7 @@ export function AdminSearch({
           value={query}
           onChange={e => { setQuery(e.target.value); setOpen(true); }}
           onFocus={() => setOpen(true)}
+          className="admin-search-input"
           placeholder={compact ? "Search..." : "Search users, shops, waitlist..."}
           style={{
             flex: 1, minWidth: 0, background: "transparent", border: "none", outline: "none",

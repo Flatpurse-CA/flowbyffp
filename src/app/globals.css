@@ -1211,3 +1211,21 @@ html[data-portal-theme="light"]:has(main.dashboard-main) .cookie-banner {
   background: rgb(109,40,217) !important;
   border-color: rgb(109,40,217) !important;
 }
+
+/* Admin Users table: row actions menu (RowActionsMenu.tsx) */
+.admin-row-menu form { margin: 0; }
+.admin-menu-label {
+  margin: 4px 10px 2px; font-size: 10px; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase; color: var(--aw35);
+}
+.admin-menu-item {
+  display: flex; align-items: center; gap: 9px; width: 100%;
+  padding: 8px 10px; border-radius: 8px; border: none; background: transparent;
+  color: var(--atext2); font-size: 12.5px; font-weight: 500; font-family: inherit;
+  text-align: left; cursor: pointer; white-space: nowrap;
+}
+.admin-menu-item:hover { background: var(--aw05); }
+.admin-menu-item.danger { color: var(--ared-text); }
+.admin-menu-row { display: flex; align-items: center; gap: 7px; padding: 4px 10px; }
+.admin-menu-sep { height: 1px; background: var(--aw07); margin: 4px 2px; }
+.admin-search-input::placeholder { color: var(--aw25); opacity: 1; }
