@@ -243,6 +243,15 @@ export const LOCAL_PAGES: LocalPage[] = VERTICALS.flatMap(vertical =>
   CITIES.map(city => ({ slug: `${vertical.slugPrefix}-${city.key}`, vertical, city })),
 );
 
+// Cities whose pages stay reachable by URL but are kept out of the sitemap,
+// hubs and cross-links and marked noindex until they're ready to publish.
+// Saskatoon: waiting on confirmation of PST on salon services (PST-46).
+// Remove a city from this set to publish its pages.
+export const HELD_CITIES: ReadonlySet<CityKey> = new Set(["saskatoon"]);
+
+export const PUBLISHED_CITIES: City[] = CITIES.filter(c => !HELD_CITIES.has(c.key));
+export const PUBLISHED_PAGES: LocalPage[] = LOCAL_PAGES.filter(p => !HELD_CITIES.has(p.city.key));
+
 export function getLocalPage(slug: string): LocalPage | undefined {
   return LOCAL_PAGES.find(p => p.slug === slug);
 }

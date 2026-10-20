@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import Hub from "@/components/seo/Hub";
-import { CITIES, LOCAL_PAGES } from "@/lib/seo/localPages";
+import { PUBLISHED_CITIES, PUBLISHED_PAGES } from "@/lib/seo/localPages";
 import { seoMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = seoMetadata({ title: "Salon, Spa & Barbershop Software by City | FlatPurse Flow", description: "Booking and payments software for salons, barbershops, spas, massage clinics and studios in Edmonton, Calgary, Saskatoon, Winnipeg, Vancouver and Toronto.", path: "/software" });
+export const metadata: Metadata = seoMetadata({ title: "Salon, Spa & Barbershop Software by City | FlatPurse Flow", description: "Booking and payments software for salons, barbershops, spas, massage clinics and studios in Edmonton, Calgary, Winnipeg, Vancouver and Toronto.", path: "/software" });
 
 export default function SoftwareHub() {
   return (
@@ -11,9 +11,9 @@ export default function SoftwareHub() {
       href="/software"
       title="Software by city"
       intro="FlatPurse Flow is built in Edmonton for Canadian salons, barbershops, spas, massage clinics and studios. Pick your city and business."
-      groups={CITIES.map(c => ({
+      groups={PUBLISHED_CITIES.map(c => ({
         heading: `${c.name}, ${c.province}`,
-        links: LOCAL_PAGES.filter(p => p.city.key === c.key).map(p => ({ href: `/${p.slug}`, label: `${p.vertical.label} in ${c.name}` })),
+        links: PUBLISHED_PAGES.filter(p => p.city.key === c.key).map(p => ({ href: `/${p.slug}`, label: `${p.vertical.label} in ${c.name}` })),
       }))}
     />
   );

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { LOCAL_PAGES, getLocalPage } from "@/lib/seo/localPages";
+import { HELD_CITIES, LOCAL_PAGES, PUBLISHED_PAGES, getLocalPage } from "@/lib/seo/localPages";
 import { RATES } from "@/lib/seo/facts";
 import { seoMetadata } from "@/lib/seo/metadata";
 import { SeoShell, SeoCta, Related, FounderQuote, faqLd } from "@/components/seo/SeoShell";
@@ -18,7 +18,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const page = getLocalPage((await params).slug);
   if (!page) return {};
   const { vertical, city } = page;
-  return seoMetadata({ title: vertical.titleTag(city.name), description: vertical.meta(city.name, city.province), path: `/${page.slug}` });
+  const meta = seoMetadata({ title: vertical.titleTag(city.name), description: vertical.meta(city.name, city.province), path: `/${page.slug}` });
+  // Held cities stay reachable by URL but out of search until published.
+  return HELD_CITIES.has(city.key) ? { ...meta, robots: { index: false, follow: true } } : meta;
 }
 
 export default async function LocalPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -28,8 +30,8 @@ export default async function LocalPage({ params }: { params: Promise<{ slug: st
   const { vertical, city } = page;
   const faqs = vertical.faqs(city);
 
-  // Same vertical in other cities, and other verticals in this city.
-  const sameVertical = LOCAL_PAGES.filter(p => p.vertical.key === vertical.key && p.city.key !== city.key);
+  // Same vertical in other published cities, and other verticals in this city.
+  const sameVertical = PUBLISHED_PAGES.filter(p => p.vertical.key === vertical.key && p.city.key !== city.key);
   const sameCity = LOCAL_PAGES.filter(p => p.city.key === city.key && p.vertical.key !== vertical.key);
 
   const softwareLd = {
