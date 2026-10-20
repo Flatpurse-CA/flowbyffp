@@ -22,6 +22,8 @@ const TAG_STYLE: Record<NonNullable<ClientTag>, { color: string; bg: string }> =
   "Churn risk": { color: "var(--dst-red-fg)", bg: "var(--dst-red-bg)" },
 };
 
+const PAGE_SIZE = 100;
+
 const FILTER_CHIPS: Array<"All" | NonNullable<ClientTag>> = ["All", "VIP", "Loyal", "New", "Overdue", "Churn risk"];
 
 const card: React.CSSProperties = {
@@ -62,6 +64,8 @@ export function ClientsClient({ clients, engagedNames }: {
   const router = useRouter();
   const [query, setQuery]   = useState("");
   const [filter, setFilter] = useState<"All" | NonNullable<ClientTag>>("All");
+  // Imported shops can have thousands of clients; render in pages.
+  const [shown, setShown]   = useState(PAGE_SIZE);
 
   const engagedSet = useMemo(() => new Set(engagedNames), [engagedNames]);
   const isEngaged = (c: DerivedClient) => engagedSet.has(c.name.trim().toLowerCase());
@@ -72,6 +76,8 @@ export function ClientsClient({ clients, engagedNames }: {
     const matchF = filter === "All" || c.tag === filter;
     return matchQ && matchF;
   });
+
+  const visible = filtered.slice(0, shown);
 
   const highChurn = clients.filter(c => c.tag === "Churn risk").length;
   const totalLTV  = clients.reduce((s, c) => s + c.ltv, 0);
@@ -113,14 +119,14 @@ export function ClientsClient({ clients, engagedNames }: {
       <div className="clients-toolbar" style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
         <div className="clients-search" style={{ display: "flex", alignItems: "center", gap: 8, background: "var(--dsurface2)", border: "1px solid var(--dw07)", borderRadius: 10, padding: "8px 12px", width: 240, flex: "1 1 200px", maxWidth: 320 }}>
           <Search size={13} color="var(--dw3)" />
-          <input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search clients…" style={{ background: "none", border: "none", outline: "none", color: "var(--dtext)", fontSize: 12.5, flex: 1, minWidth: 0 }} />
+          <input value={query} onChange={e => { setQuery(e.target.value); setShown(PAGE_SIZE); }} placeholder="Search clients…" style={{ background: "none", border: "none", outline: "none", color: "var(--dtext)", fontSize: 12.5, flex: 1, minWidth: 0 }} />
         </div>
         <div
           className="clients-filter-chips"
           style={{ display: "flex", gap: 6, flexWrap: "nowrap", overflowX: "auto", WebkitOverflowScrolling: "touch", scrollbarWidth: "none" }}
         >
           {FILTER_CHIPS.map(f => (
-            <button key={f} onClick={() => setFilter(f)} style={{
+            <button key={f} onClick={() => { setFilter(f); setShown(PAGE_SIZE); }} style={{
               padding: "7px 14px", borderRadius: 20, flexShrink: 0,
               border: filter === f ? "none" : "1px solid var(--dw08)",
               background: filter === f ? "rgb(109,40,217)" : "var(--dw03)",
@@ -146,7 +152,7 @@ export function ClientsClient({ clients, engagedNames }: {
             </tr>
           </thead>
           <tbody>
-            {filtered.map((c) => {
+            {visible.map((c) => {
               const color = colorFor(c.name);
               const avgSpend = c.visits > 0 ? c.ltv / c.visits : 0;
               const engaged = isEngaged(c);
@@ -203,7 +209,7 @@ export function ClientsClient({ clients, engagedNames }: {
 
       {/* Client list — mobile cards */}
       <div className="clients-card-list" style={{ display: "none", flexDirection: "column", gap: 8 }}>
-        {filtered.map((c) => {
+        {visible.map((c) => {
           const color = colorFor(c.name);
           const engaged = isEngaged(c);
           return (
@@ -230,6 +236,12 @@ export function ClientsClient({ clients, engagedNames }: {
           <div style={{ ...card, padding: "40px 20px", textAlign: "center", color: "var(--dw25)", fontSize: 13 }}>No clients found</div>
         )}
       </div>
+
+      {filtered.length > shown && (
+        <button onClick={() => setShown(n => n + PAGE_SIZE)} style={{ alignSelf: "center", padding: "10px 18px", borderRadius: 11, background: "var(--dsurface2)", border: "1px solid var(--dw07)", color: "var(--dtext)", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
+          Show more ({(filtered.length - shown).toLocaleString()} left)
+        </button>
+      )}
     </div>
   );
 }

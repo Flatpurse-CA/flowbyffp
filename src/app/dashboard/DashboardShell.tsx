@@ -6,7 +6,7 @@ import { useRouter, usePathname } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import {
   LayoutDashboard, CalendarDays, Users, Zap,
-  LayoutGrid, Users2, Settings, Compass,
+  LayoutGrid, Users2, Settings, Compass, ArrowRightLeft,
   LogOut, Bell, ChevronLeft, ChevronRight, ChevronDown,
   Sun, Moon, User as UserIcon, Search, MessageSquare, Sparkles,
   CalendarClock, UserRound, MoreHorizontal, Star, Wallet, type LucideIcon,
@@ -31,6 +31,7 @@ const NAV_TABS: NavTab[] = [
       { href: "/dashboard/appointments/active",    label: "Active Bookings" },
       { href: "/dashboard/appointments/cancelled", label: "Cancelled Bookings" },
       { href: "/dashboard/appointments/pending",   label: "Pending Bookings" },
+      { href: "/dashboard/appointments/history",   label: "Booking History" },
     ],
   },
   { icon: Users,           href: "/dashboard/clients",      label: "Clients",    badge: 0, ownerOnly: false },
@@ -347,6 +348,23 @@ function DashboardShellInner({ children, user, role, staffName, unreadCount, acc
         {/* Bottom: Settings + Sign out */}
         <div style={{ padding: "0 8px 20px", flexShrink: 0 }}>
           <div style={{ height: 1, background: T.border, margin: "0 4px 8px" }} />
+          {role === "owner" && (
+            <Link
+              href="/dashboard/migrate"
+              title={!open ? "Switch to Flow" : undefined}
+              style={{
+                display: "flex", alignItems: "center", gap: 12,
+                padding: open ? "9px 12px" : "11px", borderRadius: 10,
+                background: isActive("/dashboard/migrate", pathname) ? T.activePill : "transparent",
+                color: isActive("/dashboard/migrate", pathname) ? T.activeText : T.inactiveText,
+                fontSize: 13.5, fontWeight: 400, textDecoration: "none",
+                justifyContent: open ? "flex-start" : "center", marginBottom: 2,
+              }}
+            >
+              <ArrowRightLeft size={16} strokeWidth={1.7} style={{ flexShrink: 0 }} />
+              {open && <span>Switch to Flow</span>}
+            </Link>
+          )}
           {role === "owner" && (
             <Link
               href="/dashboard/settings"

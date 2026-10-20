@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import {
   Users2, Zap, LayoutGrid, Compass, Sparkles, Settings, MessageSquare, LogOut,
-  ChevronRight, Star, type LucideIcon,
+  ChevronRight, Star, ArrowRightLeft, History, type LucideIcon,
 } from "lucide-react";
 import { getShopContext } from "@/lib/dashboard/shop";
 import { getUnreadCount } from "../messages/actions";
@@ -96,11 +96,15 @@ export default async function MorePage() {
       <div style={{ ...card, marginBottom: 20 }}>
         <Row icon={MessageSquare} label="Messages" sub="Chat with your team" href="/dashboard/messages" badge={unreadCount} />
         <Divider />
+        <Row icon={History} label="Booking history" sub="Every past booking, searchable" href="/dashboard/appointments/history" />
+        <Divider />
         <Row icon={Star} label="Reviews" sub="What clients are saying" href="/dashboard/reviews" />
         {ctx.role === "owner" && (
           <>
             <Divider />
             <Row icon={Settings} label="Settings" sub="Business, payments, automation" href="/dashboard/settings" />
+            <Divider />
+            <Row icon={ArrowRightLeft} label="Switch to Flow" sub="Import from Fresha, Vagaro, Square and more" href="/dashboard/migrate" />
           </>
         )}
       </div>

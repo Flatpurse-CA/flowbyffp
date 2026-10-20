@@ -26,6 +26,7 @@ export type DerivedClient = {
   tag: ClientTag;
 };
 
+// Mirrored in SQL by shop_client_summaries (migration 0047); keep in sync.
 // customer_id (a real, stable account) takes priority over the free-text
 // contact fields — it's the only identity that's guaranteed not to drift
 // between visits (a client's phone/email captured at booking time can vary
