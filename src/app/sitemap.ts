@@ -20,6 +20,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/software`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
     { url: `${SITE_URL}/questions`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
     { url: `${SITE_URL}/guides`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
+    { url: `${SITE_URL}/no-show-calculator`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: `${SITE_URL}/compare/flow-vs-fresha-booksy-vagaro`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     ...LOCAL_PAGES.map(p => ({ url: `${SITE_URL}/${p.slug}`, lastModified: now, changeFrequency: "monthly" as const, priority: p.city.key === "edmonton" ? 0.8 : 0.7 })),
     ...QUESTIONS.map(q => ({ url: `${SITE_URL}/questions/${q.slug}`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.7 })),

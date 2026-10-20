@@ -225,6 +225,7 @@ export const GUIDES: Article[] = [
         <li><strong>The Daily Brief</strong> shows each morning what AutoPilot recovered.</li>
       </ol>
       <p>If AutoPilot recovers half of those missed appointments, the salon above keeps about 11,000 dollars a year it would have lost. On Pro+ at CAD {PRICES.proPlus} a month ({(PRICES.proPlus * 12).toLocaleString("en-CA")} dollars a year), that&apos;s roughly a 5× return from recovery alone. These are worked-example figures, not customer results.</p>
+      <p>Run your own numbers with the <Link href="/no-show-calculator">no-show cost calculator</Link>.</p>
     </>,
     related: [{ href: "/questions/reduce-no-shows", label: "How to reduce no-shows" }, ...salonLinks.slice(0, 2)],
   },
