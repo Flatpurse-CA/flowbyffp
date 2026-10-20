@@ -3,6 +3,7 @@ import type Stripe from "stripe";
 import { stripe } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getStripePriceId, type BillablePlanKey, type BillingInterval } from "@/lib/plans";
+import { settleReferralRewards } from "@/lib/referrals";
 
 export async function POST(req: Request) {
   const signature = req.headers.get("stripe-signature");
@@ -87,6 +88,15 @@ export async function POST(req: Request) {
           ...(founderClaim ? { is_founder: true, founder_discount_claimed_at: new Date().toISOString() } : {}),
         })
         .eq("id", shopId);
+
+      // Never fail the webhook over a referral: a Stripe retry would re-run the
+      // founders schedule setup above, which isn't repeatable. A failed reward
+      // is released back to 'signed_up' so it shows as pending, not lost.
+      try {
+        await settleReferralRewards(admin, shopId, session);
+      } catch (e) {
+        console.error("settleReferralRewards failed", e);
+      }
     }
   }
 

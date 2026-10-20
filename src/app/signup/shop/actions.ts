@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getOnboardingContext } from "@/lib/onboarding";
 import { applyPendingUnlimited } from "@/lib/unlimited";
+import { cookies } from "next/headers";
+import { REFERRAL_COOKIE, recordReferral } from "@/lib/referrals";
 
 export async function setupShop(formData: FormData) {
   const ctx = await getOnboardingContext();
@@ -25,7 +27,7 @@ export async function setupShop(formData: FormData) {
   }
 
   const admin = createAdminClient();
-  const { error } = await admin
+  const { data: shop, error } = await admin
     .from("shops")
     .upsert(
       {
@@ -39,13 +41,24 @@ export async function setupShop(formData: FormData) {
         country: country || "Canada",
       },
       { onConflict: "owner_id" },
-    );
+    )
+    .select("id")
+    .single();
 
   if (error) {
     redirect(`/signup/shop?error=${encodeURIComponent(error.message)}`);
   }
 
   await applyPendingUnlimited(ctx.userId);
+
+  // A referral must never block signup.
+  try {
+    const cookieStore = await cookies();
+    await recordReferral(admin, shop!.id as string, cookieStore.get(REFERRAL_COOKIE)?.value);
+    cookieStore.delete(REFERRAL_COOKIE);
+  } catch (e) {
+    console.error("recordReferral failed", e);
+  }
 
   redirect("/signup/plan");
 }

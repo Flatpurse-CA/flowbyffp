@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import {
   Users2, Zap, LayoutGrid, Compass, Sparkles, Settings, MessageSquare, LogOut,
-  ChevronRight, Star, ArrowRightLeft, History, type LucideIcon,
+  ChevronRight, Star, ArrowRightLeft, History, Gift, type LucideIcon,
 } from "lucide-react";
 import { getShopContext } from "@/lib/dashboard/shop";
 import { getUnreadCount } from "../messages/actions";
@@ -103,6 +103,8 @@ export default async function MorePage() {
           <>
             <Divider />
             <Row icon={Settings} label="Settings" sub="Business, payments, automation" href="/dashboard/settings" />
+            <Divider />
+            <Row icon={Gift} label="Refer a salon" sub="You both get a free month" href="/dashboard/referrals" />
             <Divider />
             <Row icon={ArrowRightLeft} label="Switch to Flow" sub="Import from Fresha, Vagaro, Square and more" href="/dashboard/migrate" />
           </>

@@ -6,7 +6,7 @@ import { useRouter, usePathname } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import {
   LayoutDashboard, CalendarDays, Users, Zap,
-  LayoutGrid, Users2, Settings, Compass, ArrowRightLeft,
+  LayoutGrid, Users2, Settings, Compass, ArrowRightLeft, Gift,
   LogOut, Bell, ChevronLeft, ChevronRight, ChevronDown,
   Sun, Moon, User as UserIcon, Search, MessageSquare, Sparkles,
   CalendarClock, UserRound, MoreHorizontal, Star, Wallet, type LucideIcon,
@@ -349,6 +349,22 @@ function DashboardShellInner({ children, user, role, staffName, unreadCount, acc
         <div style={{ padding: "0 8px 20px", flexShrink: 0 }}>
           <div style={{ height: 1, background: T.border, margin: "0 4px 8px" }} />
           {role === "owner" && (
+            <>
+            <Link
+              href="/dashboard/referrals"
+              title={!open ? "Refer a salon" : undefined}
+              style={{
+                display: "flex", alignItems: "center", gap: 12,
+                padding: open ? "9px 12px" : "11px", borderRadius: 10,
+                background: isActive("/dashboard/referrals", pathname) ? T.activePill : "transparent",
+                color: isActive("/dashboard/referrals", pathname) ? T.activeText : T.inactiveText,
+                fontSize: 13.5, fontWeight: 400, textDecoration: "none",
+                justifyContent: open ? "flex-start" : "center", marginBottom: 2,
+              }}
+            >
+              <Gift size={16} strokeWidth={1.7} style={{ flexShrink: 0 }} />
+              {open && <span>Refer a salon</span>}
+            </Link>
             <Link
               href="/dashboard/migrate"
               title={!open ? "Switch to Flow" : undefined}
@@ -364,6 +380,7 @@ function DashboardShellInner({ children, user, role, staffName, unreadCount, acc
               <ArrowRightLeft size={16} strokeWidth={1.7} style={{ flexShrink: 0 }} />
               {open && <span>Switch to Flow</span>}
             </Link>
+            </>
           )}
           {role === "owner" && (
             <Link
