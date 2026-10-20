@@ -1,11 +1,16 @@
 import fs from "node:fs";
 import path from "node:path";
 import Link from "next/link";
-import { H4Header, Arrow } from "@/app/home-4/H4Chrome";
+import { Arrow } from "@/app/home-4/H4Chrome";
+import { Inter } from "next/font/google";
+import LandingNav from "@/components/LandingNav";
 import Footer from "@/components/Footer";
 import { FOUNDER, SITE_URL, TRIAL } from "@/lib/seo/facts";
 import "@/app/home-4/home-4.css";
 import "./seo.css";
+
+// Same nav and font as the homepage, pricing and features pages.
+const navFont = Inter({ subsets: ["latin"], weight: ["400", "500", "600", "700"] });
 
 export type Crumb = { href: string; label: string };
 
@@ -44,7 +49,7 @@ export function SeoShell({ crumbs, schema, children }: { crumbs: Crumb[]; schema
     <>
       <div className="h4-page" data-audience="page">
         <a className="skip" href="#main">Skip to content</a>
-        <H4Header />
+        <div className={navFont.className}><LandingNav active="" /></div>
         <main id="main">
           <article className="seo">
             <nav className="seo-crumbs" aria-label="Breadcrumb">

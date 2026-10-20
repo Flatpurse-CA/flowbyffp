@@ -1,10 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Leaf } from "lucide-react";
-import { H4Header, Arrow } from "../home-4/H4Chrome";
+import { Arrow } from "../home-4/H4Chrome";
+import { Inter } from "next/font/google";
+import LandingNav from "@/components/LandingNav";
 import Footer from "@/components/Footer";
 import "../home-4/home-4.css";
 import "./about.css";
+
+// Same nav and font as the homepage, pricing and features pages.
+const navFont = Inter({ subsets: ["latin"], weight: ["400", "500", "600", "700"] });
 
 // Ported from design-imports/flow-landing/about/index.html (home-4 design).
 
@@ -18,7 +23,7 @@ export default function AboutPage() {
     <>
     <div className="h4-page" data-audience="page">
       <a className="skip" href="#main">Skip to content</a>
-      <H4Header current="about" />
+      <div className={navFont.className}><LandingNav active="" /></div>
 
       <main id="main">
         <section className="about-hero section">
