@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { RESOURCE_GROUPS } from "@/lib/seo/siteLinks";
 
 const BRAND_PURPLE = "#712AE2";
 
@@ -69,6 +70,21 @@ export default function Footer({ cta, children }: { cta?: FooterCta; children?: 
       {/* Footer body */}
       <div className="footer-body" style={{ padding: "0 155px 0", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
         {children}
+        {/* Resource links: every SEO page is within two clicks of any page. */}
+        <nav className="footer-resources" aria-label="Resources" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 32, padding: "40px 0" }}>
+          {RESOURCE_GROUPS.map(g => (
+            <div key={g.heading}>
+              <p style={{ margin: "0 0 14px", fontSize: 12, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(255,255,255,0.9)" }}>{g.heading}</p>
+              <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: 10 }}>
+                {g.links.map(l => (
+                  <li key={l.href}>
+                    <Link href={l.href} className="footer-res-link" style={{ fontSize: 14, color: "rgba(255,255,255,0.6)", textDecoration: "none" }}>{l.label}</Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </nav>
         {/* Bottom bar */}
         <div className="footer-bottom" style={{
           borderTop: "1px solid rgba(255,255,255,0.07)",
@@ -88,10 +104,6 @@ export default function Footer({ cta, children }: { cta?: FooterCta; children?: 
               { label: "Privacy Policy", href: "/privacy" },
               { label: "Cookie Policy", href: "/cookie-policy" },
               { label: "Refund Policy", href: "/refund-policy" },
-              { label: "Software by city", href: "/software" },
-              { label: "Questions", href: "/questions" },
-              { label: "Guides", href: "/guides" },
-              { label: "Compare", href: "/compare/flow-vs-fresha-booksy-vagaro" },
             ].map(({ label, href }) => (
               <Link key={label} href={href} style={{ fontSize: 12, color: "rgba(255,255,255,0.25)", textDecoration: "none", transition: "color 0.15s" }}
                 onMouseEnter={e => (e.currentTarget.style.color = "rgba(255,255,255,0.6)")}
@@ -107,11 +119,13 @@ export default function Footer({ cta, children }: { cta?: FooterCta; children?: 
       <div style={{ height: 3, background: "#712AE2" }} />
 
       <style>{`
+        .footer-res-link:hover { color: #fff !important; }
         .footer-cta-btn:hover { background: rgba(255,255,255,0.12) !important; border-color: #fff !important; }
         @media (max-width: 768px) {
           .footer-cta-wrap { padding: 80px 24px !important; }
           .footer-cta-heading { font-size: 30px !important; }
           .footer-body { padding: 0 20px !important; }
+          .footer-resources { grid-template-columns: 1fr 1fr !important; gap: 28px 20px !important; }
           .footer-body > div:first-child {
             grid-template-columns: 1fr 1fr !important;
             gap: 32px !important;

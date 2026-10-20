@@ -13,6 +13,7 @@ export default function SoftwareHub() {
       intro="FlatPurse Flow is built in Edmonton for Canadian salons, barbershops, spas, massage clinics and studios. Pick your city and business."
       groups={PUBLISHED_CITIES.map(c => ({
         heading: `${c.name}, ${c.province}`,
+        id: c.key,
         links: PUBLISHED_PAGES.filter(p => p.city.key === c.key).map(p => ({ href: `/${p.slug}`, label: `${p.vertical.label} in ${c.name}` })),
       }))}
     />

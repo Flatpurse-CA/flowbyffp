@@ -6,7 +6,8 @@ import type { ProvinceCode } from "@/lib/tax";
 import { PRICES, RATES } from "./facts";
 
 export type VerticalKey = "salon" | "barbershop" | "spa" | "massage-clinic" | "tattoo-studio";
-export type CityKey = "edmonton" | "calgary" | "saskatoon" | "winnipeg" | "vancouver" | "toronto";
+import { HELD_CITIES, type CityKey } from "./siteLinks";
+export { HELD_CITIES, type CityKey };
 
 export type Faq = { q: string; a: string };
 export type Use = { t: string; b: string };
@@ -242,12 +243,6 @@ export type LocalPage = { slug: string; vertical: Vertical; city: City };
 export const LOCAL_PAGES: LocalPage[] = VERTICALS.flatMap(vertical =>
   CITIES.map(city => ({ slug: `${vertical.slugPrefix}-${city.key}`, vertical, city })),
 );
-
-// Cities whose pages stay reachable by URL but are kept out of the sitemap,
-// hubs and cross-links and marked noindex until they're ready to publish.
-// Saskatoon: waiting on confirmation of PST on salon services (PST-46).
-// Remove a city from this set to publish its pages.
-export const HELD_CITIES: ReadonlySet<CityKey> = new Set(["saskatoon"]);
 
 export const PUBLISHED_CITIES: City[] = CITIES.filter(c => !HELD_CITIES.has(c.key));
 export const PUBLISHED_PAGES: LocalPage[] = LOCAL_PAGES.filter(p => !HELD_CITIES.has(p.city.key));
