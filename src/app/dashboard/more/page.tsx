@@ -104,7 +104,7 @@ export default async function MorePage() {
             <Divider />
             <Row icon={Settings} label="Settings" sub="Business, payments, automation" href="/dashboard/settings" />
             <Divider />
-            <Row icon={Gift} label="Refer a salon" sub="You both get a free month" href="/dashboard/referrals" />
+            <Row icon={Gift} label="Referrals" sub="Refer salons, reward clients who refer friends" href="/dashboard/referrals" />
             <Divider />
             <Row icon={ArrowRightLeft} label="Switch to Flow" sub="Import from Fresha, Vagaro, Square and more" href="/dashboard/migrate" />
           </>

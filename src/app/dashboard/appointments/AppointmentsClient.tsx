@@ -59,6 +59,7 @@ type ApptRecord = {
   service: string; stylist: string; price: string; rawPrice: number; duration: number;
   dateLabel: string; time: string; status: AppointmentStatus;
   phone: string; email: string; notes: string; depositAmount?: string;
+  discount?: { amount: string; reason: string };
   startsAt: string; hour: number;
 };
 
@@ -81,6 +82,7 @@ function rowToAppt(row: AppointmentRow, now: Date): ApptRecord {
     email: row.client_email || "",
     notes: row.client_notes || "",
     depositAmount: row.deposit_amount != null ? fmtPrice(Number(row.deposit_amount)) : undefined,
+    discount: row.discount_amount ? { amount: fmtPrice(Number(row.discount_amount)), reason: row.discount_reason || "Discount" } : undefined,
     startsAt: row.starts_at,
     hour: hourFor(d),
   };
@@ -891,6 +893,13 @@ function AppointmentDetail({ appt, onClose, onCloseOut, onChanged }: { appt: App
               ))}
             </div>
           </div>
+
+          {appt.discount && (
+            <div style={{ ...card, padding: "12px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+              <span style={{ color: "var(--dw65)", fontSize: 12.5 }}>{appt.discount.reason}</span>
+              <span style={{ color: "var(--dgreen-text)", fontSize: 13, fontWeight: 700 }}>-{appt.discount.amount}</span>
+            </div>
+          )}
 
           {/* Client notes */}
           <div style={{ ...card, padding: "14px 16px" }}>

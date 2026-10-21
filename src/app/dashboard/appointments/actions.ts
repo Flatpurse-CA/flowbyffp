@@ -55,6 +55,9 @@ export type AppointmentRow = {
   completed_at: string | null;
   tax_amount?: number | null;
   tax_breakdown?: TaxBreakdown | null;
+  /** Set when a client referral discount was applied at booking (price is already net of it). */
+  discount_amount?: number | null;
+  discount_reason?: string | null;
 };
 
 export async function hasAnyAppointments(): Promise<boolean> {

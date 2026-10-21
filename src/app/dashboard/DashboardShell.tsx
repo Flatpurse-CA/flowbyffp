@@ -352,7 +352,7 @@ function DashboardShellInner({ children, user, role, staffName, unreadCount, acc
             <>
             <Link
               href="/dashboard/referrals"
-              title={!open ? "Refer a salon" : undefined}
+              title={!open ? "Referrals" : undefined}
               style={{
                 display: "flex", alignItems: "center", gap: 12,
                 padding: open ? "9px 12px" : "11px", borderRadius: 10,
@@ -363,7 +363,7 @@ function DashboardShellInner({ children, user, role, staffName, unreadCount, acc
               }}
             >
               <Gift size={16} strokeWidth={1.7} style={{ flexShrink: 0 }} />
-              {open && <span>Refer a salon</span>}
+              {open && <span>Referrals</span>}
             </Link>
             <Link
               href="/dashboard/migrate"

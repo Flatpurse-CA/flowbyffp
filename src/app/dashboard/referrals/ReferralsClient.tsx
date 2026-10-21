@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Copy, Check, Mail, MessageSquare, Gift } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Copy, Check, Mail, MessageSquare, Gift, Users } from "lucide-react";
+import { saveClientReferralSettings } from "./actions";
 
 export type ReferralRow = {
   id: string;
@@ -12,10 +14,22 @@ export type ReferralRow = {
   createdAt: string;
 };
 
+export type ClientReferralRow = {
+  id: string;
+  referrer: string;
+  referred: string;
+  reward: number;
+  rewardUsed: boolean;
+  createdAt: string;
+};
+
 const card: React.CSSProperties = { background: "var(--dsurface1)", border: "1px solid var(--dw07)", borderRadius: 16 };
 const MESSAGE = "I run my shop on FlatPurse Flow: bookings, Tap to Pay and AI that rebooks no-shows. Sign up with my link and we both get a free month:";
 
-export function ReferralsClient({ link, rows }: { link: string; rows: ReferralRow[] }) {
+export function ReferralsClient({ link, rows, clientReferrals }: {
+  link: string; rows: ReferralRow[];
+  clientReferrals: { enabled: boolean; reward: number; rows: ClientReferralRow[] };
+}) {
   const [copied, setCopied] = useState(false);
 
   const copy = async () => {
@@ -37,7 +51,7 @@ export function ReferralsClient({ link, rows }: { link: string; rows: ReferralRo
   return (
     <div style={{ maxWidth: 900, margin: "0 auto", display: "flex", flexDirection: "column", gap: 20 }}>
       <div>
-        <h1 style={{ color: "var(--dtext)", fontSize: 22, fontWeight: 800, margin: "0 0 3px", letterSpacing: "-0.03em" }}>Refer a salon</h1>
+        <h1 style={{ color: "var(--dtext)", fontSize: 22, fontWeight: 800, margin: "0 0 3px", letterSpacing: "-0.03em" }}>Referrals</h1>
         <p style={{ color: "var(--dw35)", fontSize: 13, margin: 0 }}>Know another salon, barbershop or spa owner? You both get a free month of Flow.</p>
       </div>
 
@@ -101,6 +115,83 @@ export function ReferralsClient({ link, rows }: { link: string; rows: ReferralRo
           );
         })}
       </div>
+
+      <ClientReferralsSection {...clientReferrals} />
+    </div>
+  );
+}
+
+function ClientReferralsSection({ enabled, reward, rows }: { enabled: boolean; reward: number; rows: ClientReferralRow[] }) {
+  const router = useRouter();
+  const [on, setOn] = useState(enabled);
+  const [amount, setAmount] = useState(String(reward));
+  const [saving, setSaving] = useState(false);
+  const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
+
+  const save = async (nextOn = on) => {
+    setSaving(true);
+    setMsg(null);
+    try {
+      await saveClientReferralSettings({ enabled: nextOn, reward: Number(amount) });
+      setMsg({ ok: true, text: "Saved" });
+      router.refresh();
+    } catch (e) {
+      setMsg({ ok: false, text: e instanceof Error ? e.message : "Couldn't save" });
+      setOn(enabled);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div style={{ ...card, padding: 20, display: "flex", flexDirection: "column", gap: 16 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+        <span style={{ width: 34, height: 34, borderRadius: 10, background: "rgb(22,163,74)", display: "grid", placeItems: "center" }}>
+          <Users size={17} color="white" />
+        </span>
+        <div style={{ flex: "1 1 220px" }}>
+          <div style={{ color: "var(--dtext)", fontSize: 15, fontWeight: 700 }}>Client referrals</div>
+          <div style={{ color: "var(--dw35)", fontSize: 12.5 }}>Your clients share a link. Friends get money off their first visit, and the client who referred them gets the same off their next one.</div>
+        </div>
+        <button
+          role="switch"
+          aria-checked={on}
+          aria-label="Client referrals"
+          disabled={saving}
+          onClick={() => { const next = !on; setOn(next); save(next); }}
+          style={{ width: 46, height: 26, borderRadius: 99, border: "none", cursor: "pointer", background: on ? "rgb(22,163,74)" : "var(--dsurface3)", position: "relative", flexShrink: 0 }}
+        >
+          <span style={{ position: "absolute", top: 3, left: on ? 23 : 3, width: 20, height: 20, borderRadius: "50%", background: "white", transition: "left 0.15s" }} />
+        </button>
+      </div>
+
+      <div style={{ display: "flex", alignItems: "flex-end", gap: 10, flexWrap: "wrap" }}>
+        <label style={{ display: "flex", flexDirection: "column", gap: 6, color: "var(--dw35)", fontSize: 12 }}>
+          Reward for each side (C$)
+          <input type="number" min={1} max={500} step={1} value={amount} onChange={e => setAmount(e.target.value)} style={{ width: 120, background: "var(--dsurface2)", border: "1px solid var(--dw07)", borderRadius: 10, color: "var(--dtext)", fontSize: 14, padding: "9px 12px" }} />
+        </label>
+        <button onClick={() => save()} disabled={saving} style={{ padding: "10px 18px", borderRadius: 10, background: "rgb(109,40,217)", border: "none", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+          {saving ? "Saving..." : "Save"}
+        </button>
+        {msg && <span style={{ fontSize: 12.5, color: msg.ok ? "var(--dgreen-text)" : "var(--dred-text)" }}>{msg.text}</span>}
+      </div>
+      <p style={{ color: "var(--dw35)", fontSize: 12, margin: 0 }}>
+        Applied automatically at booking, up to half the service price. Clients see their link after they book. The referrer&apos;s reward unlocks once their friend&apos;s visit is marked completed.
+      </p>
+
+      {rows.length > 0 && (
+        <div style={{ borderTop: "1px solid var(--dw05)", paddingTop: 12, display: "flex", flexDirection: "column", gap: 8 }}>
+          {rows.map(r => (
+            <div key={r.id} style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", fontSize: 13 }}>
+              <span style={{ color: "var(--dtext)", flex: "1 1 220px" }}><strong>{r.referrer}</strong> referred <strong>{r.referred}</strong></span>
+              <span suppressHydrationWarning style={{ color: "var(--dw35)", fontSize: 12 }}>{new Date(r.createdAt).toLocaleDateString()}</span>
+              <span style={{ padding: "2px 9px", borderRadius: 99, fontSize: 11, fontWeight: 700, color: "white", background: r.rewardUsed ? "rgb(22,163,74)" : "rgb(107,114,128)" }}>
+                {r.rewardUsed ? `C$${r.reward} reward used` : "Reward pending"}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

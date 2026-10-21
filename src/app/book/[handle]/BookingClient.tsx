@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
-import { getAvailableSlots, createPublicBooking, startNewCardSetup, getAmountDue, payWithSavedCard, submitReview, deleteReview } from "./actions";
+import { getAvailableSlots, createPublicBooking, startNewCardSetup, getAmountDue, payWithSavedCard, submitReview, deleteReview, getMyReferralLink } from "./actions";
 import { customerLogin, customerSignup } from "../../customer/actions";
 import { listMyPaymentMethods, type SavedCard } from "../../customer/account/actions";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -109,10 +109,20 @@ function computeOpenStatus(businessHours: BusinessHour[]): { openNow: boolean; l
 
 // ─── Main component ────────────────────────────────────────────────────────────
 
-export function BookingClient({ shop, services, staff, businessHours, initialCustomer, reviews: initialReviews, canReview }: {
+export function BookingClient({ shop, services, staff, businessHours, initialCustomer, reviews: initialReviews, canReview, referralReward }: {
   shop: Shop; services: Service[]; staff: Staff[]; businessHours: BusinessHour[]; initialCustomer: Customer | null;
   reviews: Review[]; canReview: boolean;
+  /** The shop's client referral reward, or null when referrals are off. */
+  referralReward: number | null;
 }) {
+  // ?ref=<code> from a client's referral link; read after mount (static-safe).
+  const [refCode, setRefCode] = useState<string | null>(null);
+  const [discount, setDiscount] = useState(0);
+  useEffect(() => {
+    const ref = new URLSearchParams(window.location.search).get("ref");
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time read of the URL after hydration
+    if (ref && /^[A-Z0-9]{6,16}$/i.test(ref)) setRefCode(ref);
+  }, []);
   const [showFlow, setShowFlow]     = useState(false);
   const [step, setStep]             = useState<"datetime" | "account" | "confirm" | "pay" | "done">("datetime");
   const [appointmentId, setAppointmentId] = useState<string | null>(null);
@@ -183,8 +193,10 @@ export function BookingClient({ shop, services, staff, businessHours, initialCus
       staffId: staffId === "any" ? null : staffId,
       startsAt: time,
       notes,
+      refCode,
     });
     if (res.error) { setBookingError(res.error); setBooking(false); return; }
+    setDiscount(res.discount ?? 0);
 
     if (shop.stripeConnected && res.appointmentId) {
       setAppointmentId(res.appointmentId);
@@ -553,6 +565,11 @@ export function BookingClient({ shop, services, staff, businessHours, initialCus
                 onAuthed={(c) => { setCustomer(c); setStep("confirm"); }}
               />
             )}
+            {step === "confirm" && customer && refCode && referralReward !== null && (
+              <div style={{ marginBottom: 14, padding: "11px 14px", borderRadius: 12, background: ACCENT, color: "white", fontSize: 13, fontWeight: 600 }}>
+                A friend referred you: new clients get up to C${referralReward} off their first visit.
+              </div>
+            )}
             {step === "confirm" && customer && (
               <ConfirmStep
                 service={service} staffName={staffId === "any" ? "Anyone available" : staff.find(s => s.id === staffId)?.full_name ?? "Anyone available"}
@@ -574,7 +591,7 @@ export function BookingClient({ shop, services, staff, businessHours, initialCus
               />
             )}
             {step === "done" && (
-              <DoneStep service={service} time={time!} shop={shop} appointmentId={appointmentId} onDone={reset} />
+              <DoneStep service={service} time={time!} shop={shop} appointmentId={appointmentId} discount={discount} referralsOn={referralReward !== null} onDone={reset} />
             )}
           </div>
         </div>
@@ -969,8 +986,13 @@ function PayForm({ appointmentId, onPaid }: { appointmentId: string | null; onPa
 
 // ─── Step: done ──────────────────────────────────────────────────────────────────
 
-function DoneStep({ service, time, shop, appointmentId, onDone }: { service: Service; time: string; shop: Shop; appointmentId: string | null; onDone: () => void }) {
+function DoneStep({ service, time, shop, appointmentId, discount, referralsOn, onDone }: { service: Service; time: string; shop: Shop; appointmentId: string | null; discount: number; referralsOn: boolean; onDone: () => void }) {
   const [copied, setCopied] = useState(false);
+  const [referral, setReferral] = useState<{ url: string; reward: number } | null>(null);
+  const [refCopied, setRefCopied] = useState(false);
+  useEffect(() => {
+    if (referralsOn) getMyReferralLink(shop.id).then(setReferral).catch(() => setReferral(null));
+  }, [referralsOn, shop.id]);
   const address = [shop.streetAddress, shop.city, shop.province].filter(Boolean).join(", ");
   const mapsUrl = address ? `https://maps.google.com/?q=${encodeURIComponent(address)}` : null;
 
@@ -991,7 +1013,7 @@ function DoneStep({ service, time, shop, appointmentId, onDone }: { service: Ser
         </div>
         <div style={{ padding: "18px 22px", display: "flex", flexDirection: "column", gap: 8, textAlign: "left" }}>
           <p style={{ color: "var(--cust-text)", fontSize: 13, fontWeight: 600, margin: 0 }}>{fmtTime(time)}</p>
-          <p style={{ color: "var(--cust-text-sub)", fontSize: 12.5, margin: 0 }}>{fmtDuration(service.duration_minutes)} · C${service.price}</p>
+          <p style={{ color: "var(--cust-text-sub)", fontSize: 12.5, margin: 0 }}>{fmtDuration(service.duration_minutes)} · C${(Number(service.price) - discount).toFixed(2).replace(/\.00$/, "")}{discount > 0 ? ` (C$${discount} referral discount)` : ""}</p>
           {address && (
             <a href={mapsUrl!} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 5, color: "var(--cust-text-sub)", fontSize: 12.5, textDecoration: "none", marginTop: 2 }}>
               <MapPin size={12} /> {address}
@@ -1010,6 +1032,22 @@ function DoneStep({ service, time, shop, appointmentId, onDone }: { service: Ser
           </div>
         )}
       </div>
+
+      {referral && (
+        <div style={{ width: "100%", boxSizing: "border-box", background: "var(--cust-card-bg)", border: "1px solid var(--cust-input-border)", borderRadius: 18, padding: "18px 20px", textAlign: "left", display: "flex", flexDirection: "column", gap: 10 }}>
+          <p style={{ color: "var(--cust-text)", fontSize: 15, fontWeight: 800, margin: 0 }}>Give a friend C${referral.reward} off</p>
+          <p style={{ color: "var(--cust-text-sub)", fontSize: 12.5, margin: 0 }}>Share your link. When they visit {shop.name} for the first time, you get C${referral.reward} off your next booking too.</p>
+          <div style={{ display: "flex", gap: 8 }}>
+            <input readOnly value={referral.url} onFocus={e => e.currentTarget.select()} aria-label="Your referral link" style={{ flex: 1, minWidth: 0, padding: "10px 12px", borderRadius: 10, border: "1px solid var(--cust-input-border)", background: "var(--cust-input-bg, transparent)", color: "var(--cust-text)", fontSize: 12.5 }} />
+            <button
+              onClick={() => { navigator.clipboard.writeText(referral.url).then(() => { setRefCopied(true); setTimeout(() => setRefCopied(false), 1500); }).catch(() => {}); }}
+              style={{ padding: "10px 14px", borderRadius: 10, border: "none", background: ACCENT, color: "white", fontSize: 12.5, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}
+            >
+              {refCopied ? <><Check size={13} /> Copied</> : <><Copy size={13} /> Copy</>}
+            </button>
+          </div>
+        </div>
+      )}
 
       <Link href="/customer/account" style={{ width: "100%", boxSizing: "border-box", padding: "13px", borderRadius: 12, border: "1.5px solid var(--cust-input-border)", background: "var(--cust-card-bg)", color: "var(--cust-text)", fontSize: 13.5, fontWeight: 700, textDecoration: "none", textAlign: "center", display: "block" }}>
         View my bookings

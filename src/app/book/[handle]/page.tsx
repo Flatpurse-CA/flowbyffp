@@ -19,7 +19,7 @@ export default async function BookingPage({ params }: { params: Promise<{ handle
 
   const { data: shop } = await admin
     .from("shops")
-    .select("id, name, city, province, street_address, handle, stripe_connected, profile_image_url, cover_image_url, phone, owner_id")
+    .select("id, name, city, province, street_address, handle, stripe_connected, profile_image_url, cover_image_url, phone, owner_id, client_referrals_enabled, client_referral_reward")
     .eq("handle", handle)
     .maybeSingle();
 
@@ -93,6 +93,7 @@ export default async function BookingPage({ params }: { params: Promise<{ handle
       initialCustomer={customer ? { fullName: customer.fullName, email: customer.email } : null}
       reviews={reviews}
       canReview={canReview}
+      referralReward={shop.client_referrals_enabled ? Number(shop.client_referral_reward) : null}
     />
   );
 }

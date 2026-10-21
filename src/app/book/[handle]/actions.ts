@@ -13,6 +13,8 @@ import { computeAccessStatus } from "@/lib/dashboard/accessStatus";
 import { checkRateLimit } from "@/lib/rateLimit";
 import { fillBusinessHoursDefaults } from "@/lib/dashboard/businessHours";
 import { computeTax, shopTaxSettings, type TaxBreakdown } from "@/lib/tax";
+import { randomUUID } from "node:crypto";
+import { claimBookingDiscount, getOrCreateReferralCode } from "@/lib/clientReferrals";
 
 const SLOT_INTERVAL_MINUTES = 30;
 
@@ -110,7 +112,8 @@ export async function createPublicBooking(input: {
   staffId: string | null;
   startsAt: string;
   notes?: string;
-}): Promise<{ error?: string; appointmentId?: string }> {
+  refCode?: string | null;
+}): Promise<{ error?: string; appointmentId?: string; discount?: number }> {
   const ctx = await getCustomerContext();
   if (!ctx) return { error: "You need to be signed in to book" };
 
@@ -120,7 +123,7 @@ export async function createPublicBooking(input: {
 
   const admin = createAdminClient();
 
-  const { data: shop } = await admin.from("shops").select("id, owner_id, name, street_address, city, province, phone, trial_started_at, subscription_status, trial_override, trial_paused_at").eq("id", input.shopId).maybeSingle();
+  const { data: shop } = await admin.from("shops").select("id, owner_id, name, street_address, city, province, phone, trial_started_at, subscription_status, trial_override, trial_paused_at, client_referrals_enabled, client_referral_reward").eq("id", input.shopId).maybeSingle();
   if (!shop) return { error: "This shop couldn't be found" };
 
   const { status: shopAccessStatus } = computeAccessStatus(shop as { trial_started_at: string; subscription_status: string | null; trial_override: boolean; trial_paused_at: string | null });
@@ -165,9 +168,22 @@ export async function createPublicBooking(input: {
     if (clash) return { error: "That slot was just booked by someone else, pick another time" };
   }
 
+  // The id is chosen up front so a referral discount can be claimed against
+  // this exact booking before it's inserted.
+  const appointmentId = randomUUID();
+  const discount = await claimBookingDiscount(admin, {
+    shop: shop as { id: string; client_referrals_enabled: boolean; client_referral_reward: number },
+    customerId: ctx.customerId,
+    appointmentId,
+    price: Number(service.price),
+    refCode: input.refCode,
+  });
+  const finalPrice = Math.round((Number(service.price) - (discount?.amount ?? 0)) * 100) / 100;
+
   const { data: inserted, error } = await admin
     .from("appointments")
     .insert({
+      id: appointmentId,
       shop_id: input.shopId,
       customer_id: ctx.customerId,
       client_name: ctx.fullName,
@@ -179,15 +195,20 @@ export async function createPublicBooking(input: {
       staff_id: input.staffId,
       starts_at: input.startsAt,
       duration_minutes: service.duration_minutes,
-      price: service.price,
+      price: finalPrice,
+      discount_amount: discount?.amount ?? null,
+      discount_reason: discount?.reason ?? null,
       status: "pending",
     })
     .select("id")
     .single();
 
-  if (error || !inserted) return { error: error?.message ?? "Couldn't create that booking" };
+  if (error || !inserted) {
+    await discount?.release();
+    return { error: error?.message ?? "Couldn't create that booking" };
+  }
 
-  await attributeAutopilotRevenue(admin, { shopId: input.shopId, clientEmail: ctx.email, price: Number(service.price) });
+  await attributeAutopilotRevenue(admin, { shopId: input.shopId, clientEmail: ctx.email, price: finalPrice });
 
   try {
     await sendBookingConfirmationEmail(ctx.email, {
@@ -222,7 +243,7 @@ export async function createPublicBooking(input: {
     // Non-fatal — the booking already succeeded.
   }
 
-  return { appointmentId: inserted.id as string };
+  return { appointmentId: inserted.id as string, discount: discount?.amount };
 }
 
 // Card payments are direct charges on the shop's own connected account: the
@@ -380,4 +401,15 @@ export async function deleteReview(shopId: string): Promise<{ error?: string }> 
   const { error } = await admin.from("reviews").delete().eq("shop_id", shopId).eq("customer_id", ctx.customerId);
   if (error) return { error: error.message };
   return {};
+}
+
+/** The signed-in client's referral link for this shop, or null when the shop has referrals off. */
+export async function getMyReferralLink(shopId: string): Promise<{ url: string; reward: number } | null> {
+  const ctx = await getCustomerContext();
+  if (!ctx) return null;
+  const admin = createAdminClient();
+  const { data: shop } = await admin.from("shops").select("handle, client_referrals_enabled, client_referral_reward").eq("id", shopId).maybeSingle();
+  if (!shop?.client_referrals_enabled || !shop.handle) return null;
+  const code = await getOrCreateReferralCode(admin, shopId, ctx.customerId);
+  return { url: `${await getRequestOrigin()}/book/${shop.handle}?ref=${code}`, reward: Number(shop.client_referral_reward) };
 }
