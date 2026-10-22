@@ -20,7 +20,7 @@ const SECTIONS = [
       },
       {
         title: "2.2 Performance and Analytics Cookies",
-        body: "These cookies collect information about how visitors use our Service, for example, which pages are visited most often and whether users receive error messages from certain pages. All information collected by these cookies is aggregated and anonymised. We use Google Analytics 4 for this purpose.",
+        body: "These cookies collect information about how visitors use our Service, for example, which pages are visited most often and whether users receive error messages from certain pages. All information collected by these cookies is aggregated and anonymised. We use Google Analytics 4 and PostHog for this purpose. PostHog also records anonymised session replays (how a visit moves through pages, with form fields and, inside signed-in areas, all on-screen text masked) so we can find and fix usability problems. These tools only run if you accept analytics cookies.",
       },
       {
         title: "2.3 Marketing and Advertising Cookies",
@@ -37,6 +37,7 @@ const SECTIONS = [
     title: "Specific Technologies We Use",
     items: [
       "Google Analytics 4: measures usage patterns, page views, and conversion events. Data is processed by Google LLC under its Privacy Policy.",
+      "PostHog: measures page views and records masked session replays to show how people move through the Service. Data is processed by PostHog, Inc. and is only collected after you accept cookies.",
       "Meta Pixel: tracks conversions from Meta ads and supports retargeting on Facebook and Instagram. Data is processed by Meta Platforms, Inc. under its Data Policy.",
       "Supabase Auth: sets session cookies required for secure authentication. These are strictly necessary.",
       "Stripe: sets cookies to detect fraud and manage payment sessions when you interact with payment flows.",

@@ -127,7 +127,7 @@ Where we act as a processor, the Business User is responsible for ensuring it ha
     intro: "We use cookies and similar technologies to operate the Service, remember your preferences, measure performance, and support marketing. Categories include:",
     items: [
       "Strictly necessary: required for the Service to function (e.g., authentication, security).",
-      "Performance and analytics: Google Analytics 4 and similar tools that help us understand usage.",
+      "Performance and analytics: Google Analytics 4, PostHog (including masked session replays) and similar tools that help us understand usage.",
       "Marketing: the Meta Pixel and other advertising tags that measure campaign performance and support retargeting.",
     ],
     footer: "You can control non-essential cookies through your browser settings or our cookie banner where available. See our Cookie Policy for full details. Disabling certain cookies may affect Service functionality.",

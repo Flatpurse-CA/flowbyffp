@@ -4,6 +4,7 @@ import { ThemeProvider } from "@/lib/theme-context";
 import CookieBanner from "@/components/CookieBanner";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 import MetaPixel from "@/components/MetaPixel";
+import PostHogProvider from "@/components/PostHogProvider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -82,6 +83,7 @@ export default function RootLayout({
         <CookieBanner />
         <ServiceWorkerRegister />
         <MetaPixel />
+        <PostHogProvider />
       </body>
     </html>
   );

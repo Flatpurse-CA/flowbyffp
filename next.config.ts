@@ -3,6 +3,11 @@ import path from "node:path";
 
 const supabaseOrigin = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
 
+// PostHog is reverse-proxied through /ingest so ad blockers don't drop it and
+// CSP stays 'self'. Set NEXT_PUBLIC_POSTHOG_HOST to the EU host if the project is EU.
+const posthogHost = process.env.NEXT_PUBLIC_POSTHOG_HOST ?? "https://us.i.posthog.com";
+const posthogAssetsHost = posthogHost.replace(".i.posthog.com", "-assets.i.posthog.com");
+
 const isProd = process.env.NODE_ENV === "production";
 
 // The full source allowlist is enforced in production only: `next dev` needs
@@ -52,6 +57,14 @@ const nextConfig: NextConfig = {
     serverActions: {
       bodySizeLimit: "8mb",
     },
+  },
+  // PostHog's ingest endpoints end in a slash; Next must not redirect them.
+  skipTrailingSlashRedirect: true,
+  async rewrites() {
+    return [
+      { source: "/ingest/static/:path*", destination: `${posthogAssetsHost}/static/:path*` },
+      { source: "/ingest/:path*", destination: `${posthogHost}/:path*` },
+    ];
   },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
