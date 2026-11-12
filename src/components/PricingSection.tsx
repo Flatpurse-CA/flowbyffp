@@ -78,7 +78,20 @@ function CheckIcon({ active, founders }: { active: boolean; founders: boolean })
   );
 }
 
-export default function PricingSection() {
+// finePrint "cards" (home-6): the trial / founders / fee notes as cards and a
+// fee table instead of two grey paragraphs. Default keeps every other page as-is.
+const FINE_CARDS = [
+  { t: "14-day free trial", d: "Every plan starts with Pro+ free for 14 days. No card required." },
+  { t: "Founders pricing, locked in", d: "Beta members are pre-qualified. Your price holds as long as your subscription stays active. Cancel and it is gone for good." },
+  { t: "0% commission", d: "Flow never takes a commission on a new client." },
+];
+const FEES = [
+  { k: "Tapped in person", v: "2.7% + 20¢" },
+  { k: "Interac debit", v: "30¢ flat" },
+  { k: "Online", v: "2.9% + 30¢" },
+];
+
+export default function PricingSection({ finePrint = "text" }: { finePrint?: "text" | "cards" } = {}) {
   const [selected, setSelected] = useState("pro-plus");
   const [hovered, setHovered] = useState<string | null>(null);
   const gridRef = useRef<HTMLDivElement>(null);
@@ -300,6 +313,45 @@ export default function PricingSection() {
 
       {/* Bottom CTA */}
       <div style={{ textAlign: "center", marginTop: 48 }}>
+        {finePrint === "cards" ? (
+          <div className="ps-fine">
+            <div className="ps-fine-cards">
+              {FINE_CARDS.map(c => (
+                <div key={c.t} className="ps-fine-card">
+                  <p className="ps-fine-t">{c.t}</p>
+                  <p className="ps-fine-d">{c.d}</p>
+                </div>
+              ))}
+            </div>
+            <div className="ps-fees">
+              <p className="ps-fees-label">Card processing<span>Stripe&apos;s standard rates, paid by your shop to Stripe, the same on every plan</span></p>
+              <dl className="ps-fees-list">
+                {FEES.map(f => (
+                  <div key={f.k}><dt>{f.k}</dt><dd>{f.v}</dd></div>
+                ))}
+              </dl>
+            </div>
+            <style>{`
+              .ps-fine { margin: 0 0 36px; text-align: left; }
+              .ps-fine-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+              .ps-fine-card { background: #16121d; border: 1px solid #2b2438; border-radius: 16px; padding: 20px 22px; }
+              .ps-fine-t { margin: 0 0 6px; font-size: 15px; font-weight: 700; color: #fff; }
+              .ps-fine-d { margin: 0; font-size: 13.5px; line-height: 1.6; color: #a59cb8; }
+              .ps-fees { margin-top: 14px; display: flex; align-items: center; justify-content: space-between; gap: 24px; background: #16121d; border: 1px solid #2b2438; border-radius: 16px; padding: 18px 22px; }
+              .ps-fees-label { margin: 0; font-size: 15px; font-weight: 700; color: #fff; }
+              .ps-fees-label span { display: block; margin-top: 4px; font-size: 12.5px; font-weight: 400; color: #a59cb8; }
+              .ps-fees-list { margin: 0; display: flex; gap: 10px; flex-wrap: wrap; }
+              .ps-fees-list div { background: #221b2e; border-radius: 12px; padding: 10px 16px; min-width: 128px; }
+              .ps-fees-list dt { font-size: 11.5px; color: #a59cb8; margin: 0 0 3px; }
+              .ps-fees-list dd { margin: 0; font-size: 16px; font-weight: 700; color: #fff; letter-spacing: -0.01em; }
+              @media (max-width: 900px) {
+                .ps-fine-cards { grid-template-columns: 1fr; }
+                .ps-fees { flex-direction: column; align-items: flex-start; }
+                .ps-fees-list div { flex: 1; min-width: 0; }
+              }
+            `}</style>
+          </div>
+        ) : (<>
         <p style={{
           fontSize: 15,
           color: "rgba(255,255,255,0.5)",
@@ -312,6 +364,7 @@ export default function PricingSection() {
         <p style={{ fontSize: 13.5, color: "rgba(255,255,255,0.5)", lineHeight: 1.7, margin: "-12px auto 28px", maxWidth: 560 }}>
           Every plan starts with a free 14-day trial of Pro+, no card required. Card payments are Stripe&apos;s standard rates, paid by your shop to Stripe and the same on every plan: 2.7% + 20¢ tapped, 30¢ flat for Interac, 2.9% + 30¢ online. Flow never takes a commission on a new client.
         </p>
+        </>)}
         <a href="/signup" style={{
           display: "inline-flex", alignItems: "center", gap: 8,
           background: BRAND_PURPLE,

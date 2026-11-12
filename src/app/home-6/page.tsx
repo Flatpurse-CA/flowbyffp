@@ -212,7 +212,7 @@ export default function Home5Page() {
 
       <TestimonialsGrid />
 
-      <PricingSection />
+      <PricingSection finePrint="cards" />
 
       <IntegrationsGrid extraFaqs={EXTRA_FAQS} hideDivider />
 
