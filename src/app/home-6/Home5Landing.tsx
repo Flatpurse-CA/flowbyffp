@@ -203,7 +203,7 @@ export function Home5Main() {
                 <Chip>BUILT IN EDMONTON</Chip>
                 <h2>Canadian roots.<br />Local understanding.</h2>
                 <p>CAD pricing, familiar payment options and support from George in Edmonton.</p>
-                <Link className="h5-link" href="/about#canada">Meet the people behind Flow →</Link>
+                <Link className="h5-link" href="/about#canada">Meet the people behind Flow <ArrowUpRight size={16} strokeWidth={2.2} aria-hidden="true" /></Link>
               </article>
             </ScrollReveal>
             <ScrollReveal delay={90}>
@@ -212,7 +212,7 @@ export function Home5Main() {
                 <Chip>ROOM TO GROW</Chip>
                 <h2>Plans from C$39/month.</h2>
                 <p>Compare Starter, Pro and Pro+ to find the right fit.<br />Card processing fees apply.</p>
-                <Link className="h5-pill-btn" href="/pricing">Compare plans &amp; fees →</Link>
+                <Link className="h5-pill-btn" href="/pricing">Compare plans &amp; fees <ArrowUpRight size={16} strokeWidth={2.2} aria-hidden="true" /></Link>
               </article>
             </ScrollReveal>
           </section>
