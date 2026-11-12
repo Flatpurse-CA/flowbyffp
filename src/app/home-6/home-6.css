@@ -24,6 +24,8 @@
 
 /* ── Shared section bits ── */
 .h6-wrap { width:100%;align-self:stretch }
+/* Inside the value section, span its full content width like FeatureTabs and the cards above */
+.h3-value-section .h6-wrap .h5-section { max-width:none;padding-left:0;padding-right:0 }
 .h6-grid { display:grid;gap:18px }
 .h6-grid-3 { grid-template-columns:repeat(3,1fr) }
 .h6-grid-2 { grid-template-columns:repeat(2,1fr) }
