@@ -1,5 +1,4 @@
 import { Inter } from "next/font/google";
-import Image from "next/image";
 import AutoPilotChip from "@/components/AutoPilotChip";
 import LandingNav from "@/components/LandingNav";
 import ScrollFillText from "@/components/ScrollFillText";
@@ -16,6 +15,7 @@ import Footer from "@/components/Footer";
 import GradientWaves from "@/components/GradientWaves";
 import { EXTRA_FAQS } from "./extraFaqs";
 import { AudienceProvider, HeroAudienceToggle, HeroCopy, PageSwitch, Home5Main, Home5FooterRow, BetaBanner, HeroSegmentPicker } from "./Home5Landing";
+import DashboardMock from "./DashboardMock";
 import { AutoPilotFlows, ClientExperience, CanadaPayments, TrialCta } from "./Home6Sections";
 import type { Metadata } from "next";
 
@@ -122,13 +122,7 @@ export default function Home5Page() {
                 border: "10px solid rgba(155,133,220,0.14)",
               }}
             >
-              <Image
-                src="/home3/app-screenshot.png"
-                alt="FlatPurse Flow dashboard"
-                fill
-                sizes="(max-width: 900px) 100vw, 70vw"
-                style={{ objectFit: "cover", objectPosition: "top" }}
-              />
+              <DashboardMock />
             </div>
 
             <span
