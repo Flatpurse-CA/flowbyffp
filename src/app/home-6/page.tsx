@@ -14,7 +14,7 @@ import IntegrationsGrid from "@/components/IntegrationsGrid";
 import Footer from "@/components/Footer";
 import GradientWaves from "@/components/GradientWaves";
 import { EXTRA_FAQS } from "./extraFaqs";
-import { AudienceProvider, HeroAudienceToggle, HeroCopy, PageSwitch, Home5Main, Home5FooterRow, BetaBanner, HeroSegmentPicker } from "./Home5Landing";
+import { AudienceProvider, HeroCopy, PageSwitch, Home5Main, Home5FooterRow, BetaBanner, HeroSegmentPicker } from "./Home5Landing";
 import DashboardMock from "./DashboardMock";
 import { AutoPilotFlows, ClientExperience, CanadaPayments, TrialCta } from "./Home6Sections";
 import type { Metadata } from "next";
@@ -96,11 +96,9 @@ export default function Home5Page() {
           <div style={{ position: "relative", maxWidth: 1120, margin: "0 auto", textAlign: "center" }}>
             <BetaBanner />
 
-            <HeroAudienceToggle />
+            <HeroSegmentPicker />
 
             <HeroCopy />
-
-            <HeroSegmentPicker />
           </div>
 
           <div

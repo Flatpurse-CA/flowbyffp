@@ -10,7 +10,7 @@
 @keyframes h6-pulse { 50% { box-shadow:0 0 0 6px #14231f } }
 
 /* ── Hero: "What do you run?" 3-way picker (reuses .h5-toggle-hero) ── */
-.h6-seg { display:flex;flex-direction:column;align-items:center;margin-top:30px }
+.h6-seg { display:flex;flex-direction:column;align-items:center;margin:0 0 28px }
 .h6-seg-label { margin:0 0 10px;font-size:13px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#a99cc9 }
 .h5-toggle.h6-seg-toggle { grid-template-columns:repeat(3,1fr);margin:0 auto }
 .h5-toggle.h6-seg-toggle::before { width:calc((100% - 8px) / 3) }
