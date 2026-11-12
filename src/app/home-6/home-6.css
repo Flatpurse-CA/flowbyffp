@@ -91,3 +91,6 @@
 @media (prefers-reduced-motion: reduce) {
   .h6-beta-dot, .h6-noun, .h6-lede-swap { animation:none }
 }
+
+/* home-6: Home5Main's sections (Canadian roots / Plans duo) span the full content width too */
+.h3-value-section .h6-main .h5-section { max-width:none;padding-left:0;padding-right:0 }

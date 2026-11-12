@@ -194,7 +194,7 @@ export function Home5Main() {
   const { isClients } = useAudience();
 
   return (
-    <div className="h5-page h5-block">
+    <div className="h5-page h5-block h6-main">
         {!isClients && (
           <section className="h5-section h5-duo">
             <ScrollReveal>
