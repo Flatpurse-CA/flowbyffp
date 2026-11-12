@@ -10,7 +10,7 @@ const BRAND_PURPLE = "#712AE2";
 
 // Optional overrides so a page can supply its own CTA banner copy and an
 // extra links row; omitted props keep the footer exactly as before.
-export type FooterCta = { heading: ReactNode; body: ReactNode; href: string; label: ReactNode; eyebrow?: string };
+export type FooterCta = { heading: ReactNode; body: ReactNode; href: string; label: ReactNode; eyebrow?: string; secondary?: { href: string; label: ReactNode } };
 
 export default function Footer({ cta, children }: { cta?: FooterCta; children?: ReactNode } = {}) {
   return (
@@ -64,6 +64,17 @@ export default function Footer({ cta, children }: { cta?: FooterCta; children?: 
           >
             {cta ? cta.label : "Start Your Free Trial"}
           </Link>
+          {cta?.secondary && (
+            <Link href={cta.secondary.href} className="footer-cta-btn-2" style={{
+              display: "inline-flex", alignItems: "center", justifyContent: "center",
+              padding: "16px 36px", marginLeft: 12,
+              background: "#fff", border: "2px solid #fff",
+              color: "#3b0f8f", fontSize: 15, fontWeight: 700, letterSpacing: "-0.01em",
+              borderRadius: 12, textDecoration: "none",
+            }}>
+              {cta.secondary.label}
+            </Link>
+          )}
         </div>
       </div>
 

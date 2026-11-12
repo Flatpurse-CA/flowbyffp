@@ -16,7 +16,7 @@ import GradientWaves from "@/components/GradientWaves";
 import { EXTRA_FAQS } from "./extraFaqs";
 import { AudienceProvider, HeroCopy, PageSwitch, Home5Main, Home5FooterRow, BetaBanner, HeroSegmentPicker } from "./Home5Landing";
 import DashboardMock from "./DashboardMock";
-import { AutoPilotFlows, ClientExperience, CanadaPayments, TrialCta } from "./Home6Sections";
+import { AutoPilotFlows, ClientExperience, CanadaPayments } from "./Home6Sections";
 import type { Metadata } from "next";
 
 // Redesign preview: kept out of search until it replaces the live homepage.
@@ -216,9 +216,14 @@ export default function Home5Page() {
 
       <IntegrationsGrid extraFaqs={EXTRA_FAQS} />
 
-      <TrialCta />
 
-      <Footer>
+      <Footer cta={{
+        heading: <>Stop losing chairs<br />to no-shows.</>,
+        body: "Start your free trial today. Founders Beta shops get 40% off Pro or Pro+ for the first year.",
+        href: "/signup",
+        label: "Start your free trial",
+        secondary: { href: "/demo", label: "Book a personal demo" },
+      }}>
         <Home5FooterRow />
       </Footer>
     </div>

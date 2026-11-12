@@ -157,25 +157,3 @@ export function CanadaPayments() {
     </div>
   );
 }
-
-/** Closing call to action above the footer. */
-export function TrialCta() {
-  return (
-    <div className="h5-page h6-wrap">
-      <section className="h5-section h6-cta-section" id="trial">
-        <ScrollReveal>
-          <div className="h6-cta">
-            <h2>Stop losing chairs to <span className="h6-nowrap">no-shows.</span></h2>
-            <p>Start your free trial today. Founders Beta shops get 40% off Pro or Pro+ for the first year.</p>
-            <div className="h5-hero-actions">
-              <Link href="/signup" className="h6-cta-primary">Start your free trial</Link>
-              <Link href="/demo" className="h5-ghost h5-ghost-dark">
-                Book a personal demo <ArrowUpRight size={16} strokeWidth={2.2} />
-              </Link>
-            </div>
-          </div>
-        </ScrollReveal>
-      </section>
-    </div>
-  );
-}
