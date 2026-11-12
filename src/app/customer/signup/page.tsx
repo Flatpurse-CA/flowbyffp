@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useState } from "react";
+import PasswordStrength from "@/components/PasswordStrength";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
@@ -102,7 +103,7 @@ function SignupForm() {
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
-              <p style={{ color: "var(--auth-text-sub)", fontSize: 12, marginTop: 6 }}>Must be at least 10 characters, with a letter and a number.</p>
+              <PasswordStrength password={password} />
             </div>
 
             <button type="submit" disabled={loading} style={{ ...primaryBtnStyle, opacity: loading ? 0.6 : 1, cursor: loading ? "default" : "pointer" }}>

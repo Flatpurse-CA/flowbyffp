@@ -70,6 +70,8 @@
 
 /* How it works */
 .hc-how { display:flex;flex-direction:column;gap:32px }
+/* Same gutters as the landing: hero card 20px from the edge, content sections 155px in */
+.hc-how, .hc-invite { margin-left:135px;margin-right:135px }
 .hc-how-head { display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px 48px }
 .hc-eyebrow { font-size:13px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--hc-body) }
 .hc-how h2 { margin:12px 0 0;font-size:clamp(32px,3.6vw,48px);line-height:1.1;letter-spacing:-0.02em;font-weight:700 }
@@ -88,6 +90,9 @@
 .hc-invite p { margin:0;max-width:560px;font-size:17px;line-height:1.55;color:#c9c4da }
 .hc-invite-btns { display:flex;flex-wrap:wrap;gap:12px }
 
+@media (max-width:1200px) {
+  .hc-how, .hc-invite { margin-left:40px;margin-right:40px }
+}
 @media (max-width:1000px) {
   .hc-steps { grid-template-columns:1fr }
 }
@@ -97,4 +102,5 @@
   .hc-menu-btn { display:inline-flex }
   .hc-hero { padding:40px 22px }
   .hc-phone { flex-basis:100%;min-width:0 }
+  .hc-how, .hc-invite { margin-left:4px;margin-right:4px }
 }

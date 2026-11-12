@@ -9,6 +9,7 @@ import { FlatPurseLogo } from "@/components/FlatPurseLogo";
 import { SubmitButton } from "@/components/SubmitButton";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { createAccount } from "./actions";
+import PasswordStrength from "@/components/PasswordStrength";
 
 const easing = "cubic-bezier(0.16, 1, 0.3, 1)";
 const fadeUp = (delay: number) =>
@@ -26,6 +27,7 @@ function SignupStep1() {
   const searchParams = useSearchParams();
   const error = searchParams.get("error");
   const [showPassword, setShowPassword] = useState(false);
+  const [password, setPassword] = useState("");
   const [isExiting, setIsExiting] = useState(false);
 
   return (
@@ -137,6 +139,8 @@ function SignupStep1() {
                 <input
                   name="password"
                   type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   required
                   minLength={10}
                   autoComplete="new-password"
@@ -164,9 +168,7 @@ function SignupStep1() {
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
-              <p style={{ color: "rgb(113,113,122)", fontSize: 12, marginTop: 6 }}>
-                Must be at least 10 characters, with a letter and a number.
-              </p>
+              <PasswordStrength password={password} />
             </div>
 
             {/* CTA */}
