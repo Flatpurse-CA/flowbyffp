@@ -217,7 +217,7 @@ export default function Home5Page() {
       <IntegrationsGrid extraFaqs={EXTRA_FAQS} />
 
 
-      <Footer cta={{
+      <Footer childrenAt="bottom" cta={{
         heading: <>Stop losing chairs<br />to no-shows.</>,
         body: "Start your free trial today. Founders Beta shops get 40% off Pro or Pro+ for the first year.",
         href: "/signup",

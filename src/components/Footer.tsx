@@ -12,7 +12,8 @@ const BRAND_PURPLE = "#712AE2";
 // extra links row; omitted props keep the footer exactly as before.
 export type FooterCta = { heading: ReactNode; body: ReactNode; href: string; label: ReactNode; eyebrow?: string; secondary?: { href: string; label: ReactNode } };
 
-export default function Footer({ cta, children }: { cta?: FooterCta; children?: ReactNode } = {}) {
+// childrenAt: where the page-supplied row sits, above the resource links (default) or below them.
+export default function Footer({ cta, children, childrenAt = "top" }: { cta?: FooterCta; children?: ReactNode; childrenAt?: "top" | "bottom" } = {}) {
   return (
     <footer style={{ background: "#060606" }}>
       {/* CTA Banner */}
@@ -80,7 +81,7 @@ export default function Footer({ cta, children }: { cta?: FooterCta; children?: 
 
       {/* Footer body */}
       <div className="footer-body" style={{ padding: "0 155px 0", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
-        {children}
+        {childrenAt === "top" && children}
         {/* Resource links: every SEO page is within two clicks of any page. */}
         <nav className="footer-resources" aria-label="Resources" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 32, padding: "40px 0" }}>
           {RESOURCE_GROUPS.map(g => (
@@ -96,6 +97,9 @@ export default function Footer({ cta, children }: { cta?: FooterCta; children?: 
             </div>
           ))}
         </nav>
+        {childrenAt === "bottom" && children && (
+          <div style={{ borderTop: "1px solid rgba(255,255,255,0.07)" }}>{children}</div>
+        )}
         {/* Bottom bar */}
         <div className="footer-bottom" style={{
           borderTop: "1px solid rgba(255,255,255,0.07)",
