@@ -214,7 +214,7 @@ export default function Home5Page() {
 
       <PricingSection />
 
-      <IntegrationsGrid extraFaqs={EXTRA_FAQS} />
+      <IntegrationsGrid extraFaqs={EXTRA_FAQS} hideDivider />
 
 
       <Footer childrenAt="bottom" cta={{

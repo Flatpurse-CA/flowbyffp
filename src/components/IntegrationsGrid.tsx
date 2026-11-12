@@ -81,7 +81,8 @@ const FAQS = [
 // home-4's). Omitted, the FAQ is exactly as before.
 export type ExtraFaq = { q: string; a: ReactNode };
 
-export default function IntegrationsGrid({ extraFaqs = [] }: { extraFaqs?: ExtraFaq[] } = {}) {
+// hideDivider: drop the striped purple divider at the bottom (home-6 runs straight into the footer banner).
+export default function IntegrationsGrid({ extraFaqs = [], hideDivider = false }: { extraFaqs?: ExtraFaq[]; hideDivider?: boolean } = {}) {
   const faqs: { n: string; q: string; a: ReactNode }[] = [
     ...FAQS,
     ...extraFaqs.map((f, i) => ({ n: String(FAQS.length + i + 1).padStart(2, "0"), q: f.q, a: f.a })),
@@ -191,9 +192,11 @@ export default function IntegrationsGrid({ extraFaqs = [] }: { extraFaqs?: Extra
         <div style={{ borderTop: "1px solid rgba(0,0,0,0.08)" }} />
       </div>
 
-      <div style={{ position: "absolute", bottom: 0, left: 0, width: "100%", zIndex: 10, pointerEvents: "none" }}>
-        <div className="ff-divider-purple" />
-      </div>
+      {!hideDivider && (
+        <div style={{ position: "absolute", bottom: 0, left: 0, width: "100%", zIndex: 10, pointerEvents: "none" }}>
+          <div className="ff-divider-purple" />
+        </div>
+      )}
 
       <style>{`
         .ig-cell:hover {
