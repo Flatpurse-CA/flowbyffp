@@ -44,7 +44,7 @@ export default function Home5Page() {
     <PageSwitch owners={
     <div className={inter.className} style={{ background: H3.bg, color: H3.ink }}>
       {/* ── Nav ── */}
-      <LandingNav active="home" />
+      <LandingNav active="home" variant="v2" />
 
       {/* ── Hero ── */}
       <section className="h5-hero-section" style={{ padding: "0 20px", position: "relative" }}>

@@ -46,6 +46,13 @@ export function AudienceProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
+      // Nav "For clients" link flips the page to the Clients view
+      if ((e.target as HTMLElement | null)?.closest?.('a[href="#for-clients"]')) {
+        e.preventDefault();
+        setAudience("clients");
+        window.scrollTo({ top: 0 });
+        return;
+      }
       const link = (e.target as HTMLElement | null)?.closest?.('a[href="#demo"]');
       if (!link) return;
       e.preventDefault();
@@ -115,7 +122,7 @@ export function HeroCopy() {
       <p className="h5-hero-lede">
         {isClients
           ? "Book your favourite salon or barber when it suits you. Choose your service, pick your time, and get on with your day."
-          : "Booking, payments and AI follow-ups for Canadian salons and barbershops. Flow helps fill empty slots and bring clients back, while you focus on your craft."}
+          : "Flow is the booking and payments platform for Canadian salons. Its AutoPilot rebooks no-shows, sends rebooking reminders and brings lapsed clients back while you are behind the chair."}
       </p>
       <div className="h5-hero-actions">
         {isClients ? (
