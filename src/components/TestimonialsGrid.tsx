@@ -102,7 +102,6 @@ export default function TestimonialsGrid() {
         }
         @media (max-width: 560px) {
           .tg-sub-grid { grid-template-columns: 1fr !important; }
-          .tg-stat-grid { grid-template-columns: 1fr !important; gap: 24px !important; }
         }
       `}</style>
 
@@ -201,28 +200,6 @@ export default function TestimonialsGrid() {
 
       </div>
 
-      {/* Bottom stat bar */}
-      <div className="tg-stat-grid" style={{
-        marginTop: 64,
-        paddingTop: 40,
-        borderTop: "1px solid rgba(255,255,255,0.07)",
-        display: "grid",
-        gridTemplateColumns: "repeat(3, 1fr)",
-        gap: 32,
-      }}>
-        {[
-          { n: "80%", label: "average drop in no-shows" },
-          { n: "35%", label: "average revenue increase in 60 days" },
-          { n: "10h+", label: "saved per week on admin work" },
-        ].map(({ n, label }) => (
-          <div key={n} style={{ textAlign: "center" }}>
-            <p style={{ fontSize: "clamp(32px, 3.5vw, 48px)", fontWeight: 800, color: "#fff", letterSpacing: "-0.04em", margin: 0 }}>
-              {n}
-            </p>
-            <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", margin: "6px 0 0" }}>{label}</p>
-          </div>
-        ))}
-      </div>
     </section>
   );
 }

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Home5Page from "./home-5/page";
+import Home6Page from "./home-6/page";
 import { SITE_URL } from "@/lib/seo/facts";
 import { seoMetadata } from "@/lib/seo/metadata";
 
@@ -27,7 +27,7 @@ const SITE_LD = [
 export default function HomePage() {
   return (
     <>
-      <Home5Page />
+      <Home6Page />
       {SITE_LD.map((d, i) => <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(d).replace(/</g, "\\u003c") }} />)}
     </>
   );

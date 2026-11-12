@@ -16,6 +16,11 @@ import Footer from "@/components/Footer";
 import GradientWaves from "@/components/GradientWaves";
 import { EXTRA_FAQS } from "./extraFaqs";
 import { AudienceProvider, HeroAudienceToggle, HeroCopy, PageSwitch, Home5Main, Home5FooterRow } from "./Home5Landing";
+import type { Metadata } from "next";
+
+// Archived: the previous homepage, replaced by home-6 on 2026-11-12. Kept at
+// /home-5 for reference and kept out of search.
+export const metadata: Metadata = { robots: { index: false, follow: false } };
 
 const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600", "700"], variable: "--font-inter" });
 
