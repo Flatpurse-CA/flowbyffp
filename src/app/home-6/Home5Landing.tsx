@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowUpRight, ArrowDown, MapPin, Tag } from "lucide-react";
 import ScrollReveal from "@/components/ScrollReveal";
-import Home4Landing from "../home-4/Home4Landing";
+import ClientsLanding from "./ClientsLanding";
 import "../home-4/home-4.css";
 import "./home-5.css";
 
@@ -147,7 +147,7 @@ export function PageSwitch({ owners }: { owners: React.ReactNode }) {
   const { setAudience, isClients } = useAudience();
   useEffect(() => { window.scrollTo(0, 0); }, [isClients]);
   if (!isClients) return <>{owners}</>;
-  return <Home4Landing initialAudience="clients" onAudienceChange={setAudience} />;
+  return <ClientsLanding onOwners={() => setAudience("owners")} />;
 }
 
 /** Hero headline, paragraph and buttons; switches with the audience toggle (home-4 copy for each side). */

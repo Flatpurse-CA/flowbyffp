@@ -13,11 +13,12 @@ const BRAND_PURPLE = "#712AE2";
 export type FooterCta = { heading: ReactNode; body: ReactNode; href: string; label: ReactNode; eyebrow?: string; secondary?: { href: string; label: ReactNode } };
 
 // childrenAt: where the page-supplied row sits, above the resource links (default) or below them.
-export default function Footer({ cta, children, childrenAt = "top" }: { cta?: FooterCta; children?: ReactNode; childrenAt?: "top" | "bottom" } = {}) {
+// hideCta: drop the purple trial banner (the clients page is not selling to shops).
+export default function Footer({ cta, children, childrenAt = "top", hideCta = false }: { cta?: FooterCta; children?: ReactNode; childrenAt?: "top" | "bottom"; hideCta?: boolean } = {}) {
   return (
     <footer style={{ background: "#060606" }}>
       {/* CTA Banner */}
-      <div className="footer-cta-wrap" style={{
+      {!hideCta && <div className="footer-cta-wrap" style={{
         position: "relative",
         backgroundColor: BRAND_PURPLE,
         padding: "120px 40px",
@@ -77,7 +78,7 @@ export default function Footer({ cta, children, childrenAt = "top" }: { cta?: Fo
             </Link>
           )}
         </div>
-      </div>
+      </div>}
 
       {/* Footer body */}
       <div className="footer-body" style={{ padding: "0 155px 0", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
