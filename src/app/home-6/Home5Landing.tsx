@@ -33,7 +33,15 @@ function SectionHead({ eyebrow, title, body, align = "center" }: { eyebrow: stri
   );
 }
 
-const AudienceContext = createContext<{ audience: Audience; setAudience: (a: Audience) => void }>({ audience: "owners", setAudience: () => {} });
+/** Business type picked in the hero ("What do you run?"); swaps the headline noun and subheadline. */
+export type Segment = "salon" | "barber" | "spa";
+const SEGMENTS: { key: Segment; label: string; noun: string; lede: string }[] = [
+  { key: "salon", label: "Salon", noun: "chairs", lede: "Flow is the booking and payments platform for Canadian salons. Its AutoPilot rebooks no-shows, sends rebooking reminders and brings lapsed clients back while you are behind the chair." },
+  { key: "barber", label: "Barbershop", noun: "chairs", lede: "Flow is the booking and payments platform for Canadian barbershops. Its AutoPilot fills last-minute openings, recovers no-shows and brings regulars back while you cut." },
+  { key: "spa", label: "Spa", noun: "rooms", lede: "Flow is the booking and payments platform for Canadian spas. It books rooms and equipment, collects intake forms and issues insurance-ready receipts, while AutoPilot recovers no-shows and fills openings." },
+];
+
+const AudienceContext = createContext<{ audience: Audience; setAudience: (a: Audience) => void; seg: Segment; setSeg: (s: Segment) => void }>({ audience: "owners", setAudience: () => {}, seg: "salon", setSeg: () => {} });
 
 /**
  * Shares the Shop owners / Clients choice across the home-4 blocks added into
@@ -42,6 +50,7 @@ const AudienceContext = createContext<{ audience: Audience; setAudience: (a: Aud
  */
 export function AudienceProvider({ children }: { children: React.ReactNode }) {
   const [audience, setAudience] = useState<Audience>("owners");
+  const [seg, setSeg] = useState<Segment>("salon");
   const router = useRouter();
 
   useEffect(() => {
@@ -63,15 +72,49 @@ export function AudienceProvider({ children }: { children: React.ReactNode }) {
   }, [router]);
 
   return (
-    <AudienceContext.Provider value={{ audience, setAudience }}>
+    <AudienceContext.Provider value={{ audience, setAudience, seg, setSeg }}>
       {children}
     </AudienceContext.Provider>
   );
 }
 
 function useAudience() {
-  const { audience, setAudience } = useContext(AudienceContext);
-  return { audience, setAudience, isClients: audience === "clients" };
+  const { audience, setAudience, seg, setSeg } = useContext(AudienceContext);
+  return { audience, setAudience, seg, setSeg, isClients: audience === "clients" };
+}
+
+/** Founders Beta offer pill above the hero headline. */
+export const FOUNDERS_SPOTS_LEFT = 35;
+export function BetaBanner() {
+  const { isClients } = useAudience();
+  if (isClients) return null;
+  return (
+    <Link href="/signup" className="h6-beta">
+      <span className="h6-beta-dot" aria-hidden="true" />
+      <span><strong>Founders Beta is open.</strong> {FOUNDERS_SPOTS_LEFT} of 40 spots left, 40% off your first year</span>
+      <ArrowUpRight size={15} strokeWidth={2.2} aria-hidden="true" />
+    </Link>
+  );
+}
+
+/** "What do you run?" picker under the hero copy, owners only. */
+export function HeroSegmentPicker() {
+  const { isClients, seg, setSeg } = useAudience();
+  if (isClients) return null;
+  return (
+    <div className="h6-seg">
+      <p className="h6-seg-label" aria-hidden="true">What do you run?</p>
+      <fieldset className="h5-toggle h5-toggle-hero h6-seg-toggle">
+        <legend className="sr-only">What do you run?</legend>
+        {SEGMENTS.map(s => (
+          <label key={s.key}>
+            <input type="radio" name="hero-segment" value={s.key} checked={seg === s.key} onChange={() => setSeg(s.key)} />
+            <span>{s.label}</span>
+          </label>
+        ))}
+      </fieldset>
+    </div>
+  );
 }
 
 /** Shop owners / Clients switch for the hero, in place of home-3's chip. Same shared state as the sections below. */
@@ -109,20 +152,21 @@ export function PageSwitch({ owners }: { owners: React.ReactNode }) {
 
 /** Hero headline, paragraph and buttons; switches with the audience toggle (home-4 copy for each side). */
 export function HeroCopy() {
-  const { audience, isClients } = useAudience();
+  const { audience, isClients, seg } = useAudience();
+  const segment = SEGMENTS.find(s => s.key === seg) ?? SEGMENTS[0];
   return (
     <div key={audience} className="h5-hero-copy-swap">
       <h1 className="h3-hero-h1 h5-hero-h1">
         {isClients ? (
           <>YOUR TIME.<br /><span className="h5-hero-accent">YOUR STYLE.</span><br />ZERO FUSS.</>
         ) : (
-          <>Fill more chairs.<br /><span className="h5-hero-accent">Spend less time managing them.</span></>
+          <>Fill more <span key={segment.noun} className="h6-noun">{segment.noun}</span>.<br /><span className="h5-hero-accent">Spend less time managing them.</span></>
         )}
       </h1>
-      <p className="h5-hero-lede">
+      <p key={isClients ? "clients" : seg} className="h5-hero-lede h6-lede-swap">
         {isClients
           ? "Book your favourite salon or barber when it suits you. Choose your service, pick your time, and get on with your day."
-          : "Flow is the booking and payments platform for Canadian salons. Its AutoPilot rebooks no-shows, sends rebooking reminders and brings lapsed clients back while you are behind the chair."}
+          : segment.lede}
       </p>
       <div className="h5-hero-actions">
         {isClients ? (

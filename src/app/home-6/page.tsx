@@ -15,7 +15,8 @@ import IntegrationsGrid from "@/components/IntegrationsGrid";
 import Footer from "@/components/Footer";
 import GradientWaves from "@/components/GradientWaves";
 import { EXTRA_FAQS } from "./extraFaqs";
-import { AudienceProvider, HeroAudienceToggle, HeroCopy, PageSwitch, Home5Main, Home5FooterRow } from "./Home5Landing";
+import { AudienceProvider, HeroAudienceToggle, HeroCopy, PageSwitch, Home5Main, Home5FooterRow, BetaBanner, HeroSegmentPicker } from "./Home5Landing";
+import { AutoPilotFlows, ClientExperience, CanadaPayments, TrialCta } from "./Home6Sections";
 import type { Metadata } from "next";
 
 // Redesign preview: kept out of search until it replaces the live homepage.
@@ -93,9 +94,13 @@ export default function Home5Page() {
           </div>
 
           <div style={{ position: "relative", maxWidth: 1120, margin: "0 auto", textAlign: "center" }}>
+            <BetaBanner />
+
             <HeroAudienceToggle />
 
             <HeroCopy />
+
+            <HeroSegmentPicker />
           </div>
 
           <div
@@ -192,10 +197,16 @@ export default function Home5Page() {
           <FeatureTabs fitViewport />
         </ScrollZoom>
 
+        <AutoPilotFlows />
+
         <FoundationsGrid />
 
         {/* ── Added from home-4 ── */}
         <Home5Main />
+
+        <ClientExperience />
+
+        <CanadaPayments />
 
         <div style={{ position: "absolute", bottom: 0, left: 0, width: "100%", zIndex: 10, pointerEvents: "none" }}>
           <img src="/ffdoe.svg" alt="" style={{ width: "100%", display: "block", filter: "brightness(0.04)" }} />
@@ -212,6 +223,8 @@ export default function Home5Page() {
       <PricingSection />
 
       <IntegrationsGrid extraFaqs={EXTRA_FAQS} />
+
+      <TrialCta />
 
       <Footer>
         <Home5FooterRow />
