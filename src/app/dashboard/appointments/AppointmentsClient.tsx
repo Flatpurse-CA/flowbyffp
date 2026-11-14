@@ -1326,6 +1326,8 @@ export function AppointmentsClient({ initialAppointments, bookingUrl, staff, sel
     const params = new URLSearchParams(window.location.search);
     if (params.get("newBooking") === "1") {
       const name = params.get("clientName");
+      // One-time read of the URL after hydration; reading it during render would mismatch the server HTML.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       if (name) setPrefillClientName(name);
       setNew(true);
       const url = new URL(window.location.href);
@@ -1341,7 +1343,10 @@ export function AppointmentsClient({ initialAppointments, bookingUrl, staff, sel
     if (statusFilter === "cancelled") return allAppts.filter(a => a.status === "cancelled");
     if (statusFilter === "pending") return allAppts.filter(a => a.status === "pending");
     return allAppts;
-  }, [allAppts, statusFilter]);
+  }, [allAppts, statusFilter]).filter(a => {
+    const q = query.trim().toLowerCase();
+    return !q || `${a.name} ${a.service} ${a.stylist}`.toLowerCase().includes(q);
+  });
   const selectedAppt = appts.find(a => a.id === selectedId) ?? null;
 
   const refresh = () => startTransition(() => router.refresh());

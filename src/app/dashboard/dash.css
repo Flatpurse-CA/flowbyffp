@@ -274,3 +274,24 @@ a.fd-row:hover{background:var(--fd-hover)}
   .fd-appt .fd-status,.fd-rail-head h2 small{display:none}
   .fd-rail-time{width:58px;padding-left:14px}
 }
+
+/* Tables, chips, people */
+.fd-status-red{background:#b91c1c}
+.fd-chips{display:flex;gap:6px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+.fd-chip{flex-shrink:0;height:32px;padding:0 14px;border-radius:999px;background:var(--fd-panel);border:1px solid var(--fd-line);color:var(--fd-muted);font:inherit;font-size:12.5px;font-weight:600;cursor:pointer;transition:color .12s,border-color .12s}
+.fd-chip:hover{color:var(--fd-fg)}
+.fd-chip.is-on{background:var(--fd-accent);border-color:var(--fd-accent);color:var(--fd-accent-fg)}
+.fd-table{width:100%;border-collapse:collapse}
+.fd-table th{padding:12px 18px;text-align:left;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;color:var(--fd-faint);border-bottom:1px solid var(--fd-line)}
+.fd-table td{padding:12px 18px;font-size:13px;color:var(--fd-fg);border-top:1px solid var(--fd-line)}
+.fd-table tbody tr:first-child td{border-top:0}
+.fd-table tbody tr{cursor:pointer;transition:background .12s}
+.fd-table tbody tr:hover{background:var(--fd-hover)}
+.fd-td-num{font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+.fd-table td.fd-td-muted{color:var(--fd-muted);white-space:nowrap}
+.fd-table td.fd-td-end{width:1%;color:var(--fd-faint)}
+.fd-person{display:flex;align-items:center;gap:12px;min-width:0}
+.fd-sched-avatar{position:relative}
+.fd-sched-avatar i{position:absolute;right:-1px;bottom:-1px;width:10px;height:10px;border-radius:50%;border:2px solid var(--fd-panel)}
+.fd-cards{display:none;flex-direction:column;gap:8px}
+.fd-cards .fd-list-row{padding:12px 14px;background:var(--fd-panel);border:1px solid var(--fd-line)}
