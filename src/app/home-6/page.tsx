@@ -137,7 +137,7 @@ export default function Home5Page() {
                 whiteSpace: "nowrap",
               }}
             >
-              Built by salon owners, for salon owners.
+              Built in Edmonton for Canadian shop owners.
             </span>
 
             <span

@@ -9,7 +9,7 @@ const BRAND_PURPLE = "#712AE2";
 const ITEMS = [
   {
     title: "Zero commission, always",
-    description: "Every other platform takes a cut of your revenue. FlatPurse Flow never does. What you earn is yours, every single time.",
+    description: "Marketplace apps can charge commission on the new clients they send you. Flow never does.",
   },
   {
     title: "AI that actually works while you sleep",

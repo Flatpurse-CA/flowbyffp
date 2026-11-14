@@ -40,7 +40,7 @@ export default function Footer({ cta, children, childrenAt = "top", hideCta = fa
             color: "#fff",
             margin: "0 0 20px",
           }}>
-            {cta ? cta.heading : <>Stop Letting Your Client<br />Book Your Competitors</>}
+            {cta ? cta.heading : <>Stop letting your clients<br />book with your competitors</>}
           </h2>
           <p style={{
             fontSize: 16,

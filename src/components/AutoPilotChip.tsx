@@ -68,7 +68,7 @@ export default function AutoPilotChip({ theme = "dark", words = DEFAULT_WORDS }:
           letterSpacing: "0.01em",
           whiteSpace: "nowrap",
         }}>
-          Auto Pilot
+          AutoPilot
         </span>
         <span style={{ fontSize: 11.5, color: isLight ? "rgba(113,42,226,0.3)" : "rgba(250,219,229,0.25)" }}>·</span>
         <div style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>

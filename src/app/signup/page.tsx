@@ -88,7 +88,7 @@ function SignupStep1() {
               animation: fadeUp(60),
             }}
           >
-            Enter your personal data to create your account.
+            Set up your shop in a few minutes.
           </p>
 
           {error && (

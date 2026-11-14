@@ -146,7 +146,7 @@ export default function PricingSection({ finePrint = "text" }: { finePrint?: "te
           margin: 0,
           maxWidth: 520,
         }}>
-          The first 40 businesses to join get 40% off Pro or Pro+ for 12 months, then 25% off forever. No code required. No fine print. Here&apos;s what that looks like:
+          The first 40 businesses to join get 40% off Pro or Pro+ for 12 months, then 25% off forever. No code required. Here&apos;s what that looks like:
         </p>
       </ScrollReveal>
 
