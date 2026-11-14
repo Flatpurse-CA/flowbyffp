@@ -3,15 +3,14 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import {
-  CalendarDays, AlertTriangle,
-  BarChart2, ChevronRight, Plus, Users2, Clock,
+  AlertTriangle, ArrowUpRight, CalendarDays, ChevronRight, CircleCheck,
+  Plus, RotateCcw, Users, Users2, Zap, type LucideIcon,
 } from "lucide-react";
 import type { AppointmentRow, AppointmentStatus } from "./appointments/actions";
 import type { AutopilotState } from "./autopilot/actions";
 import type { NeedsYouCard } from "./daily-brief/actions";
-import { useDashboardTheme } from "./theme-context";
-import { tint } from "@/lib/color";
-import { deepen } from "@/lib/dashboard/deepen";
+
+// Layout and styles: ./dash.css (fd- classes), loaded by DashboardShell.
 
 // ─── Animated counter ─────────────────────────────────────────────────────────
 function AnimCount({ target, prefix = "", suffix = "", duration = 1400 }: {
@@ -38,7 +37,7 @@ function AnimCount({ target, prefix = "", suffix = "", duration = 1400 }: {
 }
 
 // ─── Pulse ring ───────────────────────────────────────────────────────────────
-function PulseRing({ color = "var(--dgreen-text)", size = 10 }: { color?: string; size?: number }) {
+function PulseRing({ color = "var(--fd-green)", size = 10 }: { color?: string; size?: number }) {
   return (
     <span style={{ position: "relative", display: "inline-flex", alignItems: "center", justifyContent: "center", width: size, height: size }}>
       <span style={{
@@ -75,26 +74,23 @@ function fmtTime(iso: string) {
   return new Intl.DateTimeFormat("en-US", { timeZone: "America/Edmonton", hour: "numeric", minute: "2-digit" }).format(new Date(iso));
 }
 
-function statusLabel(dark: boolean): Record<AppointmentStatus, { label: string; color: string; bg: string }> {
-  return {
-    completed: { label: "Done",      color: dark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.43)", bg: dark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.07)" },
-    confirmed: { label: "Confirmed", color: "var(--dst-green-fg)", bg: "var(--dst-green-bg)"},
-    pending:   { label: "Pending",   color: dark ? "rgba(255,255,255,0.5)"  : "rgba(0,0,0,0.55)",  bg: dark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.08)" },
-    deposit:   { label: "⚠ Deposit", color: "var(--dst-amber-fg)", bg: "var(--dst-amber-bg)"},
-    cancelled: { label: "Cancelled", color: dark ? "rgba(255,255,255,0.25)" : "rgba(0,0,0,0.32)",  bg: dark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.045)" },
-    no_show:   { label: "No-show",   color: "white", bg: "rgb(180,83,9)" },
-  };
-}
-const UP_NEXT = { label: "Up next", color: "var(--dst-violet-fg)", bg: "var(--dst-violet-bg)" };
+// Solid pills in both themes; grey is the quiet one for states that need no attention.
+type Tone = "violet" | "green" | "amber" | "orange" | "grey";
+const STATUS: Record<AppointmentStatus, { label: string; tone: Tone }> = {
+  completed: { label: "Done",        tone: "grey" },
+  confirmed: { label: "Confirmed",   tone: "green" },
+  pending:   { label: "Pending",     tone: "grey" },
+  deposit:   { label: "Deposit due", tone: "amber" },
+  cancelled: { label: "Cancelled",   tone: "grey" },
+  no_show:   { label: "No-show",     tone: "orange" },
+};
+const UP_NEXT: { label: string; tone: Tone } = { label: "Up next", tone: "violet" };
 
-function cardStyle(dark: boolean): React.CSSProperties {
-  return {
-    background: dark ? "rgba(255,255,255,0.025)" : "rgb(255,255,255)",
-    border: dark ? "1px solid rgba(255,255,255,0.07)" : "1px solid rgba(0,0,0,0.09)",
-    borderRadius: 18,
-    overflow: "hidden",
-  };
-}
+const NEED_ICON: Record<NeedsYouCard["kind"], LucideIcon> = {
+  winback: RotateCcw,
+  staff: Users2,
+  payment: AlertTriangle,
+};
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 type OwnerProps = {
@@ -106,27 +102,37 @@ type OwnerProps = {
   needsYou: NeedsYouCard[];
   todayBookingsCount: number;
   nextAppointmentTime: string | null;
+  revenueScheduled: number;
+  staffWorking: number;
   monthRevenue: number;
   monthRevenueDeltaPct: number | null;
 };
 type StaffProps = { role: "staff"; todaySchedule: AppointmentRow[] };
 
 export function HomeClient(props: OwnerProps | StaffProps) {
-  const { dark } = useDashboardTheme();
   const dateStr = new Date().toLocaleDateString("en-CA", { weekday: "long", month: "long", day: "numeric" });
+  const owner = props.role === "owner";
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <p style={{ color: dark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.48)", fontSize: 13, margin: 0 }}>{dateStr}</p>
-        <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 12px", borderRadius: 30, background: "var(--dbadge-green-l, rgba(52,211,153,0.1))", border: "1px solid var(--dbadge-green-l, rgba(52,211,153,0.2))" }}>
-          <PulseRing size={7} color="var(--dsel-text-l, var(--dgreen-text))" />
-          <span style={{ fontSize: 11.5, fontWeight: 700, color: "var(--dsel-text-l, var(--dgreen-text))" }}>Live</span>
+    <div className="fd-page">
+      <div className="fd-page-head">
+        <div>
+          <p className="fd-date">{dateStr}</p>
+          <h1>Overview</h1>
+          <p className="fd-sub">{owner ? "Here's what's happening at your shop today." : "Here's your schedule for today."}</p>
+        </div>
+        <div className="fd-inline">
+          <span className="fd-tag"><PulseRing size={8} /> Live</span>
+          {owner && (
+            <Link href="/dashboard/appointments" className="fd-btn fd-btn-primary">
+              <Plus size={15} strokeWidth={2.2} /> New booking
+            </Link>
+          )}
         </div>
       </div>
 
       {props.role === "staff"
-        ? <StaffSchedule schedule={props.todaySchedule} />
+        ? <ScheduleCard title="Your schedule today" schedule={props.todaySchedule} emptyText="No bookings on your calendar today." />
         : props.everBooked
           ? <OwnerPopulated {...props} />
           : <EmptyState />}
@@ -134,310 +140,231 @@ export function HomeClient(props: OwnerProps | StaffProps) {
   );
 }
 
-// ─── Staff: today's schedule only ──────────────────────────────────────────────
-function StaffSchedule({ schedule }: { schedule: AppointmentRow[] }) {
-  const { dark, T } = useDashboardTheme();
+// ─── Today's schedule (owner and staff) ───────────────────────────────────────
+function ScheduleCard({ title, schedule, emptyText, showNew = false }: {
+  title: string; schedule: AppointmentRow[]; emptyText: string; showNew?: boolean;
+}) {
   const now = new Date();
   const nextId = schedule.find(a => a.status !== "completed" && a.status !== "cancelled" && a.status !== "no_show" && new Date(a.starts_at) >= now)?.id;
 
   return (
-    <div style={cardStyle(dark)}>
-      <div style={{ padding: "18px 20px 14px", borderBottom: `1px solid ${T.divider}` }}>
-        <p style={{ color: T.text, fontSize: 15, fontWeight: 700, margin: 0 }}>Your schedule today</p>
+    <section className="fd-card fd-card-pad">
+      <div className="fd-head is-line">
+        <h2>{title}</h2>
+        <Link href="/dashboard/appointments">View all <ChevronRight size={13} /></Link>
       </div>
+
       {schedule.length === 0 ? (
-        <div style={{ padding: "40px 20px", textAlign: "center", color: dark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.43)", fontSize: 13 }}>
-          No bookings on your calendar today.
+        <div className="fd-empty">
+          <span className="fd-empty-icon"><CalendarDays size={18} strokeWidth={1.8} /></span>
+          <b>Nothing booked today</b>
+          <p>{emptyText}</p>
+          {showNew && (
+            <Link href="/dashboard/appointments" className="fd-btn fd-btn-ghost fd-btn-sm">
+              <Plus size={14} /> New booking
+            </Link>
+          )}
         </div>
       ) : (
-        <div style={{ padding: "8px 0" }}>
+        <div>
           {schedule.map(row => (
             <ScheduleRow key={row.id} row={row} isUpNext={row.id === nextId} />
           ))}
         </div>
       )}
-    </div>
+    </section>
   );
 }
 
 function ScheduleRow({ row, isUpNext }: { row: AppointmentRow; isUpNext: boolean }) {
-  const { dark, T } = useDashboardTheme();
-  const s = isUpNext ? UP_NEXT : statusLabel(dark)[row.status];
-  const color = colorFor(row.client_name);
+  const s = isUpNext ? UP_NEXT : STATUS[row.status];
   return (
-    <div className="schedule-row" style={{ display: "flex", alignItems: "center", gap: 14, padding: "12px 20px" }}>
-      <div className="schedule-row-time" style={{ display: "flex", alignItems: "center", gap: 4, width: 60, flexShrink: 0 }}>
-        <Clock className="schedule-row-time-icon" size={11} color={T.textFaint} />
-        <span style={{ color: dark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.38)", fontSize: 11.5, fontWeight: 600 }}>{fmtTime(row.starts_at)}</span>
-      </div>
-      <div className="schedule-row-avatar" style={{
-        width: 34, height: 34, borderRadius: "50%", flexShrink: 0,
-        background: tint(color, 0.13), border: `1.5px solid ${tint(color, 0.27)}`,
-        display: "flex", alignItems: "center", justifyContent: "center",
-        fontSize: 11, fontWeight: 800, color: deepen(color),
-      }}>
+    <div className="fd-sched-row">
+      <span className="fd-sched-time">{fmtTime(row.starts_at)}</span>
+      <span className="fd-sched-avatar" style={{ background: colorFor(row.client_name) }} aria-hidden="true">
         {initialsFor(row.client_name)}
-      </div>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ color: T.text, fontSize: 13, fontWeight: 700, margin: "0 0 1px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{row.client_name}</p>
-        <p style={{ color: dark ? "rgba(255,255,255,0.32)" : "rgba(0,0,0,0.4)", fontSize: 11.5, margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{row.service_name}{row.stylist_name ? ` · ${row.stylist_name}` : ""}</p>
-      </div>
-      <span className="schedule-row-badge" style={{ fontSize: 10.5, fontWeight: 700, padding: "3px 9px", borderRadius: 20, color: s.color, background: s.bg, whiteSpace: "nowrap", flexShrink: 0 }}>
-        {s.label}
       </span>
-      <span style={{ color: "var(--dgreen-text)", fontSize: 13, fontWeight: 700, flexShrink: 0, minWidth: 46, textAlign: "right" }}>
-        {fmtPrice(Number(row.price))}
+      <span className="fd-row-main">
+        <b>{row.client_name}</b>
+        <small>{row.service_name}{row.stylist_name ? ` · ${row.stylist_name}` : ""}</small>
       </span>
+      <span className={`fd-status fd-status-${s.tone}`}>{s.label}</span>
+      <span className="fd-sched-price">{fmtPrice(Number(row.price))}</span>
     </div>
   );
 }
 
-// ─── Owner: onboarding empty state ─────────────────────────────────────────────
+// ─── Owner: before the first booking ──────────────────────────────────────────
 function EmptyState() {
-  const { dark } = useDashboardTheme();
-  const card = cardStyle(dark);
-  const primaryText = dark ? "rgb(250,250,250)" : "rgb(12,12,20)";
+  const steps: { icon: LucideIcon; title: string; sub: string; cta: string; href: string; primary: boolean }[] = [
+    { icon: CalendarDays, title: "Add today's bookings", sub: "Enter your first appointment to see the schedule come alive.", cta: "Add booking", href: "/dashboard/appointments", primary: true },
+    { icon: Users2,       title: "Add your team",        sub: "Each staff member gets their own calendar column.",        cta: "Add team member", href: "/dashboard/team", primary: false },
+  ];
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-      {/* Compact AutoPilot balance card — bold solid fill, no gradient */}
-      <div data-portal-theme="dark" style={{
-        background: "rgb(109,40,217)",
-        borderRadius: 20, padding: "20px 24px",
-      }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-          <PulseRing color="var(--dgreen-text)" size={7} />
-          <span style={{ color: "rgb(180,246,214)", fontSize: 10.5, fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase" }}>
-            AutoPilot is watching
-          </span>
+    <>
+      <section className="fd-band">
+        <div className="fd-band-main">
+          <p className="fd-band-status"><PulseRing color="#6ee7b7" size={9} /> AutoPilot is watching</p>
+          <p className="fd-band-value">C$0 <small>recovered so far</small></p>
         </div>
-        <div style={{ display: "flex", alignItems: "baseline", gap: 10, flexWrap: "wrap" }}>
-          <p style={{ color: "white", fontSize: 32, fontWeight: 800, margin: 0, letterSpacing: "-0.04em", lineHeight: 1 }}>C$0</p>
-          <p style={{ color: "rgba(255,255,255,0.68)", fontSize: 12.5, margin: 0 }}>recovered so far</p>
+        <p className="fd-band-note">Starts recovering revenue automatically the moment your first booking comes in.</p>
+        <Link href="/dashboard/autopilot" className="fd-band-btn">
+          Open AutoPilot <ArrowUpRight size={16} strokeWidth={2.2} />
+        </Link>
+      </section>
+
+      <section className="fd-card fd-card-pad">
+        <div className="fd-head is-line">
+          <h2>Complete your setup</h2>
+          <small>{steps.length} steps</small>
         </div>
-        <p style={{ color: "rgba(255,255,255,0.68)", fontSize: 12.5, margin: "6px 0 0", maxWidth: 340, lineHeight: 1.5 }}>
-          Starts recovering revenue automatically the moment your first booking comes in.
-        </p>
-      </div>
-
-      <p style={{ color: primaryText, fontSize: 13, fontWeight: 700, margin: "2px 0 -4px" }}>Complete your setup</p>
-
-      {[
-        { icon: CalendarDays, fill: "rgb(139,92,246)", title: "Add today's bookings", sub: "Enter your first appointment to see the schedule come alive.", cta: "Add booking", href: "/dashboard/appointments" },
-        { icon: Users2,       fill: "rgb(59,130,246)",  title: "Add your team",        sub: "Each staff member gets their own calendar column.",        cta: "Add team member", href: "/dashboard/team" },
-      ].map(row => {
-        const Icon = row.icon;
-        return (
-          <div key={row.title} style={{ ...card, padding: "18px 20px", display: "flex", flexDirection: "column", gap: 14 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-              <div style={{ width: 42, height: 42, borderRadius: 12, flexShrink: 0, background: row.fill, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <Icon size={20} color="white" strokeWidth={1.8} />
+        <ul className="fd-rows fd-setup">
+          {steps.map(({ icon: Icon, title, sub, cta, href, primary }) => (
+            <li key={title}>
+              <div className="fd-row">
+                <span className="fd-ico"><Icon size={17} strokeWidth={1.8} /></span>
+                <span className="fd-row-main">
+                  <b>{title}</b>
+                  <small>{sub}</small>
+                </span>
+                <Link href={href} className={`fd-btn fd-btn-sm ${primary ? "fd-btn-primary" : "fd-btn-ghost"}`}>
+                  <Plus size={14} strokeWidth={2.2} /> {cta}
+                </Link>
               </div>
-              <div style={{ flex: 1 }}>
-                <p style={{ color: dark ? "rgb(250,250,250)" : "rgb(12,12,20)", fontSize: 14, fontWeight: 700, margin: "0 0 2px" }}>{row.title}</p>
-                <p style={{ color: dark ? "rgba(255,255,255,0.38)" : "rgba(0,0,0,0.46)", fontSize: 12.5, margin: 0, lineHeight: 1.5 }}>{row.sub}</p>
-              </div>
-            </div>
-            <Link href={row.href} style={{
-              display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
-              width: "100%", padding: "11px 16px", borderRadius: 10,
-              background: row.fill,
-              border: "none",
-              color: "white", fontSize: 13, fontWeight: 700,
-              textDecoration: "none", whiteSpace: "nowrap",
-            }}>
-              <Plus size={13} strokeWidth={2.5} /> {row.cta}
-            </Link>
-          </div>
-        );
-      })}
-    </div>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </>
   );
 }
 
-// ─── Owner: populated (real data) ──────────────────────────────────────────────
+// ─── Owner: live numbers ──────────────────────────────────────────────────────
 function OwnerPopulated(props: OwnerProps) {
-  const { dark } = useDashboardTheme();
-  const card = cardStyle(dark);
-  const { autopilot, todayAutopilotRevenue, needsYou,
-    todayBookingsCount, nextAppointmentTime, monthRevenue, monthRevenueDeltaPct, todaySchedule } = props;
+  const { autopilot, todayAutopilotRevenue, needsYou, todayBookingsCount, nextAppointmentTime,
+    revenueScheduled, staffWorking, monthRevenue, monthRevenueDeltaPct, todaySchedule } = props;
 
   const topNeed = needsYou[0] ?? null;
-  const paymentNeed = needsYou.find(n => n.kind === "payment") ?? null;
-  const now = new Date();
-  const nextId = todaySchedule.find(a => a.status !== "completed" && a.status !== "cancelled" && a.status !== "no_show" && new Date(a.starts_at) >= now)?.id;
 
-  const primaryText = dark ? "rgb(250,250,250)" : "rgb(12,12,20)";
-  const faintChevron = dark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.28)";
-  const labelColor = dark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.43)";
+  const bandStats = [
+    { label: "Today", value: fmtPrice(todayAutopilotRevenue) },
+    { label: "Slots filled", value: String(autopilot.flowStats.filler.count) },
+    { label: "No-shows saved", value: String(autopilot.flowStats.noshow.count) },
+    { label: "Win-backs", value: String(autopilot.flowStats.winback.count) },
+    { label: "Clients reached", value: String(autopilot.totals.customers) },
+  ];
+
+  const delta = monthRevenueDeltaPct;
+  const stats: { title: string; value: string; foot: string; href: string; alert?: boolean; footTone?: "up" | "down" }[] = [
+    {
+      title: "Today's bookings", value: String(todayBookingsCount), href: "/dashboard/appointments",
+      foot: nextAppointmentTime ? `Next at ${nextAppointmentTime}` : "Nothing left today",
+    },
+    {
+      title: "Needs your eyes", value: String(needsYou.length), href: "/dashboard/daily-brief",
+      foot: topNeed ? topNeed.text : "All clear", alert: needsYou.length > 0,
+    },
+    {
+      title: "Booked today", value: fmtPrice(revenueScheduled), href: "/dashboard/payments",
+      foot: staffWorking > 0 ? `${staffWorking} staff working` : "No one scheduled yet",
+    },
+    {
+      title: "Revenue this month", value: fmtPrice(monthRevenue), href: "/dashboard/operations",
+      foot: delta == null ? "No data last month" : `${delta >= 0 ? "+" : ""}${delta}% vs last month`,
+      footTone: delta == null ? undefined : delta >= 0 ? "up" : "down",
+    },
+  ];
+
+  const links: { icon: LucideIcon; label: string; href: string }[] = [
+    { icon: Users,  label: "Go to Clients",  href: "/dashboard/clients" },
+    { icon: Zap,    label: "View AutoPilot", href: "/dashboard/autopilot" },
+    { icon: Users2, label: "View Team",      href: "/dashboard/team" },
+  ];
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-
-      {/* Hero: AutoPilot — bold solid fill, no gradient */}
-      <div data-portal-theme="dark" style={{
-        background: "rgb(109,40,217)",
-        borderRadius: 20, padding: "22px 24px",
-        position: "relative",
-      }}>
-        <Link href="/dashboard/autopilot" title="Open AutoPilot" style={{
-          position: "absolute", top: 18, right: 18,
-          width: 34, height: 34, borderRadius: "50%", flexShrink: 0,
-          display: "flex", alignItems: "center", justifyContent: "center",
-          background: "rgba(255,255,255,0.14)",
-          color: "white", textDecoration: "none",
-        }}>
-          <ChevronRight size={17} strokeWidth={2.5} />
-        </Link>
-
-        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-          <PulseRing size={8} />
-          <span style={{ color: "rgb(180,246,214)", fontSize: 11, fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase" }}>
-            AutoPilot is on
-          </span>
+    <>
+      <section className="fd-band">
+        <div className="fd-band-main">
+          <p className="fd-band-status"><PulseRing color="#6ee7b7" size={9} /> AutoPilot is on</p>
+          <p className="fd-band-value">
+            <span>C$<AnimCount target={Math.round(autopilot.totals.revenue)} /></span>
+            <small>recovered this month</small>
+          </p>
         </div>
-        <p style={{ color: "rgba(255,255,255,0.68)", fontSize: 12, fontWeight: 600, margin: "0 0 4px", letterSpacing: "0.03em" }}>
-          RECOVERED THIS MONTH
-        </p>
-        <p style={{ color: "white", fontSize: 46, fontWeight: 800, margin: "0 0 20px", letterSpacing: "-0.04em", lineHeight: 1 }}>
-          C$<AnimCount target={Math.round(autopilot.totals.revenue)} />
-        </p>
-
-        <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
-          {[
-            { label: "Today", value: fmtPrice(todayAutopilotRevenue) },
-            { label: "Slots filled", value: String(autopilot.flowStats.filler.count) },
-            { label: "No-shows saved", value: String(autopilot.flowStats.noshow.count) },
-          ].map(s => (
+        <dl className="fd-band-stats">
+          {bandStats.map(s => (
             <div key={s.label}>
-              <p style={{ color: "white", fontSize: 18, fontWeight: 800, margin: "0 0 2px", letterSpacing: "-0.03em" }}>{s.value}</p>
-              <p style={{ color: "rgba(255,255,255,0.6)", fontSize: 11, margin: 0 }}>{s.label}</p>
+              <dt>{s.label}</dt>
+              <dd>{s.value}</dd>
             </div>
           ))}
-        </div>
+        </dl>
+        <Link href="/dashboard/autopilot" className="fd-band-btn">
+          Open AutoPilot <ArrowUpRight size={16} strokeWidth={2.2} />
+        </Link>
+      </section>
+
+      <div className="fd-stats">
+        {stats.map(s => (
+          <Link key={s.title} href={s.href} className="fd-card fd-stat">
+            <div className="fd-stat-top">
+              <h2>{s.title}</h2>
+              <ArrowUpRight size={15} aria-hidden="true" />
+            </div>
+            <p className={`fd-big${s.alert ? " is-alert" : ""}`}>{s.value}</p>
+            <p className={`fd-foot${s.footTone ? ` is-${s.footTone}` : ""}`}>{s.foot}</p>
+          </Link>
+        ))}
       </div>
 
-      {/* 3 nav cards */}
-      <div className="home-stat-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14 }}>
-        <Link href="/dashboard/appointments" style={{ textDecoration: "none" }}>
-          <div style={{ ...card, padding: "20px 20px 18px", cursor: "pointer" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(139,92,246,0.12)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <CalendarDays size={17} color="var(--dviolet-text)" strokeWidth={1.8} />
-              </div>
-              <ChevronRight size={15} color={faintChevron} />
-            </div>
-            <p style={{ color: labelColor, fontSize: 10, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 6px" }}>TODAY&apos;S BOOKINGS</p>
-            <p style={{ color: primaryText, fontSize: 28, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.04em" }}>{todayBookingsCount}</p>
-            <p style={{ color: labelColor, fontSize: 12, margin: 0 }}>{nextAppointmentTime ? `Next at ${nextAppointmentTime}` : "Nothing left today"}</p>
-          </div>
-        </Link>
+      <div className="fd-grid-main">
+        <ScheduleCard title="Today's schedule" schedule={todaySchedule} emptyText="Bookings for today will show up here as they come in." showNew />
 
-        <Link href="/dashboard/daily-brief" style={{ textDecoration: "none" }}>
-          <div style={{ ...card, padding: "20px 20px 18px", cursor: "pointer", border: needsYou.length > 0 ? "1px solid rgba(248,113,113,0.22)" : card.border }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(239,68,68,0.1)", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
-                <AlertTriangle size={17} color="var(--dred-text)" strokeWidth={1.8} />
-                {needsYou.length > 0 && (
-                  <span style={{ position: "absolute", top: -4, right: -4, minWidth: 16, height: 16, borderRadius: 8, background: "rgb(239,68,68)", color: "white", fontSize: 9, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    {needsYou.length}
-                  </span>
-                )}
-              </div>
-              <ChevronRight size={15} color={faintChevron} />
+        <div className="fd-col">
+          <section className="fd-card fd-card-pad">
+            <div className="fd-head">
+              <h2>Needs attention {needsYou.length > 0 && <span className="fd-num">{needsYou.length}</span>}</h2>
+              {needsYou.length > 0 && <Link href="/dashboard/daily-brief">Daily brief <ChevronRight size={13} /></Link>}
             </div>
-            <p style={{ color: labelColor, fontSize: 10, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 6px" }}>NEEDS YOUR EYES</p>
-            <p style={{ color: needsYou.length > 0 ? "var(--dred-text)" : primaryText, fontSize: 28, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.04em" }}>{needsYou.length}</p>
-            <p style={{ color: labelColor, fontSize: 12, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{topNeed ? topNeed.text : "All clear"}</p>
-          </div>
-        </Link>
-
-        <Link href="/dashboard/operations" style={{ textDecoration: "none" }}>
-          <div style={{ ...card, padding: "20px 20px 18px", cursor: "pointer" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(59,130,246,0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <BarChart2 size={17} color="var(--dblue-text)" strokeWidth={1.8} />
-              </div>
-              <ChevronRight size={15} color={faintChevron} />
-            </div>
-            <p style={{ color: labelColor, fontSize: 10, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 6px" }}>THIS MONTH</p>
-            <p style={{ color: primaryText, fontSize: 28, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.04em" }}>{fmtPrice(monthRevenue)}</p>
-            <p style={{ color: monthRevenueDeltaPct == null ? labelColor : monthRevenueDeltaPct >= 0 ? "var(--dgreen-text)" : "var(--dred-text)", fontSize: 12, margin: 0 }}>
-              {monthRevenueDeltaPct == null ? "No data last month" : `${monthRevenueDeltaPct >= 0 ? "+" : ""}${monthRevenueDeltaPct}% vs last month`}
-            </p>
-          </div>
-        </Link>
-      </div>
-
-      {/* Today's schedule + quick actions */}
-      <div className="home-schedule-grid" style={{ display: "grid", gridTemplateColumns: "1fr 300px", gap: 16 }}>
-
-        <div style={card}>
-          <div style={{ padding: "18px 20px 14px", borderBottom: dark ? "1px solid rgba(255,255,255,0.05)" : "1px solid rgba(0,0,0,0.07)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <p style={{ color: primaryText, fontSize: 15, fontWeight: 700, margin: 0 }}>Today&apos;s Schedule</p>
-            <Link href="/dashboard/appointments" style={{ display: "flex", alignItems: "center", gap: 4, color: "var(--dviolet-text)", fontSize: 12, fontWeight: 600, textDecoration: "none" }}>
-              View all <ChevronRight size={13} />
-            </Link>
-          </div>
-
-          {paymentNeed && (
-            <div style={{ margin: "12px 16px 0", padding: "11px 14px", background: "var(--dbadge-amber-l, rgba(245,158,11,0.07))", border: "1px solid var(--dbadge-amber-l, rgba(245,158,11,0.2))", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-              <div style={{ display: "flex", alignItems: "flex-start", gap: 9 }}>
-                <AlertTriangle size={14} color="var(--dsel-text-l, var(--damber-text))" strokeWidth={2} style={{ flexShrink: 0, marginTop: 1 }} />
-                <p style={{ color: dark ? "rgba(255,255,255,0.6)" : "rgb(255,255,255)", fontWeight: dark ? 400 : 600, fontSize: 12.5, margin: 0, lineHeight: 1.5 }}>{paymentNeed.text}</p>
-              </div>
-              <Link href="/dashboard/daily-brief" style={{ padding: "7px 13px", borderRadius: 9, flexShrink: 0, background: "var(--dalert-btn-l, rgb(245,158,11))", color: "var(--dalert-amber-btn-fg-l, rgb(10,8,0))", fontSize: 12, fontWeight: 700, whiteSpace: "nowrap", textDecoration: "none" }}>
-                View
-              </Link>
-            </div>
-          )}
-
-          {todaySchedule.length === 0 ? (
-            <div style={{ padding: "40px 20px", textAlign: "center", color: labelColor, fontSize: 13 }}>
-              No bookings scheduled for today.
-            </div>
-          ) : (
-            <div style={{ padding: "8px 0" }}>
-              {todaySchedule.map(row => (
-                <ScheduleRow key={row.id} row={row} isUpNext={row.id === nextId} />
-              ))}
-            </div>
-          )}
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          <div style={{ ...card, padding: "18px 20px" }}>
-            <p style={{ color: dark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.48)", fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", margin: "0 0 14px" }}>Quick actions</p>
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {[
-                { label: "+ New booking",  href: "/dashboard/appointments", color: "rgb(109,40,217)",                                     text: "white" },
-                { label: "Go to Clients",  href: "/dashboard/clients",      color: dark ? "rgba(255,255,255,0.05)" : "rgb(255,255,255)",  text: dark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.78)" },
-                { label: "View AutoPilot", href: "/dashboard/autopilot",    color: dark ? "rgba(255,255,255,0.05)" : "rgb(255,255,255)",  text: dark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.78)" },
-                { label: "View Team",      href: "/dashboard/team",         color: dark ? "rgba(255,255,255,0.05)" : "rgb(255,255,255)",  text: dark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.78)" },
-              ].map(a => (
-                <Link key={a.label} href={a.href} style={{ display: "block", padding: "10px 14px", borderRadius: 10, background: a.color, border: dark ? "1px solid rgba(255,255,255,0.07)" : "1px solid rgba(0,0,0,0.09)", color: a.text, fontSize: 13, fontWeight: 700, textDecoration: "none", textAlign: "center" }}>
-                  {a.label}
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ background: "var(--dcard-l, rgba(139,92,246,0.06))", border: "1px solid var(--dcard-border-l, rgba(139,92,246,0.2))", borderRadius: 14, padding: "16px 18px" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
-              <PulseRing size={6} color="var(--dviolet-text)" />
-              <span style={{ color: labelColor, fontSize: 10, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase" }}>Needs your attention</span>
-            </div>
-            <p style={{ color: dark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.68)", fontSize: 12.5, margin: "0 0 10px", lineHeight: 1.55 }}>
-              {topNeed ? topNeed.text : "You're all caught up. Nothing needs your attention right now."}
-            </p>
-            {topNeed && (
-              <Link href="/dashboard/daily-brief" style={{ display: "inline-block", padding: "7px 14px", borderRadius: 9, border: "1px solid var(--dsel-border-l, rgba(139,92,246,0.3))", background: "var(--dcard-l, rgba(139,92,246,0.1))", color: "var(--dviolet-text)", fontSize: 12, fontWeight: 700, textDecoration: "none" }}>
-                View details →
-              </Link>
+            {needsYou.length > 0 ? (
+              <ul className="fd-rows">
+                {needsYou.map(n => {
+                  const Icon = NEED_ICON[n.kind] ?? AlertTriangle;
+                  return (
+                    <li key={n.id}>
+                      <Link href="/dashboard/daily-brief" className="fd-row">
+                        <span className="fd-ico"><Icon size={16} strokeWidth={1.8} /></span>
+                        <span className="fd-row-text">{n.text}</span>
+                        <ChevronRight size={15} />
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : (
+              <p className="fd-clear"><CircleCheck size={16} /> You&apos;re all caught up.</p>
             )}
-          </div>
+          </section>
+
+          <section className="fd-card fd-card-pad">
+            <div className="fd-head">
+              <h2>Quick actions</h2>
+            </div>
+            <ul className="fd-rows">
+              {links.map(({ icon: Icon, label, href }) => (
+                <li key={href}>
+                  <Link href={href} className="fd-row">
+                    <span className="fd-ico"><Icon size={16} strokeWidth={1.8} /></span>
+                    <span className="fd-row-text">{label}</span>
+                    <ChevronRight size={15} />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
         </div>
       </div>
-    </div>
+    </>
   );
 }

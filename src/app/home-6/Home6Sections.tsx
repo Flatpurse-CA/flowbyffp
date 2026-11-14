@@ -1,6 +1,6 @@
 "use client";
 
-// Sections ported from the "FlatPurse Flow — Full Site Redesign" canvas (Home
+// Sections ported from the "FlatPurse Flow: Full Site Redesign" canvas (Home
 // artboard), rebuilt with home-5's card/chip/section styles so they sit
 // naturally on the existing page. New styles are h6-* in ./home-6.css.
 

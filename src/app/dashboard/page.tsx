@@ -66,6 +66,8 @@ export default async function HomePage() {
       needsYou={brief.needsYou}
       todayBookingsCount={brief.today.bookingsCount}
       nextAppointmentTime={brief.today.nextAppointmentTime}
+      revenueScheduled={brief.today.revenueScheduled}
+      staffWorking={brief.today.staffWorking}
       monthRevenue={monthRevenue}
       monthRevenueDeltaPct={monthRevenueDeltaPct}
     />
