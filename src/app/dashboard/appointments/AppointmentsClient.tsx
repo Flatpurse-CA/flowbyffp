@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { createPortal } from "react-dom";
 import {
   Plus, Search, Copy, Check, MessageSquare,
-  Mail, ExternalLink, Zap, Clock, ChevronRight,
+  Mail, ExternalLink, Clock,
   X, Phone, CreditCard, Banknote, Smartphone,
   Send, Pencil, Ban, CheckCircle2, StickyNote, SquarePen, UserX,
 } from "lucide-react";
@@ -1067,6 +1067,16 @@ function AppointmentDetail({ appt, onClose, onCloseOut, onChanged }: { appt: App
 
 // ─── Day view ─────────────────────────────────────────────────────────────────
 
+// Solid status pill tones (dash.css .fd-status-*)
+const STATUS_TONE: Record<string, string> = {
+  confirmed: "green", pending: "amber", deposit: "orange",
+  completed: "violet", cancelled: "grey", no_show: "orange",
+};
+
+function StatusPill({ status }: { status: string }) {
+  return <span className={`fd-status fd-status-${STATUS_TONE[status] ?? "grey"} rail-status-badge`}>{STATUS_STYLE[status].label}</span>;
+}
+
 function DayView({ appts, bookingUrl, onNewBooking, onSelect }: {
   appts: ApptRecord[]; bookingUrl: string | null;
   onNewBooking: () => void; onSelect: (appt: ApptRecord) => void;
@@ -1076,120 +1086,46 @@ function DayView({ appts, bookingUrl, onNewBooking, onSelect }: {
   const openCount = HOURS.filter(h => !bookingAtHour(h)).length;
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-
-      {/* Booking link card */}
+    <>
       <BookingLinkCard bookingUrl={bookingUrl} />
 
-      {/* Today summary banner */}
-      <div className="bookings-day-banner" style={{
-        display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12,
-        background: "var(--dcard-l, rgba(139,92,246,0.08))", border: "1px solid var(--dcard-border-l, rgba(139,92,246,0.22))",
-        borderRadius: 14, padding: "12px 18px",
-      }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
-          <Zap size={16} color="var(--dviolet-text)" strokeWidth={1.8} style={{ flexShrink: 0 }} />
-          <span style={{ color: "var(--dpurple-text)", fontSize: 13.5, fontWeight: 700 }}>
-            {todayAppts.length} booked today
-          </span>
-          <span style={{ color: "var(--dw35)", fontSize: 13 }}>· {openCount} open slot{openCount === 1 ? "" : "s"}</span>
-        </div>
-        <button className="bookings-day-banner-btn" onClick={onNewBooking} style={{
-          display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
-          padding: "9px 16px", borderRadius: 10, flexShrink: 0,
-          background: "rgb(109,40,217)", border: "none",
-          color: "white", fontSize: 12.5, fontWeight: 700, cursor: "pointer",
-        }}>
-          Add booking <ChevronRight size={13} strokeWidth={2.5} />
-        </button>
-      </div>
-
       {/* Time rail */}
-      <div style={{ ...card, padding: 0 }}>
-        <div style={{ padding: "16px 20px 12px", borderBottom: "1px solid var(--dw06)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <p style={{ color: "var(--dtext)", fontSize: 14, fontWeight: 700, margin: 0 }}>Today</p>
-          <button onClick={onNewBooking} style={{
-            display: "flex", alignItems: "center", gap: 6,
-            padding: "7px 14px", borderRadius: 9,
-            background: "rgb(109,40,217)", border: "none",
-            color: "white", fontSize: 12, fontWeight: 700, cursor: "pointer",
-          }}>
-            <Plus size={13} strokeWidth={2.5} /> Add booking
+      <div className="fd-card">
+        <div className="fd-head fd-rail-head">
+          <h2>Today <small>{todayAppts.length} booked, {openCount} open slot{openCount === 1 ? "" : "s"}</small></h2>
+          <button className="fd-btn fd-btn-ghost fd-btn-sm" onClick={onNewBooking}>
+            <Plus size={14} strokeWidth={2.2} /> Add booking
           </button>
         </div>
 
         {HOURS.map(h => {
           const booking = bookingAtHour(h);
-
           return (
-            <div key={h} style={{
-              display: "flex", alignItems: "stretch",
-              borderBottom: h < HOURS[HOURS.length - 1] ? "1px solid var(--dw04)" : "none",
-              minHeight: 56,
-            }}>
-              {/* Time label */}
-              <div className="rail-time" style={{
-                width: 72, flexShrink: 0, padding: "16px 0 16px 20px",
-                display: "flex", alignItems: "flex-start",
-              }}>
-                <span style={{ color: "var(--dw22)", fontSize: 11.5, fontWeight: 600 }}>{fmt12(h)}</span>
-              </div>
-
-              {/* Slot content */}
-              <div className="rail-slot" style={{ flex: 1, minWidth: 0, padding: "8px 16px 8px 8px", display: "flex", alignItems: "center" }}>
+            <div key={h} className="fd-rail-row">
+              <span className="fd-rail-time rail-time">{fmt12(h)}</span>
+              <div className="fd-rail-slot rail-slot">
                 {booking ? (
-                  <div onClick={() => onSelect(booking)} style={{
-                    flex: 1, minWidth: 0, padding: "10px 14px", borderRadius: 12,
-                    background: tint(booking.color, 0.07),
-                    border: `1px solid ${tint(booking.color, 0.19)}`,
-                    display: "flex", alignItems: "center", gap: 12, cursor: "pointer",
-                  }}>
-                    <div style={{
-                      width: 32, height: 32, borderRadius: "50%", flexShrink: 0,
-                      background: tint(booking.color, 0.13), border: `1.5px solid ${tint(booking.color, 0.27)}`,
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      fontSize: 10, fontWeight: 800, color: booking.color,
-                    }}>{booking.initials}</div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ color: "var(--dtext)", fontSize: 13, fontWeight: 700, margin: "0 0 2px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{booking.name}</p>
-                      <p style={{ color: "var(--dw38)", fontSize: 11.5, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{booking.service} · {booking.stylist}</p>
-                    </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
-                      <span className="rail-status-badge" style={{
-                        fontSize: 10, fontWeight: 700, padding: "3px 9px", borderRadius: 20,
-                        color: STATUS_STYLE[booking.status].color,
-                        background: STATUS_STYLE[booking.status].bg,
-                      }}>
-                        {STATUS_STYLE[booking.status].label}
-                      </span>
-                      <span style={{ color: "var(--dgreen-text)", fontSize: 13, fontWeight: 700 }}>{booking.price}</span>
-                    </div>
-                  </div>
-                ) : (
-                  <div onClick={onNewBooking} style={{
-                    flex: 1, padding: "10px 14px", borderRadius: 12,
-                    border: "1.5px dashed rgba(139,92,246,0.25)",
-                    display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, cursor: "pointer",
-                  }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <Clock size={13} color="rgba(139,92,246,0.4)" />
-                      <span style={{ color: "var(--dw25)", fontSize: 12.5 }}>Open slot</span>
-                    </div>
-                    <span style={{
-                      padding: "5px 12px", borderRadius: 8,
-                      background: "var(--dcard-l, rgba(139,92,246,0.1))", border: "1px solid var(--dsel-border-l, rgba(139,92,246,0.25))",
-                      color: "var(--dviolet-text)", fontSize: 11.5, fontWeight: 700,
-                    }}>
-                      Add →
+                  <button type="button" className="fd-appt" onClick={() => onSelect(booking)}>
+                    <span className="fd-sched-avatar" style={{ background: booking.color }}>{booking.initials}</span>
+                    <span className="fd-row-main">
+                      <b>{booking.name}</b>
+                      <small>{booking.service} · {booking.stylist}</small>
                     </span>
-                  </div>
+                    <StatusPill status={booking.status} />
+                    <span className="fd-sched-price">{booking.price}</span>
+                  </button>
+                ) : (
+                  <button type="button" className="fd-open" onClick={onNewBooking}>
+                    <span>Open slot</span>
+                    <span className="fd-open-add"><Plus size={13} strokeWidth={2.2} /> Add</span>
+                  </button>
                 )}
               </div>
             </div>
           );
         })}
       </div>
-    </div>
+    </>
   );
 }
 
@@ -1226,68 +1162,45 @@ function WeekView({ appts }: { appts: ApptRecord[] }) {
   const totalAppts = weekDays.reduce((s, d) => s + d.booked, 0);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-
+    <>
       {/* Summary tiles */}
-      <div className="bookings-week-tiles" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14 }}>
+      <div className="fd-stats fd-stats-3 bookings-week-tiles">
         {[
           { label: "Week total", value: fmtPrice(weekTotal), sub: `${activeDays} active day${activeDays === 1 ? "" : "s"}` },
-          { label: "Avg / day",  value: fmtPrice(weekTotal / 7), sub: "across the week" },
+          { label: "Average per day", value: fmtPrice(weekTotal / 7), sub: "across the week" },
           { label: "Appointments", value: String(totalAppts), sub: "booked this week" },
         ].map(t => (
-          <div key={t.label} className="bookings-week-tile" style={{ ...card, padding: "16px 18px" }}>
-            <p style={{ color: "var(--dw35)", fontSize: 10, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 6px" }}>{t.label}</p>
-            <p className="bookings-week-tile-value" style={{ color: "var(--dtext)", fontSize: 24, fontWeight: 800, margin: "0 0 3px", letterSpacing: "-0.03em" }}>{t.value}</p>
-            <p style={{ color: "var(--dw35)", fontSize: 11.5, margin: 0 }}>{t.sub}</p>
+          <div key={t.label} className="fd-card fd-stat bookings-week-tile">
+            <div className="fd-stat-top"><h2>{t.label}</h2></div>
+            <p className="fd-big bookings-week-tile-value">{t.value}</p>
+            <p className="fd-foot">{t.sub}</p>
           </div>
         ))}
       </div>
 
       {/* 7-day columns */}
-      <div style={{ ...card, padding: "20px", overflowX: "auto" }}>
-        <div className="bookings-week-grid" style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 10, minWidth: 560 }}>
-          {weekDays.map((day) => (
-            <div key={day.label} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
-              {/* Day header */}
-              <div style={{ textAlign: "center" }}>
-                <p style={{ color: day.isToday ? "var(--dviolet-text)" : "var(--dw35)", fontSize: 11, fontWeight: 700, margin: "0 0 2px", textTransform: "uppercase" }}>{day.label}</p>
-                <div style={{
-                  width: 30, height: 30, borderRadius: "50%",
-                  background: day.isToday ? "rgb(109,40,217)" : "transparent",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                }}>
-                  <p style={{ color: day.isToday ? "white" : "var(--dw5)", fontSize: 13, fontWeight: day.isToday ? 800 : 500, margin: 0 }}>{day.date.split(" ")[1]}</p>
-                </div>
+      <div className="fd-card fd-card-pad" style={{ overflowX: "auto" }}>
+        <div className="fd-week bookings-week-grid">
+          {weekDays.map(day => (
+            <div key={day.label} className={`fd-week-day${day.isToday ? " is-today" : ""}`}>
+              <p className="fd-label">{day.label}</p>
+              <p className="fd-week-date">{day.date.split(" ")[1]}</p>
+              <div className="fd-week-bar">
+                <span style={{ height: `${(day.booked / maxBooked) * 100}%`, minHeight: day.booked > 0 ? 4 : 0 }} />
               </div>
-
-              {/* Bar chart */}
-              <div style={{ width: "100%", height: 80, display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
-                <div style={{
-                  width: "60%", borderRadius: "4px 4px 0 0",
-                  height: `${(day.booked / maxBooked) * 100}%`,
-                  background: day.isToday ? "rgb(139,92,246)" : "rgba(139,92,246,0.4)",
-                  minHeight: day.booked > 0 ? 4 : 0,
-                }} />
-              </div>
-
-              {/* Booked */}
-              <p style={{ color: "var(--dw5)", fontSize: 11, margin: 0, textAlign: "center" }}>
-                <span style={{ color: "var(--dtext)", fontWeight: 700 }}>{day.booked}</span> booked
-              </p>
-
-              {/* Revenue */}
-              <p style={{ color: "var(--dgreen-text)", fontSize: 11, fontWeight: 700, margin: 0 }}>{fmtPrice(day.revenue)}</p>
+              <p className="fd-week-count"><b>{day.booked}</b> booked</p>
+              <p className="fd-week-rev">{fmtPrice(day.revenue)}</p>
             </div>
           ))}
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
 // ─── List view ────────────────────────────────────────────────────────────────
 
-function ListView({ appts, onSelect }: { appts: ApptRecord[]; onSelect: (appt: ApptRecord) => void }) {
+function ListView({ appts, onSelect, onNewBooking }: { appts: ApptRecord[]; onSelect: (appt: ApptRecord) => void; onNewBooking: () => void }) {
   const upcoming = useMemo(
     () => [...appts].sort((a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime()),
     [appts],
@@ -1299,49 +1212,41 @@ function ListView({ appts, onSelect }: { appts: ApptRecord[]; onSelect: (appt: A
 
   if (upcoming.length === 0) {
     return (
-      <div style={{ ...card, padding: "40px 20px", textAlign: "center" }}>
-        <p style={{ color: "var(--dw35)", fontSize: 13, margin: 0 }}>No appointments yet, add your first booking to see it here.</p>
+      <div className="fd-card">
+        <div className="fd-empty" style={{ paddingBottom: 36 }}>
+          <span className="fd-empty-icon"><Clock size={17} strokeWidth={1.8} /></span>
+          <b>No appointments yet</b>
+          <p>Add your first booking to see it here.</p>
+          <button className="fd-btn fd-btn-primary fd-btn-sm" onClick={onNewBooking}><Plus size={14} strokeWidth={2.2} /> New booking</button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+    <>
       {Object.entries(grouped).map(([date, bookings]) => (
-        <div key={date}>
-          <p style={{ color: "var(--dw35)", fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 10px" }}>{date}</p>
-          <div style={{ ...card }}>
-            {bookings.map((b, i) => {
-              const s = STATUS_STYLE[b.status];
-              return (
-                <div key={b.id} onClick={() => onSelect(b)} style={{
-                  display: "flex", alignItems: "center", gap: 14,
-                  padding: "13px 18px", cursor: "pointer",
-                  borderBottom: i < bookings.length - 1 ? "1px solid var(--dw04)" : "none",
-                }}>
-                  <div style={{ width: 34, height: 34, borderRadius: "50%", background: tint(b.color, 0.13), display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 800, color: b.color, flexShrink: 0 }}>
-                    {b.initials}
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ color: "var(--dtext)", fontSize: 13, fontWeight: 700, margin: "0 0 2px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{b.name}</p>
-                    <p style={{ color: "var(--dw35)", fontSize: 12, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{b.service} · {b.stylist}</p>
-                  </div>
-                  {/* Right column: stacks under nothing on desktop, right-aligned column on mobile */}
-                  <div className="bookings-list-meta" style={{ display: "flex", alignItems: "center", gap: 14, flexShrink: 0 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--dw4)", fontSize: 12 }}>
-                      <Clock size={11} />
-                      {b.time}
-                    </div>
-                    <span style={{ fontSize: 10, fontWeight: 700, padding: "3px 9px", borderRadius: 20, color: s.color, background: s.bg, whiteSpace: "nowrap" }}>{s.label}</span>
-                    <span style={{ color: "var(--dgreen-text)", fontSize: 13, fontWeight: 700, minWidth: 52, textAlign: "right" }}>{b.price}</span>
-                  </div>
-                </div>
-              );
-            })}
+        <div key={date} className="fd-card">
+          <div className="fd-head fd-rail-head">
+            <h2>{date} <small>{bookings.length} booking{bookings.length === 1 ? "" : "s"}</small></h2>
           </div>
+          {bookings.map(b => (
+            <button type="button" key={b.id} className="fd-list-row" onClick={() => onSelect(b)}>
+              <span className="fd-sched-avatar" style={{ background: b.color }}>{b.initials}</span>
+              <span className="fd-row-main">
+                <b>{b.name}</b>
+                <small>{b.service} · {b.stylist}</small>
+              </span>
+              <span className="fd-list-meta bookings-list-meta">
+                <span className="fd-list-time"><Clock size={12} /> {b.time}</span>
+                <StatusPill status={b.status} />
+                <span className="fd-sched-price">{b.price}</span>
+              </span>
+            </button>
+          ))}
         </div>
       ))}
-    </div>
+    </>
   );
 }
 
@@ -1352,9 +1257,9 @@ function BookingLinkCard({ bookingUrl }: { bookingUrl: string | null }) {
 
   if (!bookingUrl) {
     return (
-      <div style={{ ...card, padding: "16px 20px" }}>
-        <p style={{ color: "var(--dw4)", fontSize: 13, margin: 0 }}>
-          Set up your booking page handle in Settings → Business to get a shareable booking link.
+      <div className="fd-card fd-card-pad">
+        <p className="fd-sub" style={{ margin: 0 }}>
+          Set up your booking page handle in Settings, Business to get a shareable booking link.
         </p>
       </div>
     );
@@ -1371,45 +1276,21 @@ function BookingLinkCard({ bookingUrl }: { bookingUrl: string | null }) {
   };
 
   return (
-    <div style={{ ...card, padding: "16px 20px" }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
-        <a href={bookingUrl} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 10, flex: 1, minWidth: 0, textDecoration: "none" }}>
-          <div style={{ width: 34, height: 34, borderRadius: 9, background: "rgba(139,92,246,0.12)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-            <ExternalLink size={15} color="var(--dviolet-text)" strokeWidth={1.8} />
-          </div>
-          <div style={{ minWidth: 0 }}>
-            <p style={{ color: "var(--dw35)", fontSize: 10, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 2px" }}>Your booking link · tap to preview</p>
-            <p style={{ color: "var(--dpurple-text)", fontSize: 13.5, fontWeight: 600, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{displayText}</p>
-          </div>
-        </a>
-
-        <div className="bookings-link-actions" style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
-          <a href={smsHref} title="Share via SMS" style={{
-            width: 32, height: 32, borderRadius: 8, border: "1px solid var(--dw08)",
-            background: "var(--dsurface2)", display: "flex", alignItems: "center", justifyContent: "center",
-            cursor: "pointer", color: "var(--dgreen-text)", textDecoration: "none",
-          }}>
-            <MessageSquare size={14} strokeWidth={1.8} />
-          </a>
-          <a href={emailHref} title="Share via email" style={{
-            width: 32, height: 32, borderRadius: 8, border: "1px solid var(--dw08)",
-            background: "var(--dsurface2)", display: "flex", alignItems: "center", justifyContent: "center",
-            cursor: "pointer", color: "var(--dblue-text)", textDecoration: "none",
-          }}>
-            <Mail size={14} strokeWidth={1.8} />
-          </a>
-          <button onClick={copy} style={{
-            display: "flex", alignItems: "center", gap: 6,
-            padding: "7px 14px", borderRadius: 9,
-            background: copied ? "rgba(52,211,153,0.12)" : "var(--dw06)",
-            border: `1px solid ${copied ? "rgba(52,211,153,0.3)" : "var(--dw1)"}`,
-            color: copied ? "var(--dgreen-text)" : "var(--dw6)",
-            fontSize: 12.5, fontWeight: 700, cursor: "pointer", transition: "all 0.2s",
-          }}>
-            {copied ? <Check size={13} /> : <Copy size={13} />}
-            {copied ? "Copied!" : "Copy"}
-          </button>
-        </div>
+    <div className="fd-card fd-link-card">
+      <a href={bookingUrl} target="_blank" rel="noopener noreferrer" className="fd-link-main">
+        <span className="fd-ico"><ExternalLink size={16} strokeWidth={1.8} /></span>
+        <span className="fd-row-main">
+          <small>Your booking link, tap to preview</small>
+          <b>{displayText}</b>
+        </span>
+      </a>
+      <div className="fd-inline bookings-link-actions">
+        <a href={smsHref} title="Share via SMS" aria-label="Share via SMS" className="fd-btn fd-btn-ghost fd-btn-sm fd-btn-icon"><MessageSquare size={15} strokeWidth={1.8} /></a>
+        <a href={emailHref} title="Share via email" aria-label="Share via email" className="fd-btn fd-btn-ghost fd-btn-sm fd-btn-icon"><Mail size={15} strokeWidth={1.8} /></a>
+        <button onClick={copy} className="fd-btn fd-btn-ghost fd-btn-sm">
+          {copied ? <Check size={14} /> : <Copy size={14} />}
+          {copied ? "Copied" : "Copy link"}
+        </button>
       </div>
     </div>
   );
@@ -1470,43 +1351,30 @@ export function AppointmentsClient({ initialAppointments, bookingUrl, staff, sel
   });
 
   return (
-    <div style={{ maxWidth: 1280, margin: "0 auto", display: "flex", flexDirection: "column", gap: 20 }}>
+    <div className="fd-page">
 
       {/* Header */}
-      <div className="bookings-header" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", rowGap: 12 }}>
+      <div className="fd-page-head bookings-header">
         <div>
-          <h1 style={{ color: "var(--dtext)", fontSize: 22, fontWeight: 800, margin: "0 0 3px", letterSpacing: "-0.03em" }}>{statusFilter ? STATUS_FILTER_TITLE[statusFilter] : "Bookings"}</h1>
-          <p style={{ color: "var(--dw35)", fontSize: 13, margin: 0 }}>{dateStr}</p>
+          <h1>{statusFilter ? STATUS_FILTER_TITLE[statusFilter] : "Bookings"}</h1>
+          <p className="fd-sub">{dateStr}</p>
         </div>
-        <div className="bookings-header-controls" style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+        <div className="fd-inline bookings-header-controls">
           {/* View switcher */}
-          <div className="bookings-view-switch" style={{ display: "flex", gap: 2, background: "var(--dsurface2)", border: "1px solid var(--dw07)", borderRadius: 11, padding: 3 }}>
+          <div className="fd-seg bookings-view-switch">
             {VIEWS.map(v => (
-              <button key={v} onClick={() => setView(v)} style={{
-                padding: "8px 16px", borderRadius: 8, border: "none", cursor: "pointer",
-                fontSize: 12.5, fontWeight: view === v ? 700 : 500,
-                background: view === v ? "var(--dsel-bg-l, rgba(109,40,217,0.45))" : "transparent",
-                color: view === v ? "var(--dsel-text-l, var(--dpurple-text))" : "var(--dw4)",
-                transition: "all 0.15s",
-              }}>
-                {v}
-              </button>
+              <button key={v} onClick={() => setView(v)} className={view === v ? "is-on" : undefined} aria-pressed={view === v}>{v}</button>
             ))}
           </div>
 
           {/* Search */}
-          <div className="bookings-search" style={{ display: "flex", alignItems: "center", gap: 8, background: "var(--dsurface2)", border: "1px solid var(--dw07)", borderRadius: 10, padding: "8px 12px", width: 200 }}>
-            <Search size={13} color="var(--dw3)" />
-            <input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search…" style={{ background: "none", border: "none", outline: "none", color: "var(--dtext)", fontSize: 12.5, flex: 1, minWidth: 0 }} />
-          </div>
+          <label className="fd-field bookings-search">
+            <Search size={14} />
+            <input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search" aria-label="Search bookings" />
+          </label>
 
-          <button className="bookings-new-btn" onClick={() => setNew(true)} style={{
-            display: "flex", alignItems: "center", justifyContent: "center", gap: 7,
-            padding: "10px 18px", borderRadius: 11,
-            background: "rgb(109,40,217)", border: "none",
-            color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer",
-          }}>
-            <Plus size={15} strokeWidth={2.5} /> New booking
+          <button className="fd-btn fd-btn-primary bookings-new-btn" onClick={() => setNew(true)}>
+            <Plus size={15} strokeWidth={2.2} /> New booking
           </button>
         </div>
       </div>
@@ -1514,7 +1382,7 @@ export function AppointmentsClient({ initialAppointments, bookingUrl, staff, sel
       {/* View content */}
       {view === "Day"  && <DayView appts={appts} bookingUrl={bookingUrl} onNewBooking={() => setNew(true)} onSelect={a => setSelectedId(a.id)} />}
       {view === "Week" && <WeekView appts={appts} />}
-      {view === "List" && <ListView appts={appts} onSelect={a => setSelectedId(a.id)} />}
+      {view === "List" && <ListView appts={appts} onSelect={a => setSelectedId(a.id)} onNewBooking={() => setNew(true)} />}
 
       {/* New booking overlay */}
       {showNewBooking && <NewBookingOverlay onClose={() => { setNew(false); setPrefillClientName(undefined); }} onCreated={refresh} staff={staff} selfStaffId={selfStaffId} initialClientName={prefillClientName} />}

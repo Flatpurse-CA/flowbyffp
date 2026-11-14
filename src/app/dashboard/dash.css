@@ -223,3 +223,54 @@ a.fd-row:hover{background:var(--fd-hover)}
   .fd-header-divider{display:none}
   .fd-page-head h1{font-size:22px}
 }
+
+/* Inner pages: controls, bookings rail, lists */
+.fd-btn-icon{width:32px;padding:0}
+.fd-seg{display:inline-flex;gap:2px;padding:3px;border-radius:9px;background:var(--fd-panel);border:1px solid var(--fd-line)}
+.fd-seg button{height:30px;padding:0 14px;border:0;border-radius:7px;background:transparent;color:var(--fd-muted);font:inherit;font-size:12.5px;font-weight:600;cursor:pointer;transition:background .12s,color .12s}
+.fd-seg button:hover{color:var(--fd-fg)}
+.fd-seg button.is-on{background:var(--fd-accent);color:var(--fd-accent-fg)}
+.fd-field{display:flex;align-items:center;gap:8px;width:220px;height:38px;padding:0 12px;border-radius:9px;background:var(--fd-panel);border:1px solid var(--fd-line);color:var(--fd-faint)}
+.fd-field:focus-within{border-color:var(--fd-accent-text)}
+.fd-field input{flex:1;min-width:0;border:0;outline:0;background:none;font:inherit;font-size:13px;color:var(--fd-fg)}
+.fd-field input::placeholder{color:var(--fd-faint)}
+.fd-label{margin:0;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--fd-faint)}
+.fd-stats-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.fd-rail-head{padding:14px 18px;border-bottom:1px solid var(--fd-line)}
+.fd-rail-head h2 small{font-weight:400}
+.fd-rail-row{display:flex;align-items:center;min-height:56px}
+.fd-rail-row+.fd-rail-row{border-top:1px solid var(--fd-line)}
+.fd-rail-time{width:76px;flex-shrink:0;padding-left:18px;font-size:12px;font-weight:500;color:var(--fd-faint);font-variant-numeric:tabular-nums}
+.fd-rail-slot{flex:1;min-width:0;padding:7px 14px 7px 0}
+.fd-appt,.fd-open,.fd-list-row{display:flex;align-items:center;gap:12px;width:100%;font:inherit;text-align:left;cursor:pointer;color:var(--fd-fg)}
+.fd-appt{padding:8px 12px;border-radius:10px;background:var(--fd-panel-2);border:1px solid var(--fd-line);transition:border-color .12s}
+.fd-appt:hover{border-color:var(--fd-accent-text)}
+.fd-open{justify-content:space-between;height:40px;padding:0 12px;border-radius:10px;background:transparent;border:1px dashed var(--fd-line);color:var(--fd-faint);font-size:12.5px;transition:border-color .12s,color .12s}
+.fd-open-add{display:inline-flex;align-items:center;gap:4px;font-weight:600;opacity:0;transition:opacity .12s}
+.fd-open:hover,.fd-open:focus-visible{border-color:var(--fd-accent-text);color:var(--fd-accent-text)}
+.fd-open:hover .fd-open-add,.fd-open:focus-visible .fd-open-add{opacity:1}
+.fd-list-row{padding:12px 18px;border:0;background:transparent;transition:background .12s}
+.fd-list-row+.fd-list-row{border-top:1px solid var(--fd-line)}
+.fd-list-row:hover{background:var(--fd-hover)}
+.fd-list-meta{display:flex;align-items:center;gap:14px;flex-shrink:0}
+.fd-list-time{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;color:var(--fd-muted);font-variant-numeric:tabular-nums}
+.fd-link-card{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:14px 18px}
+.fd-link-main{display:flex;align-items:center;gap:12px;flex:1;min-width:0;text-decoration:none}
+.fd-link-main b{color:var(--fd-accent-text)}
+.fd-week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:10px;min-width:560px}
+.fd-week-day{display:flex;flex-direction:column;align-items:center;gap:8px}
+.fd-week-date{margin:0;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:500;color:var(--fd-muted)}
+.fd-week-day.is-today .fd-label{color:var(--fd-accent-text)}
+.fd-week-day.is-today .fd-week-date{background:var(--fd-accent);color:var(--fd-accent-fg);font-weight:700}
+.fd-week-bar{width:100%;height:84px;display:flex;align-items:flex-end;justify-content:center;border-bottom:1px solid var(--fd-line)}
+.fd-week-bar span{width:56%;border-radius:4px 4px 0 0;background:var(--fd-line)}
+.fd-week-day.is-today .fd-week-bar span{background:var(--fd-accent)}
+.fd-week-count{margin:0;font-size:12px;color:var(--fd-faint)}
+.fd-week-count b{color:var(--fd-fg);font-weight:600}
+.fd-week-rev{margin:0;font-size:12.5px;font-weight:600;color:var(--fd-fg);font-variant-numeric:tabular-nums}
+@container fdpage (max-width:560px){
+  .fd-stats-3{grid-template-columns:1fr}
+  .fd-field{width:100%}
+  .fd-appt .fd-status,.fd-rail-head h2 small{display:none}
+  .fd-rail-time{width:58px;padding-left:14px}
+}
