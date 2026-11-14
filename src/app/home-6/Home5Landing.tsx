@@ -84,14 +84,13 @@ function useAudience() {
 }
 
 /** Founders Beta offer pill above the hero headline. */
-export const FOUNDERS_SPOTS_LEFT = 35;
-export function BetaBanner() {
+export function BetaBanner({ spotsLeft }: { spotsLeft: number | null }) {
   const { isClients } = useAudience();
   if (isClients) return null;
   return (
     <Link href="/signup" className="h6-beta">
       <span className="h6-beta-dot" aria-hidden="true" />
-      <span><strong>Founders Beta is open.</strong> {FOUNDERS_SPOTS_LEFT} of 40 spots left, 40% off your first year</span>
+      <span><strong>Founders Beta is open.</strong> {spotsLeft !== null && spotsLeft > 0 ? `${spotsLeft} of 40 spots left, ` : ""}40% off your first year</span>
       <ArrowUpRight size={15} strokeWidth={2.2} aria-hidden="true" />
     </Link>
   );
@@ -184,7 +183,7 @@ export function HeroCopy() {
           {isClients ? <>Explore the benefits <ArrowDown size={16} strokeWidth={2.2} /></> : <>Request a personal demo <ArrowUpRight size={16} strokeWidth={2.2} /></>}
         </a>
       </div>
-      <p className="h5-hero-micro">{isClients ? "Your favourite shop. A simpler way to book." : "No credit card required."}</p>
+      <p className="h5-hero-micro">{isClients ? "Your favourite shop. A simpler way to book." : "14-day free trial. Cancel any time before it ends."}</p>
     </div>
   );
 }

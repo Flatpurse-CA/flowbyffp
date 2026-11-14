@@ -11,10 +11,10 @@ const PLANS = [
     id: "starter",
     label: "Starter",
     badge: null,
-    originalPrice: "C$39/mo",
-    price: "C$23.40",
+    originalPrice: null,
+    price: "C$39",
     priceSuffix: "/mo",
-    subtitle: "Year 1 · then C$29.25/mo forever",
+    subtitle: "Flat monthly price",
     description: "Solo businesses getting started",
     features: ["Bookings, calendar & online booking page", "Payments & Tap to Pay on iPhone", "Client CRM, reminders & reviews", "Up to 2 team members"],
     cta: "Start Free Trial",
@@ -81,7 +81,7 @@ function CheckIcon({ active, founders }: { active: boolean; founders: boolean })
 // finePrint "cards" (home-6): the trial / founders / fee notes as cards and a
 // fee table instead of two grey paragraphs. Default keeps every other page as-is.
 const FINE_CARDS = [
-  { t: "14-day free trial", d: "Every plan starts with Pro+ free for 14 days. No card required." },
+  { t: "14-day free trial", d: "Every plan starts with Pro+ free for 14 days. Cancel any time before it ends." },
   { t: "Founders pricing, locked in", d: "Beta members are pre-qualified. Your price holds as long as your subscription stays active. Cancel and it is gone for good." },
   { t: "0% commission", d: "Flow never takes a commission on a new client." },
 ];
@@ -362,7 +362,7 @@ export default function PricingSection({ finePrint = "text" }: { finePrint?: "te
           Beta members are pre-qualified. Founders pricing is locked in for as long as your subscription stays active; cancel and you lose it for good.
         </p>
         <p style={{ fontSize: 13.5, color: "rgba(255,255,255,0.5)", lineHeight: 1.7, margin: "-12px auto 28px", maxWidth: 560 }}>
-          Every plan starts with a free 14-day trial of Pro+, no card required. Card payments are Stripe&apos;s standard rates, paid by your shop to Stripe and the same on every plan: 2.7% + 20¢ tapped, 30¢ flat for Interac, 2.9% + 30¢ online. Flow never takes a commission on a new client.
+          Every plan starts with a free 14-day trial of Pro+. Cancel any time before it ends. Card payments are Stripe&apos;s standard rates, paid by your shop to Stripe and the same on every plan: 2.7% + 20¢ tapped, 30¢ flat for Interac, 2.9% + 30¢ online. Flow never takes a commission on a new client.
         </p>
         </>)}
         <a href="/signup" style={{

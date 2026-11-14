@@ -6,9 +6,9 @@ import FeatureTabs from "@/components/FeatureTabs";
 import ScrollReveal from "@/components/ScrollReveal";
 import ScrollZoom from "@/components/ScrollZoom";
 import FoundationsGrid from "@/components/FoundationsSection";
-import TestimonialsSection from "@/components/TestimonialsSection";
+import FoundersBeta from "@/components/FoundersBeta";
+import { getFoundersSpotsLeft } from "@/lib/founders";
 import ChangelogSection from "@/components/ChangelogSection";
-import TestimonialsGrid from "@/components/TestimonialsGrid";
 import PricingSection from "@/components/PricingSection";
 import IntegrationsGrid from "@/components/IntegrationsGrid";
 import Footer from "@/components/Footer";
@@ -43,7 +43,8 @@ const H3 = {
 // home-3, unchanged, with home-4's content added in home-3's style:
 // Home5Main after the feature grid, home-4's missing FAQs appended to home-3's FAQ, and
 // Home5FooterRow inside the footer.
-export default function Home5Page() {
+export default async function Home5Page() {
+  const spotsLeft = await getFoundersSpotsLeft();
   return (
     <AudienceProvider>
     {/* --font-inter lets home-4's Clients page (rendered by PageSwitch) use Inter too */}
@@ -94,7 +95,7 @@ export default function Home5Page() {
           </div>
 
           <div style={{ position: "relative", maxWidth: 1120, margin: "0 auto", textAlign: "center" }}>
-            <BetaBanner />
+            <BetaBanner spotsLeft={spotsLeft} />
 
             <HeroSegmentPicker />
 
@@ -206,11 +207,9 @@ export default function Home5Page() {
 
       </section>
 
-      <TestimonialsSection />
+      <FoundersBeta spotsLeft={spotsLeft} />
 
       <ChangelogSection />
-
-      <TestimonialsGrid />
 
       <PricingSection finePrint="cards" />
 

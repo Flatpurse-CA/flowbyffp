@@ -77,7 +77,7 @@ export function SeoCta() {
         <Link className="button" href="/signup">{TRIAL.primary} <Arrow /></Link>
         <a className="ghost" href={TRIAL.callHref}>{TRIAL.secondary}</a>
       </div>
-      <p>No card required. Full Pro+ access during the trial. {TRIAL.line}</p>
+      <p>Cancel any time before the trial ends. Full Pro+ access during the trial. {TRIAL.line}</p>
     </section>
   );
 }

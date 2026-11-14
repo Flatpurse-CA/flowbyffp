@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import type { ReactNode } from "react";
 import { useState } from "react";
 import { CreditCard, MessageCircle, Camera, Calendar, Mail, Smartphone, Zap, Star, ChevronDown } from "lucide-react";
@@ -66,15 +67,15 @@ const ITEMS = [
   },
 ];
 
-const FAQS = [
-  { n: "01", q: "What is FlatPurse Flow?", a: "FlatPurse Flow is an AI-powered booking and revenue management platform built specifically for independent salons and barbershops. It handles your bookings, fills empty slots, wins back lapsed clients, and manages payments, all automatically." },
-  { n: "02", q: "How does AutoPilot work?", a: "AutoPilot is a set of six always-on AI flows that run in the background of your shop. It sends reminders, fills cancellations from your waitlist, messages clients who haven't visited in 30+ days, and answers booking DMs, without you lifting a finger." },
-  { n: "03", q: "Is there really zero commission?", a: "Yes. FlatPurse Flow never takes a percentage of your revenue. You pay a flat monthly subscription and keep everything you earn. The only fees are standard payment processing fees charged by Stripe." },
-  { n: "04", q: "How long does setup take?", a: "Most shops are fully set up in under 15 minutes. You create your booking page, add your services and staff, connect payments, and AutoPilot handles the rest. No complicated onboarding required." },
-  { n: "05", q: "Can clients book directly from Instagram or WhatsApp?", a: "Yes. AutoPilot's AI Front Desk reads incoming DMs on Instagram and WhatsApp, responds to booking requests, and confirms appointments, all without you needing to reply manually." },
-  { n: "06", q: "What happens when a client no-shows or cancels?", a: "AutoPilot immediately pulls the next client from your waitlist, fills the slot, and sends them a payment link. You recover revenue that would otherwise be lost, with zero effort." },
-  { n: "07", q: "Is my client data safe?", a: "Yes. All data is encrypted in transit and at rest. We never sell or share your client data with third parties. FlatPurse Flow is fully compliant with data protection regulations." },
-  { n: "08", q: "Can I cancel or change my plan anytime?", a: "Absolutely. There are no contracts or lock-in periods. You can upgrade, downgrade, or cancel at any time. If you cancel, you keep access until the end of your billing period." },
+const FAQS: { n: string; q: string; a: ReactNode }[] = [
+  { n: "01", q: "What is FlatPurse Flow?", a: "Flow is booking, payments and client management for Canadian salons, barbershops and spas. Its AutoPilot recovers no-shows, fills cancelled slots and brings lapsed clients back. Flow is built in Edmonton by FlatPurse Inc." },
+  { n: "02", q: "How does AutoPilot work?", a: "AutoPilot is six automated flows: No-Show Recovery, Last-Minute Slot Filler, 30-Day Win-Back, AI Front Desk, Rebooking Reminders, and Birthday and Occasion Offers. You switch each one on or pause it whenever you like. AI Front Desk starts on Pro. All six are included in Pro+." },
+  { n: "03", q: "Is there really zero commission?", a: "Yes. You pay a flat monthly plan. Flow takes no percentage of your bookings and no fee for new clients. Card processing goes to Stripe: 2.7% + 20¢ tapped in person, 30¢ flat for Interac debit, and 2.9% + 30¢ online." },
+  { n: "04", q: "How long does setup take?", a: "Most shops are set up in under 15 minutes. You add your services, staff and hours, then connect Stripe to take payments." },
+  { n: "05", q: "Can clients book from Instagram or WhatsApp?", a: "Yes, on Pro and Pro+. AI Front Desk replies to booking messages on Instagram and WhatsApp, books the appointment, and hands the chat to you when it needs a person. On every plan, clients can book through your own booking link." },
+  { n: "06", q: "What happens when a client no-shows or cancels?", a: "Two different flows handle it. When a client cancels, Last-Minute Slot Filler offers the opening to your waitlist and sends the next client a payment link. When a client does not show, No-Show Recovery messages them an hour later with a link to rebook. You can also collect a deposit at booking." },
+  { n: "07", q: "Is my client data safe?", a: <>Client data is stored in Canada, encrypted in transit and at rest, and never sold. Flow handles personal information under PIPEDA and Alberta&apos;s Personal Information Protection Act. The <Link href="/privacy">Privacy Policy</Link> has the details.</> },
+  { n: "08", q: "Can I cancel or change my plan any time?", a: "Yes. There are no contracts. You can upgrade, downgrade or cancel whenever you like, and you keep access until the end of your billing period. Founders pricing ends if you cancel." },
 ];
 
 // extraFaqs: optional questions a page appends to the FAQ (home-5 adds

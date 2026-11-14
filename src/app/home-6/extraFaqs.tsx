@@ -1,9 +1,9 @@
 import Link from "next/link";
 
-/** home-4 FAQs that home-3's FAQ didn't already cover; appended to home-3's FAQ on home-5. */
+/** FAQs 09 to 12, appended to the shared FAQ list on the homepage. */
 export const EXTRA_FAQS: { q: string; a: React.ReactNode }[] = [
-  { q: "Does Flow actually work for a business like mine?", a: <>Flow is designed for independent salons and barbershops. The walkthrough shows an example workflow with demo data, not verified customer results. <a href="#demo">Request a personal demo</a> to explore how it fits your services, team and booking process.</> },
-  { q: "How hard is switching to Flow?", a: "You’ll need to set up your services, staff, booking availability and payment settings. Before switching, contact us to confirm which client records can be imported from your current system and what setup help is available." },
-  { q: "Which plan includes AutoPilot?", a: <>Starter begins at C$39/month for booking, client management and payments. Pro starts at C$89/month and adds AI Front Desk and the Daily Brief. Pro+ starts at C$189/month and adds AutoPilot, Flow Coach and business insights. Card processing fees apply. <Link href="/pricing">Compare all features and fees</Link>.</> },
-  { q: "What happens after I click Start free trial?", a: <>You’ll go to Flow’s signup page to create your account. No credit card is required to get started. Confirm the current trial duration, included features and any beta offer during signup, or <a href="#demo">ask us before joining</a>.</> },
+  { q: "Does Flow work for a business like mine?", a: "Flow is built for appointment-based shops: salons, barbershops, spas, and nail and beauty studios. It suits a solo owner through to a multi-chair team, and Enterprise covers three or more locations. The dashboard and walkthrough on this site use sample data. The 14-day trial is the real test, with your own services and clients." },
+  { q: "How hard is switching to Flow?", a: "You set up your services, staff, hours and payments. You can bring your client list over from your current booking app with the Switch to Flow tool in your dashboard." },
+  { q: "Which plan includes AutoPilot?", a: <>Pro+ at C$189 a month includes all six AutoPilot flows, Flow Coach and business insights. Pro at C$89 a month includes AI Front Desk and the Daily Brief. Starter at C$39 a month covers booking, client management and payments. Card processing fees apply on every plan. <Link href="/pricing">Compare plans</Link>.</> },
+  { q: "What happens after I click Start free trial?", a: "You create your account and get 14 days of Pro+. You choose a plan and add a card, and you are not charged until the trial ends. Founders pricing is applied automatically while spots remain." },
 ];

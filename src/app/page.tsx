@@ -24,6 +24,9 @@ const SITE_LD = [
   { "@context": "https://schema.org", "@type": "WebSite", name: "FlatPurse Flow", url: SITE_URL },
 ];
 
+// Founders spots are read live; refresh the page data every 5 minutes.
+export const revalidate = 300;
+
 export default function HomePage() {
   return (
     <>

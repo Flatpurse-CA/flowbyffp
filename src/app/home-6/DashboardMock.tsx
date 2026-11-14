@@ -69,6 +69,7 @@ export default function DashboardMock() {
       aria-label="FlatPurse Flow dashboard showing C$4,860 recovered by AutoPilot this month, 14 bookings today and C$18,420 revenue this month"
       style={{ position: "absolute", inset: 0, overflow: "hidden", background: "rgb(246,246,248)" }}
     >
+      <span style={{ position: "absolute", top: 10, right: 10, zIndex: 2, padding: "5px 11px", borderRadius: 999, background: "#1b1730", color: "#fff", fontSize: 11, fontWeight: 600, letterSpacing: "0.04em", textTransform: "uppercase" }}>Sample data</span>
       <div aria-hidden="true" style={{ width: W, transformOrigin: "0 0", transform: `scale(${scale})`, opacity: scale ? 1 : 0, display: "flex", fontFamily: "inherit", color: INK }}>
         {/* Sidebar */}
         <div style={{ width: 76, flexShrink: 0, borderRight: LINE, background: "#fff", minHeight: 900, display: "flex", flexDirection: "column", alignItems: "center", paddingTop: 18, gap: 10 }}>

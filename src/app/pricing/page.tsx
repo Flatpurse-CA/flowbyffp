@@ -1,7 +1,6 @@
 import { Inter } from "next/font/google";
 import LandingNav from "@/components/LandingNav";
 import PricingSection from "@/components/PricingSection";
-import TestimonialsGrid from "@/components/TestimonialsGrid";
 import Footer from "@/components/Footer";
 
 const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600", "700"] });
@@ -18,8 +17,6 @@ export default function PricingPage() {
       <LandingNav active="pricing" />
 
       <PricingSection />
-
-      <TestimonialsGrid />
 
       <Footer />
     </div>
