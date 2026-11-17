@@ -35,7 +35,7 @@ export default function FoundersBeta({ spotsLeft }: { spotsLeft: number | null }
           ))}
         </div>
         <div className="fb-note">
-          <blockquote>&ldquo;Flow is new, so I am not going to show you reviews we have not earned yet. Try it for 14 days and tell me what is missing.&rdquo;</blockquote>
+          <blockquote>&ldquo;Flow is brand new, and the first businesses to join get to help shape it. Try it free for 14 days. If you stay, Founders get 40% off their first year, 25% off for life after that, and a direct line to me.&rdquo;</blockquote>
           <div className="fb-note-foot">
             <p><strong>George Ogunbande</strong><span>Founder, FlatPurse Flow</span></p>
             <Link href="/signup" className="fb-btn">Claim a Founders spot</Link>
