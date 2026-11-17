@@ -137,7 +137,7 @@ export default function FoundationsGrid() {
               The core of smart booking, automated recovery, and real-time client intelligence, all powered by FlatPurse Flow's AutoPilot engine.
             </p>
           </div>
-          <Link href="#" style={{
+          <Link href="/autopilot" style={{
             display: "inline-flex",
             alignItems: "center",
             gap: 6,

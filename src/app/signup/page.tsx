@@ -90,6 +90,9 @@ function SignupStep1() {
           >
             Set up your shop in a few minutes.
           </p>
+          <p style={{ margin: "-20px 0 28px", fontSize: 13, lineHeight: 1.5, color: "rgb(196,181,253)", animation: fadeUp(70) }}>
+            14 days of Pro+ free. Founders pricing is applied automatically.
+          </p>
 
           {error && (
             <p className="mb-4 rounded-lg bg-red-950 px-3 py-2 text-sm text-red-300">
@@ -196,6 +199,9 @@ function SignupStep1() {
               </SubmitButton>
             </div>
           </form>
+          <p style={{ margin: "14px 0 0", fontSize: 12, lineHeight: 1.55, color: "rgb(113,113,122)", textAlign: "center" }}>
+            By creating an account you agree to the <Link href="/terms" style={{ color: "rgb(212,212,216)", textDecoration: "underline" }}>Terms of Service</Link> and <Link href="/privacy" style={{ color: "rgb(212,212,216)", textDecoration: "underline" }}>Privacy Policy</Link>.
+          </p>
 
           {/* Footer */}
           <p

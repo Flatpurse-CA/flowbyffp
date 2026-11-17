@@ -221,7 +221,7 @@ export default async function Home5Page() {
         body: "Start your free trial today. Founders Beta shops get 40% off Pro or Pro+ for the first year.",
         href: "/signup",
         label: "Start your free trial",
-        secondary: { href: "/demo", label: "Book a personal demo" },
+        secondary: { href: "/demo", label: "Watch the walkthrough" },
       }}>
         <Home5FooterRow />
       </Footer>

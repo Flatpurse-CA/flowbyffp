@@ -17,7 +17,7 @@ const PLANS = [
     subtitle: "Flat monthly price",
     description: "Solo businesses getting started",
     features: ["Bookings, calendar & online booking page", "Payments & Tap to Pay on iPhone", "Client CRM, reminders & reviews", "Up to 2 team members"],
-    cta: "Start Free Trial",
+    cta: "Start with Starter",
     href: "/signup",
     gradient: "radial-gradient(140% 60% at 50% 100%, rgb(109,40,217) 0%, rgb(76,29,149) 28%, rgb(30,10,60) 58%, rgba(9,9,11,0) 85%)",
     isFounders: false,
@@ -32,7 +32,7 @@ const PLANS = [
     subtitle: "Year 1 · then C$66.75/mo forever",
     description: "Run your business",
     features: ["AI Front Desk: answers clients and books appointments", "Daily Brief: morning business summary", "Client segmentation & churn-risk alerts", "Up to 6 team members"],
-    cta: "Get started with Pro",
+    cta: "Start with Pro",
     href: "/signup",
     gradient: "radial-gradient(140% 60% at 50% 100%, rgb(109,40,217) 0%, rgb(76,29,149) 28%, rgb(30,10,60) 58%, rgba(9,9,11,0) 85%)",
     isFounders: false,
@@ -47,7 +47,7 @@ const PLANS = [
     subtitle: "Year 1 · then C$141.75/mo forever",
     description: "Grow your business",
     features: ["AutoPilot: no-show recovery, slot filler, win-backs, birthday offers", "Flow Coach™: your AI business consultant", "Business Health Score & revenue forecasting", "Unlimited team members at one location"],
-    cta: "Get started with Pro+",
+    cta: "Start with Pro+",
     href: "/signup",
     gradient: "radial-gradient(140% 60% at 50% 100%, rgb(109,40,217) 0%, rgb(76,29,149) 28%, rgb(30,10,60) 58%, rgba(9,9,11,0) 85%)",
     isFounders: false,
@@ -62,7 +62,7 @@ const PLANS = [
     subtitle: "Unlimited staff, 3+ locations",
     description: "Scale your business",
     features: ["Multi-location dashboard", "Advanced reporting & priority support", "Dedicated onboarding", "Unlimited team members"],
-    cta: "Talk to Us",
+    cta: "Talk to us",
     href: "mailto:sales@flatpurse.com?subject=Enterprise%20plan",
     gradient: "radial-gradient(140% 60% at 50% 100%, rgb(109,40,217) 0%, rgb(76,29,149) 28%, rgb(30,10,60) 58%, rgba(9,9,11,0) 85%)",
     isFounders: false,
@@ -250,7 +250,7 @@ export default function PricingSection({ finePrint = "text" }: { finePrint?: "te
                   )}
                   <div style={{ display: "flex", alignItems: "baseline", gap: 2 }}>
                     <span style={{
-                      fontSize: 32, fontWeight: 800, letterSpacing: "-0.04em", lineHeight: 1,
+                      fontSize: "clamp(24px, 2.5vw, 32px)", fontWeight: 800, letterSpacing: "-0.04em", lineHeight: 1, whiteSpace: "nowrap",
                       color: isSelected ? "rgb(237,233,254)" : "rgb(250,250,250)",
                       transition: "color 0.25s",
                     }}>
@@ -285,17 +285,16 @@ export default function PricingSection({ finePrint = "text" }: { finePrint?: "te
                 <div style={{
                   height: 1,
                   background: isSelected ? "rgba(139,92,246,0.25)" : "rgb(39,39,42)",
-                  marginBottom: 13, transition: "background 0.25s",
-                  flex: 1,
+                  marginTop: "auto", marginBottom: 13, transition: "background 0.25s",
                 }} />
 
                 {/* CTA */}
-                {isSelected && (
-                  <a href={p.href} style={{
+                {(
+                  <a href={p.href} onClick={e => e.stopPropagation()} style={{
                     width: "100%",
-                    background: p.isFounders ? "rgba(234,88,12,0.45)" : "rgba(109,40,217,0.45)",
-                    border: p.isFounders ? "1px solid rgba(249,115,22,0.65)" : "1px solid rgba(139,92,246,0.65)",
-                    color: p.isFounders ? "rgb(254,215,170)" : "rgb(233,213,255)",
+                    background: isSelected ? (p.isFounders ? "rgb(194,65,12)" : "rgb(109,40,217)") : "rgb(39,39,42)",
+                    border: isSelected ? "1px solid transparent" : "1px solid rgb(63,63,70)",
+                    color: "rgb(250,250,250)",
                     borderRadius: 8, padding: "11px 0",
                     fontSize: 13, fontWeight: 700,
                     cursor: "pointer", letterSpacing: "0.01em",

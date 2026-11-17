@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import AutoPilotChip from "@/components/AutoPilotChip";
 import ScrollZoom from "@/components/ScrollZoom";
@@ -75,7 +76,7 @@ export default function ChangelogSection() {
           </h2>
         </div>
 
-        <a href="#" style={{
+        <Link href="/features" style={{
           display: "inline-flex",
           alignItems: "center",
           gap: 6,
@@ -90,7 +91,7 @@ export default function ChangelogSection() {
           onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.55)")}
         >
           See all features <ArrowRight size={14} />
-        </a>
+        </Link>
       </div>
 
       {/* Timeline + items */}

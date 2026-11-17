@@ -179,8 +179,8 @@ export function HeroCopy() {
             <span className="h3-cta-text">Start your free trial</span>
           </Link>
         )}
-        <a href={isClients ? "#booking" : "#demo"} className="h5-ghost h5-ghost-dark">
-          {isClients ? <>Explore the benefits <ArrowDown size={16} strokeWidth={2.2} /></> : <>Request a personal demo <ArrowUpRight size={16} strokeWidth={2.2} /></>}
+        <a href={isClients ? "#booking" : "/demo"} className="h5-ghost h5-ghost-dark">
+          {isClients ? <>Explore the benefits <ArrowDown size={16} strokeWidth={2.2} /></> : <>Watch the walkthrough <ArrowUpRight size={16} strokeWidth={2.2} /></>}
         </a>
       </div>
       <p className="h5-hero-micro">{isClients ? "Your favourite shop. A simpler way to book." : "14-day free trial. Cancel any time before it ends."}</p>

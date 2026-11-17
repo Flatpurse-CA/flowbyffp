@@ -14,7 +14,7 @@ export const metadata = {
 export default function PricingPage() {
   return (
     <div className={inter.className} style={{ background: "#000", color: "#342448" }}>
-      <LandingNav active="pricing" />
+      <LandingNav active="pricing" variant="v2" />
 
       <PricingSection />
 

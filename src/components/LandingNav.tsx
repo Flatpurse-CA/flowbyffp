@@ -168,7 +168,12 @@ export default function LandingNav({ active = "home", variant = "v1" }: { active
 .nav-v2-link:hover, .nav-v2-login:hover { color: ${V2_INK} !important; }
 .nav-v2-cta { transition: background 0.15s; }
 .nav-v2-cta:hover { background: #4426c4 !important; }
-@media (max-width: 900px) { .nav-v2-grid { display: flex !important; } }`}</style>
+.nav-v2-login, .nav-v2-cta { white-space: nowrap; }
+@media (max-width: 1100px) {
+  .nav-v2-grid { display: flex !important; }
+  .nav-v2-grid .h3-nav-links, .nav-v2-grid .h3-account-btn { display: none !important; }
+  .nav-v2-grid .h3-nav-mobile { display: flex !important; }
+}`}</style>
     </nav>
   );
 
