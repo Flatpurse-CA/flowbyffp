@@ -208,7 +208,7 @@ export async function createPublicBooking(input: {
     return { error: error?.message ?? "Couldn't create that booking" };
   }
 
-  await attributeAutopilotRevenue(admin, { shopId: input.shopId, clientEmail: ctx.email, price: finalPrice });
+  await attributeAutopilotRevenue(admin, { shopId: input.shopId, clientEmail: ctx.email, clientPhone: ctx.phone, price: finalPrice });
 
   try {
     await sendBookingConfirmationEmail(ctx.email, {

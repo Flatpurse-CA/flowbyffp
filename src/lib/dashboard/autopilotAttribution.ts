@@ -1,4 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { toE164 } from "@/lib/phone";
+import { pgrstQuote } from "@/lib/postgrest";
 
 const LOOKBACK_MS = 21 * 24 * 60 * 60 * 1000;
 
@@ -9,9 +11,10 @@ const LOOKBACK_MS = 21 * 24 * 60 * 60 * 1000;
 // so "recovered revenue" on Home/AutoPilot reflects real conversions, not just sends.
 export async function attributeAutopilotRevenue(
   supabase: SupabaseClient,
-  input: { shopId: string; clientEmail: string | null | undefined; price: number },
+  input: { shopId: string; clientEmail: string | null | undefined; clientPhone?: string | null; price: number },
 ): Promise<void> {
-  if (!input.clientEmail) return;
+  const phone = toE164(input.clientPhone ?? null);
+  if (!input.clientEmail && !phone) return;
 
   const lookback = new Date(Date.now() - LOOKBACK_MS).toISOString();
 
@@ -19,7 +22,7 @@ export async function attributeAutopilotRevenue(
     .from("autopilot_events")
     .select("id")
     .eq("shop_id", input.shopId)
-    .eq("client_email", input.clientEmail)
+    .or([input.clientEmail ? `client_email.eq.${pgrstQuote(input.clientEmail)}` : null, phone ? `client_phone.eq.${pgrstQuote(phone)}` : null].filter(Boolean).join(","))
     .is("amount", null)
     .gte("created_at", lookback)
     .order("created_at", { ascending: false })

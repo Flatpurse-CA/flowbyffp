@@ -441,6 +441,17 @@ export async function sendNoShowEmail(to: string, input: { shopName: string; ser
   return send({ to, subject, html });
 }
 
+/** AutoPilot outreach: plain message from the shop with one booking button. */
+export async function sendAutopilotEmail(to: string, input: { shopName: string; subject: string; text: string; ctaLabel: string; ctaUrl: string }) {
+  const html = `<div style="font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;max-width:520px;margin:0 auto;padding:28px 20px;color:#18181b">
+  <p style="font-size:13px;font-weight:600;color:#6d28d9;margin:0 0 18px">${escapeHtml(input.shopName)}</p>
+  <p style="font-size:16px;line-height:1.6;margin:0 0 24px">${escapeHtml(input.text)}</p>
+  <a href="${escapeHtml(input.ctaUrl)}" style="display:inline-block;background:#6d28d9;color:#fff;text-decoration:none;font-weight:600;font-size:15px;padding:12px 22px;border-radius:10px">${escapeHtml(input.ctaLabel)}</a>
+  <p style="font-size:12px;color:#71717a;margin:28px 0 0">Sent by ${escapeHtml(input.shopName)} with FlatPurse Flow.</p>
+</div>`;
+  return send({ to, subject: input.subject, html });
+}
+
 export async function sendReviewRequestEmail(to: string, input: { shopName: string; reviewUrl: string }) {
   const { subject, html } = await renderTemplate("review_request", { shopName: input.shopName }, { ctaUrl: input.reviewUrl });
   return send({ to, subject, html });

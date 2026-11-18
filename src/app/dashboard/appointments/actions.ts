@@ -11,6 +11,7 @@ import { requireShop, getCurrentShopId, getShopContext } from "@/lib/dashboard/s
 import { attributeAutopilotRevenue } from "@/lib/dashboard/autopilotAttribution";
 import { stripe } from "@/lib/stripe";
 import { sendSms } from "@/lib/twilio";
+import { shopHasFeature } from "@/lib/dashboard/plan";
 import { getRequestOrigin } from "@/lib/requestOrigin";
 import {
   sendBookingConfirmedEmail,
@@ -146,7 +147,7 @@ export async function createAppointment(input: {
 
   if (error) throw new Error(error.message);
 
-  await attributeAutopilotRevenue(supabase, { shopId, clientEmail: input.clientEmail, price: input.price });
+  await attributeAutopilotRevenue(supabase, { shopId, clientEmail: input.clientEmail, clientPhone: input.clientPhone, price: input.price });
 
   revalidatePath("/dashboard/appointments");
 }
@@ -374,7 +375,7 @@ export async function markNoShow(id: string) {
   if (error) throw new Error(error.message);
   revalidatePath("/dashboard/appointments");
 
-  if (appt?.client_email) {
+  if (appt?.client_email && !(await shopHasFeature(shopId, "autopilot"))) {
     const shop = await getShopEmailContext(supabase, shopId);
     if (shop) {
       try {
