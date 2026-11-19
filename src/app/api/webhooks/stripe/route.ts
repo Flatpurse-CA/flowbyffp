@@ -56,6 +56,9 @@ export async function POST(req: Request) {
       const subscriptionId = typeof session.subscription === "string" ? session.subscription : session.subscription.id;
 
       let finalSubscriptionId = subscriptionId;
+      // Card-up-front trials arrive here as "trialing"; the first charge is at trial_end.
+      const sub = await stripe().subscriptions.retrieve(subscriptionId);
+      const trialEnd = sub.status === "trialing" && sub.trial_end ? sub.trial_end : null;
 
       if (founderClaim) {
         const { data: claimed } = await admin.rpc("claim_founder_spot");
@@ -71,7 +74,9 @@ export async function POST(req: Request) {
         await stripe().subscriptionSchedules.update(schedule.id, {
           end_behavior: "release",
           phases: [
-            { items: [{ price: priceId, quantity: 1 }], duration: { interval: "month", interval_count: 12 }, discounts: [{ coupon: "founders-40-off" }] },
+            // Keep the trial as its own phase so the 12 discounted months start at the first charge.
+            ...(trialEnd ? [{ items: [{ price: priceId, quantity: 1 }], trial_end: trialEnd, end_date: trialEnd }] : []),
+            { items: [{ price: priceId, quantity: 1 }], duration: { interval: "month" as const, interval_count: 12 }, discounts: [{ coupon: "founders-40-off" }] },
             { items: [{ price: priceId, quantity: 1 }], discounts: [{ coupon: "founders-25-off" }] },
           ],
         });
@@ -84,7 +89,7 @@ export async function POST(req: Request) {
           plan: planKey,
           billing_interval: interval,
           subscription_id: finalSubscriptionId,
-          subscription_status: "active",
+          subscription_status: trialEnd ? "trialing" : "active",
           ...(founderClaim ? { is_founder: true, founder_discount_claimed_at: new Date().toISOString() } : {}),
         })
         .eq("id", shopId);

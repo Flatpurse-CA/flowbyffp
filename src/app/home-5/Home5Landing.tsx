@@ -140,7 +140,7 @@ export function HeroCopy() {
           {isClients ? <>Explore the benefits <ArrowDown size={16} strokeWidth={2.2} /></> : <>Request a personal demo <ArrowUpRight size={16} strokeWidth={2.2} /></>}
         </a>
       </div>
-      <p className="h5-hero-micro">{isClients ? "Your favourite shop. A simpler way to book." : "No credit card required."}</p>
+      <p className="h5-hero-micro">{isClients ? "Your favourite shop. A simpler way to book." : "14-day free trial. Cancel any time before it ends."}</p>
     </div>
   );
 }

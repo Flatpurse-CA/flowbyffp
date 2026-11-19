@@ -8,7 +8,7 @@ import {
   Wallet, Clock, Receipt, Zap, Camera,
   ChevronDown, ChevronUp,
 } from "lucide-react";
-import { updateBusinessHours, startStripeOnboarding, startCheckout, chooseStarterPlan, openBillingPortal, setFlowEnabled, updateNotificationPrefs, updateTaxSettings, updateBusinessProfile, updateShopImage, type BusinessHourRow, type BillingStatus, type BusinessProfile, type FlowKey, type NotificationPrefs } from "./actions";
+import { updateBusinessHours, startStripeOnboarding, startCheckout, openBillingPortal, setFlowEnabled, updateNotificationPrefs, updateTaxSettings, updateBusinessProfile, updateShopImage, type BusinessHourRow, type BillingStatus, type BusinessProfile, type FlowKey, type NotificationPrefs } from "./actions";
 import { PLANS, NO_MARKETPLACE_FEE_NOTE, type BillingInterval } from "@/lib/plans";
 import { PROVINCES, computeTax, describeRates, getProvince, type ShopTaxSettings } from "@/lib/tax";
 import { deepen } from "@/lib/dashboard/deepen";
@@ -165,6 +165,8 @@ function buildHourRows(initial: BusinessHourRow[]): HourRow[] {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
+const STAFF_LIMIT: Record<string, string> = { starter: "Up to 2 staff", pro: "Up to 6 staff", pro_plus: "Unlimited staff", enterprise: "Unlimited staff, 3+ locations" };
+
 export function SettingsClient({ shopId, initialBusinessHours, initialStripeConnected, initialBookingUrl, initialBilling, initialFlowFlags, initialNotificationPrefs, initialTax, initialBusinessProfile, initialProfileImageUrl, initialCoverImageUrl, twilioConfigured }: { shopId: string | null; initialBusinessHours: BusinessHourRow[]; initialStripeConnected: boolean; initialBookingUrl: string | null; initialBilling: BillingStatus | null; initialFlowFlags: Record<FlowKey, boolean>; initialNotificationPrefs: NotificationPrefs; initialTax: ShopTaxSettings & { taxNumber: string }; initialBusinessProfile: BusinessProfile; initialProfileImageUrl: string | null; initialCoverImageUrl: string | null; twilioConfigured: boolean }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -209,20 +211,12 @@ export function SettingsClient({ shopId, initialBusinessHours, initialStripeConn
 
   const selectPlan = async (planKey: string, claimFounders: boolean) => {
     setBillingError(null);
-    if (planKey === "starter") {
-      setPendingPlanKey(planKey);
-      const res = await chooseStarterPlan();
-      setPendingPlanKey(null);
-      if (res.error) setBillingError(res.error);
-      else router.refresh();
-      return;
-    }
     if (planKey === "enterprise") {
       redirectTo("mailto:sales@flatpurse.com?subject=Enterprise%20plan");
       return;
     }
     setPendingPlanKey(planKey);
-    const res = await startCheckout({ planKey: planKey as "pro" | "pro_plus", interval: billingInterval, claimFounders });
+    const res = await startCheckout({ planKey: planKey as "starter" | "pro" | "pro_plus", interval: billingInterval, claimFounders });
     if (res.error) {
       setBillingError(res.error);
       setPendingPlanKey(null);
@@ -945,21 +939,38 @@ export function SettingsClient({ shopId, initialBusinessHours, initialStripeConn
               // completed — otherwise the plan card locks with no way to add a
               // card and "Manage billing" has no subscription to manage either.
               const isCurrent = initialBilling?.plan === plan.key
-                && (plan.key === "starter" || initialBilling?.subscriptionStatus === "active");
-              const price = plan.monthlyPrice === null ? plan.priceLabel : plan.monthlyPrice === 0 ? "Free" : `C$${billingInterval === "annual" ? plan.annualPrice : plan.monthlyPrice}/${billingInterval === "annual" ? "yr" : "mo"}`;
+                && ["active", "trialing"].includes(initialBilling?.subscriptionStatus ?? "");
+              const price = plan.monthlyPrice === null ? plan.priceLabel : plan.monthlyPrice === 0 ? "Free" : `C$${billingInterval === "annual" ? plan.annualPrice : plan.monthlyPrice}/${billingInterval === "annual" ? "yr" : "mo"}`
+              const founderPrice = initialBilling?.foundersEligible && billingInterval === "monthly" && (plan.key === "pro" || plan.key === "pro_plus") && plan.monthlyPrice
+                ? `C$${(Math.round(plan.monthlyPrice * 60) / 100).toFixed(2)}/mo` : null;
               return (
                 <div key={plan.key} style={{ ...card, border: `1px solid ${isCurrent ? plan.color : "var(--dw07)"}`, display: "flex", flexDirection: "column", gap: 10 }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                     <span style={{ fontSize: 11, fontWeight: 700, color: deepen(plan.color), letterSpacing: "0.06em", textTransform: "uppercase" }}>{plan.label}</span>
                     {plan.badge && <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 20, background: plan.bg, color: plan.color }}>{plan.badge}</span>}
                   </div>
-                  <p style={{ color: "var(--dtext)", fontSize: 20, fontWeight: 800, margin: 0 }}>{price}</p>
+                  {founderPrice ? (
+                    <div>
+                      <p style={{ color: "var(--dtext)", fontSize: 20, fontWeight: 800, margin: 0 }}>
+                        <s style={{ color: "var(--dw45)", fontSize: 14, fontWeight: 600, marginRight: 6 }}>{price}</s>{founderPrice}
+                      </p>
+                      <p style={{ color: "var(--dw45)", fontSize: 11.5, margin: "2px 0 0" }}>Year 1, then C${(Math.round((plan.monthlyPrice ?? 0) * 75) / 100).toFixed(2)}/mo forever</p>
+                    </div>
+                  ) : (
+                    <p style={{ color: "var(--dtext)", fontSize: 20, fontWeight: 800, margin: 0 }}>{price}</p>
+                  )}
                   {billingInterval === "annual" && plan.annualMonthlyEquivalent != null && (
                     <p style={{ color: "var(--dpurple-text)", fontSize: 11.5, margin: "-6px 0 0" }}>
                       ≈ C${plan.annualMonthlyEquivalent}/mo{plan.annualSavingsLabel ? ` · ${plan.annualSavingsLabel}` : ""}
                     </p>
                   )}
-                  <p style={{ color: "var(--dw35)", fontSize: 12, margin: 0 }}>{plan.perfectFor}</p>
+                  <p style={{ color: "var(--dw45)", fontSize: 12, margin: 0 }}>{plan.perfectFor}</p>
+                  <p style={{ color: "var(--dtext)", fontSize: 12, fontWeight: 700, margin: 0 }}>{STAFF_LIMIT[plan.key]}</p>
+                  <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 4 }}>
+                    {plan.features.slice(0, 4).map(f => (
+                      <li key={f} style={{ color: "var(--dw45)", fontSize: 11.5, lineHeight: 1.4, display: "flex", gap: 6 }}><Check size={12} style={{ color: "var(--dpurple-text)", flexShrink: 0, marginTop: 2 }} />{f}</li>
+                    ))}
+                  </ul>
                   <div style={{ display: "flex", flexDirection: "column", gap: 3, padding: "10px 0", borderTop: "1px solid var(--dw05)", borderBottom: "1px solid var(--dw05)" }}>
                     <p style={{ color: "var(--dw4)", fontSize: 11.5, margin: 0 }}>Card fee: <span style={{ color: "var(--dw45)" }}>{plan.cardFee}</span></p>
                     <p style={{ color: "var(--dw4)", fontSize: 11.5, margin: 0 }}>Interac: <span style={{ color: "var(--dw45)" }}>{plan.interacFee}</span></p>
@@ -984,7 +995,8 @@ export function SettingsClient({ shopId, initialBusinessHours, initialStripeConn
             })}
           </div>
 
-          <p style={{ color: "var(--dw3)", fontSize: 11.5, textAlign: "center", margin: 0 }}>{NO_MARKETPLACE_FEE_NOTE}</p>
+          <p style={{ color: "var(--dw45)", fontSize: 12, textAlign: "center", margin: 0 }}>Prices in CAD, per location, plus applicable tax. Cancel anytime. <Link href="/pricing" style={{ color: "var(--dpurple-text)" }}>Compare all features</Link></p>
+          <p style={{ color: "var(--dw45)", fontSize: 11.5, textAlign: "center", margin: 0 }}>{NO_MARKETPLACE_FEE_NOTE}</p>
         </>
       )}
     </div>

@@ -6,7 +6,9 @@ import type Stripe from "stripe";
 import { toE164 } from "@/lib/phone";
 import { stripe } from "@/lib/stripe";
 import { getRequestOrigin } from "@/lib/requestOrigin";
-import { getPlan, getStripePriceId, type BillablePlanKey, type BillingInterval } from "@/lib/plans";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { createPlanCheckout } from "@/lib/billing/trialCheckout";
+import { type BillablePlanKey, type BillingInterval } from "@/lib/plans";
 import { effectiveRate, getProvince, normalizeProvince, type ShopTaxSettings } from "@/lib/tax";
 
 export type BusinessHourRow = { weekday: number; open: boolean; start: string; end: string };
@@ -154,69 +156,17 @@ export async function getBillingStatus(): Promise<BillingStatus | null> {
 export async function startCheckout(input: { planKey: BillablePlanKey; interval: BillingInterval; claimFounders: boolean }): Promise<{ url?: string; error?: string }> {
   const ctx = await getShopContext();
   if (!ctx || ctx.role !== "owner") return { error: "Only the shop owner can manage billing" };
-  const { supabase, shopId } = await requireShop();
-
-  const { data: shop } = await supabase
-    .from("shops")
-    .select("stripe_customer_id, name, founder_discount_claimed_at")
-    .eq("id", shopId)
-    .maybeSingle();
-  if (!shop) return { error: "Shop not found" };
-
-  const plan = getPlan(input.planKey);
-  const origin = await getRequestOrigin();
-
-  try {
-    let customerId = shop.stripe_customer_id as string | null;
-    if (!customerId) {
-      const customer = await stripe().customers.create({ name: shop.name as string, metadata: { shop_id: shopId } });
-      customerId = customer.id;
-      await supabase.from("shops").update({ stripe_customer_id: customerId }).eq("id", shopId);
-    }
-
-    const wantsFounders = input.claimFounders && !shop.founder_discount_claimed_at;
-    let foundersSpotsLeft = 0;
-    if (wantsFounders) {
-      const { data } = await supabase.from("founders_program").select("spots_remaining").eq("id", true).maybeSingle();
-      foundersSpotsLeft = data?.spots_remaining ?? 0;
-    }
-    const applyFoundersDiscount = wantsFounders && foundersSpotsLeft > 0;
-
-    const session = await stripe().checkout.sessions.create({
-      mode: "subscription",
-      customer: customerId,
-      line_items: [{ price: getStripePriceId(input.planKey, input.interval), quantity: 1 }],
-      // Stripe rejects the request if both are present, even with allow_promotion_codes: false.
-      ...(applyFoundersDiscount
-        ? { discounts: [{ coupon: "founders-40-off" }] }
-        : { allow_promotion_codes: true }),
-      success_url: `${origin}/dashboard/settings?tab=Billing&checkout=success`,
-      cancel_url: `${origin}/dashboard/settings?tab=Billing&checkout=cancelled`,
-      metadata: {
-        context: "platform_subscription",
-        shop_id: shopId,
-        plan_key: plan.key,
-        interval: input.interval,
-        founder_claim: applyFoundersDiscount ? "true" : "false",
-      },
-    });
-
-    return { url: session.url ?? undefined };
-  } catch (e) {
-    return { error: e instanceof Error ? e.message : "Couldn't start checkout" };
-  }
-}
-
-/** Starter has no Stripe subscription — just record the plan directly. Downgrading off a paid plan should go through openBillingPortal (cancel) instead, so subscription_status stays truthful. */
-export async function chooseStarterPlan(): Promise<{ error?: string }> {
-  const ctx = await getShopContext();
-  if (!ctx || ctx.role !== "owner") return { error: "Only the shop owner can change plans" };
-  const { supabase, shopId } = await requireShop();
-
-  const { error } = await supabase.from("shops").update({ plan: "starter" }).eq("id", shopId);
-  if (error) return { error: error.message };
-  revalidatePath("/dashboard/settings");
-  return {};
+  const { shopId } = await requireShop();
+  return createPlanCheckout({
+    admin: createAdminClient(),
+    shopId,
+    planKey: input.planKey,
+    interval: input.interval,
+    claimFounders: input.claimFounders,
+    origin: await getRequestOrigin(),
+    successPath: "/dashboard/settings?tab=Billing&checkout=success",
+    cancelPath: "/dashboard/settings?tab=Billing&checkout=cancelled",
+  });
 }
 
 export async function openBillingPortal(): Promise<{ url?: string; error?: string }> {
@@ -235,7 +185,7 @@ export async function openBillingPortal(): Promise<{ url?: string; error?: strin
   // having completed Checkout, so there's no active subscription for the
   // portal to manage yet. Rather than dead-ending with an error, start real
   // Checkout for that plan — this is the actual "add a card" path.
-  if (!shop.stripe_customer_id || shop.subscription_status !== "active") {
+  if (!shop.stripe_customer_id || !["active", "trialing", "past_due"].includes(shop.subscription_status as string)) {
     // Enterprise is sales-negotiated and has no Price, so it falls back to Pro
     const planKey: BillablePlanKey =
       shop.plan === "pro_plus" ? "pro_plus" : shop.plan === "starter" ? "starter" : "pro";

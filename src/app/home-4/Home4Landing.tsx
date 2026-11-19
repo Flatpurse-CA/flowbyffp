@@ -110,7 +110,7 @@ const OWNER_FAQ: { q: string; a: React.ReactNode }[] = [
   { q: "What happens when a client cancels?", a: "With the relevant AutoPilot flows enabled, Flow can contact clients to help fill an opening. A replacement booking depends on client availability and response; it is not guaranteed. Watch the simulation above for an example." },
   { q: "How hard is switching to Flow?", a: "You’ll need to set up your services, staff, booking availability and payment settings. Before switching, contact us to confirm which client records can be imported from your current system and what setup help is available." },
   { q: "Which plan includes AutoPilot?", a: <>Starter begins at C$39/month for booking, client management and payments. Pro starts at C$89/month and adds AI Front Desk and the Daily Brief. Pro+ starts at C$189/month and adds AutoPilot, Flow Coach and business insights. Card processing fees apply. <Link href="/pricing">Compare all features and fees</Link>.</> },
-  { q: "What happens after I click Start free trial?", a: <>You’ll go to Flow’s signup page to create your account. No credit card is required to get started. Confirm the current trial duration, included features and any beta offer during signup, or <a href="#demo">ask us before joining</a>.</> },
+  { q: "What happens after I click Start free trial?", a: <>You’ll go to Flow’s signup page to create your account. You add a card at plan selection and nothing is charged until Day 14. Confirm the current trial duration, included features and any beta offer during signup, or <a href="#demo">ask us before joining</a>.</> },
 ];
 
 const CLIENT_FAQ: { q: string; a: string }[] = [
@@ -321,7 +321,7 @@ export default function Home4Landing({ initialAudience = "owners", onAudienceCha
                   <Link className="button" href="/signup">Start your free trial <ArrowUpRight className="h4-arrow" size={16} aria-hidden="true" /></Link>
                   <a className="text-link" href="#demo">Request a personal demo <ArrowUpRight className="h4-arrow" size={16} aria-hidden="true" /></a>
                 </div>
-                <div className="micro">No credit card required.</div>
+                <div className="micro">14-day free trial. Cancel any time before it ends.</div>
               </Fragment>
             )}
           </div>

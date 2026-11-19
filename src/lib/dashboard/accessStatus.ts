@@ -23,6 +23,12 @@ export function computeAccessStatus(shop: {
     return { status: "active", trialEndsAt, graceEndsAt };
   }
 
+  // Card on file and Stripe is running the trial: Stripe decides when it ends
+  // (first charge on Day 14), so the local clock can't drop it into grace.
+  if (shop.subscription_status === "trialing") {
+    return { status: "trialing", trialEndsAt, graceEndsAt };
+  }
+
   // Frozen by an admin — full access, clock doesn't advance until resumed
   // (resuming shifts trial_started_at forward to preserve remaining time).
   if (shop.trial_paused_at) {

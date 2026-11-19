@@ -9,6 +9,10 @@ import { choosePlan } from "./actions";
 
 const easing = "cubic-bezier(0.16, 1, 0.3, 1)";
 
+const STAFF_LIMIT: Record<string, string> = { starter: "Up to 2 staff", pro: "Up to 6 staff", pro_plus: "Unlimited staff", enterprise: "Unlimited staff, 3+ locations" };
+const FOUNDERS_PLANS = ["pro", "pro_plus"];
+const money = (n: number) => (Number.isInteger(n) ? `C$${n}` : `C$${n.toFixed(2)}`);
+
 const PLANS = REAL_PLANS.map(p => ({
   id: p.key,
   label: p.label,
@@ -16,7 +20,8 @@ const PLANS = REAL_PLANS.map(p => ({
   price: p.monthlyPrice === null ? "Custom" : p.monthlyPrice === 0 ? "$0" : `C$${p.monthlyPrice}`,
   priceSuffix: p.monthlyPrice === null ? "" : "/month",
   description: p.perfectFor,
-  features: p.features.slice(0, 5),
+  features: p.features.slice(0, 4),
+  monthly: p.monthlyPrice,
   cta: p.key === "enterprise" ? "Continue with Enterprise" : `Continue with ${p.label}`,
 }));
 
@@ -97,25 +102,22 @@ export function PlanForm({ error, foundersSpotsRemaining, unlimited = false }: {
           animation: `0.5s ${easing} 60ms 1 normal both running fp-fade-up`,
         }}
       >
-        Start free and upgrade anytime.
+        14 days of Pro+ free. You add a card before your trial starts, and nothing is charged until Day 14.
       </p>
 
       {foundersSpotsRemaining > 0 && (
         <div
           style={{
-            background: "rgba(251,191,36,0.08)",
-            border: "1px solid rgba(251,191,36,0.25)",
+            background: "rgb(194,65,12)",
+            border: "none",
             borderRadius: 8,
             padding: "12px 16px",
             marginBottom: 24,
             animation: `0.5s ${easing} 40ms 1 normal both running fp-fade-up`,
           }}
         >
-          <p style={{ color: "rgb(217,161,10)", fontSize: 13, fontWeight: 700, margin: "0 0 2px" }}>
-            Founders Beta: {foundersSpotsRemaining} spot{foundersSpotsRemaining === 1 ? "" : "s"} left
-          </p>
-          <p style={{ color: "var(--auth-text-sub)", fontSize: 12.5, margin: 0, lineHeight: 1.5 }}>
-            Pick Pro or Pro+ and get 40% off your first 12 months, then 25% off forever, applied automatically when you set up billing.
+          <p style={{ color: "#fff", fontSize: 13, fontWeight: 700, margin: 0, lineHeight: 1.5 }}>
+            Founders Beta: 40% off your first year, then 25% off for life on Pro and Pro+. {foundersSpotsRemaining} of 40 spots left.
           </p>
         </div>
       )}
@@ -260,7 +262,7 @@ export function PlanForm({ error, foundersSpotsRemaining, unlimited = false }: {
                         transition: "color 0.25s",
                       }}
                     >
-                      {p.price}
+                      {foundersSpotsRemaining > 0 && FOUNDERS_PLANS.includes(p.id) && p.monthly ? money(Math.round(p.monthly * 60) / 100) : p.price}
                     </span>
                     {p.priceSuffix && (
                       <span
@@ -275,6 +277,13 @@ export function PlanForm({ error, foundersSpotsRemaining, unlimited = false }: {
                       </span>
                     )}
                   </div>
+
+                  {foundersSpotsRemaining > 0 && FOUNDERS_PLANS.includes(p.id) && p.monthly ? (
+                    <p style={{ fontSize: 11.5, margin: "-2px 0 8px", color: "var(--auth-text-sub)" }}>
+                      <s>{p.price}/mo</s> · Year 1, then {money(Math.round(p.monthly * 75) / 100)}/mo
+                    </p>
+                  ) : null}
+                  <p style={{ fontSize: 12, fontWeight: 700, margin: "0 0 8px", color: "var(--auth-text)" }}>{STAFF_LIMIT[p.id]}</p>
 
                   {/* Description */}
                   <p
@@ -320,34 +329,21 @@ export function PlanForm({ error, foundersSpotsRemaining, unlimited = false }: {
                     ))}
                   </ul>
 
-                  {/* CTA inside selected card */}
-                  {isSelected && (
-                    <SubmitButton
-                      pendingText="Saving…"
-                      style={{
-                        width: "100%",
-                        background: isDark ? "rgba(109,40,217,0.45)" : "rgb(109,40,217)",
-                        border: isDark ? "1px solid rgba(139,92,246,0.65)" : "none",
-                        color: isDark ? "rgb(233,213,255)" : "white",
-                        borderRadius: 8,
-                        padding: "11px 0",
-                        fontSize: 13,
-                        fontWeight: 700,
-                        cursor: "pointer",
-                        letterSpacing: "0.01em",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        gap: 6,
-                      }}
-                    >
-                      {plan.cta}
-                    </SubmitButton>
-                  )}
                 </div>
               </div>
             );
           })}
+        </div>
+        <p style={{ color: "var(--auth-text-sub)", fontSize: 12.5, textAlign: "center", margin: "4px 0 16px" }}>
+          Prices in CAD, per location, plus applicable tax. Cancel anytime. <a href="/pricing" target="_blank" rel="noreferrer" style={{ color: "rgb(167,139,250)" }}>Compare all features</a>
+        </p>
+        <div style={{ position: "sticky", bottom: 0, padding: "12px 0 calc(12px + env(safe-area-inset-bottom, 0px))", background: "var(--auth-bg)", zIndex: 5 }}>
+          <SubmitButton
+            pendingText="Saving..."
+            style={{ width: "100%", background: "rgb(109,40,217)", border: "none", color: "white", borderRadius: 10, padding: "14px 0", fontSize: 14.5, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}
+          >
+            {plan.cta}
+          </SubmitButton>
         </div>
       </form>
     </div>

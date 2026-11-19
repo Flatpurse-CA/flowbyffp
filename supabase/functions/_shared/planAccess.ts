@@ -31,7 +31,7 @@ export function shopHasFeature(shop: ShopPlanFields, feature: PlanFeature, now =
   if (shop.trial_override) plan = "enterprise";
   else if (shop.subscription_status !== "active") {
     const trialEnds = new Date(shop.trial_started_at).getTime() + TRIAL_DAYS * DAY_MS;
-    if (shop.trial_paused_at || now.getTime() < trialEnds) plan = RANK[plan] > RANK.pro_plus ? plan : "pro_plus";
+    if (shop.subscription_status === "trialing" || shop.trial_paused_at || now.getTime() < trialEnds) plan = RANK[plan] > RANK.pro_plus ? plan : "pro_plus";
   }
   return RANK[plan] >= RANK[MIN_PLAN[feature]];
 }
