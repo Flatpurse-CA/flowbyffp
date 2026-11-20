@@ -13,7 +13,7 @@ const sub: React.CSSProperties = { color: "#555", fontSize: 14.5, margin: 0, lin
 /** Client manage page (FL-041): reschedule or cancel within policy, fee shown first. */
 export function ManageBooking(p: {
   token: string; shopName: string; shopPhone: string | null; firstName: string; service: string; staff: string | null;
-  startsAt: string; active: boolean; cancelled: boolean; inside: boolean; lateFee: number; policy: string;
+  startsAt: string; active: boolean; cancelled: boolean; inside: boolean; lateFee: number; policy: string; intakeHref: string | null;
 }) {
   const [view, setView] = useState<"main" | "times" | "confirmCancel" | "done">(p.cancelled ? "done" : "main");
   const [when, setWhen] = useState(p.startsAt);
@@ -56,6 +56,7 @@ export function ManageBooking(p: {
             <button type="button" style={ghost} onClick={() => setView("main")}>Back</button>
           </>
         )}
+        {p.intakeHref && p.active && <a href={p.intakeHref} style={{ ...ghost, textDecoration: "none" }}>Fill your intake form</a>}
         <p style={{ ...sub, fontSize: 13 }}>{p.policy}</p>
       </div>
     </main>

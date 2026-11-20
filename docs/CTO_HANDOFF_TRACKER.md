@@ -40,7 +40,7 @@ Legend: DONE = built, verify only · PARTIAL = something exists, needs finishing
 | FL-038/039 | Refunds w/ reason, dispute alerts, payout report CSV | DONE (migration 0059; owner refunds on Payments; dispute email with deadline; CSV from Stripe balance transactions) |
 | FL-033/034/035 | Connect Express, application fee, tips, cash, receipts | DONE (app fee behind PLATFORM_FEE_ENABLED; receipt page /a/token/receipt with GST/HST #; tips by staff on Payments) |
 | FL-042 | Rooms/equipment resources | DONE (migration 0057; capacity check in slot finder; owner page under Services) |
-| FL-043/044 | Intake forms, insurance-ready receipts | PARTIAL |
+| FL-043/044 | Intake forms, insurance-ready receipts | DONE (migration 0061; AES-GCM answers, needs INTAKE_ENCRYPTION_KEY env; view log; registration # on receipts) |
 | FL-045 | 3-tap staff booking | DONE (Quick book page; due = past usual gap, usual service, usual-time/gap-filler ranking) |
 | FL-046/047 | Send Times (tappable slots) + rules | DONE (manual send; no deposit step, Mobile Mode, segments or SMS allowance yet) |
 | FL-066-069 | Cancel flow + save offers, pause/downgrade, emails, account deletion | DONE (purge gated by DATA_DELETION_ENABLED; export is direct download, not emailed link) |

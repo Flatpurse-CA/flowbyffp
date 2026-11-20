@@ -15,6 +15,7 @@ export default async function ManagePage({ params }: { params: Promise<{ token: 
   if (!a) notFound();
   const { data: shop } = await admin.from("shops").select(`name, phone, ${POLICY_COLUMNS}`).eq("id", a.shop_id).maybeSingle();
   const p = shop as unknown as Policy & { name: string; phone: string | null };
+  const { data: form } = await admin.from("intake_forms").select("id").eq("shop_id", a.shop_id).eq("active", true).limit(1);
   const { inside, upcoming } = timing(a.starts_at as string, p.cancel_window_hours);
   return (
     <ManageBooking
@@ -28,6 +29,7 @@ export default async function ManagePage({ params }: { params: Promise<{ token: 
       inside={inside}
       lateFee={inside ? amountFor(p.late_cancel_fee_mode, p.late_cancel_fee_value, Number(a.price)) : 0}
       policy={policyText(p, Number(a.price))}
+      intakeHref={form?.length ? `/a/${token}/intake` : null}
     />
   );
 }
