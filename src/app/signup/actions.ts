@@ -1,10 +1,13 @@
 "use server";
 
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createAdminClient, isEmailAlreadyConfirmed } from "@/lib/supabase/admin";
 import { validatePassword } from "@/lib/passwordPolicy";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
+
+/** Bump when /terms or /privacy change materially. */
+const LEGAL_VERSION = "2026-11-20";
 
 const ONBOARDING_COOKIE_MAX_AGE = 60 * 30;
 
@@ -13,6 +16,7 @@ export async function createAccount(formData: FormData) {
   const lastName = formData.get("lastName") as string;
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
+  const marketingOptIn = formData.get("marketingOptIn") === "on";
 
   if (!firstName || !lastName || !email || !password) {
     redirect(`/signup?error=${encodeURIComponent("All fields are required")}`);
@@ -55,7 +59,15 @@ export async function createAccount(formData: FormData) {
 
   await admin
     .from("profiles")
-    .upsert({ id: userId, first_name: firstName, last_name: lastName });
+    .upsert({ id: userId, first_name: firstName, last_name: lastName, ...(marketingOptIn ? { marketing_opt_in: true, marketing_opt_in_at: new Date().toISOString() } : {}) });
+
+  // FL-018: legal acceptance record (version, time, IP).
+  const ip = await getClientIp();
+  const ua = (await headers()).get("user-agent")?.slice(0, 300) ?? null;
+  await admin.from("legal_acceptances").insert([
+    { user_id: userId, document: "terms", version: LEGAL_VERSION, ip, user_agent: ua },
+    { user_id: userId, document: "privacy", version: LEGAL_VERSION, ip, user_agent: ua },
+  ]);
 
   // Pending (pre-verification) identity — shop/plan/verify steps read this via
   // getOnboardingContext() until the real session takes over after OTP verification.

@@ -72,7 +72,7 @@ Legend: DONE = built, verify only · PARTIAL = something exists, needs finishing
 | FL-012/013 | Server-side roles; audit log | PARTIAL |
 | FL-016 | Strings into translation files | TODO |
 | FL-017 | Product analytics events (IDs only) | PARTIAL |
-| FL-018 | Legal acceptance record (version, time, IP) + unticked marketing box | PARTIAL |
+| FL-018 | Legal acceptance record (version, time, IP) + unticked marketing box | DONE (migration 0064; LEGAL_VERSION const in signup actions) |
 | FL-019 | Test suite + CI + seed data | PARTIAL (vitest money/policy/tax/area tests + GitHub CI; no seed data or E2E yet) |
 
 ### P2 (month 1 after launch)

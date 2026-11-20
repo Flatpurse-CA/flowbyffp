@@ -176,6 +176,10 @@ function SignupStep1() {
 
             {/* CTA */}
             <div style={{ animation: fadeUp(320) }}>
+              <label style={{ display: "flex", gap: 8, alignItems: "flex-start", fontSize: 12.5, color: "var(--auth-text-sub)", margin: "0 0 12px", lineHeight: 1.5, cursor: "pointer" }}>
+                <input type="checkbox" name="marketingOptIn" style={{ marginTop: 3 }} />
+                Send me tips and product news by email (optional, unsubscribe anytime).
+              </label>
               <SubmitButton
                 onClick={() => setIsExiting(true)}
                 pendingText="Creating account…"
