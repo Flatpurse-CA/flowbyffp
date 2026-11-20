@@ -1,5 +1,6 @@
 "use server";
 
+import { isPausedNow } from "@/lib/billing/pause";
 import { normalizePhoneForStorage } from "@/lib/phone";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getCustomerContext } from "@/lib/dashboard/customer";
@@ -123,11 +124,11 @@ export async function createPublicBooking(input: {
 
   const admin = createAdminClient();
 
-  const { data: shop } = await admin.from("shops").select("id, owner_id, name, street_address, city, province, phone, trial_started_at, subscription_status, trial_override, trial_paused_at, client_referrals_enabled, client_referral_reward").eq("id", input.shopId).maybeSingle();
+  const { data: shop } = await admin.from("shops").select("id, owner_id, name, street_address, city, province, phone, trial_started_at, subscription_status, trial_override, trial_paused_at, client_referrals_enabled, client_referral_reward, paused_until").eq("id", input.shopId).maybeSingle();
   if (!shop) return { error: "This shop couldn't be found" };
 
   const { status: shopAccessStatus } = computeAccessStatus(shop as { trial_started_at: string; subscription_status: string | null; trial_override: boolean; trial_paused_at: string | null });
-  if (shopAccessStatus === "grace" || shopAccessStatus === "inactive") {
+  if (shopAccessStatus === "grace" || shopAccessStatus === "inactive" || isPausedNow(shop.paused_until as string | null)) {
     return { error: "This business isn't currently accepting new bookings" };
   }
 

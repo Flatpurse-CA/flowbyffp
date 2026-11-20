@@ -37,7 +37,7 @@ type Shop = {
   trial_started_at: string; subscription_status: string | null; trial_override: boolean; trial_paused_at: string | null;
   noshow_recovery_enabled: boolean; filler_enabled: boolean; winback_enabled: boolean;
   reminders_enabled: boolean; birthday_enabled: boolean;
-  created_at: string; autopilot_approval_until: string | null;
+  created_at: string; autopilot_approval_until: string | null; paused_until: string | null;
 };
 
 export type AutopilotRunResult = { shops: number; sent: number; failed: number; skipped: string[] };
@@ -73,7 +73,7 @@ export async function runAutopilot(now = new Date(), opts: { ignoreQuietHours?: 
   const admin = createAdminClient();
   const { data: shops, error } = await admin
     .from("shops")
-    .select("id, name, handle, trial_started_at, subscription_status, trial_override, trial_paused_at, noshow_recovery_enabled, filler_enabled, winback_enabled, reminders_enabled, birthday_enabled, created_at, autopilot_approval_until");
+    .select("id, name, handle, trial_started_at, subscription_status, trial_override, trial_paused_at, noshow_recovery_enabled, filler_enabled, winback_enabled, reminders_enabled, birthday_enabled, created_at, autopilot_approval_until, paused_until");
   if (error) throw new Error(error.message);
 
   for (const shop of (shops ?? []) as Shop[]) {
@@ -98,6 +98,7 @@ async function runShop(admin: ReturnType<typeof createAdminClient>, shop: Shop, 
   const counts = { sent: 0, failed: 0 };
   const bookingUrl = shop.handle ? `${SITE_URL}/book/${shop.handle}` : null;
   if (!bookingUrl) return counts; // nothing to send people to
+  if (shop.paused_until && new Date(shop.paused_until).getTime() > now.getTime()) return counts; // owner paused the plan
 
   const since = new Date(now.getTime() - 400 * DAY).toISOString();
   const { data: rows } = await admin

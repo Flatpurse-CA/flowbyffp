@@ -896,11 +896,12 @@ export function SettingsClient({ shopId, initialBusinessHours, initialStripeConn
               </div>
               <Shield size={36} color="rgba(139,92,246,0.5)" strokeWidth={1.2} />
             </div>
-            {initialBilling?.plan !== "starter" && (
-              <div style={{ display: "flex", gap: 10, marginTop: 18 }}>
+            {initialBilling?.subscriptionStatus && initialBilling.subscriptionStatus !== "canceled" && (
+              <div style={{ display: "flex", gap: 10, marginTop: 18, flexWrap: "wrap", alignItems: "center" }}>
                 <button onClick={manageBilling} disabled={portalLoading} style={{ padding: "9px 18px", borderRadius: 9, background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.6)", fontSize: 13, cursor: portalLoading ? "default" : "pointer", opacity: portalLoading ? 0.6 : 1 }}>
-                  {portalLoading ? "Opening…" : "Manage billing (invoices, card, cancel)"}
+                  {portalLoading ? "Opening…" : "Manage billing (invoices, card)"}
                 </button>
+                <Link href="/dashboard/settings/cancel" style={{ color: "rgba(255,255,255,0.5)", fontSize: 13 }}>Cancel or pause plan</Link>
               </div>
             )}
           </div>

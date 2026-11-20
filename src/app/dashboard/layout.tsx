@@ -7,6 +7,7 @@ import { DashboardShell } from "./DashboardShell";
 import { needsCard } from "@/lib/billing/cardGate";
 import { getTrialNotice } from "@/lib/billing/trialNotice";
 import { TrialEndNotice } from "./TrialEndNotice";
+import { PlanStatusBanner } from "./PlanStatusBanner";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const user = await getAuthUser();
@@ -86,9 +87,13 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   const unreadCount = await getUnreadCount();
   const trialNotice = ctx.role === "owner" ? await getTrialNotice(createAdminClient(), ctx.shopId) : null;
+  const { data: planState } = ctx.role === "owner"
+    ? await createAdminClient().from("shops").select("cancel_at, paused_until").eq("id", ctx.shopId).maybeSingle()
+    : { data: null };
 
   return (
     <DashboardShell user={user} role={ctx.role} staffName={ctx.staffName} unreadCount={unreadCount} accessStatus={ctx.accessStatus} initialDark={(await cookies()).get("portal-theme")?.value !== "light"}>
+      {planState && (planState.cancel_at || planState.paused_until) && <PlanStatusBanner cancelAt={planState.cancel_at} pausedUntil={planState.paused_until} />}
       {trialNotice && <TrialEndNotice notice={trialNotice} />}
       {children}
     </DashboardShell>

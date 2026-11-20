@@ -160,7 +160,9 @@ export async function POST(req: Request) {
       .from("shops")
       .update({
         subscription_status: canceled ? "canceled" : sub.status,
-        ...(canceled ? { subscription_id: null, billing_interval: null } : {}),
+        cancel_at: !canceled && sub.cancel_at ? new Date(sub.cancel_at * 1000).toISOString() : null,
+        ...(sub.pause_collection ? {} : { paused_until: null }),
+        ...(canceled ? { subscription_id: null, billing_interval: null, plan_ended_at: new Date().toISOString() } : { plan_ended_at: null }),
       })
       .eq("stripe_customer_id", customerId);
 
