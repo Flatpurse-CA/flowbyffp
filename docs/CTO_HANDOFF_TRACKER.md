@@ -25,7 +25,7 @@ Legend: DONE = built, verify only · PARTIAL = something exists, needs finishing
 | ID | Task | Status |
 |---|---|---|
 | FL-048 | Engine: trigger, wait, re-check, send, attribute; per-flow toggles | DONE (built 2026-11-18, cron live 11-19) |
-| FL-050-054 | No-show, Slot Filler, Win-Back, Rebook, Birthday flows | PARTIAL (+24h no-show follow-up done; waitlist tier + auto-applied offers moved to Batch 3, need booking checkout) |
+| FL-050-054 | No-show, Slot Filler, Win-Back, Rebook, Birthday flows | DONE except client waitlist tier (no client waitlist exists yet); offer % editable in DB only, no settings UI |
 | FL-007 | Frequency caps 1/day, 2/7 days per client across flows | DONE |
 | FL-049 | "Ask me first" approval queue for first 14 days | DONE |
 | FL-055 | Activity feed + revenue recovered counters | PARTIAL |

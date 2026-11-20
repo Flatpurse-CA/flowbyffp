@@ -1,5 +1,6 @@
 "use server";
 
+import { claimOffer } from "@/lib/autopilot/offers";
 import { isPausedNow } from "@/lib/billing/pause";
 import { normalizePhoneForStorage } from "@/lib/phone";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -114,6 +115,7 @@ export async function createPublicBooking(input: {
   startsAt: string;
   notes?: string;
   refCode?: string | null;
+  offerToken?: string | null;
 }): Promise<{ error?: string; appointmentId?: string; discount?: number }> {
   const ctx = await getCustomerContext();
   if (!ctx) return { error: "You need to be signed in to book" };
@@ -172,7 +174,11 @@ export async function createPublicBooking(input: {
   // The id is chosen up front so a referral discount can be claimed against
   // this exact booking before it's inserted.
   const appointmentId = randomUUID();
-  const discount = await claimBookingDiscount(admin, {
+  // An AutoPilot offer replaces any referral discount (offers never stack).
+  const offer = input.offerToken
+    ? await claimOffer(admin, { shopId: input.shopId, token: input.offerToken, email: ctx.email, phone: ctx.phone, appointmentId, price: Number(service.price) })
+    : null;
+  const discount = offer ?? await claimBookingDiscount(admin, {
     shop: shop as { id: string; client_referrals_enabled: boolean; client_referral_reward: number },
     customerId: ctx.customerId,
     appointmentId,

@@ -6,6 +6,7 @@ import { sendSms, twilioConfigured } from "@/lib/twilio";
 import { toE164 } from "@/lib/phone";
 import { sendAutopilotEmail } from "@/lib/resend";
 import { SITE_URL } from "@/lib/seo/facts";
+import { createOffer } from "@/lib/autopilot/offers";
 
 // AutoPilot: the five outbound flows (AI Front Desk is event-driven, see
 // lib/dashboard/frontdesk.ts). Runs on a schedule. Every send is claimed in
@@ -26,7 +27,8 @@ const CAP_PER_WEEK = 2;
 const COMMERCIAL = new Set<FlowKey>(["filler", "reminders", "winback", "birthday"]);
 const IMPLIED_CONSENT_DAYS = 730;
 const MAX_SENDS_PER_SHOP = 40;
-const FILLER_OFFERS_PER_SLOT = 3;
+const FILLER_OFFERS_PER_SLOT = 3;  // per run (runs every 15 min)
+const FILLER_MAX_PER_SLOT = 10;    // per opening, in total
 
 type Appt = ClientAppointment & {
   id: string; service_name: string; staff_id: string | null; updated_at: string | null;
@@ -38,6 +40,7 @@ type Shop = {
   noshow_recovery_enabled: boolean; filler_enabled: boolean; winback_enabled: boolean;
   reminders_enabled: boolean; birthday_enabled: boolean;
   created_at: string; autopilot_approval_until: string | null; paused_until: string | null;
+  winback_offer_pct: number | string; birthday_offer_pct: number | string;
 };
 
 export type AutopilotRunResult = { shops: number; sent: number; failed: number; skipped: string[] };
@@ -73,7 +76,7 @@ export async function runAutopilot(now = new Date(), opts: { ignoreQuietHours?: 
   const admin = createAdminClient();
   const { data: shops, error } = await admin
     .from("shops")
-    .select("id, name, handle, trial_started_at, subscription_status, trial_override, trial_paused_at, noshow_recovery_enabled, filler_enabled, winback_enabled, reminders_enabled, birthday_enabled, created_at, autopilot_approval_until, paused_until");
+    .select("id, name, handle, trial_started_at, subscription_status, trial_override, trial_paused_at, noshow_recovery_enabled, filler_enabled, winback_enabled, reminders_enabled, birthday_enabled, created_at, autopilot_approval_until, paused_until, winback_offer_pct, birthday_offer_pct");
   if (error) throw new Error(error.message);
 
   for (const shop of (shops ?? []) as Shop[]) {
@@ -157,7 +160,7 @@ async function runShop(admin: ReturnType<typeof createAdminClient>, shop: Shop, 
   const touched = new Set<string>(); // one message per client per run
 
   const send = async (flow: FlowKey, dedupeKey: string, to: { name: string; email: string | null; phone: string | null },
-    msg: { subject: string; text: string; cta: string }, appointmentId: string | null = null) => {
+    msg: { subject: string; text: string; cta: string; offer?: { flow: "winback" | "birthday"; pct: number } }, appointmentId: string | null = null) => {
     if (counts.sent + counts.failed >= MAX_SENDS_PER_SHOP) return false;
     const k = keyOf(to.email, to.phone, to.name);
     if (excluded.has(k)) return false;
@@ -185,13 +188,20 @@ async function runShop(admin: ReturnType<typeof createAdminClient>, shop: Shop, 
       weekCount.set(k, (weekCount.get(k) ?? 0) + 1);
       dayCount.set(k, (dayCount.get(k) ?? 0) + 1);
     }
+    // Personal link carrying the auto-applied offer (FL-052/054).
+    let link = bookingUrl;
+    if (msg.offer && msg.offer.pct > 0) {
+      const token = await createOffer(admin, { shopId: shop.id, flow: msg.offer.flow, percentOff: msg.offer.pct, email: to.email, phone });
+      link = `${bookingUrl}?offer=${token}`;
+      await admin.from("autopilot_events").update({ link }).eq("id", claim.id);
+    }
     // "Ask me first": the owner approves it from the AutoPilot page (FL-049).
     if (askFirst) { counts.sent += 1; return true; }
 
     let ok = false;
-    if (canSms) ok = !(await sendSms(phone!, smsText(shop.name, msg.text, bookingUrl, commercial))).error;
+    if (canSms) ok = !(await sendSms(phone!, smsText(shop.name, msg.text, link, commercial))).error;
     if (to.email) {
-      const r = await sendAutopilotEmail(to.email, { shopName: shop.name, subject: msg.subject, text: msg.text, ctaLabel: msg.cta, ctaUrl: bookingUrl });
+      const r = await sendAutopilotEmail(to.email, { shopName: shop.name, subject: msg.subject, text: msg.text, ctaLabel: msg.cta, ctaUrl: link });
       ok = ok || !r.error;
     }
     if (!ok) await admin.from("autopilot_events").update({ outcome: "failed" }).eq("id", claim.id);
@@ -238,10 +248,17 @@ async function runShop(admin: ReturnType<typeof createAdminClient>, shop: Shop, 
       const retaken = appts.some(b => b.id !== a.id && ACTIVE.has(b.status) && b.starts_at === a.starts_at && b.staff_id === a.staff_id);
       if (retaken) continue;
       const cancelledBy = keyOf(a.client_email, a.client_phone, a.client_name);
+      const { count: alreadyOffered } = await admin.from("autopilot_events").select("id", { count: "exact", head: true })
+        .eq("shop_id", shop.id).eq("flow_key", "filler").eq("appointment_id", a.id);
+      const room = Math.min(FILLER_OFFERS_PER_SLOT, FILLER_MAX_PER_SLOT - (alreadyOffered ?? 0));
+      if (room <= 0) continue;
+      // Clients who've had this service (or this staff member) before go first, then most overdue.
+      const affinity = (k: string) => past.some(p => keyOf(p.client_email, p.client_phone, p.client_name) === k
+        && (p.service_name === a.service_name || (a.staff_id && p.staff_id === a.staff_id))) ? 1 : 0;
       const candidates = clients
         .filter(c => c.key !== cancelledBy && !upcoming.has(c.key) && !touched.has(c.key) && (c.email || c.phone))
-        .sort((x, y) => overdueScore(y) - overdueScore(x))
-        .slice(0, FILLER_OFFERS_PER_SLOT);
+        .sort((x, y) => affinity(y.key) - affinity(x.key) || overdueScore(y) - overdueScore(x))
+        .slice(0, room);
       for (const c of candidates) {
         await send("filler", `slot:${a.id}:${c.key}`, c, {
           subject: `A spot just opened at ${shop.name}`,
@@ -268,14 +285,18 @@ async function runShop(admin: ReturnType<typeof createAdminClient>, shop: Shop, 
   }
 
   // 4. 30-Day Win-Back: no visit in 30 to 120 days and nothing booked.
+  const winbackPct = Number(shop.winback_offer_pct) || 0;
   if (shop.winback_enabled) {
     for (const c of clients) {
       if (c.daysSinceLastVisit == null || c.daysSinceLastVisit < 30 || c.daysSinceLastVisit > 120 || !c.lastVisitAt) continue;
       if (upcoming.has(c.key) || touched.has(c.key) || cooled.has(c.key)) continue;
       await send("winback", `winback:${c.key}:${c.lastVisitAt.slice(0, 10)}`, c, {
         subject: `We miss you at ${shop.name}`,
-        text: `Hi ${firstName(c.name)}, it's been a while since we saw you at ${shop.name}. We'd love to have you back. Book a time that works for you:`,
+        text: winbackPct > 0
+          ? `Hi ${firstName(c.name)}, it's been a while since we saw you at ${shop.name}. Come back in the next 14 days and get ${winbackPct}% off your visit, applied automatically:`
+          : `Hi ${firstName(c.name)}, it's been a while since we saw you at ${shop.name}. We'd love to have you back. Book a time that works for you:`,
         cta: "Book a visit",
+        offer: { flow: "winback", pct: winbackPct },
       });
     }
   }
@@ -283,7 +304,8 @@ async function runShop(admin: ReturnType<typeof createAdminClient>, shop: Shop, 
   // 5. Birthday: on the client's birthday (from the client list, e.g. imported).
   if (shop.birthday_enabled) {
     const bdays = (clientRows ?? []).filter(c => c.date_of_birth);
-    const today = localMonthDay(now);
+    const today = localMonthDay(new Date(now.getTime() + 7 * DAY)); // spec: 7 days before
+    const bdayPct = Number(shop.birthday_offer_pct) || 0;
     const year = now.getUTCFullYear();
     for (const b of bdays ?? []) {
       const dob = String(b.date_of_birth); // YYYY-MM-DD
@@ -292,9 +314,12 @@ async function runShop(admin: ReturnType<typeof createAdminClient>, shop: Shop, 
       const k = keyOf(to.email, to.phone, to.name);
       if (touched.has(k)) continue;
       await send("birthday", `bday:${b.id}:${year}`, to, {
-        subject: `Happy birthday from ${shop.name}`,
-        text: `Happy birthday, ${firstName(to.name)}! Everyone at ${shop.name} hopes it's a great one. Treat yourself to a visit:`,
+        subject: `Happy early birthday from ${shop.name}`,
+        text: bdayPct > 0
+          ? `Happy early birthday, ${firstName(to.name)}! Enjoy ${bdayPct}% off at ${shop.name} this month, applied automatically when you book:`
+          : `Happy early birthday, ${firstName(to.name)}! Everyone at ${shop.name} hopes it's a great one. Treat yourself to a visit:`,
         cta: "Book a treat",
+        offer: { flow: "birthday", pct: bdayPct },
       });
     }
   }

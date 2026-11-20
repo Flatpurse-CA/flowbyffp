@@ -41,7 +41,7 @@ export async function decideMessage(id: string, approve: boolean): Promise<{ err
   if (!ctx) return { error: "Only the owner can do this" };
   const admin = createAdminClient();
   const { data: ev } = await admin.from("autopilot_events")
-    .select("id, flow_key, client_email, client_phone, message_body, event_text, outcome")
+    .select("id, flow_key, client_email, client_phone, message_body, event_text, outcome, link")
     .eq("id", id).eq("shop_id", ctx.shopId).maybeSingle();
   if (!ev || ev.outcome !== "pending") return { error: "This message was already handled" };
 
@@ -52,7 +52,7 @@ export async function decideMessage(id: string, approve: boolean): Promise<{ err
   if (!approve) { revalidatePath("/dashboard/autopilot"); return {}; }
 
   const { data: shop } = await admin.from("shops").select("name, handle").eq("id", ctx.shopId).maybeSingle();
-  const bookingUrl = `${SITE_URL}/book/${shop?.handle ?? ""}`;
+  const bookingUrl = (ev.link as string | null) ?? `${SITE_URL}/book/${shop?.handle ?? ""}`;
   const text = (ev.message_body as string) ?? "";
   const subject = ((ev.event_text as string) ?? "").replace(/ \(.*\)$/, "");
   let ok = false;

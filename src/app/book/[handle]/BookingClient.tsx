@@ -117,11 +117,14 @@ export function BookingClient({ shop, services, staff, businessHours, initialCus
 }) {
   // ?ref=<code> from a client's referral link; read after mount (static-safe).
   const [refCode, setRefCode] = useState<string | null>(null);
+  const [offerToken, setOfferToken] = useState<string | null>(null);
   const [discount, setDiscount] = useState(0);
   useEffect(() => {
     const ref = new URLSearchParams(window.location.search).get("ref");
     // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time read of the URL after hydration
     if (ref && /^[A-Z0-9]{6,16}$/i.test(ref)) setRefCode(ref);
+    const offer = new URLSearchParams(window.location.search).get("offer");
+    if (offer && /^[A-Za-z0-9_-]{8,32}$/.test(offer)) setOfferToken(offer);
   }, []);
   const [showFlow, setShowFlow]     = useState(false);
   const [step, setStep]             = useState<"datetime" | "account" | "confirm" | "pay" | "done">("datetime");
@@ -194,6 +197,7 @@ export function BookingClient({ shop, services, staff, businessHours, initialCus
       startsAt: time,
       notes,
       refCode,
+      offerToken,
     });
     if (res.error) { setBookingError(res.error); setBooking(false); return; }
     setDiscount(res.discount ?? 0);
@@ -565,7 +569,12 @@ export function BookingClient({ shop, services, staff, businessHours, initialCus
                 onAuthed={(c) => { setCustomer(c); setStep("confirm"); }}
               />
             )}
-            {step === "confirm" && customer && refCode && referralReward !== null && (
+            {step === "confirm" && customer && offerToken && (
+              <div style={{ marginBottom: 14, padding: "11px 14px", borderRadius: 12, background: ACCENT, color: "white", fontSize: 13, fontWeight: 600 }}>
+                Your personal offer is applied automatically when you book (one use, for you only).
+              </div>
+            )}
+            {step === "confirm" && customer && !offerToken && refCode && referralReward !== null && (
               <div style={{ marginBottom: 14, padding: "11px 14px", borderRadius: 12, background: ACCENT, color: "white", fontSize: 13, fontWeight: 600 }}>
                 A friend referred you: new clients get up to C${referralReward} off their first visit.
               </div>
