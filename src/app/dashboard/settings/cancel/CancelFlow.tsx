@@ -5,6 +5,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { acceptOffer, cancelPlan, logKept, type CancelContext, type CancelReason, type OfferKind } from "./actions";
 
+// Plain link (not next/link): it downloads a file.
+const EXPORT_HREF = "/api/account/export";
+
 const REASONS: [CancelReason, string][] = [
   ["expensive", "Too expensive"],
   ["not_using", "Not using it enough / too hard to set up"],
@@ -156,7 +159,7 @@ export function CancelFlow({ data }: { data: CancelContext }) {
             <p style={{ ...p, color: "var(--dtext)" }}>Your plan stays active until {data.periodEnd}. After that your booking page stops taking bookings and AutoPilot stops. Your data is kept for 90 days.</p>
           )}
           {reason === "closing" && <p style={p}>We&apos;re sorry to see you go, and we wish you the very best with what comes next.</p>}
-          <Link href="/dashboard/settings?tab=account" style={{ color: "var(--dpurple-text)", fontSize: 14 }}>Export my data</Link>
+          <a href={EXPORT_HREF} download style={{ color: "var(--dpurple-text)", fontSize: 14 }}>Export my data</a>
           <button type="button" style={danger} disabled={pending} onClick={cancel}>{pending ? "Cancelling..." : "Cancel my plan"}</button>
           <button type="button" style={ghost} onClick={keep}>Keep my plan</button>
         </>

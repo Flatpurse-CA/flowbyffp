@@ -88,12 +88,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const unreadCount = await getUnreadCount();
   const trialNotice = ctx.role === "owner" ? await getTrialNotice(createAdminClient(), ctx.shopId) : null;
   const { data: planState } = ctx.role === "owner"
-    ? await createAdminClient().from("shops").select("cancel_at, paused_until").eq("id", ctx.shopId).maybeSingle()
+    ? await createAdminClient().from("shops").select("cancel_at, paused_until, deletion_scheduled_at").eq("id", ctx.shopId).maybeSingle()
     : { data: null };
 
   return (
     <DashboardShell user={user} role={ctx.role} staffName={ctx.staffName} unreadCount={unreadCount} accessStatus={ctx.accessStatus} initialDark={(await cookies()).get("portal-theme")?.value !== "light"}>
-      {planState && (planState.cancel_at || planState.paused_until) && <PlanStatusBanner cancelAt={planState.cancel_at} pausedUntil={planState.paused_until} />}
+      {planState && (planState.cancel_at || planState.paused_until) && <PlanStatusBanner cancelAt={planState.cancel_at} pausedUntil={planState.paused_until} deletionAt={planState.deletion_scheduled_at} />}
       {trialNotice && <TrialEndNotice notice={trialNotice} />}
       {children}
     </DashboardShell>

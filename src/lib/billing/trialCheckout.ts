@@ -2,6 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { stripe } from "@/lib/stripe";
 import { getStripePriceId, type BillablePlanKey, type BillingInterval } from "@/lib/plans";
 import { TRIAL_DAYS } from "@/lib/dashboard/accessStatus";
+import { inComebackWindow } from "@/lib/billing/lifecycle";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -40,7 +41,7 @@ export async function createPlanCheckout(opts: {
 
   const { data: shop } = await admin
     .from("shops")
-    .select("stripe_customer_id, name, phone, founder_discount_claimed_at, trial_started_at, subscription_status")
+    .select("stripe_customer_id, name, phone, founder_discount_claimed_at, trial_started_at, subscription_status, plan_ended_at")
     .eq("id", shopId)
     .maybeSingle();
   if (!shop) return { error: "Shop not found" };
@@ -71,6 +72,13 @@ export async function createPlanCheckout(opts: {
     }
     const trialDays = everSubscribed || phoneUsed ? 0 : remainingTrialDays(shop.trial_started_at as string | null);
 
+    // C6/C7 comeback offer: 50% off the first 2 months back (never stacks with Founders).
+    const comeback = !applyFounders && inComebackWindow(shop.plan_ended_at as string | null);
+    if (comeback) {
+      try { await stripe().coupons.retrieve("flow-save-50-2m"); }
+      catch { await stripe().coupons.create({ id: "flow-save-50-2m", percent_off: 50, duration: "repeating", duration_in_months: 2, name: "50% off 2 months" }); }
+    }
+
     const session = await stripe().checkout.sessions.create({
       mode: "subscription",
       customer: customerId,
@@ -80,7 +88,9 @@ export async function createPlanCheckout(opts: {
         ? { subscription_data: { trial_period_days: trialDays, metadata: { shop_id: shopId } } }
         : {}),
       // Stripe rejects the request if both are present.
-      ...(applyFounders ? { discounts: [{ coupon: "founders-40-off" }] } : { allow_promotion_codes: true }),
+      ...(applyFounders
+        ? { discounts: [{ coupon: "founders-40-off" }] }
+        : comeback ? { discounts: [{ coupon: "flow-save-50-2m" }] } : { allow_promotion_codes: true }),
       success_url: `${origin}${opts.successPath}`,
       cancel_url: `${origin}${opts.cancelPath}`,
       metadata: {

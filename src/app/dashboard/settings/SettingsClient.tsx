@@ -13,6 +13,9 @@ import { PLANS, NO_MARKETPLACE_FEE_NOTE, type BillingInterval } from "@/lib/plan
 import { PROVINCES, computeTax, describeRates, getProvince, type ShopTaxSettings } from "@/lib/tax";
 import { deepen } from "@/lib/dashboard/deepen";
 
+// Plain link (not next/link): it downloads a file.
+const EXPORT_HREF = "/api/account/export";
+
 function redirectTo(url: string) {
   window.location.href = url;
 }
@@ -902,6 +905,8 @@ export function SettingsClient({ shopId, initialBusinessHours, initialStripeConn
                   {portalLoading ? "Opening…" : "Manage billing (invoices, card)"}
                 </button>
                 <Link href="/dashboard/settings/cancel" style={{ color: "rgba(255,255,255,0.5)", fontSize: 13 }}>Cancel or pause plan</Link>
+                <a href={EXPORT_HREF} download style={{ color: "rgba(255,255,255,0.5)", fontSize: 13 }}>Export my data</a>
+                <Link href="/dashboard/settings/delete" style={{ color: "rgba(255,255,255,0.5)", fontSize: 13 }}>Delete account</Link>
               </div>
             )}
           </div>
