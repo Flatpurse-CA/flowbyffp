@@ -10,6 +10,8 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { requireShop, getCurrentShopId, getShopContext } from "@/lib/dashboard/shop";
 import { attributeAutopilotRevenue } from "@/lib/dashboard/autopilotAttribution";
 import { stripe } from "@/lib/stripe";
+import { amountFor, type FeeMode } from "@/lib/booking/policy";
+import { chargeSavedCard } from "@/lib/booking/chargeFee";
 import { sendSms } from "@/lib/twilio";
 import { shopHasFeature } from "@/lib/dashboard/plan";
 import { getRequestOrigin } from "@/lib/requestOrigin";
@@ -369,11 +371,12 @@ export async function markNoShow(id: string) {
     .update({ status: "no_show", updated_at: new Date().toISOString() })
     .eq("id", id)
     .eq("shop_id", shopId)
-    .select("client_email, service_name, starts_at")
+    .select("client_email, service_name, starts_at, price, customer_id, fee_charged_at")
     .maybeSingle();
 
   if (error) throw new Error(error.message);
   revalidatePath("/dashboard/appointments");
+  const feeAvailable = appt ? await noShowFeeFor(shopId, Number(appt.price), appt.customer_id as string | null, appt.fee_charged_at as string | null) : 0;
 
   if (appt?.client_email && !(await shopHasFeature(shopId, "autopilot"))) {
     const shop = await getShopEmailContext(supabase, shopId);
@@ -389,6 +392,7 @@ export async function markNoShow(id: string) {
       }
     }
   }
+  return { feeAvailable };
 }
 
 // Real Stripe Payment Link, created on the shop's own connected account —
@@ -439,4 +443,26 @@ export async function sendAppointmentReceipt(input: { clientPhone: string | null
   const { error } = await sendSms(input.clientPhone, `Hi ${input.clientName.split(" ")[0]}, your receipt for ${input.serviceName}: ${fmtMoney(input.amount)} paid. Thanks for booking with us!`);
   if (error) return { error };
   return {};
+}
+
+async function noShowFeeFor(shopId: string, price: number, customerId: string | null, chargedAt: string | null): Promise<number> {
+  if (!customerId || chargedAt) return 0;
+  const { data: shop } = await createAdminClient().from("shops").select("no_show_fee_mode, no_show_fee_value, stripe_connected").eq("id", shopId).maybeSingle();
+  if (!shop?.stripe_connected) return 0;
+  return amountFor(shop.no_show_fee_mode as FeeMode, Number(shop.no_show_fee_value), price);
+}
+
+/** FL-037: no-show fee, charged only after staff confirm, to the client's saved card. */
+export async function chargeNoShowFee(id: string): Promise<{ error?: string; amount?: number }> {
+  const { shopId } = await requireShop();
+  const admin = createAdminClient();
+  const { data: a } = await admin.from("appointments").select("id, status, price, customer_id, fee_charged_at, card_consent_at").eq("id", id).eq("shop_id", shopId).maybeSingle();
+  if (!a || a.status !== "no_show") return { error: "Mark the booking as a no-show first" };
+  if (!a.card_consent_at) return { error: "The client didn't agree to fees when booking" };
+  const amount = await noShowFeeFor(shopId, Number(a.price), a.customer_id as string | null, a.fee_charged_at as string | null);
+  if (!amount) return { error: "No fee to charge" };
+  const { data: shop } = await admin.from("shops").select("stripe_account_id").eq("id", shopId).maybeSingle();
+  const r = await chargeSavedCard(admin, { appointmentId: id, customerId: a.customer_id as string, stripeAccountId: shop?.stripe_account_id as string, amount, kind: "no_show" });
+  revalidatePath("/dashboard/appointments");
+  return r.error ? { error: r.error } : { amount };
 }

@@ -321,7 +321,7 @@ export async function sendStaffInviteEmail(to: string, input: { shopName: string
 
 export async function sendBookingConfirmationEmail(to: string, input: {
   appointmentId: string; shopName: string; serviceName: string; startsAt: string; durationMinutes: number; stylistName: string | null;
-  streetAddress?: string | null; city?: string | null; province?: string | null; shopPhone?: string | null;
+  streetAddress?: string | null; city?: string | null; province?: string | null; shopPhone?: string | null; manageUrl?: string;
 }) {
   const when = formatApptWhen(input.startsAt);
   const { address, mapsUrl } = formatShopAddress(input);
@@ -334,7 +334,8 @@ export async function sendBookingConfirmationEmail(to: string, input: {
   const { subject, html } = await renderTemplate("booking_request_received", {
     serviceName: input.serviceName, stylistLine: stylistLine(input.stylistName), shopName: input.shopName,
   }, {
-    extraHtml: apptDataBlock({ when, address, mapsUrl, appointmentId: input.appointmentId, shopPhone: input.shopPhone ? `${input.shopName}: ${input.shopPhone}` : null }),
+    extraHtml: apptDataBlock({ when, address, mapsUrl, appointmentId: input.appointmentId, shopPhone: input.shopPhone ? `${input.shopName}: ${input.shopPhone}` : null })
+      + (input.manageUrl ? `<p><a href="${escapeHtml(input.manageUrl)}">Change or cancel your booking</a></p>` : ""),
   });
 
   return send({ to, subject, html, attachments: [{ filename: "booking.ics", content: Buffer.from(ics).toString("base64"), contentType: "text/calendar" }] });

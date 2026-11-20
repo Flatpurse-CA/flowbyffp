@@ -9,6 +9,7 @@ import { shopWallTimeToUTC } from "@/lib/dashboard/shopTime";
 import { sendBookingConfirmationEmail, sendNewBookingAlertEmail } from "@/lib/resend";
 import { getRequestOrigin } from "@/lib/requestOrigin";
 import { stripe } from "@/lib/stripe";
+import { amountFor, newManageToken, type FeeMode } from "@/lib/booking/policy";
 import { ensureStripeCustomerId } from "@/lib/stripeCustomer";
 import { attributeAutopilotRevenue } from "@/lib/dashboard/autopilotAttribution";
 import { computeAccessStatus } from "@/lib/dashboard/accessStatus";
@@ -140,7 +141,7 @@ export async function createPublicBooking(input: {
 
   const admin = createAdminClient();
 
-  const { data: shop } = await admin.from("shops").select("id, owner_id, name, street_address, city, province, phone, trial_started_at, subscription_status, trial_override, trial_paused_at, client_referrals_enabled, client_referral_reward, paused_until").eq("id", input.shopId).maybeSingle();
+  const { data: shop } = await admin.from("shops").select("id, owner_id, name, street_address, city, province, phone, trial_started_at, subscription_status, trial_override, trial_paused_at, client_referrals_enabled, client_referral_reward, paused_until, stripe_connected").eq("id", input.shopId).maybeSingle();
   if (!shop) return { error: "This shop couldn't be found" };
 
   const { status: shopAccessStatus } = computeAccessStatus(shop as { trial_started_at: string; subscription_status: string | null; trial_override: boolean; trial_paused_at: string | null });
@@ -201,12 +202,15 @@ export async function createPublicBooking(input: {
   });
   const finalPrice = Math.round((Number(service.price) - (discount?.amount ?? 0)) * 100) / 100;
 
+  const manageToken = newManageToken();
   const { data: inserted, error } = await admin
     .from("appointments")
     .insert({
       id: appointmentId,
       shop_id: input.shopId,
       customer_id: ctx.customerId,
+      manage_token: manageToken,
+      card_consent_at: shop.stripe_connected ? new Date().toISOString() : null,
       client_name: ctx.fullName,
       client_phone: normalizePhoneForStorage(ctx.phone),
       client_email: ctx.email,
@@ -234,6 +238,7 @@ export async function createPublicBooking(input: {
   try {
     await sendBookingConfirmationEmail(ctx.email, {
       appointmentId: inserted.id as string,
+      manageUrl: `${process.env.NEXT_PUBLIC_SITE_URL ?? "https://flow.flatpurse.com"}/a/${manageToken}`,
       shopName: shop.name as string,
       serviceName: service.name as string,
       startsAt: input.startsAt,
@@ -286,7 +291,7 @@ async function loadPayableAppointment(appointmentId: string, customerId: string,
 
   const { data: shop } = await admin
     .from("shops")
-    .select("stripe_account_id, stripe_connected, province, province_code, tax_registered, pst_on_services, tax_inclusive")
+    .select("stripe_account_id, stripe_connected, province, province_code, tax_registered, pst_on_services, tax_inclusive, deposit_mode, deposit_value")
     .eq("id", appt.shop_id)
     .maybeSingle();
   if (!shop?.stripe_connected || !shop.stripe_account_id) return { error: "This shop isn't set up for online payments" };
@@ -294,7 +299,7 @@ async function loadPayableAppointment(appointmentId: string, customerId: string,
   const price = Number(appt.price);
   if (depositOnly) {
     // Deposits aren't taxed; tax is charged on the final bill.
-    return { id: appt.id as string, shopId: appt.shop_id as string, stripeAccountId: shop.stripe_account_id as string, amount: Math.ceil(price * 0.2 * 100) / 100, tax: null };
+    return { id: appt.id as string, shopId: appt.shop_id as string, stripeAccountId: shop.stripe_account_id as string, amount: Math.max(amountFor(shop.deposit_mode as FeeMode, Number(shop.deposit_value), price), 0.5), tax: null };
   }
   const { data: exempt } = await admin.from("services").select("id").eq("shop_id", appt.shop_id).eq("name", appt.service_name).eq("tax_exempt", true).limit(1);
   const tax = computeTax(shopTaxSettings(shop), [{ amount: price, kind: "service", exempt: Boolean(exempt?.length) }]);

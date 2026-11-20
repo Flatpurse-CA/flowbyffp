@@ -35,8 +35,8 @@ Legend: DONE = built, verify only · PARTIAL = something exists, needs finishing
 ### Batch 3: Booking, payments, cancel/save
 | ID | Task | Status |
 |---|---|---|
-| FL-040/041 | Client booking page flow + reschedule/cancel within policy | PARTIAL |
-| FL-037 | Deposits, cancellation window, late-cancel/no-show fees | PARTIAL |
+| FL-040/041 | Client booking page flow + reschedule/cancel within policy | DONE (manage link /a/token in confirmation email; reschedule outside window, late fee shown + charged inside) |
+| FL-037 | Deposits, cancellation window, late-cancel/no-show fees | DONE (migration 0058; Booking policy page; no-show fee after staff confirm, needs card consent at booking) |
 | FL-038/039 | Refunds w/ reason, dispute alerts, payout report CSV | PARTIAL |
 | FL-033/034/035 | Connect Express, application fee, tips, cash, receipts | PARTIAL |
 | FL-042 | Rooms/equipment resources | DONE (migration 0057; capacity check in slot finder; owner page under Services) |

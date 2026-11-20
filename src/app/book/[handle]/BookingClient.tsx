@@ -1,5 +1,7 @@
 "use client";
 
+import { policyText, type Policy } from "@/lib/booking/policy";
+
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
@@ -32,7 +34,7 @@ async function confirmOnShopAccount(clientSecret: string, stripeAccount: string)
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type Shop = { id: string; name: string; city: string; province: string; streetAddress: string | null; stripeConnected: boolean; profileImageUrl: string | null; coverImageUrl: string | null; phone: string | null; email: string | null };
+type Shop = { id: string; name: string; city: string; province: string; streetAddress: string | null; stripeConnected: boolean; profileImageUrl: string | null; coverImageUrl: string | null; phone: string | null; email: string | null; policy: Policy };
 type Service = { id: string; name: string; price: number; duration_minutes: number; category: string | null };
 type Staff = { id: string; full_name: string; role: string | null; color: string };
 type BusinessHour = { weekday: number; open: boolean; start_time: string; end_time: string };
@@ -583,7 +585,7 @@ export function BookingClient({ shop, services, staff, businessHours, initialCus
               <ConfirmStep
                 service={service} staffName={staffId === "any" ? "Anyone available" : staff.find(s => s.id === staffId)?.full_name ?? "Anyone available"}
                 time={time!} customer={customer} notes={notes} setNotes={setNotes}
-                error={bookingError} submitting={booking} stripeConnected={shop.stripeConnected}
+                error={bookingError} submitting={booking} stripeConnected={shop.stripeConnected} policyLine={policyText(shop.policy, service?.price ?? 0)}
                 onBack={() => setStep(customer ? "datetime" : "account")}
                 onConfirm={handleConfirm}
               />
@@ -781,10 +783,10 @@ function AccountStep({ onBack, onAuthed }: { onBack: () => void; onAuthed: (c: C
 
 // ─── Step: confirm ──────────────────────────────────────────────────────────────
 
-function ConfirmStep({ service, staffName, time, customer, notes, setNotes, error, submitting, stripeConnected, onBack, onConfirm }: {
+function ConfirmStep({ service, staffName, time, customer, notes, setNotes, error, submitting, stripeConnected, policyLine, onBack, onConfirm }: {
   service: Service; staffName: string; time: string; customer: Customer;
   notes: string; setNotes: (v: string) => void;
-  error: string | null; submitting: boolean; stripeConnected: boolean;
+  error: string | null; submitting: boolean; stripeConnected: boolean; policyLine: string;
   onBack: () => void; onConfirm: () => void;
 }) {
   return (
@@ -822,6 +824,7 @@ function ConfirmStep({ service, staffName, time, customer, notes, setNotes, erro
         </span>
       </div>
 
+      <p style={{ color: "var(--cust-text-sub)", fontSize: 12.5, margin: 0, lineHeight: 1.5 }}>{policyLine}{stripeConnected ? " By booking you agree your saved card can be charged these fees." : ""}</p>
       {error && <div style={{ padding: "10px 13px", borderRadius: 10, background: "rgb(220,38,38)", border: "1px solid rgb(220,38,38)", color: "white", fontSize: 12.5 }}>{error}</div>}
 
       <button onClick={onConfirm} disabled={submitting} style={{
