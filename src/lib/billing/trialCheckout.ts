@@ -40,7 +40,7 @@ export async function createPlanCheckout(opts: {
 
   const { data: shop } = await admin
     .from("shops")
-    .select("stripe_customer_id, name, founder_discount_claimed_at, trial_started_at, subscription_status")
+    .select("stripe_customer_id, name, phone, founder_discount_claimed_at, trial_started_at, subscription_status")
     .eq("id", shopId)
     .maybeSingle();
   if (!shop) return { error: "Shop not found" };
@@ -62,7 +62,14 @@ export async function createPlanCheckout(opts: {
 
     // A shop that already paid once (or is mid-subscription) gets no new trial.
     const everSubscribed = Boolean(shop.subscription_status);
-    const trialDays = everSubscribed ? 0 : remainingTrialDays(shop.trial_started_at as string | null);
+    // One free trial per phone number (FL-023). Card is checked in the webhook.
+    let phoneUsed = false;
+    if (shop.phone) {
+      const { count } = await admin.from("shops").select("id", { count: "exact", head: true })
+        .eq("phone", shop.phone).neq("id", shopId).not("subscription_status", "is", null);
+      phoneUsed = (count ?? 0) > 0;
+    }
+    const trialDays = everSubscribed || phoneUsed ? 0 : remainingTrialDays(shop.trial_started_at as string | null);
 
     const session = await stripe().checkout.sessions.create({
       mode: "subscription",

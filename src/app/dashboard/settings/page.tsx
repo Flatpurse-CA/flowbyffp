@@ -56,7 +56,7 @@ export default async function SettingsPage() {
 
   const DEFAULT_NOTIFICATION_PREFS = {
     new_booking: true, cancellation: true, no_show_alert: true, payment_received: false,
-    autopilot_win: true, daily_brief: true, weekly_revenue_recap: true, monthly_statement: false,
+    autopilot_win: true, daily_brief: true, weekly_revenue_recap: true, monthly_statement: false, renewal_reminder: true,
   };
   const initialNotificationPrefs = { ...DEFAULT_NOTIFICATION_PREFS, ...(shop?.notification_prefs as object ?? {}) };
 

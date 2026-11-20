@@ -5,6 +5,8 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { getUnreadCount } from "./messages/actions";
 import { DashboardShell } from "./DashboardShell";
 import { needsCard } from "@/lib/billing/cardGate";
+import { getTrialNotice } from "@/lib/billing/trialNotice";
+import { TrialEndNotice } from "./TrialEndNotice";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const user = await getAuthUser();
@@ -83,9 +85,11 @@ export default async function DashboardLayout({ children }: { children: React.Re
   }
 
   const unreadCount = await getUnreadCount();
+  const trialNotice = ctx.role === "owner" ? await getTrialNotice(createAdminClient(), ctx.shopId) : null;
 
   return (
     <DashboardShell user={user} role={ctx.role} staffName={ctx.staffName} unreadCount={unreadCount} accessStatus={ctx.accessStatus} initialDark={(await cookies()).get("portal-theme")?.value !== "light"}>
+      {trialNotice && <TrialEndNotice notice={trialNotice} />}
       {children}
     </DashboardShell>
   );

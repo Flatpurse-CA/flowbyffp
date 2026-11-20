@@ -19,7 +19,7 @@ export function computeAccessStatus(shop: {
   const trialEndsAt = new Date(startedAt.getTime() + TRIAL_DAYS * DAY_MS);
   const graceEndsAt = new Date(trialEndsAt.getTime() + GRACE_DAYS * DAY_MS);
 
-  if (shop.subscription_status === "active" || shop.trial_override) {
+  if (shop.subscription_status === "active" || shop.subscription_status === "past_due" || shop.trial_override) {
     return { status: "active", trialEndsAt, graceEndsAt };
   }
 

@@ -241,6 +241,7 @@ export type NotificationPrefs = {
   daily_brief: boolean;
   weekly_revenue_recap: boolean;
   monthly_statement: boolean;
+  renewal_reminder: boolean;
 };
 
 export async function updateNotificationPrefs(prefs: NotificationPrefs): Promise<{ error?: string }> {

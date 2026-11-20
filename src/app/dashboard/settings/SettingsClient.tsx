@@ -846,6 +846,7 @@ export function SettingsClient({ shopId, initialBusinessHours, initialStripeConn
             <Toggle label="Daily brief"          sub="Morning summary delivered at 8 AM"              on={notificationPrefs.daily_brief}            onToggle={() => toggleNotification("daily_brief")} />
             <Toggle label="Weekly revenue recap" sub="Revenue + bookings recap every Monday"          on={notificationPrefs.weekly_revenue_recap}   onToggle={() => toggleNotification("weekly_revenue_recap")} />
             <Toggle label="Monthly statement"    sub="Full income statement on the 1st"               on={notificationPrefs.monthly_statement}      onToggle={() => toggleNotification("monthly_statement")} />
+            <Toggle label="Renewal reminders"    sub="Email 3 days before each monthly charge"        on={notificationPrefs.renewal_reminder}      onToggle={() => toggleNotification("renewal_reminder")} />
           </div>
           <SaveBar onSave={saveNotifications} onDiscard={() => setNotificationPrefs(initialNotificationPrefs)} saving={savingNotifications} saved={notificationsSaved} />
         </>

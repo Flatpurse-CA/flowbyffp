@@ -16,10 +16,10 @@ Legend: DONE = built, verify only · PARTIAL = something exists, needs finishing
 | FL-021 | 14-day trial, card up front: SetupIntent then subscription with trial_end = Day 14 | PARTIAL |
 | FL-025 | Plan selection screen fixes (10.1 items 1-9) | TODO |
 | FL-022 | Founders coupon server-side (40% yr 1, then 25%) + live counter | PARTIAL (counter live) |
-| FL-023 | One trial per business, phone, card | TODO |
-| FL-024 | Dunning: Smart Retries + emails day 0/3/5/7, pause after final retry | TODO |
-| FL-116-118 | Renewal reminders (monthly, annual, Founders price change) | TODO |
-| FL-070/071 | Day 11 trial-end screens + reminder text/email + Day 12-13 banner | TODO |
+| FL-023 | One trial per business, phone, card | DONE (needs migration 0051 + Stripe settings) |
+| FL-024 | Dunning: Smart Retries + emails day 0/3/5/7, pause after final retry | DONE (needs migration 0051 + Stripe settings) |
+| FL-116-118 | Renewal reminders (monthly, annual, Founders price change) | DONE (needs migration 0051 + Stripe settings) |
+| FL-070/071 | Day 11 trial-end screens + reminder text/email + Day 12-13 banner | DONE (needs migration 0051 + Stripe settings) |
 
 ### Batch 2: AutoPilot completion
 | ID | Task | Status |

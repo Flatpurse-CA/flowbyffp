@@ -4,6 +4,7 @@ import { stripe } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getStripePriceId, type BillablePlanKey, type BillingInterval } from "@/lib/plans";
 import { settleReferralRewards } from "@/lib/referrals";
+import { SHOP_BILLING_COLUMNS, sendDunningEmail, sendPausedEmail, sendRenewalReminder } from "@/lib/billing/notices";
 
 export async function POST(req: Request) {
   const signature = req.headers.get("stripe-signature");
@@ -58,7 +59,25 @@ export async function POST(req: Request) {
       let finalSubscriptionId = subscriptionId;
       // Card-up-front trials arrive here as "trialing"; the first charge is at trial_end.
       const sub = await stripe().subscriptions.retrieve(subscriptionId);
-      const trialEnd = sub.status === "trialing" && sub.trial_end ? sub.trial_end : null;
+      let trialEnd = sub.status === "trialing" && sub.trial_end ? sub.trial_end : null;
+
+      // One free trial per card (FL-023): a card already used by another shop ends the trial now.
+      const pmId = typeof sub.default_payment_method === "string" ? sub.default_payment_method : sub.default_payment_method?.id;
+      if (pmId) {
+        const pm = await stripe().paymentMethods.retrieve(pmId);
+        const fingerprint = pm.card?.fingerprint ?? null;
+        if (fingerprint) {
+          await admin.from("shops").update({ card_fingerprint: fingerprint }).eq("id", shopId);
+          if (trialEnd) {
+            const { count } = await admin.from("shops").select("id", { count: "exact", head: true })
+              .eq("card_fingerprint", fingerprint).neq("id", shopId);
+            if ((count ?? 0) > 0) {
+              await stripe().subscriptions.update(subscriptionId, { trial_end: "now" });
+              trialEnd = null;
+            }
+          }
+        }
+      }
 
       if (founderClaim) {
         const { data: claimed } = await admin.rpc("claim_founder_spot");
@@ -105,10 +124,37 @@ export async function POST(req: Request) {
     }
   }
 
+  if (event.type === "invoice.payment_failed" || event.type === "invoice.paid" || event.type === "invoice.upcoming") {
+    const inv = event.data.object as Stripe.Invoice;
+    const customerId = typeof inv.customer === "string" ? inv.customer : inv.customer?.id;
+    const { data: shop } = customerId
+      ? await admin.from("shops").select(SHOP_BILLING_COLUMNS).eq("stripe_customer_id", customerId).maybeSingle()
+      : { data: null };
+    if (shop && event.type === "invoice.payment_failed" && inv.billing_reason !== "manual") {
+      // Day 0 of dunning. Stripe Smart Retries handles the retries themselves.
+      if (!shop.payment_failed_at) {
+        await admin.from("shops").update({ payment_failed_at: new Date().toISOString(), dunning_step: 0, subscription_status: "past_due" }).eq("id", shop.id);
+        await sendDunningEmail(admin, shop as never, 0);
+      }
+    } else if (shop && event.type === "invoice.paid" && inv.amount_paid > 0) {
+      await admin.from("shops").update({ payment_failed_at: null, dunning_step: 0 }).eq("id", shop.id);
+    } else if (shop && event.type === "invoice.upcoming") {
+      await sendRenewalReminder(admin, shop as never, inv as never);
+    }
+  }
+
   if (event.type === "customer.subscription.updated" || event.type === "customer.subscription.deleted") {
     const sub = event.data.object as Stripe.Subscription;
     const customerId = typeof sub.customer === "string" ? sub.customer : sub.customer.id;
     const canceled = event.type === "customer.subscription.deleted";
+    const prev = (event.data as { previous_attributes?: { status?: string } }).previous_attributes?.status;
+
+    // Final retry failed: Stripe marks the subscription unpaid (set "If all retries fail" to
+    // "mark as unpaid" in Stripe settings). The account pauses; nothing is deleted.
+    if (!canceled && (sub.status === "unpaid" || sub.status === "paused") && prev && prev !== sub.status) {
+      const { data: owner } = await admin.from("shops").select("owner_id, name").eq("stripe_customer_id", customerId).maybeSingle();
+      if (owner) await sendPausedEmail(admin, owner);
+    }
 
     await admin
       .from("shops")

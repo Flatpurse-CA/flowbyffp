@@ -548,6 +548,11 @@ export async function sendTestEmailTemplate(key: EmailTemplateKey, to: string) {
   return send({ to, subject: `[TEST] ${subject}`, html });
 }
 
+export async function sendBillingEmail(to: string, input: { subject: string; heading: string; body: string; ctaLabel?: string; ctaUrl?: string }) {
+  const html = renderShell({ heading: input.heading, bodyHtml: paragraphsHtml(input.body), ctaHtml: ctaHtml(input.ctaLabel, input.ctaUrl) });
+  return send({ to, subject: input.subject, html });
+}
+
 export async function sendShopSetupReminderEmail(to: string, input: { firstName: string; loginUrl: string }) {
   const { subject, html } = await renderTemplate("shop_setup_reminder", { firstName: input.firstName }, {
     ctaUrl: input.loginUrl,
