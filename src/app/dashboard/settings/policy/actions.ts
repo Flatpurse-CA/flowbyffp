@@ -1,5 +1,6 @@
 "use server";
 
+import { logShopAction } from "@/lib/audit";
 import { revalidatePath } from "next/cache";
 import { getShopContext } from "@/lib/dashboard/shop";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -19,6 +20,7 @@ export async function savePolicy(p: Policy): Promise<{ error?: string }> {
     late_cancel_fee_mode: p.late_cancel_fee_mode, late_cancel_fee_value: val(p.late_cancel_fee_mode, p.late_cancel_fee_value),
     no_show_fee_mode: p.no_show_fee_mode, no_show_fee_value: val(p.no_show_fee_mode, p.no_show_fee_value),
   }).eq("id", ctx.shopId);
+  if (!error) await logShopAction("policy_saved", { window_h: p.cancel_window_hours });
   revalidatePath("/dashboard/settings/policy");
   return error ? { error: error.message } : {};
 }

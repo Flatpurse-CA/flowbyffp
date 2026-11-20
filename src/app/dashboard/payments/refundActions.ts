@@ -1,5 +1,6 @@
 "use server";
 
+import { logShopAction } from "@/lib/audit";
 import { revalidatePath } from "next/cache";
 import { getShopContext, getAuthUser } from "@/lib/dashboard/shop";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -40,6 +41,7 @@ export async function refundPayment(input: { appointmentId: string; amount: numb
   const user = await getAuthUser();
   await admin.from("refunds").insert({ shop_id: ctx.shopId, appointment_id: a.id, amount, tax_amount: taxShare, reason, refunded_by: user?.id ?? null, stripe_refund_id: refundId });
   await admin.from("appointments").update({ refunded_amount: Math.round((Number(a.refunded_amount ?? 0) + amount) * 100) / 100 }).eq("id", a.id);
+  await logShopAction("refund", { amount: amount.toFixed(2), reason });
   revalidatePath("/dashboard/payments");
   return {};
 }

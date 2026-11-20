@@ -1,5 +1,6 @@
 "use server";
 
+import { logShopAction } from "@/lib/audit";
 import { createHash, randomInt } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { stripe } from "@/lib/stripe";
@@ -64,6 +65,7 @@ export async function scheduleDeletion(input: { businessName: string; code: stri
     deletion_scheduled_at: at.toISOString(), paused_until: at.toISOString(),
     deletion_code_hash: null, deletion_code_expires_at: null,
   }).eq("id", shop.id);
+  await logShopAction("account_deletion", { at: at.toISOString().slice(0, 10) });
 
   const { email, firstName } = await ownerContact(admin, shop.owner_id);
   if (email) {

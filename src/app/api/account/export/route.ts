@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { logShopAction } from "@/lib/audit";
 import { requireTwoStep } from "@/lib/auth/twoStep";
 import { zipSync, strToU8 } from "fflate";
 import { getShopContext } from "@/lib/dashboard/shop";
@@ -25,6 +26,7 @@ export async function GET() {
   if (!ctx || ctx.role !== "owner") return NextResponse.json({ error: "Only the owner can export data" }, { status: 403 });
   const twoStep = await requireTwoStep();
   if (twoStep) return NextResponse.json({ error: twoStep }, { status: 403 });
+  await logShopAction("data_export");
   const admin = createAdminClient();
   const tables = ["clients", "appointments", "services", "staff"] as const;
   const files: Record<string, Uint8Array> = {};

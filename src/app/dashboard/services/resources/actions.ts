@@ -1,5 +1,6 @@
 "use server";
 
+import { logShopAction } from "@/lib/audit";
 import { revalidatePath } from "next/cache";
 import { getShopContext } from "@/lib/dashboard/shop";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -21,6 +22,7 @@ export async function addResource(input: { name: string; kind: "room" | "equipme
 
 export async function deleteResource(id: string) {
   const { shopId, admin } = await owner();
+  await logShopAction("resource_deleted", { id });
   await admin.from("resources").delete().eq("id", id).eq("shop_id", shopId);
   revalidatePath("/dashboard/services/resources");
 }

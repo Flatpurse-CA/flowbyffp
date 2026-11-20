@@ -908,6 +908,7 @@ export function SettingsClient({ shopId, initialBusinessHours, initialStripeConn
                 <a href={EXPORT_HREF} download style={{ color: "rgba(255,255,255,0.5)", fontSize: 13 }}>Export my data</a>
                 <Link href="/dashboard/settings/delete" style={{ color: "rgba(255,255,255,0.5)", fontSize: 13 }}>Delete account</Link>
                 <Link href="/dashboard/settings/security" style={{ color: "rgba(255,255,255,0.5)", fontSize: 13 }}>2-step verification</Link>
+                <Link href="/dashboard/settings/audit" style={{ color: "rgba(255,255,255,0.5)", fontSize: 13 }}>Activity log</Link>
               </div>
             )}
           </div>

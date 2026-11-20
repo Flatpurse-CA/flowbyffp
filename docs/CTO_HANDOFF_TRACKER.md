@@ -69,7 +69,7 @@ Legend: DONE = built, verify only · PARTIAL = something exists, needs finishing
 | FL-008 | AI gateway (templates, logging, cost, PII redaction) | PARTIAL |
 | FL-009/010 | Attribution ledger, nightly metrics engine | PARTIAL |
 | FL-011 | Optional 2-step; required for payouts/export | DONE (Supabase TOTP on Settings > Security; gates export + payout changes; needs MFA enabled in Supabase Auth) |
-| FL-012/013 | Server-side roles; audit log | PARTIAL |
+| FL-012/013 | Server-side roles; audit log | DONE (migration 0065; shop activity log for refunds, fees, policy, export, cancel/pause, staff, deletion; owner page) |
 | FL-016 | Strings into translation files | TODO |
 | FL-017 | Product analytics events (IDs only) | PARTIAL |
 | FL-018 | Legal acceptance record (version, time, IP) + unticked marketing box | DONE (migration 0064; LEGAL_VERSION const in signup actions) |

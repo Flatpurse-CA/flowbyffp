@@ -1,5 +1,6 @@
 "use server";
 
+import { logShopAction } from "@/lib/audit";
 import { computeTax, shopTaxSettings, type TaxBreakdown } from "@/lib/tax";
 
 import { normalizePhoneForStorage } from "@/lib/phone";
@@ -475,5 +476,6 @@ export async function chargeNoShowFee(id: string): Promise<{ error?: string; amo
   const { data: shop } = await admin.from("shops").select("stripe_account_id").eq("id", shopId).maybeSingle();
   const r = await chargeSavedCard(admin, { appointmentId: id, customerId: a.customer_id as string, stripeAccountId: shop?.stripe_account_id as string, amount, kind: "no_show", shopId });
   revalidatePath("/dashboard/appointments");
+  if (!r.error) await logShopAction("no_show_fee", { amount: amount.toFixed(2) });
   return r.error ? { error: r.error } : { amount };
 }

@@ -1,5 +1,6 @@
 "use server";
 
+import { logShopAction } from "@/lib/audit";
 import { revalidatePath } from "next/cache";
 import type Stripe from "stripe";
 import { stripe } from "@/lib/stripe";
@@ -140,6 +141,7 @@ export async function acceptOffer(input: { reason: CancelReason; comment?: strin
 export async function pausePlan(months: number): Promise<{ message?: string; error?: string }> {
   const l = await load();
   if (!l) return { error: "Only the owner can do this" };
+  await logShopAction("plan_pause", { months });
   const { admin, shop } = l;
   const used = pauseMonthsUsed(shop.pause_history);
   months = Math.round(months);
@@ -181,6 +183,7 @@ export async function resumePlan(): Promise<{ error?: string }> {
 export async function cancelPlan(input: { reason: CancelReason; comment?: string; detail?: string; offerShown: OfferKind }): Promise<{ periodEnd?: string; error?: string }> {
   const l = await load();
   if (!l) return { error: "Only the owner can do this" };
+  await logShopAction("plan_cancel", { reason: input.reason });
   const { admin, shop } = l;
   try {
     const { sub, scheduleId } = await liveSub(shop.subscription_id as string);
