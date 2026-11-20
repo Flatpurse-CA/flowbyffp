@@ -73,7 +73,7 @@ Legend: DONE = built, verify only · PARTIAL = something exists, needs finishing
 | FL-016 | Strings into translation files | TODO |
 | FL-017 | Product analytics events (IDs only) | PARTIAL |
 | FL-018 | Legal acceptance record (version, time, IP) + unticked marketing box | PARTIAL |
-| FL-019 | Test suite + CI + seed data | TODO |
+| FL-019 | Test suite + CI + seed data | PARTIAL (vitest money/policy/tax/area tests + GitHub CI; no seed data or E2E yet) |
 
 ### P2 (month 1 after launch)
 FL-087 schedules/time off · FL-088 commissions (PARTIAL) · FL-089 staff performance · FL-090 Daily Brief push/email (PARTIAL) · FL-091 weekly/monthly emails · FL-092 nudges · FL-093 reviews (PARTIAL) · FL-094 Operations Score (PARTIAL) · FL-095 annual plan (PARTIAL) · FL-096 referral (DONE, verify) · FL-097-099 wow screens · FL-100 Flow Coach (PARTIAL) · FL-101 AI help assistant
