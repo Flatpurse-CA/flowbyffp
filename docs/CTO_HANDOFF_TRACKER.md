@@ -41,7 +41,7 @@ Legend: DONE = built, verify only · PARTIAL = something exists, needs finishing
 | FL-033/034/035 | Connect Express, application fee, tips, cash, receipts | PARTIAL |
 | FL-042 | Rooms/equipment resources | TODO |
 | FL-043/044 | Intake forms, insurance-ready receipts | PARTIAL |
-| FL-045 | 3-tap staff booking | TODO |
+| FL-045 | 3-tap staff booking | DONE (Quick book page; due = past usual gap, usual service, usual-time/gap-filler ranking) |
 | FL-046/047 | Send Times (tappable slots) + rules | DONE (manual send; no deposit step, Mobile Mode, segments or SMS allowance yet) |
 | FL-066-069 | Cancel flow + save offers, pause/downgrade, emails, account deletion | DONE (purge gated by DATA_DELETION_ENABLED; export is direct download, not emailed link) |
 
