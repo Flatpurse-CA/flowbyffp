@@ -6,13 +6,14 @@ export const dynamic = "force-dynamic";
 
 const money = (n: number) => `$${n.toFixed(0)}`;
 const DAY = 86_400_000;
+const nowMs = () => Date.now();
 
 /** FL-089: staff performance, last 30 days. Revenue excludes tips. */
 export default async function PerformancePage({ searchParams }: { searchParams: Promise<{ days?: string }> }) {
   const ctx = await getShopContext();
   if (!ctx || ctx.role !== "owner") redirect("/dashboard");
   const days = Math.min(365, Math.max(7, Number((await searchParams).days ?? 30) || 30));
-  const since = new Date(Date.now() - days * DAY).toISOString();
+  const since = new Date(nowMs() - days * DAY).toISOString();
   const admin = createAdminClient();
   const [{ data: staff }, { data: appts }] = await Promise.all([
     admin.from("staff").select("id, full_name").eq("shop_id", ctx.shopId).eq("active", true).order("full_name"),
