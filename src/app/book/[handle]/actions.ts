@@ -94,6 +94,12 @@ export async function getAvailableSlots(input: {
 
   const overlaps = (aStart: number, aEnd: number, bStart: number, bEnd: number) => aStart < bEnd && aEnd > bStart;
 
+  // Time off (FL-087): shop closures (staff_id null) and per-staff blocks.
+  const { data: offRows } = await admin.from("time_off").select("staff_id, starts_at, ends_at")
+    .eq("shop_id", input.shopId).lt("starts_at", dayEnd.toISOString()).gt("ends_at", dayStart.toISOString());
+  const blocked = (sid: string | null, t: number, end: number) => (offRows ?? []).some(o =>
+    (o.staff_id === null || o.staff_id === sid) && overlaps(new Date(o.starts_at as string).getTime(), new Date(o.ends_at as string).getTime(), t, end));
+
   // Mobile Mode (FL-058): leave drive time around every visit.
   const { data: mob } = await admin.from("shops").select("mobile_enabled, drive_buffer_min").eq("id", input.shopId).maybeSingle();
   const bufferMs = mob?.mobile_enabled ? Number(mob.drive_buffer_min ?? 0) * 60000 : 0;
@@ -116,7 +122,7 @@ export async function getAvailableSlots(input: {
   for (let t = dayStart.getTime(); t + durationMinutes * 60000 <= dayEnd.getTime(); t += SLOT_INTERVAL_MINUTES * 60000) {
     const slotEnd = t + durationMinutes * 60000;
 
-    const isFree = (sid: string | null) => !appts.some(a => {
+    const isFree = (sid: string | null) => !blocked(sid, t, slotEnd) && !appts.some(a => {
       if (a.staff_id !== sid) return false;
       const aStart = new Date(a.starts_at).getTime();
       return overlaps(aStart - bufferMs, aStart + (a.duration_minutes as number) * 60000 + bufferMs, t, slotEnd);

@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, TrendingDown, TrendingUp, AlertTriangle, MoreHorizontal, X, Clock } from "lucide-react";
@@ -414,6 +416,7 @@ export function TeamClient({ staff, appointments }: { staff: StaffRow[]; appoint
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div>
             <h1 style={{ color: "var(--dtext)", fontSize: 22, fontWeight: 800, margin: "0 0 3px", letterSpacing: "-0.03em" }}>Team</h1>
+            <Link href="/dashboard/team/time-off" style={{ color: "rgb(109,40,217)", fontWeight: 600, fontSize: 13 }}>Time off</Link>
             <p style={{ color: "var(--dw35)", fontSize: 13, margin: 0 }}>{staff.length} active staff member{staff.length === 1 ? "" : "s"}</p>
           </div>
           <button onClick={() => setShowAdd(true)} style={{
