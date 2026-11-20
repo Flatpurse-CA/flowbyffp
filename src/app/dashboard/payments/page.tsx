@@ -39,6 +39,10 @@ export default async function PaymentsPage() {
 
   const payments = ctx ? await listPayments(rangeStart.toISOString(), now.toISOString()) : [];
 
+  const tipsByStaff = Object.entries(payments.reduce<Record<string, number>>((m, p) => {
+    if (p.tipAmount) m[p.staffName ?? "Unassigned"] = (m[p.staffName ?? "Unassigned"] ?? 0) + p.tipAmount;
+    return m;
+  }, {})).sort((x, y) => y[1] - x[1]);
   const totalCollected = payments.reduce((s, p) => s + (p.paidAmount ?? p.depositAmount ?? 0), 0);
   const totalTips = payments.reduce((s, p) => s + (p.tipAmount ?? 0), 0);
   const outstandingDeposits = payments.filter(p => p.status === "deposit").length;
@@ -53,6 +57,14 @@ export default async function PaymentsPage() {
         <p style={{ color: "var(--dw35)", fontSize: 13, margin: 0 }}>Transaction history from your last 90 days of bookings.{isOwner && <> <a href={PAYOUT_HREF} style={{ color: "rgb(109,40,217)", fontWeight: 600 }}>Download payout report (CSV)</a></>}</p>
       </div>
 
+      {tipsByStaff.length > 0 && (
+        <div style={{ ...card }}>
+          <p style={{ color: "var(--dw35)", fontSize: 10, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 8px" }}>Tips by staff (untaxed, paid to staff)</p>
+          {tipsByStaff.map(([name, amt]) => (
+            <div key={name} style={{ display: "flex", justifyContent: "space-between", color: "var(--dtext)", fontSize: 13.5, padding: "3px 0" }}><span>{name}</span><strong>{fmtPrice(amt)}</strong></div>
+          ))}
+        </div>
+      )}
       <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
         <div style={{ ...card, flex: "1 1 180px" }}>
           <p style={{ color: "var(--dw35)", fontSize: 10, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 8px" }}>Collected</p>

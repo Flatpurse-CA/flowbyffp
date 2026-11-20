@@ -31,7 +31,7 @@ export async function cancelByLink(token: string, acceptFee: boolean): Promise<{
   const fee = insideWindow(a.starts_at as string, shop.cancel_window_hours) ? amountFor(shop.late_cancel_fee_mode, shop.late_cancel_fee_value, Number(a.price)) : 0;
   if (fee > 0 && !acceptFee) return { fee, needsConsent: true };
   if (fee > 0 && a.customer_id && shop.stripe_connected && shop.stripe_account_id) {
-    const c = await chargeSavedCard(admin, { appointmentId: a.id as string, customerId: a.customer_id as string, stripeAccountId: shop.stripe_account_id, amount: fee, kind: "late_cancel" });
+    const c = await chargeSavedCard(admin, { appointmentId: a.id as string, customerId: a.customer_id as string, stripeAccountId: shop.stripe_account_id, amount: fee, kind: "late_cancel", shopId: a.shop_id as string });
     if (c.error) return { error: `We couldn't charge the late-cancel fee: ${c.error}. Please contact the business.` };
   }
   await admin.from("appointments").update({ status: "cancelled", updated_at: new Date().toISOString() }).eq("id", a.id);

@@ -9,6 +9,7 @@ import { shopWallTimeToUTC } from "@/lib/dashboard/shopTime";
 import { sendBookingConfirmationEmail, sendNewBookingAlertEmail } from "@/lib/resend";
 import { getRequestOrigin } from "@/lib/requestOrigin";
 import { stripe } from "@/lib/stripe";
+import { applicationFeeParam } from "@/lib/billing/platformFee";
 import { amountFor, newManageToken, type FeeMode } from "@/lib/booking/policy";
 import { ensureStripeCustomerId } from "@/lib/stripeCustomer";
 import { attributeAutopilotRevenue } from "@/lib/dashboard/autopilotAttribution";
@@ -363,6 +364,7 @@ export async function payWithSavedCard(input: {
       {
         amount: Math.round(payable.amount * 100),
         currency: "cad",
+        ...(await applicationFeeParam(payable.shopId, Math.round(payable.amount * 100))),
         payment_method: cloned.id,
         payment_method_types: ["card"],
         confirm: true,

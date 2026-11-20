@@ -431,7 +431,7 @@ function CloseOutModal({ appt, onClose, onCompleted, stripeTerminalLocationId, t
   const sendReceiptIfRequested = async () => {
     if (!receiptSms) return;
     // Best-effort — a receipt failure shouldn't undo an already-recorded payment.
-    await sendAppointmentReceipt({ clientPhone: appt.phone || null, clientName: appt.name, serviceName: appt.service, amount: total }).catch(() => {});
+    await sendAppointmentReceipt({ clientPhone: appt.phone || null, clientName: appt.name, serviceName: appt.service, amount: total, appointmentId: appt.id }).catch(() => {});
   };
 
   const runCharge = async () => {

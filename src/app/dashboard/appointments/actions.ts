@@ -10,7 +10,8 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { requireShop, getCurrentShopId, getShopContext } from "@/lib/dashboard/shop";
 import { attributeAutopilotRevenue } from "@/lib/dashboard/autopilotAttribution";
 import { stripe } from "@/lib/stripe";
-import { amountFor, type FeeMode } from "@/lib/booking/policy";
+import { applicationFeeParam } from "@/lib/billing/platformFee";
+import { amountFor, newManageToken, type FeeMode } from "@/lib/booking/policy";
 import { chargeSavedCard } from "@/lib/booking/chargeFee";
 import { sendSms } from "@/lib/twilio";
 import { shopHasFeature } from "@/lib/dashboard/plan";
@@ -423,6 +424,7 @@ export async function sendAppointmentPaymentLink(
           },
           quantity: 1,
         }],
+        ...(await applicationFeeParam(shopId, Math.round(input.amount * 100))),
         metadata: { appointment_id: appointmentId, shop_id: shopId },
       },
       { stripeAccount: stripeAccountId },
@@ -437,10 +439,19 @@ export async function sendAppointmentPaymentLink(
   }
 }
 
-export async function sendAppointmentReceipt(input: { clientPhone: string | null; clientName: string; serviceName: string; amount: number }): Promise<{ error?: string }> {
+export async function sendAppointmentReceipt(input: { clientPhone: string | null; clientName: string; serviceName: string; amount: number; appointmentId?: string }): Promise<{ error?: string }> {
   if (!input.clientPhone) return { error: "This client has no phone number on file to text a receipt to" };
   const fmtMoney = (n: number) => `C$${n.toFixed(2)}`;
-  const { error } = await sendSms(input.clientPhone, `Hi ${input.clientName.split(" ")[0]}, your receipt for ${input.serviceName}: ${fmtMoney(input.amount)} paid. Thanks for booking with us!`);
+  let link = "";
+  if (input.appointmentId) {
+    const { shopId } = await requireShop();
+    const admin = createAdminClient();
+    const { data: a } = await admin.from("appointments").select("manage_token").eq("id", input.appointmentId).eq("shop_id", shopId).maybeSingle();
+    let token = (a?.manage_token as string | null) ?? null;
+    if (a && !token) { token = newManageToken(); await admin.from("appointments").update({ manage_token: token }).eq("id", input.appointmentId); }
+    if (token) link = ` Full receipt: ${process.env.NEXT_PUBLIC_SITE_URL ?? "https://flow.flatpurse.com"}/a/${token}/receipt`;
+  }
+  const { error } = await sendSms(input.clientPhone, `Hi ${input.clientName.split(" ")[0]}, your receipt for ${input.serviceName}: ${fmtMoney(input.amount)} paid.${link} Thanks for booking with us!`);
   if (error) return { error };
   return {};
 }
@@ -462,7 +473,7 @@ export async function chargeNoShowFee(id: string): Promise<{ error?: string; amo
   const amount = await noShowFeeFor(shopId, Number(a.price), a.customer_id as string | null, a.fee_charged_at as string | null);
   if (!amount) return { error: "No fee to charge" };
   const { data: shop } = await admin.from("shops").select("stripe_account_id").eq("id", shopId).maybeSingle();
-  const r = await chargeSavedCard(admin, { appointmentId: id, customerId: a.customer_id as string, stripeAccountId: shop?.stripe_account_id as string, amount, kind: "no_show" });
+  const r = await chargeSavedCard(admin, { appointmentId: id, customerId: a.customer_id as string, stripeAccountId: shop?.stripe_account_id as string, amount, kind: "no_show", shopId });
   revalidatePath("/dashboard/appointments");
   return r.error ? { error: r.error } : { amount };
 }

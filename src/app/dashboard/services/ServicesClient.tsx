@@ -129,7 +129,7 @@ export function ServicesClient({ services }: { services: ServiceRow[] }) {
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", rowGap: 12 }}>
         <div>
           <h1 style={{ color: "var(--dtext)", fontSize: 22, fontWeight: 800, margin: "0 0 3px", letterSpacing: "-0.03em" }}>Services</h1>
-          <p style={{ color: "var(--dw35)", fontSize: 13, margin: 0 }}>{services.length} service{services.length === 1 ? "" : "s"} · {services.filter(s => s.active).length} active · <Link href="/dashboard/services/resources" style={{ color: "rgb(109,40,217)", fontWeight: 600 }}>Rooms and equipment</Link> · <Link href="/dashboard/settings/policy" style={{ color: "rgb(109,40,217)", fontWeight: 600 }}>Booking policy</Link></p>
+          <p style={{ color: "var(--dw35)", fontSize: 13, margin: 0 }}>{services.length} service{services.length === 1 ? "" : "s"} · {services.filter(s => s.active).length} active · <Link href="/dashboard/services/resources" style={{ color: "rgb(109,40,217)", fontWeight: 600 }}>Rooms and equipment</Link> · <Link href="/dashboard/settings/policy" style={{ color: "rgb(109,40,217)", fontWeight: 600 }}>Booking policy</Link> · <Link href="/dashboard/settings/receipts" style={{ color: "rgb(109,40,217)", fontWeight: 600 }}>Receipt details</Link></p>
         </div>
         <button onClick={() => setAdding(true)} style={{ display: "flex", alignItems: "center", gap: 7, padding: "10px 18px", borderRadius: 11, background: "rgb(109,40,217)", border: "none", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
           <Plus size={15} strokeWidth={2.5} />
