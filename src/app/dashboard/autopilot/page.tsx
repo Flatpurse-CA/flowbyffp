@@ -3,6 +3,8 @@ import { getShopContext } from "@/lib/dashboard/shop";
 import { logFeatureUsage } from "@/lib/featureUsage";
 import { getAutopilotState } from "./actions";
 import { AutoPilotClient } from "./AutoPilotClient";
+import { ApprovalQueue } from "./ApprovalQueue";
+import { getApprovalState } from "./approvalActions";
 import { shopHasFeature } from "@/lib/dashboard/plan";
 import PlanUpsell from "@/components/PlanUpsell";
 
@@ -46,6 +48,11 @@ export default async function AutoPilotPage() {
 
   await logFeatureUsage("autopilot_viewed", ctx.shopId);
 
-  const state = await getAutopilotState();
-  return <AutoPilotClient state={state} />;
+  const [state, approval] = await Promise.all([getAutopilotState(), getApprovalState()]);
+  return (
+    <>
+      {approval && <ApprovalQueue state={approval} />}
+      <AutoPilotClient state={state} />
+    </>
+  );
 }

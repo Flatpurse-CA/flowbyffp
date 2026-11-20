@@ -16,21 +16,21 @@ Legend: DONE = built, verify only · PARTIAL = something exists, needs finishing
 | FL-021 | 14-day trial, card up front: SetupIntent then subscription with trial_end = Day 14 | PARTIAL |
 | FL-025 | Plan selection screen fixes (10.1 items 1-9) | TODO |
 | FL-022 | Founders coupon server-side (40% yr 1, then 25%) + live counter | PARTIAL (counter live) |
-| FL-023 | One trial per business, phone, card | DONE (needs migration 0051 + Stripe settings) |
-| FL-024 | Dunning: Smart Retries + emails day 0/3/5/7, pause after final retry | DONE (needs migration 0051 + Stripe settings) |
-| FL-116-118 | Renewal reminders (monthly, annual, Founders price change) | DONE (needs migration 0051 + Stripe settings) |
-| FL-070/071 | Day 11 trial-end screens + reminder text/email + Day 12-13 banner | DONE (needs migration 0051 + Stripe settings) |
+| FL-023 | One trial per business, phone, card | DONE (migration 0051 applied; needs Stripe settings) |
+| FL-024 | Dunning: Smart Retries + emails day 0/3/5/7, pause after final retry | DONE (migration 0051 applied; needs Stripe settings) |
+| FL-116-118 | Renewal reminders (monthly, annual, Founders price change) | DONE (migration 0051 applied; needs Stripe settings) |
+| FL-070/071 | Day 11 trial-end screens + reminder text/email + Day 12-13 banner | DONE (migration 0051 applied; needs Stripe settings) |
 
 ### Batch 2: AutoPilot completion
 | ID | Task | Status |
 |---|---|---|
 | FL-048 | Engine: trigger, wait, re-check, send, attribute; per-flow toggles | DONE (built 2026-11-18, cron live 11-19) |
-| FL-050-054 | No-show, Slot Filler, Win-Back, Rebook, Birthday flows | PARTIAL (no +24h no-show follow-up, no waitlist tier, no auto-applied 15%/10% offers) |
-| FL-007 | Frequency caps 1/day, 2/7 days per client across flows | PARTIAL (7-day cooldown per flow only) |
-| FL-049 | "Ask me first" approval queue for first 14 days | TODO |
+| FL-050-054 | No-show, Slot Filler, Win-Back, Rebook, Birthday flows | PARTIAL (+24h no-show follow-up done; waitlist tier + auto-applied offers moved to Batch 3, need booking checkout) |
+| FL-007 | Frequency caps 1/day, 2/7 days per client across flows | DONE |
+| FL-049 | "Ask me first" approval queue for first 14 days | DONE |
 | FL-055 | Activity feed + revenue recovered counters | PARTIAL |
-| FL-006 | CASL consent ledger + STOP/HELP | PARTIAL |
-| FL-029/061 | First-send rules; imported clients transactional-only by default | TODO |
+| FL-006 | CASL consent ledger + STOP/HELP | DONE (quiet hours now 8am-9pm) |
+| FL-029/061 | First-send rules; imported clients transactional-only by default | DONE (importer does not yet read a consent column) |
 
 ### Batch 3: Booking, payments, cancel/save
 | ID | Task | Status |
