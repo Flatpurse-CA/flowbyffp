@@ -10,11 +10,11 @@ Legend: DONE = built, verify only · PARTIAL = something exists, needs finishing
 ### Batch 1: Billing + trial (launch blockers)
 | ID | Task | Status |
 |---|---|---|
-| FL-032 | Remove Family Hours everywhere; no website builder | TODO |
-| FL-082 | Remove "no card required" copy; cookie banner; pixels only after consent | PARTIAL |
+| FL-032 | Remove Family Hours everywhere; no website builder | DONE (no references left) |
+| FL-082 | Remove "no card required" copy; cookie banner; pixels only after consent | DONE (pixels + PostHog consent-gated; waitlist beta "No credit card" kept, decision for CEO) |
 | FL-020 | Plan never activates without a confirmed card (Stripe webhook) | PARTIAL |
 | FL-021 | 14-day trial, card up front: SetupIntent then subscription with trial_end = Day 14 | PARTIAL |
-| FL-025 | Plan selection screen fixes (10.1 items 1-9) | TODO |
+| FL-025 | Plan selection screen fixes (10.1 items 1-9) | DONE except item 1 (Starter Founders, waiting on D3) |
 | FL-022 | Founders coupon server-side (40% yr 1, then 25%) + live counter | PARTIAL (counter live) |
 | FL-023 | One trial per business, phone, card | DONE (migration 0051 applied; needs Stripe settings) |
 | FL-024 | Dunning: Smart Retries + emails day 0/3/5/7, pause after final retry | DONE (migration 0051 applied; needs Stripe settings) |
@@ -52,7 +52,7 @@ Legend: DONE = built, verify only · PARTIAL = something exists, needs finishing
 | FL-072/073 | Home goal ring, feed, streak, payment celebration | PARTIAL |
 | FL-062-065 | Email domain/streams, client + owner sequence E0-E12, staff emails | PARTIAL |
 | FL-074 | Staff invites, roles, weekly hours | DONE (verify) |
-| FL-075 | SMS allowances per plan, 80% warning, email fallback | TODO |
+| FL-075 | SMS allowances per plan, 80% warning, email fallback | DONE (migration 0062; placeholder 200/1000/3000 via SMS_ALLOWANCE env; meter on Settings) |
 | FL-077 | Offline read-only today's schedule | TODO |
 | FL-078/079 | Admin console v1 + "view as owner" | PARTIAL |
 | FL-056/057 | AI Front Desk SMS + web chat, guardrails, take over | PARTIAL |

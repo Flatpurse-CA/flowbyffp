@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { SmsUsageMeter } from "./SmsUsageMeter";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getShopContext, getAuthUser } from "@/lib/dashboard/shop";
@@ -62,6 +63,7 @@ export default async function SettingsPage() {
 
   return (
     <Suspense>
+      {ctx?.role === "owner" && <SmsUsageMeter shopId={ctx.shopId} />}
       <SettingsClient
         shopId={ctx?.shopId ?? null}
         initialBusinessHours={initialBusinessHours}

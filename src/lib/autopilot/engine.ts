@@ -1,8 +1,9 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { sendShopSms } from "@/lib/sms/allowance";
 import { deriveClients, type ClientAppointment, type DerivedClient } from "@/lib/dashboard/clients";
 import { computeAccessStatus } from "@/lib/dashboard/accessStatus";
 import { shopHasFeature } from "@/lib/dashboard/plan";
-import { sendSms, twilioConfigured } from "@/lib/twilio";
+import { twilioConfigured } from "@/lib/twilio";
 import { toE164 } from "@/lib/phone";
 import { sendAutopilotEmail } from "@/lib/resend";
 import { SITE_URL } from "@/lib/seo/facts";
@@ -199,7 +200,7 @@ async function runShop(admin: ReturnType<typeof createAdminClient>, shop: Shop, 
     if (askFirst) { counts.sent += 1; return true; }
 
     let ok = false;
-    if (canSms) ok = !(await sendSms(phone!, smsText(shop.name, msg.text, link, commercial))).error;
+    if (canSms) ok = !(await sendShopSms(shop.id, phone!, smsText(shop.name, msg.text, link, commercial), { marketing: commercial })).error;
     if (to.email) {
       const r = await sendAutopilotEmail(to.email, { shopName: shop.name, subject: msg.subject, text: msg.text, ctaLabel: msg.cta, ctaUrl: link });
       ok = ok || !r.error;

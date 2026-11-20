@@ -1,10 +1,11 @@
 "use server";
 
+import { sendShopSms } from "@/lib/sms/allowance";
 import { randomBytes } from "node:crypto";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getAuthUser, getShopContext } from "@/lib/dashboard/shop";
 import { getAvailableSlots } from "@/app/book/[handle]/actions";
-import { sendSms, twilioConfigured } from "@/lib/twilio";
+import { twilioConfigured } from "@/lib/twilio";
 import { sendAutopilotEmail } from "@/lib/resend";
 import { toE164 } from "@/lib/phone";
 import { SITE_URL } from "@/lib/seo/facts";
@@ -77,7 +78,7 @@ export async function sendTimes(input: {
     const text = input.message.replaceAll("{first_name}", r.name.trim().split(/\s+/)[0] || "there").replaceAll("{link}", link);
     let ok = false;
     if (phone && twilioConfigured() && !blocked.has(phone)) {
-      ok = !(await sendSms(phone, group ? `${text}\nReply STOP to opt out.` : text)).error;
+      ok = !(await sendShopSms(ctx.shopId, phone, group ? `${text}\nReply STOP to opt out.` : text, { marketing: group })).error;
     }
     if (r.email) {
       const res = await sendAutopilotEmail(r.email, { shopName: shop.name as string, subject: `Open times at ${shop.name}`, text: text.replace(link, "").trim(), ctaLabel: "Pick a time", ctaUrl: link });
