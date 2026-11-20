@@ -53,7 +53,7 @@ Legend: DONE = built, verify only · PARTIAL = something exists, needs finishing
 | FL-062-065 | Email domain/streams, client + owner sequence E0-E12, staff emails | PARTIAL |
 | FL-074 | Staff invites, roles, weekly hours | DONE (verify) |
 | FL-075 | SMS allowances per plan, 80% warning, email fallback | DONE (migration 0062; placeholder 200/1000/3000 via SMS_ALLOWANCE env; meter on Settings) |
-| FL-077 | Offline read-only today's schedule | TODO |
+| FL-077 | Offline read-only today's schedule | DONE (service worker serves /offline.html with schedule saved every 5 min) |
 | FL-078/079 | Admin console v1 + "view as owner" | PARTIAL |
 | FL-056/057 | AI Front Desk SMS + web chat, guardrails, take over | PARTIAL |
 | FL-058/059 | Mobile Mode core + Pro (ETA, running late, route) | TODO |

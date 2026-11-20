@@ -8,6 +8,7 @@ import { needsCard } from "@/lib/billing/cardGate";
 import { getTrialNotice } from "@/lib/billing/trialNotice";
 import { TrialEndNotice } from "./TrialEndNotice";
 import { PlanStatusBanner } from "./PlanStatusBanner";
+import { TodayCache } from "./TodayCache";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const user = await getAuthUser();
@@ -95,6 +96,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
     <DashboardShell user={user} role={ctx.role} staffName={ctx.staffName} unreadCount={unreadCount} accessStatus={ctx.accessStatus} initialDark={(await cookies()).get("portal-theme")?.value !== "light"}>
       {planState && (planState.cancel_at || planState.paused_until) && <PlanStatusBanner cancelAt={planState.cancel_at} pausedUntil={planState.paused_until} deletionAt={planState.deletion_scheduled_at} />}
       {trialNotice && <TrialEndNotice notice={trialNotice} />}
+      <TodayCache />
       {children}
     </DashboardShell>
   );

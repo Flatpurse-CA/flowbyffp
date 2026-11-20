@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Offline - Flow</title>
+<style>
+  body { margin: 0; font-family: system-ui, sans-serif; background: #0b0b10; color: #f4f4f5; padding: 24px 16px; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  .sub { color: #c4c4cc; font-size: 13.5px; margin: 0 0 18px; }
+  .row { background: #17171f; border: 1px solid #2a2a35; border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; }
+  .t { font-weight: 800; font-size: 15px; }
+  .m { color: #c4c4cc; font-size: 13px; margin-top: 2px; }
+  button { margin-top: 12px; background: rgb(109,40,217); color: #fff; border: none; border-radius: 10px; padding: 12px 16px; font-weight: 700; font-size: 14px; }
+</style>
+</head>
+<body>
+  <h1>You're offline</h1>
+  <p class="sub" id="sub">Showing today's schedule from your last connection. Read only.</p>
+  <div id="list"></div>
+  <button onclick="location.reload()">Try again</button>
+<script>
+  (function () {
+    var list = document.getElementById("list"), sub = document.getElementById("sub"), data = null;
+    try { data = JSON.parse(localStorage.getItem("flow-today") || "null"); } catch (e) {}
+    if (!data || !data.items) { sub.textContent = "No saved schedule on this device yet. Open the dashboard once while online."; return; }
+    var saved = new Date(data.savedAt);
+    sub.textContent = "Today's schedule, saved " + saved.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }) + ". Read only.";
+    if (!data.items.length) { list.textContent = "No bookings today."; return; }
+    data.items.forEach(function (a) {
+      var row = document.createElement("div"); row.className = "row";
+      var t = document.createElement("div"); t.className = "t";
+      t.textContent = new Date(a.startsAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }) + "  " + a.client;
+      var m = document.createElement("div"); m.className = "m";
+      m.textContent = [a.service, a.staff, a.phone, a.status].filter(Boolean).join(" · ");
+      row.appendChild(t); row.appendChild(m); list.appendChild(row);
+    });
+  })();
+</script>
+</body>
+</html>
