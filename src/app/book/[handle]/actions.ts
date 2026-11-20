@@ -91,6 +91,20 @@ export async function getAvailableSlots(input: {
 
   const overlaps = (aStart: number, aEnd: number, bStart: number, bEnd: number) => aStart < bEnd && aEnd > bStart;
 
+  // Rooms/equipment (FL-042): each resource this service needs must have spare capacity.
+  const { data: needs } = await admin.from("service_resources").select("resource_id, resources!inner(capacity, active)").eq("service_id", input.serviceId);
+  const resourceChecks: { capacity: number; names: Set<string> }[] = [];
+  for (const n of (needs ?? []) as unknown as { resource_id: string; resources: { capacity: number; active: boolean } }[]) {
+    if (!n.resources.active) continue;
+    const { data: users } = await admin.from("service_resources").select("services!inner(name)").eq("resource_id", n.resource_id);
+    resourceChecks.push({ capacity: n.resources.capacity, names: new Set(((users ?? []) as unknown as { services: { name: string } }[]).map(u => u.services.name)) });
+  }
+  const { data: apptNames } = resourceChecks.length ? await admin.from("appointments").select("service_name, starts_at, duration_minutes")
+    .eq("shop_id", input.shopId).neq("status", "cancelled")
+    .gte("starts_at", new Date(dayStart.getTime() - 8 * 60 * 60 * 1000).toISOString()).lte("starts_at", dayEnd.toISOString()) : { data: [] };
+  const resourcesFree = (t: number, end: number) => resourceChecks.every(rc =>
+    (apptNames ?? []).filter(a => rc.names.has(a.service_name as string) && overlaps(new Date(a.starts_at as string).getTime(), new Date(a.starts_at as string).getTime() + (a.duration_minutes as number) * 60000, t, end)).length < rc.capacity);
+
   const slots: string[] = [];
   for (let t = dayStart.getTime(); t + durationMinutes * 60000 <= dayEnd.getTime(); t += SLOT_INTERVAL_MINUTES * 60000) {
     const slotEnd = t + durationMinutes * 60000;
@@ -102,7 +116,7 @@ export async function getAvailableSlots(input: {
     });
 
     const available = unstaffed ? isFree(null) : staffIds.some(isFree);
-    if (available) slots.push(new Date(t).toISOString());
+    if (available && resourcesFree(t, slotEnd)) slots.push(new Date(t).toISOString());
   }
 
   return slots;

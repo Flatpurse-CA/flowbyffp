@@ -39,7 +39,7 @@ Legend: DONE = built, verify only · PARTIAL = something exists, needs finishing
 | FL-037 | Deposits, cancellation window, late-cancel/no-show fees | PARTIAL |
 | FL-038/039 | Refunds w/ reason, dispute alerts, payout report CSV | PARTIAL |
 | FL-033/034/035 | Connect Express, application fee, tips, cash, receipts | PARTIAL |
-| FL-042 | Rooms/equipment resources | TODO |
+| FL-042 | Rooms/equipment resources | DONE (migration 0057; capacity check in slot finder; owner page under Services) |
 | FL-043/044 | Intake forms, insurance-ready receipts | PARTIAL |
 | FL-045 | 3-tap staff booking | DONE (Quick book page; due = past usual gap, usual service, usual-time/gap-filler ranking) |
 | FL-046/047 | Send Times (tappable slots) + rules | DONE (manual send; no deposit step, Mobile Mode, segments or SMS allowance yet) |
