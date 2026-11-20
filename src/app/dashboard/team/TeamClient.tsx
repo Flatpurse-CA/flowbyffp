@@ -417,6 +417,7 @@ export function TeamClient({ staff, appointments }: { staff: StaffRow[]; appoint
           <div>
             <h1 style={{ color: "var(--dtext)", fontSize: 22, fontWeight: 800, margin: "0 0 3px", letterSpacing: "-0.03em" }}>Team</h1>
             <Link href="/dashboard/team/time-off" style={{ color: "rgb(109,40,217)", fontWeight: 600, fontSize: 13 }}>Time off</Link>
+            <Link href="/dashboard/team/performance" style={{ color: "rgb(109,40,217)", fontWeight: 600, fontSize: 13, marginLeft: 12 }}>Performance</Link>
             <p style={{ color: "var(--dw35)", fontSize: 13, margin: 0 }}>{staff.length} active staff member{staff.length === 1 ? "" : "s"}</p>
           </div>
           <button onClick={() => setShowAdd(true)} style={{
