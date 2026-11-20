@@ -68,7 +68,7 @@ Legend: DONE = built, verify only · PARTIAL = something exists, needs finishing
 | FL-003/004/005 | Event bus, local-time scheduler, unified messaging log | PARTIAL |
 | FL-008 | AI gateway (templates, logging, cost, PII redaction) | PARTIAL |
 | FL-009/010 | Attribution ledger, nightly metrics engine | PARTIAL |
-| FL-011 | Optional 2-step; required for payouts/export | TODO |
+| FL-011 | Optional 2-step; required for payouts/export | DONE (Supabase TOTP on Settings > Security; gates export + payout changes; needs MFA enabled in Supabase Auth) |
 | FL-012/013 | Server-side roles; audit log | PARTIAL |
 | FL-016 | Strings into translation files | TODO |
 | FL-017 | Product analytics events (IDs only) | PARTIAL |

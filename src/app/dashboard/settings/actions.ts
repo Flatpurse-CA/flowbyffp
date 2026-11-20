@@ -1,5 +1,6 @@
 "use server";
 
+import { requireTwoStep } from "@/lib/auth/twoStep";
 import { revalidatePath } from "next/cache";
 import { requireShop, getShopContext, getAuthUser } from "@/lib/dashboard/shop";
 import type Stripe from "stripe";
@@ -25,6 +26,9 @@ export async function startStripeOnboarding(): Promise<{ url?: string; error?: s
   const ctx = await getShopContext();
   if (!ctx || ctx.role !== "owner") return { error: "Only the shop owner can connect Stripe" };
   const { supabase, shopId } = await requireShop();
+  // FL-011: changing payout details on an already-connected account needs 2-step.
+  const { data: existing } = await supabase.from("shops").select("stripe_connected").eq("id", shopId).maybeSingle();
+  if (existing?.stripe_connected) { const twoStep = await requireTwoStep(); if (twoStep) return { error: twoStep }; }
 
   const { data: shop } = await supabase
     .from("shops")

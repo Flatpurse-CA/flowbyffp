@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { requireTwoStep } from "@/lib/auth/twoStep";
 import { zipSync, strToU8 } from "fflate";
 import { getShopContext } from "@/lib/dashboard/shop";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -22,6 +23,8 @@ function toCsv(rows: Record<string, unknown>[]): string {
 export async function GET() {
   const ctx = await getShopContext();
   if (!ctx || ctx.role !== "owner") return NextResponse.json({ error: "Only the owner can export data" }, { status: 403 });
+  const twoStep = await requireTwoStep();
+  if (twoStep) return NextResponse.json({ error: twoStep }, { status: 403 });
   const admin = createAdminClient();
   const tables = ["clients", "appointments", "services", "staff"] as const;
   const files: Record<string, Uint8Array> = {};
