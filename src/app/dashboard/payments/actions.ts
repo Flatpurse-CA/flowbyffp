@@ -16,6 +16,7 @@ export type PaymentRow = {
   tipAmount: number | null;
   paidAmount: number | null;
   paymentMethod: string | null;
+  refundedAmount: number;
 };
 
 // Transaction history sourced from appointments — the only place payment
@@ -30,7 +31,7 @@ export async function listPayments(rangeStart: string, rangeEnd: string): Promis
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("appointments")
-    .select("id, client_name, service_name, starts_at, completed_at, status, price, deposit_amount, tip_amount, paid_amount, payment_method")
+    .select("id, client_name, service_name, starts_at, completed_at, status, price, deposit_amount, tip_amount, paid_amount, payment_method, refunded_amount")
     .eq("shop_id", shopId)
     .or("paid_amount.not.is.null,deposit_amount.not.is.null")
     .gte("starts_at", rangeStart)
@@ -51,5 +52,6 @@ export async function listPayments(rangeStart: string, rangeEnd: string): Promis
     tipAmount: r.tip_amount !== null ? Number(r.tip_amount) : null,
     paidAmount: r.paid_amount !== null ? Number(r.paid_amount) : null,
     paymentMethod: (r.payment_method as string | null) ?? null,
+    refundedAmount: Number(r.refunded_amount ?? 0),
   }));
 }

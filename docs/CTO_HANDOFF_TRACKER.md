@@ -37,7 +37,7 @@ Legend: DONE = built, verify only · PARTIAL = something exists, needs finishing
 |---|---|---|
 | FL-040/041 | Client booking page flow + reschedule/cancel within policy | DONE (manage link /a/token in confirmation email; reschedule outside window, late fee shown + charged inside) |
 | FL-037 | Deposits, cancellation window, late-cancel/no-show fees | DONE (migration 0058; Booking policy page; no-show fee after staff confirm, needs card consent at booking) |
-| FL-038/039 | Refunds w/ reason, dispute alerts, payout report CSV | PARTIAL |
+| FL-038/039 | Refunds w/ reason, dispute alerts, payout report CSV | DONE (migration 0059; owner refunds on Payments; dispute email with deadline; CSV from Stripe balance transactions) |
 | FL-033/034/035 | Connect Express, application fee, tips, cash, receipts | PARTIAL |
 | FL-042 | Rooms/equipment resources | DONE (migration 0057; capacity check in slot finder; owner page under Services) |
 | FL-043/044 | Intake forms, insurance-ready receipts | PARTIAL |

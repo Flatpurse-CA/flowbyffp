@@ -1,3 +1,5 @@
+import { sendBillingEmail } from "@/lib/resend";
+import { ownerContact } from "@/lib/billing/notices";
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { stripe } from "@/lib/stripe";
@@ -202,10 +204,26 @@ export async function POST(req: Request) {
         reason: dispute.reason,
         status: dispute.status,
         is_platform: !connectedAccountId,
+        evidence_due_by: dispute.evidence_details?.due_by ? new Date(dispute.evidence_details.due_by * 1000).toISOString() : null,
         updated_at: new Date().toISOString(),
       },
       { onConflict: "stripe_dispute_id" },
     );
+    // FL-038: alert the owner once, with the deadline and what evidence helps.
+    if (event.type === "charge.dispute.created" && shopId) {
+      const { data: s } = await admin.from("shops").select("owner_id").eq("id", shopId).maybeSingle();
+      const owner = s?.owner_id ? await ownerContact(admin, s.owner_id as string) : null;
+      if (owner?.email) {
+        const due = dispute.evidence_details?.due_by ? new Date(dispute.evidence_details.due_by * 1000).toLocaleDateString("en-CA", { month: "long", day: "numeric", year: "numeric" }) : "soon";
+        await sendBillingEmail(owner.email, {
+          subject: `A client disputed a $${(dispute.amount / 100).toFixed(2)} payment`,
+          heading: "A payment was disputed",
+          body: `A client's bank has disputed a $${(dispute.amount / 100).toFixed(2)} charge (reason: ${dispute.reason.replaceAll("_", " ")}). Send evidence by ${due}. Helpful evidence: the booking confirmation, your cancellation policy the client agreed to, check-in or completion time, any messages with the client, and the receipt. Respond in your Stripe dashboard under Payments > Disputes.`,
+          ctaLabel: "Open Stripe", ctaUrl: "https://dashboard.stripe.com/disputes",
+        }).catch(() => {});
+        await admin.from("disputes").update({ alerted_at: new Date().toISOString() }).eq("stripe_dispute_id", dispute.id);
+      }
+    }
   }
 
   if (event.type === "payment_intent.succeeded") {
@@ -217,6 +235,7 @@ export async function POST(req: Request) {
         .update({
           paid_amount: pi.amount_received / 100,
           payment_method: "card",
+          stripe_payment_intent: pi.id,
           status: "confirmed",
           updated_at: new Date().toISOString(),
         })

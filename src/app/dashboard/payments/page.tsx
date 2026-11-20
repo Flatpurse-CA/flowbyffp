@@ -1,6 +1,9 @@
 import { redirect } from "next/navigation";
 import { Wallet } from "lucide-react";
 import { listPayments } from "./actions";
+import { RefundButton } from "./RefundButton";
+
+const PAYOUT_HREF = "/api/payments/payout-report?days=30";
 import { getShopContext } from "@/lib/dashboard/shop";
 
 export const dynamic = "force-dynamic";
@@ -28,6 +31,7 @@ const STATUS_COLOR: Record<string, { fg: string; bg: string }> = {
 export default async function PaymentsPage() {
   const ctx = await getShopContext();
   if (ctx && ctx.role !== "owner") redirect("/dashboard");
+  const isOwner = ctx?.role === "owner";
 
   const now = new Date();
   const rangeStart = new Date(now);
@@ -46,7 +50,7 @@ export default async function PaymentsPage() {
     <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
       <div>
         <h1 style={{ color: "var(--dtext)", fontSize: 22, fontWeight: 800, margin: "0 0 3px", letterSpacing: "-0.03em" }}>Payments</h1>
-        <p style={{ color: "var(--dw35)", fontSize: 13, margin: 0 }}>Transaction history from your last 90 days of bookings.</p>
+        <p style={{ color: "var(--dw35)", fontSize: 13, margin: 0 }}>Transaction history from your last 90 days of bookings.{isOwner && <> <a href={PAYOUT_HREF} style={{ color: "rgb(109,40,217)", fontWeight: 600 }}>Download payout report (CSV)</a></>}</p>
       </div>
 
       <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
@@ -74,7 +78,7 @@ export default async function PaymentsPage() {
           <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 640 }}>
             <thead>
               <tr style={{ background: "var(--dsurface2)" }}>
-                {["Client", "Service", "Date", "Method", "Status", "Amount"].map(h => (
+                {["Client", "Service", "Date", "Method", "Status", "Amount", ...(isOwner ? [""] : [])].map(h => (
                   <th key={h} style={{ padding: "10px 16px", textAlign: "left", color: "var(--dw35)", fontSize: 10.5, fontWeight: 600, letterSpacing: "0.05em", textTransform: "uppercase", borderBottom: "1px solid var(--dw06)", whiteSpace: "nowrap" }}>
                     {h}
                   </th>
@@ -98,7 +102,9 @@ export default async function PaymentsPage() {
                     </td>
                     <td style={{ padding: "12px 16px", color: "var(--dtext)", fontSize: 13, fontWeight: 700, whiteSpace: "nowrap" }}>
                       {fmtPrice(amount)}{p.tipAmount ? <span style={{ color: "var(--dw35)", fontWeight: 500 }}> + {fmtPrice(p.tipAmount)} tip</span> : ""}
+                      {p.refundedAmount > 0 && <span style={{ display: "block", color: "rgb(220,38,38)", fontWeight: 600, fontSize: 11.5 }}>-{fmtPrice(p.refundedAmount)} refunded</span>}
                     </td>
+                    {isOwner && <td style={{ padding: "12px 16px" }}>{p.paidAmount ? <RefundButton appointmentId={p.id} max={Math.round((p.paidAmount - p.refundedAmount) * 100) / 100} /> : null}</td>}
                   </tr>
                 );
               })}
