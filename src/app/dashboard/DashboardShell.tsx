@@ -9,7 +9,7 @@ import {
   LayoutGrid, Users2, Settings, Compass, ArrowRightLeft, Gift,
   LogOut, Bell, ChevronsLeft, ChevronsRight, ChevronDown,
   Sun, Moon, User as UserIcon, Search, MessageSquare, Sparkles,
-  CalendarClock, UserRound, MoreHorizontal, Star, Wallet, type LucideIcon, Send, MousePointerClick, ClipboardList } from "lucide-react";
+  CalendarClock, UserRound, MoreHorizontal, Star, Wallet, type LucideIcon, Send, MousePointerClick, ClipboardList, Car } from "lucide-react";
 import { logout, searchDashboard, type SearchResult } from "./actions";
 import type { ShopRole } from "@/lib/dashboard/shop";
 import { DashboardThemeProvider, useDashboardTheme } from "./theme-context";
@@ -37,6 +37,7 @@ const NAV_TABS: NavTab[] = [
   },
   { icon: Users,           href: "/dashboard/clients",      label: "Clients",    badge: 0, ownerOnly: false, group: "main" },
   { icon: MousePointerClick, href: "/dashboard/quick-book",  label: "Quick book", badge: 0, ownerOnly: false, group: "main" },
+  { icon: Car,             href: "/dashboard/route",        label: "Today's route", badge: 0, ownerOnly: false, group: "main" },
   { icon: ClipboardList,   href: "/dashboard/intake",       label: "Intake forms", badge: 0, ownerOnly: false, group: "main" },
   { icon: Send,            href: "/dashboard/send-times",   label: "Send Times", badge: 0, ownerOnly: false, group: "main" },
   { icon: Wallet,          href: "/dashboard/payments",     label: "Payments",   badge: 0, ownerOnly: true,  group: "main" },

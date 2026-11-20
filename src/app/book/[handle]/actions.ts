@@ -11,6 +11,7 @@ import { getRequestOrigin } from "@/lib/requestOrigin";
 import { stripe } from "@/lib/stripe";
 import { applicationFeeParam } from "@/lib/billing/platformFee";
 import { amountFor, newManageToken, type FeeMode } from "@/lib/booking/policy";
+import { inServiceArea, validPostal } from "@/lib/booking/mobile";
 import { ensureStripeCustomerId } from "@/lib/stripeCustomer";
 import { attributeAutopilotRevenue } from "@/lib/dashboard/autopilotAttribution";
 import { computeAccessStatus } from "@/lib/dashboard/accessStatus";
@@ -93,6 +94,10 @@ export async function getAvailableSlots(input: {
 
   const overlaps = (aStart: number, aEnd: number, bStart: number, bEnd: number) => aStart < bEnd && aEnd > bStart;
 
+  // Mobile Mode (FL-058): leave drive time around every visit.
+  const { data: mob } = await admin.from("shops").select("mobile_enabled, drive_buffer_min").eq("id", input.shopId).maybeSingle();
+  const bufferMs = mob?.mobile_enabled ? Number(mob.drive_buffer_min ?? 0) * 60000 : 0;
+
   // Rooms/equipment (FL-042): each resource this service needs must have spare capacity.
   const { data: needs } = await admin.from("service_resources").select("resource_id, resources!inner(capacity, active)").eq("service_id", input.serviceId);
   const resourceChecks: { capacity: number; names: Set<string> }[] = [];
@@ -114,7 +119,7 @@ export async function getAvailableSlots(input: {
     const isFree = (sid: string | null) => !appts.some(a => {
       if (a.staff_id !== sid) return false;
       const aStart = new Date(a.starts_at).getTime();
-      return overlaps(aStart, aStart + (a.duration_minutes as number) * 60000, t, slotEnd);
+      return overlaps(aStart - bufferMs, aStart + (a.duration_minutes as number) * 60000 + bufferMs, t, slotEnd);
     });
 
     const available = unstaffed ? isFree(null) : staffIds.some(isFree);
@@ -132,6 +137,8 @@ export async function createPublicBooking(input: {
   notes?: string;
   refCode?: string | null;
   offerToken?: string | null;
+  address?: string;
+  postal?: string;
 }): Promise<{ error?: string; appointmentId?: string; discount?: number }> {
   const ctx = await getCustomerContext();
   if (!ctx) return { error: "You need to be signed in to book" };
@@ -142,7 +149,7 @@ export async function createPublicBooking(input: {
 
   const admin = createAdminClient();
 
-  const { data: shop } = await admin.from("shops").select("id, owner_id, name, street_address, city, province, phone, trial_started_at, subscription_status, trial_override, trial_paused_at, client_referrals_enabled, client_referral_reward, paused_until, stripe_connected").eq("id", input.shopId).maybeSingle();
+  const { data: shop } = await admin.from("shops").select("id, owner_id, name, street_address, city, province, phone, trial_started_at, subscription_status, trial_override, trial_paused_at, client_referrals_enabled, client_referral_reward, paused_until, stripe_connected, mobile_enabled, service_fsas, travel_fee").eq("id", input.shopId).maybeSingle();
   if (!shop) return { error: "This shop couldn't be found" };
 
   const { status: shopAccessStatus } = computeAccessStatus(shop as { trial_started_at: string; subscription_status: string | null; trial_override: boolean; trial_paused_at: string | null });
@@ -158,6 +165,10 @@ export async function createPublicBooking(input: {
     .eq("active", true)
     .maybeSingle();
   if (!service) return { error: "This service is no longer available" };
+  if (shop.mobile_enabled) {
+    if (!input.address?.trim() || !input.postal || !validPostal(input.postal)) return { error: "Enter your street address and a valid postal code" };
+    if (!inServiceArea(input.postal, (shop.service_fsas as string[]) ?? [])) return { error: "Sorry, that address is outside this business's service area" };
+  }
 
   let stylistName: string | null = null;
   if (input.staffId) {
@@ -201,7 +212,8 @@ export async function createPublicBooking(input: {
     price: Number(service.price),
     refCode: input.refCode,
   });
-  const finalPrice = Math.round((Number(service.price) - (discount?.amount ?? 0)) * 100) / 100;
+  const travelFee = shop.mobile_enabled ? Number(shop.travel_fee ?? 0) : 0;
+  const finalPrice = Math.round((Number(service.price) - (discount?.amount ?? 0) + travelFee) * 100) / 100;
 
   const manageToken = newManageToken();
   const { data: inserted, error } = await admin
@@ -211,6 +223,8 @@ export async function createPublicBooking(input: {
       shop_id: input.shopId,
       customer_id: ctx.customerId,
       manage_token: manageToken,
+      location_address: shop.mobile_enabled ? `${input.address!.trim().slice(0, 200)}, ${input.postal!.toUpperCase().trim()}` : null,
+      travel_fee: shop.mobile_enabled ? travelFee : null,
       card_consent_at: shop.stripe_connected ? new Date().toISOString() : null,
       client_name: ctx.fullName,
       client_phone: normalizePhoneForStorage(ctx.phone),

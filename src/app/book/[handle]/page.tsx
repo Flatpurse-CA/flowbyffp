@@ -21,7 +21,7 @@ export default async function BookingPage({ params }: { params: Promise<{ handle
 
   const { data: shop } = await admin
     .from("shops")
-    .select("id, name, city, province, street_address, handle, stripe_connected, profile_image_url, cover_image_url, phone, owner_id, client_referrals_enabled, client_referral_reward, paused_until, deposit_mode, deposit_value, cancel_window_hours, late_cancel_fee_mode, late_cancel_fee_value, no_show_fee_mode, no_show_fee_value")
+    .select("id, name, city, province, street_address, handle, stripe_connected, profile_image_url, cover_image_url, phone, owner_id, client_referrals_enabled, client_referral_reward, paused_until, deposit_mode, deposit_value, cancel_window_hours, late_cancel_fee_mode, late_cancel_fee_value, no_show_fee_mode, no_show_fee_value, mobile_enabled, travel_fee")
     .eq("handle", handle)
     .maybeSingle();
 
@@ -100,6 +100,7 @@ export default async function BookingPage({ params }: { params: Promise<{ handle
         phone: (shop.phone as string | null) ?? null,
         email: owner.user?.email ?? null,
         policy: shop as unknown as Policy,
+        mobile: { enabled: Boolean(shop.mobile_enabled), fee: Number(shop.travel_fee ?? 0) },
       }}
       services={(services ?? []) as { id: string; name: string; price: number; duration_minutes: number; category: string | null }[]}
       staff={(staff ?? []) as { id: string; full_name: string; role: string | null; color: string }[]}
