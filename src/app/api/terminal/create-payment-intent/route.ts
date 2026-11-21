@@ -46,7 +46,7 @@ export async function POST(req: Request) {
       // intent as done.
       payment_method_types: currency === "cad" ? ["card_present", "interac_present"] : ["card_present"],
       capture_method: "manual",
-      ...(await applicationFeeParam(ctx.shopId, Math.round(amount * 100))),
+      ...(await applicationFeeParam(ctx.shopId, Math.round(amount * 100), "in_person")),
       metadata: appointmentId ? { appointment_id: appointmentId } : undefined,
     },
     { stripeAccount: stripeAccountId },

@@ -91,3 +91,14 @@ FL-102/103 Flow Voice · FL-104-106 gift cards, packages, memberships · FL-107/
 - FL-086 Pick 3 beta shops for staging tests.
 - Decision: Starter Founders price (spec 10.1 #1 says yes, CEO D3 said Pro/Pro+ only).
 - Decision: Flow Voice minute cap and overage (later).
+
+## Decisions from George, Nov 21 2026 (source: Open Questions Answers PDF; Nov 19 pricing spec is the source of truth for pricing)
+- Founders: fixed locked prices on all 3 plans (Starter $29/mo, $290/yr), 12 separate Stripe prices, no coupon. Cap 40 locations or Jan 31 2027 23:59 MT. Spot counts at first paid charge (in-person testers held from test start). Plan change keeps Founders on new plan. Guarantee Pro/Pro+ only.
+- Card rates (DONE in platformFee.ts): in person Starter 3.4%+25c, Pro/Pro+ 3.2%+25c; online Starter 3.5%+30c, Pro/Pro+ 3.4%+30c; intl +1%. Fee stays off until real $45 test charges show a positive application fee. Enterprise never below Pro.
+- Payouts default weekly (DONE on new Connect accounts). Waitlist "No credit card" removed (DONE). SMS 2x alert (DONE). Vercel region yul1 (DONE). Next.js 16.4.6 (DONE).
+- Defaults: 24h cancel window (already default), deposits off, refunds owner-only with grantable staff permission. Purge 30 days after deletion, billing/tax kept 6 yrs, intake 7 yrs after last visit.
+- 2-step optional for owners, staff can use it, owner can require for team. Flow Voice Pro+ only, 300 min + C$0.25/min.
+- FL-002 and FL-016 after launch; new tables carry location_id, new screens use translation files. Quebec: waitlist only.
+- Now: FL-020/021, FL-022 (rename: Founders prices + server-side spot counter), FL-055, FL-027 card step + FL-031 checklist, E0-E3 + staff invite on mail.flatpurse.com, FL-078/079 (read-only, logged), FL-060, scheduler + message log, attribution ledger, seed data + E2E, commissions (% per service, per-staff override, pre-tax, no tips), Daily Brief email, recap emails in shop timezone Monday 7am.
+- Fix before launch: pricing page claims "direct billing to insurers", not built. Remove the claim or build it.
+- George: Twilio numbers (FlatPurse Inc.), Supabase region check, pen test firm, beta shops, revoke token, env/MFA/webhooks.

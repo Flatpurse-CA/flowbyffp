@@ -49,5 +49,15 @@ export async function sendShopSms(shopId: string, to: string, body: string, opts
       }).catch(() => {});
     }
   }
+  if (Number.isFinite(allowance) && count === allowance * 2) {
+    const { data: shop } = await admin.from("shops").select("owner_id").eq("id", shopId).maybeSingle();
+    const owner = shop?.owner_id ? await ownerContact(admin, shop.owner_id as string) : null;
+    if (owner?.email) await sendBillingEmail(owner.email, {
+      subject: "You've sent twice this month's texts",
+      heading: "Texts at 2x your allowance",
+      body: `You've sent ${count} texts this month, twice your plan's ${allowance}. Booking texts keep sending so clients still get reminders. Upgrade for a bigger allowance.`,
+      ctaLabel: "See plans", ctaUrl: `${process.env.NEXT_PUBLIC_SITE_URL ?? "https://flow.flatpurse.com"}/dashboard/settings`,
+    }).catch(() => {});
+  }
   return {};
 }

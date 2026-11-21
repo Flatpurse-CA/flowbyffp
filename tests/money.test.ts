@@ -41,8 +41,10 @@ describe("platform fee", () => {
   it("uses plan rates", async () => {
     process.env.PLATFORM_FEE_ENABLED = "true";
     const { feeForPlan } = await import("@/lib/billing/platformFee");
-    expect(feeForPlan("starter", 10000)).toBe(290);
-    expect(feeForPlan("pro", 10000)).toBe(270);
+    expect(feeForPlan("starter", 10000)).toBe(60);
+    expect(feeForPlan("starter", 4500, "in_person")).toBe(36);
+    expect(feeForPlan("pro", 10000)).toBe(50);
+    expect(feeForPlan("pro", 4500, "in_person")).toBe(27);
     delete process.env.PLATFORM_FEE_ENABLED;
   });
 });

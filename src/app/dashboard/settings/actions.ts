@@ -60,7 +60,8 @@ export async function startStripeOnboarding(): Promise<{ url?: string; error?: s
   };
 
   // The shop pays Stripe's fees on its own direct charges and Stripe carries
-  // fraud and chargeback losses; Flow takes no cut of card payments.
+  // fraud and chargeback losses. Flow's margin is the Connect application fee
+  // (platformFee.ts). Payouts default to weekly (each payout costs Flow $0.25).
   const createAccount = async () => {
     const account = await stripe().accounts.create({
       country: "CA",
@@ -72,6 +73,7 @@ export async function startStripeOnboarding(): Promise<{ url?: string; error?: s
       },
       capabilities: { card_payments: { requested: true }, transfers: { requested: true } },
       business_profile: businessProfile,
+      settings: { payouts: { schedule: { interval: "weekly", weekly_anchor: "monday" } } },
     });
     await supabase.from("shops").update({ stripe_account_id: account.id }).eq("id", shopId);
     return account.id;

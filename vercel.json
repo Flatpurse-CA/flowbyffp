@@ -12,5 +12,8 @@
       "path": "/api/cron/billing",
       "schedule": "0 14 * * *"
     }
+  ],
+  "regions": [
+    "yul1"
   ]
 }
