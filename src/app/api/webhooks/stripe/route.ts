@@ -80,13 +80,20 @@ export async function POST(req: Request) {
         }
       }
 
+      // FL-020: the plan only activates once Stripe confirms the card (trialing
+      // or active). An incomplete first payment leaves the shop where it was.
+      const confirmed = await stripe().subscriptions.retrieve(subscriptionId);
+      if (!["trialing", "active"].includes(confirmed.status)) {
+        await admin.from("shops").update({ subscription_id: subscriptionId, subscription_status: confirmed.status }).eq("id", shopId);
+        return NextResponse.json({ received: true });
+      }
       await admin
         .from("shops")
         .update({
           plan: planKey,
           billing_interval: interval,
           subscription_id: subscriptionId,
-          subscription_status: trialEnd ? "trialing" : "active",
+          subscription_status: confirmed.status,
         })
         .eq("id", shopId);
 
@@ -159,6 +166,10 @@ export async function POST(req: Request) {
         cancel_at: !canceled && sub.cancel_at ? new Date(sub.cancel_at * 1000).toISOString() : null,
         ...(sub.pause_collection ? {} : { paused_until: null }),
         ...(canceled ? { subscription_id: null, billing_interval: null, plan_ended_at: new Date().toISOString() } : { plan_ended_at: null }),
+        // FL-020: a first payment that needed extra steps activates the plan
+        // only once Stripe confirms it.
+        ...(!canceled && prev && ["incomplete", "incomplete_expired"].includes(prev) && ["active", "trialing"].includes(sub.status) && sub.metadata?.plan_key
+          ? { plan: sub.metadata.plan_key, billing_interval: sub.metadata.interval ?? "monthly" } : {}),
       })
       .eq("stripe_customer_id", customerId);
 

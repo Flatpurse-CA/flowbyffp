@@ -14,6 +14,8 @@ export function needsCard(shop: {
 }): boolean {
   if (shop.trial_override) return false;
   if (shop.plan === "enterprise") return false; // sales-led, invoiced separately
+  // incomplete / incomplete_expired: the first card was never confirmed (FL-020).
+  if (shop.subscription_status === "incomplete" || shop.subscription_status === "incomplete_expired") return true;
   if (shop.subscription_status) return false; // trialing, active, past_due, canceled: Stripe already has a card
   if (!shop.created_at) return false;
   return new Date(shop.created_at).getTime() >= new Date(CARD_REQUIRED_SINCE).getTime();

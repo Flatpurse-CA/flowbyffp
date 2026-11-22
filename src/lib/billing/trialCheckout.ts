@@ -83,9 +83,10 @@ export async function createPlanCheckout(opts: {
       customer: customerId,
       line_items: [{ price: priceIdFor(planKey, interval, applyFounders), quantity: 1 }],
       payment_method_collection: "always",
-      ...(trialDays > 0
-        ? { subscription_data: { trial_period_days: trialDays, metadata: { shop_id: shopId } } }
-        : {}),
+      subscription_data: {
+        metadata: { shop_id: shopId, plan_key: planKey, interval },
+        ...(trialDays > 0 ? { trial_period_days: trialDays, trial_settings: { end_behavior: { missing_payment_method: "cancel" as const } } } : {}),
+      },
       // Stripe rejects the request if both are present.
       ...(applyFounders ? {}
         : comeback ? { discounts: [{ coupon: "flow-save-50-2m" }] } : { allow_promotion_codes: true }),
