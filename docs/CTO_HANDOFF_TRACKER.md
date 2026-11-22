@@ -12,10 +12,10 @@ Legend: DONE = built, verify only · PARTIAL = something exists, needs finishing
 |---|---|---|
 | FL-032 | Remove Family Hours everywhere; no website builder | DONE (no references left) |
 | FL-082 | Remove "no card required" copy; cookie banner; pixels only after consent | DONE (pixels + PostHog consent-gated; waitlist beta "No credit card" kept, decision for CEO) |
-| FL-020 | Plan never activates without a confirmed card (Stripe webhook) | PARTIAL |
-| FL-021 | 14-day trial, card up front: SetupIntent then subscription with trial_end = Day 14 | PARTIAL |
+| FL-020 | Plan never activates without a confirmed card (Stripe webhook) | DONE (plan set only when Stripe says trialing or active; incomplete payments activate on confirm) |
+| FL-021 | 14-day trial, card up front: SetupIntent then subscription with trial_end = Day 14 | DONE (trial cancels if card removed before Day 14) |
 | FL-025 | Plan selection screen fixes (10.1 items 1-9) | DONE except item 1 (Starter Founders, waiting on D3) |
-| FL-022 | Founders coupon server-side (40% yr 1, then 25%) + live counter | PARTIAL (counter live) |
+| FL-022 | Founders prices (12 Stripe prices) + server-side spot counter | DONE (migration 0067; spot claimed at first paid charge; cap 40 or Jan 31 2027 MT; hold_founder_spot for testers) |
 | FL-023 | One trial per business, phone, card | DONE (migration 0051 applied; needs Stripe settings) |
 | FL-024 | Dunning: Smart Retries + emails day 0/3/5/7, pause after final retry | DONE (migration 0051 applied; needs Stripe settings) |
 | FL-116-118 | Renewal reminders (monthly, annual, Founders price change) | DONE (migration 0051 applied; needs Stripe settings) |
@@ -28,7 +28,7 @@ Legend: DONE = built, verify only · PARTIAL = something exists, needs finishing
 | FL-050-054 | No-show, Slot Filler, Win-Back, Rebook, Birthday flows | DONE except client waitlist tier (no client waitlist exists yet); offer % editable in DB only, no settings UI |
 | FL-007 | Frequency caps 1/day, 2/7 days per client across flows | DONE |
 | FL-049 | "Ask me first" approval queue for first 14 days | DONE |
-| FL-055 | Activity feed + revenue recovered counters | PARTIAL |
+| FL-055 | Activity feed + revenue recovered counters | DONE (migration 0068; recoveries marked booked and linked to the booking; cancelling removes them) |
 | FL-006 | CASL consent ledger + STOP/HELP | DONE (quiet hours now 8am-9pm) |
 | FL-029/061 | First-send rules; imported clients transactional-only by default | DONE (importer does not yet read a consent column) |
 

@@ -11,7 +11,7 @@ const LOOKBACK_MS = 21 * 24 * 60 * 60 * 1000;
 // so "recovered revenue" on Home/AutoPilot reflects real conversions, not just sends.
 export async function attributeAutopilotRevenue(
   supabase: SupabaseClient,
-  input: { shopId: string; clientEmail: string | null | undefined; clientPhone?: string | null; price: number },
+  input: { shopId: string; clientEmail: string | null | undefined; clientPhone?: string | null; price: number; appointmentId?: string | null },
 ): Promise<void> {
   const phone = toE164(input.clientPhone ?? null);
   if (!input.clientEmail && !phone) return;
@@ -24,6 +24,7 @@ export async function attributeAutopilotRevenue(
     .eq("shop_id", input.shopId)
     .or([input.clientEmail ? `client_email.eq.${pgrstQuote(input.clientEmail)}` : null, phone ? `client_phone.eq.${pgrstQuote(phone)}` : null].filter(Boolean).join(","))
     .is("amount", null)
+    .not("outcome", "in", "(pending,skipped,failed,booked,disabled)")
     .gte("created_at", lookback)
     .order("created_at", { ascending: false })
     .limit(1)
@@ -31,5 +32,11 @@ export async function attributeAutopilotRevenue(
 
   if (!existing) return;
 
-  await supabase.from("autopilot_events").update({ amount: input.price }).eq("id", existing.id);
+  await supabase.from("autopilot_events")
+    .update({ amount: input.price, outcome: "booked", appointment_id: input.appointmentId ?? null }).eq("id", existing.id);
+}
+
+/** A recovered booking was cancelled: it no longer counts as revenue recovered. */
+export async function unattributeAutopilotRevenue(supabase: SupabaseClient, appointmentId: string): Promise<void> {
+  await supabase.from("autopilot_events").update({ amount: null, outcome: "sent", appointment_id: null }).eq("appointment_id", appointmentId);
 }

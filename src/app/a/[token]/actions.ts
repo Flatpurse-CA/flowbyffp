@@ -1,5 +1,6 @@
 "use server";
 
+import { unattributeAutopilotRevenue } from "@/lib/dashboard/autopilotAttribution";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { checkRateLimit } from "@/lib/rateLimit";
 import { getAvailableSlots } from "@/app/book/[handle]/actions";
@@ -35,6 +36,7 @@ export async function cancelByLink(token: string, acceptFee: boolean): Promise<{
     if (c.error) return { error: `We couldn't charge the late-cancel fee: ${c.error}. Please contact the business.` };
   }
   await admin.from("appointments").update({ status: "cancelled", updated_at: new Date().toISOString() }).eq("id", a.id);
+  await unattributeAutopilotRevenue(admin, a.id as string);
   return { fee };
 }
 

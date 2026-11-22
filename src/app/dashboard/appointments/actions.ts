@@ -9,7 +9,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { requireShop, getCurrentShopId, getShopContext } from "@/lib/dashboard/shop";
-import { attributeAutopilotRevenue } from "@/lib/dashboard/autopilotAttribution";
+import { attributeAutopilotRevenue, unattributeAutopilotRevenue } from "@/lib/dashboard/autopilotAttribution";
 import { stripe } from "@/lib/stripe";
 import { applicationFeeParam } from "@/lib/billing/platformFee";
 import { amountFor, newManageToken, type FeeMode } from "@/lib/booking/policy";
@@ -132,7 +132,7 @@ export async function createAppointment(input: {
     customerId = (match?.id as string | undefined) ?? null;
   }
 
-  const { error } = await supabase.from("appointments").insert({
+  const { data: insertedAppt, error } = await supabase.from("appointments").insert({
     shop_id: shopId,
     customer_id: customerId,
     client_name: input.clientName,
@@ -147,11 +147,11 @@ export async function createAppointment(input: {
     price: input.price,
     deposit_amount: input.requireDeposit ? (input.depositAmount ?? null) : null,
     status: input.requireDeposit ? "deposit" : "confirmed",
-  });
+  }).select("id").single();
 
   if (error) throw new Error(error.message);
 
-  await attributeAutopilotRevenue(supabase, { shopId, clientEmail: input.clientEmail, clientPhone: input.clientPhone, price: input.price });
+  await attributeAutopilotRevenue(supabase, { shopId, clientEmail: input.clientEmail, clientPhone: input.clientPhone, price: input.price, appointmentId: insertedAppt?.id as string | undefined });
 
   revalidatePath("/dashboard/appointments");
 }
@@ -282,6 +282,7 @@ export async function cancelAppointment(id: string) {
     .eq("shop_id", shopId)
     .select("client_email, service_name, starts_at")
     .maybeSingle();
+  if (appt) await unattributeAutopilotRevenue(createAdminClient(), id);
 
   if (error) throw new Error(error.message);
   revalidatePath("/dashboard/appointments");

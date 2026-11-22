@@ -1,5 +1,6 @@
 "use server";
 
+import { unattributeAutopilotRevenue } from "@/lib/dashboard/autopilotAttribution";
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
@@ -59,6 +60,7 @@ export async function cancelMyBooking(appointmentId: string) {
     .from("appointments")
     .update({ status: "cancelled", updated_at: new Date().toISOString() })
     .eq("id", appointmentId);
+  if (!error) await unattributeAutopilotRevenue(admin, appointmentId);
 
   if (error) throw new Error(error.message);
   revalidatePath("/customer/account");
