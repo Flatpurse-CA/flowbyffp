@@ -1,3 +1,4 @@
+import { isFoundersPriceId } from "@/lib/plans";
 import { sendBillingEmail } from "@/lib/resend";
 import { ownerContact } from "@/lib/billing/notices";
 import { NextResponse } from "next/server";
@@ -55,10 +56,8 @@ export async function POST(req: Request) {
       const shopId = session.metadata.shop_id;
       const planKey = session.metadata.plan_key as BillablePlanKey;
       const interval = session.metadata.interval as BillingInterval;
-      const founderClaim = session.metadata.founder_claim === "true";
       const subscriptionId = typeof session.subscription === "string" ? session.subscription : session.subscription.id;
 
-      let finalSubscriptionId = subscriptionId;
       // Card-up-front trials arrive here as "trialing"; the first charge is at trial_end.
       const sub = await stripe().subscriptions.retrieve(subscriptionId);
       let trialEnd = sub.status === "trialing" && sub.trial_end ? sub.trial_end : null;
@@ -81,37 +80,13 @@ export async function POST(req: Request) {
         }
       }
 
-      if (founderClaim) {
-        const { data: claimed } = await admin.rpc("claim_founder_spot");
-        if (!claimed) {
-          // Spots ran out between checkout creation and completion — rare (40-spot beta).
-          // The 40%-off coupon was already shown and applied at checkout, so we honor it
-          // rather than silently repricing a subscription the customer already agreed to.
-          console.warn(`Founders spot claim missed for shop ${shopId} (checkout already showed the discount, honoring it)`);
-        }
-
-        const priceId = getStripePriceId(planKey, interval);
-        const schedule = await stripe().subscriptionSchedules.create({ from_subscription: subscriptionId });
-        await stripe().subscriptionSchedules.update(schedule.id, {
-          end_behavior: "release",
-          phases: [
-            // Keep the trial as its own phase so the 12 discounted months start at the first charge.
-            ...(trialEnd ? [{ items: [{ price: priceId, quantity: 1 }], trial_end: trialEnd, end_date: trialEnd }] : []),
-            { items: [{ price: priceId, quantity: 1 }], duration: { interval: "month" as const, interval_count: 12 }, discounts: [{ coupon: "founders-40-off" }] },
-            { items: [{ price: priceId, quantity: 1 }], discounts: [{ coupon: "founders-25-off" }] },
-          ],
-        });
-        finalSubscriptionId = schedule.id;
-      }
-
       await admin
         .from("shops")
         .update({
           plan: planKey,
           billing_interval: interval,
-          subscription_id: finalSubscriptionId,
+          subscription_id: subscriptionId,
           subscription_status: trialEnd ? "trialing" : "active",
-          ...(founderClaim ? { is_founder: true, founder_discount_claimed_at: new Date().toISOString() } : {}),
         })
         .eq("id", shopId);
 
@@ -140,6 +115,25 @@ export async function POST(req: Request) {
       }
     } else if (shop && event.type === "invoice.paid" && inv.amount_paid > 0) {
       await admin.from("shops").update({ payment_failed_at: null, dunning_step: 0 }).eq("id", shop.id);
+      // FL-022: a Founders spot counts at the first paid charge.
+      const line = inv.lines?.data?.[0] as unknown as { price?: { id?: string }; pricing?: { price_details?: { price?: string } } } | undefined;
+      const linePrice = line?.price?.id ?? line?.pricing?.price_details?.price;
+      if (isFoundersPriceId(linePrice) && !(shop as { is_founder?: boolean }).is_founder) {
+        const { data: claimed } = await admin.rpc("claim_founder_spot", { p_shop: shop.id });
+        if (!claimed) {
+          // Sold out or past the deadline before this first charge: honor this
+          // invoice, move to the regular price from the next period.
+          const subId = typeof (inv as unknown as { subscription?: unknown }).subscription === "string"
+            ? (inv as unknown as { subscription: string }).subscription
+            : (inv as unknown as { parent?: { subscription_details?: { subscription?: string } } }).parent?.subscription_details?.subscription;
+          const plan = (shop as { plan?: string }).plan as BillablePlanKey;
+          const interval = ((shop as { billing_interval?: string }).billing_interval ?? "monthly") as BillingInterval;
+          if (subId && plan) {
+            const sub = await stripe().subscriptions.retrieve(subId);
+            await stripe().subscriptions.update(subId, { items: [{ id: sub.items.data[0].id, price: getStripePriceId(plan, interval) }], proration_behavior: "none" });
+          }
+        }
+      }
     } else if (shop && event.type === "invoice.upcoming") {
       await sendRenewalReminder(admin, shop as never, inv as never);
     }

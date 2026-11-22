@@ -221,3 +221,35 @@ export function getStripePriceId(key: BillablePlanKey, interval: BillingInterval
   if (!id) throw new Error(`${envName} is not set, run scripts/stripe-setup-billing.js and add the printed IDs to .env.local`);
   return id;
 }
+
+/**
+ * FL-022: Founders prices, locked for life (Nov 19 pricing spec). Separate
+ * Stripe Prices, applied automatically, no code. Pro and Pro+ amounts must match
+ * the spec; change them here and in scripts/stripe-setup-billing.js together.
+ */
+export const FOUNDERS_PRICES: Record<BillablePlanKey, Record<BillingInterval, number>> = {
+  starter:  { monthly: 29,  annual: 290 },
+  pro:      { monthly: 65,  annual: 650 },
+  pro_plus: { monthly: 139, annual: 1390 },
+};
+
+const FOUNDERS_PRICE_ENV = (key: BillablePlanKey, interval: BillingInterval) =>
+  `STRIPE_PRICE_FOUNDERS_${key.toUpperCase()}_${interval === "monthly" ? "MONTHLY" : "ANNUAL"}`;
+
+export function getFoundersPriceId(key: BillablePlanKey, interval: BillingInterval): string {
+  const envName = FOUNDERS_PRICE_ENV(key, interval);
+  const id = process.env[envName];
+  if (!id) throw new Error(`${envName} is not set, run scripts/stripe-setup-billing.js and add the printed IDs`);
+  return id;
+}
+
+/** Regular or Founders price for a shop. */
+export function priceIdFor(key: BillablePlanKey, interval: BillingInterval, founders: boolean): string {
+  return founders ? getFoundersPriceId(key, interval) : getStripePriceId(key, interval);
+}
+
+export function isFoundersPriceId(id: string | null | undefined): boolean {
+  if (!id) return false;
+  return (["starter", "pro", "pro_plus"] as BillablePlanKey[]).some((k) =>
+    (["monthly", "annual"] as BillingInterval[]).some((i) => process.env[FOUNDERS_PRICE_ENV(k, i)] === id));
+}

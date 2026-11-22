@@ -1,5 +1,7 @@
 "use client";
 
+import { FOUNDERS_PRICES, type BillablePlanKey } from "@/lib/plans";
+
 import { useState } from "react";
 import { StepProgress } from "@/components/StepProgress";
 import { SubmitButton } from "@/components/SubmitButton";
@@ -10,7 +12,7 @@ import { choosePlan } from "./actions";
 const easing = "cubic-bezier(0.16, 1, 0.3, 1)";
 
 const STAFF_LIMIT: Record<string, string> = { starter: "Up to 2 staff", pro: "Up to 6 staff", pro_plus: "Unlimited staff", enterprise: "Unlimited staff, 3+ locations" };
-const FOUNDERS_PLANS = ["pro", "pro_plus"];
+const FOUNDERS_PLANS = ["starter", "pro", "pro_plus"];
 const money = (n: number) => (Number.isInteger(n) ? `C$${n}` : `C$${n.toFixed(2)}`);
 
 const PLANS = REAL_PLANS.map(p => ({
@@ -117,7 +119,7 @@ export function PlanForm({ error, foundersSpotsRemaining, unlimited = false }: {
           }}
         >
           <p style={{ color: "#fff", fontSize: 13, fontWeight: 700, margin: 0, lineHeight: 1.5 }}>
-            Founders Beta: 40% off your first year, then 25% off for life on Pro and Pro+. {foundersSpotsRemaining} of 40 spots left.
+            Founders prices: at least 25% off every plan, locked for life. {foundersSpotsRemaining} of 40 spots left, until January 31.
           </p>
         </div>
       )}
@@ -262,7 +264,7 @@ export function PlanForm({ error, foundersSpotsRemaining, unlimited = false }: {
                         transition: "color 0.25s",
                       }}
                     >
-                      {foundersSpotsRemaining > 0 && FOUNDERS_PLANS.includes(p.id) && p.monthly ? money(Math.round(p.monthly * 60) / 100) : p.price}
+                      {foundersSpotsRemaining > 0 && FOUNDERS_PLANS.includes(p.id) && p.monthly ? money(FOUNDERS_PRICES[p.id as BillablePlanKey].monthly) : p.price}
                     </span>
                     {p.priceSuffix && (
                       <span
@@ -280,7 +282,7 @@ export function PlanForm({ error, foundersSpotsRemaining, unlimited = false }: {
 
                   {foundersSpotsRemaining > 0 && FOUNDERS_PLANS.includes(p.id) && p.monthly ? (
                     <p style={{ fontSize: 11.5, margin: "-2px 0 8px", color: "var(--auth-text-sub)" }}>
-                      <s>{p.price}/mo</s> · Year 1, then {money(Math.round(p.monthly * 75) / 100)}/mo
+                      <s>{p.price}/mo</s> · Founders price, locked
                     </p>
                   ) : null}
                   <p style={{ fontSize: 12, fontWeight: 700, margin: "0 0 8px", color: "var(--auth-text)" }}>{STAFF_LIMIT[p.id]}</p>

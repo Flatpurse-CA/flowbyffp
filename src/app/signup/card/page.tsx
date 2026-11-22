@@ -4,6 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { OnboardingShell } from "@/components/OnboardingShell";
 import { SubmitButton } from "@/components/SubmitButton";
 import { getPlan, type PlanKey } from "@/lib/plans";
+import { FOUNDERS_PRICES } from "@/lib/plans";
 import { FOUNDERS_PLANS, remainingTrialDays } from "@/lib/billing/trialCheckout";
 import { needsCard } from "@/lib/billing/cardGate";
 import { startCardCheckout } from "./actions";
@@ -24,7 +25,7 @@ export default async function CardPage({ searchParams }: { searchParams: Promise
 
   const admin = createAdminClient();
   const [{ data: shop }, { data: founders }] = await Promise.all([
-    admin.from("shops").select("plan, created_at, subscription_status, trial_override, trial_started_at, founder_discount_claimed_at").eq("id", ctx.shopId).maybeSingle(),
+    admin.from("shops").select("plan, created_at, subscription_status, trial_override, trial_started_at, founder_discount_claimed_at, is_founder, founder_status").eq("id", ctx.shopId).maybeSingle(),
     admin.from("founders_program").select("spots_remaining").eq("id", true).maybeSingle(),
   ]);
   if (!shop || !needsCard(shop)) redirect("/dashboard");
@@ -33,8 +34,8 @@ export default async function CardPage({ searchParams }: { searchParams: Promise
   const plan = getPlan(planKey);
   const list = plan.monthlyPrice ?? 0;
   const spots = founders?.spots_remaining ?? 0;
-  const founder = FOUNDERS_PLANS.includes(planKey as "pro") && spots > 0 && !shop.founder_discount_claimed_at;
-  const firstPrice = founder ? Math.round(list * 0.6 * 100) / 100 : list;
+  const founder = FOUNDERS_PLANS.includes(planKey as "pro") && (Boolean(shop.is_founder || shop.founder_status) || spots > 0);
+  const firstPrice = founder ? FOUNDERS_PRICES[planKey as "pro"].monthly : list;
   const days = remainingTrialDays(shop.trial_started_at as string | null);
   const chargeDate = formatChargeDate(days);
 
@@ -60,7 +61,7 @@ export default async function CardPage({ searchParams }: { searchParams: Promise
               C${firstPrice}<span style={{ fontSize: 13, fontWeight: 500, color: "var(--auth-text-sub)" }}>/mo</span>
             </span>
           </div>
-          {founder && <p style={{ ...muted, fontSize: 13 }}>Founders Beta: 40% off your first year, then 25% off for life. {spots} of 40 spots left.</p>}
+          {founder && <p style={{ ...muted, fontSize: 13 }}>Founders price, locked for life. {spots} of 40 spots left.</p>}
           <p style={{ ...muted, fontSize: 13 }}>Full Pro+ access during your trial. Prices in CAD, per location, plus applicable tax.</p>
         </div>
 

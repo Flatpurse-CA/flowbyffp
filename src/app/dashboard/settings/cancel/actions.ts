@@ -6,7 +6,7 @@ import type Stripe from "stripe";
 import { stripe } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getShopContext } from "@/lib/dashboard/shop";
-import { getPlan, getStripePriceId, type BillingInterval } from "@/lib/plans";
+import { getPlan, priceIdFor, type BillingInterval } from "@/lib/plans";
 import { sendBillingEmail } from "@/lib/resend";
 import { fmtDate, ownerContact, trialStats } from "@/lib/billing/notices";
 
@@ -120,7 +120,7 @@ export async function acceptOffer(input: { reason: CancelReason; comment?: strin
     } else if (input.offer === "downgrade_starter") {
       const interval = (shop.billing_interval as BillingInterval | null) ?? "monthly";
       // New price from the next billing date, no proration.
-      await stripe().subscriptions.update(sub.id, { items: [{ id: sub.items.data[0].id, price: getStripePriceId("starter", interval) }], proration_behavior: "none" });
+      await stripe().subscriptions.update(sub.id, { items: [{ id: sub.items.data[0].id, price: priceIdFor("starter", interval, Boolean((shop as { is_founder?: boolean }).is_founder)) }], proration_behavior: "none" });
       await admin.from("shops").update({ plan: "starter" }).eq("id", shop.id);
       message = "Your plan moves to Starter on your next billing date";
     } else if (input.offer === "pause") {

@@ -31,10 +31,9 @@ const PLAN_PRODUCTS = [
   { planKey: "pro_plus", name: "FlatPurse Flow — Pro+", monthly: 189, annual: 1890 },
 ];
 
-const FOUNDERS_COUPONS = [
-  { id: "founders-40-off", percent_off: 40, name: "Founders Beta — 40% off (12 months)" },
-  { id: "founders-25-off", percent_off: 25, name: "Founders Beta — 25% off (forever)" },
-];
+// Founders prices, locked for life (must match FOUNDERS_PRICES in src/lib/plans.ts).
+const FOUNDERS_PRICES = { starter: [29, 290], pro: [65, 650], pro_plus: [139, 1390] };
+const FOUNDERS_COUPONS = [];
 
 async function findProductByPlanKey(planKey) {
   const products = await stripe.products.search({ query: `metadata['flatpurse_plan']:'${planKey}'` });
@@ -96,6 +95,11 @@ async function main() {
     const envPrefix = planKey.toUpperCase();
     envLines.push(`STRIPE_PRICE_${envPrefix}_MONTHLY=${monthlyPrice.id}`);
     envLines.push(`STRIPE_PRICE_${envPrefix}_ANNUAL=${annualPrice.id}`);
+    const [fm, fa] = FOUNDERS_PRICES[planKey];
+    const fMonthly = await ensurePrice(product, fm, "month");
+    const fAnnual = await ensurePrice(product, fa, "year");
+    envLines.push(`STRIPE_PRICE_FOUNDERS_${envPrefix}_MONTHLY=${fMonthly.id}`);
+    envLines.push(`STRIPE_PRICE_FOUNDERS_${envPrefix}_ANNUAL=${fAnnual.id}`);
   }
 
   for (const coupon of FOUNDERS_COUPONS) {

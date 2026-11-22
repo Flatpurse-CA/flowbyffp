@@ -1,13 +1,14 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { stripe } from "@/lib/stripe";
-import { getStripePriceId, type BillablePlanKey, type BillingInterval } from "@/lib/plans";
+import { priceIdFor, type BillablePlanKey, type BillingInterval } from "@/lib/plans";
+import { foundersEligible } from "@/lib/founders";
 import { TRIAL_DAYS } from "@/lib/dashboard/accessStatus";
 import { inComebackWindow } from "@/lib/billing/lifecycle";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-/** Founders Beta pricing applies to Pro and Pro+ only (CEO decision D3). */
-export const FOUNDERS_PLANS: BillablePlanKey[] = ["pro", "pro_plus"];
+/** Founders prices apply to all three plans (Nov 21 decision, supersedes D3). */
+export const FOUNDERS_PLANS: BillablePlanKey[] = ["starter", "pro", "pro_plus"];
 
 /**
  * Whole trial days still left on the shop's 14-day clock. Stripe needs at
@@ -41,7 +42,7 @@ export async function createPlanCheckout(opts: {
 
   const { data: shop } = await admin
     .from("shops")
-    .select("stripe_customer_id, name, phone, founder_discount_claimed_at, trial_started_at, subscription_status, plan_ended_at")
+    .select("stripe_customer_id, name, phone, founder_discount_claimed_at, is_founder, founder_status, trial_started_at, subscription_status, plan_ended_at")
     .eq("id", shopId)
     .maybeSingle();
   if (!shop) return { error: "Shop not found" };
@@ -54,12 +55,10 @@ export async function createPlanCheckout(opts: {
       await admin.from("shops").update({ stripe_customer_id: customerId }).eq("id", shopId);
     }
 
-    const wantsFounders = opts.claimFounders && FOUNDERS_PLANS.includes(planKey) && !shop.founder_discount_claimed_at;
-    let applyFounders = false;
-    if (wantsFounders) {
-      const { data } = await admin.from("founders_program").select("spots_remaining").eq("id", true).maybeSingle();
-      applyFounders = (data?.spots_remaining ?? 0) > 0;
-    }
+    // Founders keep Founders prices on any plan or interval change. The spot
+    // itself is claimed on the first paid invoice (webhook), not here.
+    const applyFounders = FOUNDERS_PLANS.includes(planKey) &&
+      (Boolean(shop.is_founder || shop.founder_status) || (opts.claimFounders && await foundersEligible(admin, shop)));
 
     // A shop that already paid once (or is mid-subscription) gets no new trial.
     const everSubscribed = Boolean(shop.subscription_status);
@@ -82,14 +81,13 @@ export async function createPlanCheckout(opts: {
     const session = await stripe().checkout.sessions.create({
       mode: "subscription",
       customer: customerId,
-      line_items: [{ price: getStripePriceId(planKey, interval), quantity: 1 }],
+      line_items: [{ price: priceIdFor(planKey, interval, applyFounders), quantity: 1 }],
       payment_method_collection: "always",
       ...(trialDays > 0
         ? { subscription_data: { trial_period_days: trialDays, metadata: { shop_id: shopId } } }
         : {}),
       // Stripe rejects the request if both are present.
-      ...(applyFounders
-        ? { discounts: [{ coupon: "founders-40-off" }] }
+      ...(applyFounders ? {}
         : comeback ? { discounts: [{ coupon: "flow-save-50-2m" }] } : { allow_promotion_codes: true }),
       success_url: `${origin}${opts.successPath}`,
       cancel_url: `${origin}${opts.cancelPath}`,
