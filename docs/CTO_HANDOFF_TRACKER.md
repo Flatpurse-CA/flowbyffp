@@ -48,7 +48,7 @@ Legend: DONE = built, verify only · PARTIAL = something exists, needs finishing
 ### Batch 4: Onboarding, Home, email, team, SMS, admin
 | ID | Task | Status |
 |---|---|---|
-| FL-026/027/028/030/031 | Wow onboarding 1A, card step, contacts path, win screen, setup checklist | PARTIAL |
+| FL-026/027/028/030/031 | Wow onboarding 1A, card step, contacts path, win screen, setup checklist | PARTIAL (027 DONE: win screen hands new shops to the card step; 031 DONE: 6-item checklist on dashboard home from real data, hides when complete) |
 | FL-072/073 | Home goal ring, feed, streak, payment celebration | PARTIAL |
 | FL-062-065 | Email domain/streams, client + owner sequence E0-E12, staff emails | PARTIAL |
 | FL-074 | Staff invites, roles, weekly hours | DONE (verify) |

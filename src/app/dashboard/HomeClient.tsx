@@ -1,9 +1,10 @@
 "use client";
 
+import type { SetupItem } from "@/lib/dashboard/setupChecklist";
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import {
-  AlertTriangle, ArrowUpRight, CalendarDays, ChevronRight, CircleCheck,
+  AlertTriangle, ArrowUpRight, CalendarDays, Check, ChevronRight, CircleCheck,
   Plus, RotateCcw, Users, Users2, Zap, type LucideIcon,
 } from "lucide-react";
 import type { AppointmentRow, AppointmentStatus } from "./appointments/actions";
@@ -96,6 +97,7 @@ const NEED_ICON: Record<NeedsYouCard["kind"], LucideIcon> = {
 type OwnerProps = {
   role: "owner";
   everBooked: boolean;
+  setup: SetupItem[];
   todaySchedule: AppointmentRow[];
   autopilot: AutopilotState;
   todayAutopilotRevenue: number;
@@ -133,9 +135,10 @@ export function HomeClient(props: OwnerProps | StaffProps) {
 
       {props.role === "staff"
         ? <ScheduleCard title="Your schedule today" schedule={props.todaySchedule} emptyText="No bookings on your calendar today." />
-        : props.everBooked
-          ? <OwnerPopulated {...props} />
-          : <EmptyState />}
+        : <>
+            <SetupChecklist items={props.setup} />
+            {props.everBooked ? <OwnerPopulated {...props} /> : <EmptyState />}
+          </>}
     </div>
   );
 }
@@ -196,11 +199,6 @@ function ScheduleRow({ row, isUpNext }: { row: AppointmentRow; isUpNext: boolean
 
 // ─── Owner: before the first booking ──────────────────────────────────────────
 function EmptyState() {
-  const steps: { icon: LucideIcon; title: string; sub: string; cta: string; href: string; primary: boolean }[] = [
-    { icon: CalendarDays, title: "Add today's bookings", sub: "Enter your first appointment to see the schedule come alive.", cta: "Add booking", href: "/dashboard/appointments", primary: true },
-    { icon: Users2,       title: "Add your team",        sub: "Each staff member gets their own calendar column.",        cta: "Add team member", href: "/dashboard/team", primary: false },
-  ];
-
   return (
     <>
       <section className="fd-band">
@@ -214,29 +212,37 @@ function EmptyState() {
         </Link>
       </section>
 
-      <section className="fd-card fd-card-pad">
-        <div className="fd-head is-line">
-          <h2>Complete your setup</h2>
-          <small>{steps.length} steps</small>
-        </div>
-        <ul className="fd-rows fd-setup">
-          {steps.map(({ icon: Icon, title, sub, cta, href, primary }) => (
-            <li key={title}>
-              <div className="fd-row">
-                <span className="fd-ico"><Icon size={17} strokeWidth={1.8} /></span>
-                <span className="fd-row-main">
-                  <b>{title}</b>
-                  <small>{sub}</small>
-                </span>
-                <Link href={href} className={`fd-btn fd-btn-sm ${primary ? "fd-btn-primary" : "fd-btn-ghost"}`}>
-                  <Plus size={14} strokeWidth={2.2} /> {cta}
-                </Link>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </section>
     </>
+  );
+}
+
+// ─── Owner: setup checklist (FL-031) ──────────────────────────────────────────
+function SetupChecklist({ items }: { items: SetupItem[] }) {
+  const left = items.filter((i) => !i.done).length;
+  if (left === 0) return null;
+  return (
+    <section className="fd-card fd-card-pad">
+      <div className="fd-head is-line">
+        <h2>Complete your setup</h2>
+        <small>{items.length - left} of {items.length} done</small>
+      </div>
+      <ul className="fd-rows fd-setup">
+        {items.map((it) => (
+          <li key={it.key}>
+            <div className="fd-row" style={it.done ? { opacity: 0.55 } : undefined}>
+              <span className="fd-ico">{it.done ? <Check size={17} strokeWidth={2.2} /> : <Plus size={17} strokeWidth={1.8} />}</span>
+              <span className="fd-row-main">
+                <b style={it.done ? { textDecoration: "line-through" } : undefined}>{it.title}</b>
+                <small>{it.sub}</small>
+              </span>
+              {!it.done && (
+                <Link href={it.href} className="fd-btn fd-btn-sm fd-btn-ghost">{it.cta}</Link>
+              )}
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
 
