@@ -16,6 +16,10 @@ const row: React.CSSProperties = { display: "flex", justifyContent: "space-betwe
 const muted: React.CSSProperties = { color: "var(--aw45)", fontSize: 12.5 };
 const when = (s: string) => new Date(s).toLocaleString("en-CA", { timeZone: "America/Edmonton", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
 
+function isFresh(createdAt: string) {
+  return Date.now() - new Date(createdAt).getTime() < SESSION_MS;
+}
+
 /** FL-079: read-only snapshot of what the owner sees. Needs a logged support session from the last hour. */
 export default async function ViewAsOwnerPage({ params, searchParams }: { params: Promise<{ shopId: string }>; searchParams: Promise<{ s?: string }> }) {
   const { email } = await requireAdmin();
@@ -26,7 +30,7 @@ export default async function ViewAsOwnerPage({ params, searchParams }: { params
   const { data: session } = s
     ? await admin.from("admin_audit_log").select("admin_email, target_id, details, created_at").eq("id", s).eq("action", "view_as_owner").maybeSingle()
     : { data: null };
-  const valid = session && session.admin_email === email && session.target_id === shopId && Date.now() - new Date(session.created_at as string).getTime() < SESSION_MS;
+  const valid = session && session.admin_email === email && session.target_id === shopId && isFresh(session.created_at as string);
   if (!valid) redirect("/admin/shops");
 
   const now = new Date();
