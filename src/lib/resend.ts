@@ -644,3 +644,15 @@ export async function sendLifecycleEmail(to: string, key: EmailTemplateKey, vars
   const founder = FOUNDER_KEYS.includes(key);
   return send({ to, subject, html, ...(founder ? { from: FOUNDER_FROM, replyTo: FOUNDER_REPLY_TO } : {}), log: { kind: key, audience: "owner" } });
 }
+
+/** Daily Brief / recaps: a heading plus only the sections that have something to say. */
+export async function sendDigestEmail(to: string, input: {
+  shopId: string; kind: string; subject: string; heading: string; intro?: string;
+  sections: { title: string; lines: string[] }[]; ctaLabel: string; ctaUrl: string;
+}) {
+  const sec = input.sections.filter((x) => x.lines.length).map((x) => `
+    <h2 style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: #6d28d9; margin: 22px 0 8px;">${escapeHtml(x.title)}</h2>
+    ${x.lines.map((l) => `<p style="color: #333; font-size: 14px; line-height: 1.5; margin: 0 0 6px;">${escapeHtml(l)}</p>`).join("")}`).join("");
+  const html = renderShell({ heading: input.heading, bodyHtml: (input.intro ? paragraphsHtml(input.intro) : "") + sec, ctaHtml: ctaHtml(input.ctaLabel, input.ctaUrl) });
+  return send({ to, subject: input.subject, html, log: { shopId: input.shopId, kind: input.kind, audience: "owner" } });
+}

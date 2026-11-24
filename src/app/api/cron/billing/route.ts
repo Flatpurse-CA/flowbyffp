@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { runBillingJob } from "@/lib/billing/notices";
 import { runLifecycleJob } from "@/lib/billing/lifecycle";
-import { runRecapJob } from "@/lib/billing/recap";
 
 // Daily job (vercel.json): dunning follow-ups, Day 11 trial reminder, Founders month-13 notice.
 export const dynamic = "force-dynamic";
@@ -14,5 +13,6 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const admin = createAdminClient();
-  return NextResponse.json({ billing: await runBillingJob(admin), lifecycle: await runLifecycleJob(admin), recap: await runRecapJob(admin) });
+  return NextResponse.json({ billing: await runBillingJob(admin), lifecycle: await runLifecycleJob(admin) });
+  // Weekly/monthly recaps moved to the local-time scheduler (src/lib/digests.ts).
 }
