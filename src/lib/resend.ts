@@ -2,6 +2,9 @@ import { Resend } from "resend";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 const FROM = process.env.RESEND_FROM_EMAIL ?? "FlatPurse Flow <onboarding@resend.dev>";
+// Founder emails (Spec 4B): "George from Flow" on mail.flatpurse.com, replies go to George.
+const FOUNDER_FROM = process.env.RESEND_FOUNDER_FROM ?? "George from Flow <george@mail.flatpurse.com>";
+const FOUNDER_REPLY_TO = process.env.RESEND_FOUNDER_REPLY_TO ?? "george@flatpurse.com";
 
 function client(): Resend | null {
   const key = process.env.RESEND_API_KEY;
@@ -11,7 +14,7 @@ function client(): Resend | null {
 
 // Never throws — callers destructure `{ error }` the same way the Resend SDK
 // itself responds, whether the failure is a missing API key or a real send error.
-async function send(payload: { to: string; subject: string; html: string; attachments?: { filename: string; content: string; contentType?: string }[] }) {
+async function send(payload: { to: string; subject: string; html: string; attachments?: { filename: string; content: string; contentType?: string }[]; from?: string; replyTo?: string }) {
   const c = client();
   if (!c) {
     return {
@@ -19,7 +22,7 @@ async function send(payload: { to: string; subject: string; html: string; attach
       error: { name: "config_error", message: "RESEND_API_KEY is not set, add it to .env.local (or the deployment's env vars) before sending email." },
     };
   }
-  return c.emails.send({ from: FROM, ...payload });
+  return c.emails.send({ ...payload, from: payload.from ?? FROM });
 }
 
 function icsEscape(text: string) {
@@ -83,7 +86,8 @@ export type EmailTemplateKey =
   | "welcome" | "password_changed" | "booking_confirmed" | "booking_declined"
   | "booking_cancelled" | "booking_rescheduled" | "appointment_reminder"
   | "no_show" | "review_request" | "new_booking_alert" | "staff_activated"
-  | "shop_setup_reminder";
+  | "shop_setup_reminder" | "verify_nudge" | "owner_welcome" | "setup_resume"
+  | "booking_page_steps" | "booking_link_live" | "staff_invite_reminder";
 
 export type EmailTemplateContent = { subject: string; heading: string; body: string; cta_label: string | null };
 
@@ -104,13 +108,23 @@ export const EMAIL_TEMPLATE_INFO: Record<EmailTemplateKey, { label: string; desc
   new_booking_alert:         { label: "New booking alert",         description: "Sent to the shop owner whenever a client books online.",          tokens: ["clientName", "serviceName", "stylistLine"],        hasCta: true  },
   staff_activated:           { label: "Staff account activated",   description: "Sent to a staff member after they set their password.",           tokens: ["firstName", "shopName"],                           hasCta: false },
   shop_setup_reminder:       { label: "Finish shop setup reminder", description: "Sent from admin to owners who signed up but never created their shop.", tokens: ["firstName"],                                  hasCta: true  },
+  verify_nudge:              { label: "E0b: Not verified yet",      description: "From George, 1 hour and 24 hours after signup if the email is still not verified.", tokens: ["firstName", "businessName"], hasCta: true },
+  owner_welcome:             { label: "E1: Owner welcome",          description: "From George, right after an owner verifies their email.",          tokens: ["firstName", "businessName"],                        hasCta: true  },
+  setup_resume:              { label: "E2: Setup not finished",     description: "From George, 1 hour after verifying if onboarding is unfinished.", tokens: ["firstName", "stepNumber", "totalSteps", "stepName"], hasCta: true },
+  booking_page_steps:        { label: "E3a: Day 1, setup not done", description: "From George, day 1 if services or the booking link are missing.", tokens: ["firstName", "businessName", "vertical"],           hasCta: true  },
+  booking_link_live:         { label: "E3b: Day 1, setup done",     description: "From George, day 1 once the booking page is live.",                tokens: ["firstName", "bookingUrl"],                          hasCta: true  },
+  staff_invite_reminder:     { label: "Staff invite not accepted",  description: "To the owner, 2 days after a staff invite is still not accepted.", tokens: ["staffName", "shopName"],                          hasCta: true  },
 };
+
+/** Spec 4B: founder emails are plain-text style from George, so they read like a personal note. */
+const FOUNDER_KEYS: EmailTemplateKey[] = ["verify_nudge", "owner_welcome", "setup_resume", "booking_page_steps", "booking_link_live"];
+const SIGNATURE = "George\nFounder, FlatPurse Flow";
 
 const DEFAULT_TEMPLATES: Record<EmailTemplateKey, EmailTemplateContent> = {
   otp: {
-    subject: "{{code}} is your FlatPurse Flow verification code",
+    subject: "Your Flow code: {{code}}",
     heading: "Hi {{firstName}},",
-    body: "Your verification code is:",
+    body: "Here's your code to finish creating your Flow account:",
     cta_label: null,
   },
   password_reset: {
@@ -203,6 +217,42 @@ const DEFAULT_TEMPLATES: Record<EmailTemplateKey, EmailTemplateContent> = {
     body: "You created a FlatPurse Flow account but haven't set up your shop yet. It only takes a couple of minutes: add your shop details, pick a plan, and your booking page goes live.\n\nLog in with the email and password you signed up with and you'll go straight to setup.",
     cta_label: "Finish setting up",
   },
+  verify_nudge: {
+    subject: "Your Flow account is almost ready",
+    heading: "Hi {{firstName}},",
+    body: "You started setting up Flow for {{businessName}} but didn't finish verifying your email. Tap below and we'll send a fresh code. It takes 30 seconds.",
+    cta_label: "Finish signing up",
+  },
+  owner_welcome: {
+    subject: "Welcome to Flow, {{firstName}} 👋",
+    heading: "Hi {{firstName}},",
+    body: "I'm George, founder of FlatPurse Flow. Thank you for trusting us with {{businessName}}.\n\nFlow does three things for you:\n- Takes your bookings and payments, 24/7.\n- Wins back no-shows and quiet clients automatically.\n- Tells you every morning what's happening in your business.\n\nYour next 15 minutes: add your services, invite your team, turn on AutoPilot.\n\nReply to this email anytime. It comes straight to me.",
+    cta_label: "Continue setup",
+  },
+  setup_resume: {
+    subject: "Pick up where you left off",
+    heading: "Hi {{firstName}},",
+    body: "You're on step {{stepNumber}} of {{totalSteps}}: {{stepName}}. Everything you entered is saved.\n\nMost owners finish in under 15 minutes.",
+    cta_label: "Continue setup",
+  },
+  booking_page_steps: {
+    subject: "Your booking page is 2 steps away",
+    heading: "Hi {{firstName}},",
+    body: "Once your services are in, clients can book {{businessName}} 24/7, even at 11 pm when you're off.\n\nWe've suggested the most common {{vertical}} services for you. Just check the prices and durations.",
+    cta_label: "Add my services",
+  },
+  booking_link_live: {
+    subject: "Your booking link is live. Here's where to put it",
+    heading: "Hi {{firstName}},",
+    body: "Your booking page: {{bookingUrl}}\n\nPut it in these 3 places today:\n- Your Instagram bio\n- Your Google Business Profile\n- Your text replies to clients (\"Book here anytime: {{bookingUrl}}\")",
+    cta_label: "Open my booking page",
+  },
+  staff_invite_reminder: {
+    subject: "{{staffName}} hasn't joined yet",
+    heading: "{{staffName}} hasn't joined {{shopName}} yet",
+    body: "You invited {{staffName}} 2 days ago and they haven't set up their account. You can resend the invite from your Team page.",
+    cta_label: "Open Team",
+  },
 };
 
 export async function getEmailTemplate(key: EmailTemplateKey): Promise<EmailTemplateContent> {
@@ -262,8 +312,19 @@ function renderShell(input: { heading: string; bodyHtml: string; extraHtml?: str
   `;
 }
 
+function renderFounder(heading: string, body: string, ctaLabel: string | null, ctaUrl?: string) {
+  const p = (t: string) => `<p style="color: #222; font-size: 15px; line-height: 1.6; margin: 0 0 14px; white-space: pre-line;">${escapeHtml(t)}</p>`;
+  const paras = [heading, ...body.split(/\n\s*\n/)].map(s => s.trim()).filter(Boolean).map(p).join("");
+  const cta = ctaLabel && ctaUrl ? `<p style="margin: 0 0 14px;"><a href="${ctaUrl}" style="color: #6d28d9; font-weight: 600;">${escapeHtml(ctaLabel)}</a></p>` : "";
+  return `<div style="font-family: -apple-system, Helvetica, Arial, sans-serif; max-width: 520px;">${paras}${cta}${p(SIGNATURE)}</div>`;
+}
+
 async function renderTemplate(key: EmailTemplateKey, vars: Record<string, string>, opts: { ctaUrl?: string; extraHtml?: string; footerHtml?: string } = {}) {
   const t = await getEmailTemplate(key);
+  if (FOUNDER_KEYS.includes(key)) {
+    const label = t.cta_label?.trim() || DEFAULT_TEMPLATES[key].cta_label;
+    return { subject: fillText(t.subject, vars), html: renderFounder(fillText(t.heading, vars), fillText(t.body, vars), label, opts.ctaUrl) };
+  }
   const subject = fillText(t.subject, vars);
   const heading = fillText(t.heading, vars);
   const bodyHtml = paragraphsHtml(fillText(t.body, vars));
@@ -512,6 +573,13 @@ async function buildPreview(key: EmailTemplateKey): Promise<{ subject: string; h
       });
     case "welcome":
       return renderTemplate(key, { firstName: "Jordan" });
+    case "verify_nudge":
+    case "owner_welcome":
+    case "setup_resume":
+    case "booking_page_steps":
+    case "booking_link_live":
+    case "staff_invite_reminder":
+      return renderTemplate(key, { firstName: "Jordan", businessName: "Luxe Hair Studio", stepNumber: "2", totalSteps: "4", stepName: "Add your services", vertical: "hair salon", bookingUrl: "https://flow.flatpurse.com/book/luxe", staffName: "Sam", shopName: "Luxe Hair Studio" }, { ctaUrl: "https://flow.flatpurse.com/dashboard" });
     case "password_changed":
       return renderTemplate(key, { firstName: "Jordan" }, {
         footerHtml: `<p style="color: #999; font-size: 12px;">If you didn't make this change, contact us right away.</p>`,
@@ -560,4 +628,11 @@ export async function sendShopSetupReminderEmail(to: string, input: { firstName:
     footerHtml: `<p style="color: #999; font-size: 12px; margin-top: 24px;">You're getting this because you created a FlatPurse Flow account. We'll send at most three reminders. If you'd rather not get them, just reply to this email and we'll stop.</p>`,
   });
   return send({ to, subject, html });
+}
+
+// ─── Lifecycle emails E0b-E3 + staff invite reminder ────────────────────────
+export async function sendLifecycleEmail(to: string, key: EmailTemplateKey, vars: Record<string, string>, ctaUrl?: string) {
+  const { subject, html } = await renderTemplate(key, vars, { ctaUrl });
+  const founder = FOUNDER_KEYS.includes(key);
+  return send({ to, subject, html, ...(founder ? { from: FOUNDER_FROM, replyTo: FOUNDER_REPLY_TO } : {}) });
 }

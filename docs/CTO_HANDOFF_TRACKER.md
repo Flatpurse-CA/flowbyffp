@@ -50,7 +50,7 @@ Legend: DONE = built, verify only · PARTIAL = something exists, needs finishing
 |---|---|---|
 | FL-026/027/028/030/031 | Wow onboarding 1A, card step, contacts path, win screen, setup checklist | PARTIAL (027 DONE: win screen hands new shops to the card step; 031 DONE: 6-item checklist on dashboard home from real data, hides when complete) |
 | FL-072/073 | Home goal ring, feed, streak, payment celebration | PARTIAL |
-| FL-062-065 | Email domain/streams, client + owner sequence E0-E12, staff emails | PARTIAL |
+| FL-062-065 | Email domain/streams, client + owner sequence E0-E12, staff emails | PARTIAL (E0, E0b, E1, E2, E3a/b + staff-invite reminder DONE: migration 0069, /api/cron/lifecycle, founder sender George from Flow on mail.flatpurse.com; E4-E18 left; domain DNS + Resend verify is George) |
 | FL-074 | Staff invites, roles, weekly hours | DONE (verify) |
 | FL-075 | SMS allowances per plan, 80% warning, email fallback | DONE (migration 0062; placeholder 200/1000/3000 via SMS_ALLOWANCE env; meter on Settings) |
 | FL-077 | Offline read-only today's schedule | DONE (service worker serves /offline.html with schedule saved every 5 min) |
