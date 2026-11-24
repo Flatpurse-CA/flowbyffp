@@ -131,7 +131,7 @@ export default function CookiePolicyPage() {
           FlatPurse Flow &nbsp;|&nbsp; Effective Date: June 2026 &nbsp;|&nbsp; Last Updated: June 2026
         </p>
         <p style={{ fontSize: 15, color: "rgba(255,255,255,0.5)", lineHeight: 1.8, margin: "28px 0 0", maxWidth: 720 }}>
-          This Cookie Policy explains how FlatPurse Inc. ("FlatPurse," "we," "us," or "our") uses cookies and similar tracking technologies on the FlatPurse Flow platform, including our website at flatpurse.com, our web application, and related services (collectively, the "Service").
+          This Cookie Policy explains how FlatPurse Inc. (&quot;FlatPurse,&quot; &quot;we,&quot; &quot;us,&quot; or &quot;our&quot;) uses cookies and similar tracking technologies on the FlatPurse Flow platform, including our website at flatpurse.com, our web application, and related services (collectively, the &quot;Service&quot;).
         </p>
         <p style={{ fontSize: 15, color: "rgba(255,255,255,0.5)", lineHeight: 1.8, margin: "16px 0 0", maxWidth: 720 }}>
           This Cookie Policy should be read alongside our{" "}

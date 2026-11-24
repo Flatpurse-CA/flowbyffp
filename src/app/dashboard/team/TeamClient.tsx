@@ -215,7 +215,9 @@ function buildStaffHourRows(initial: StaffHourRow[]): StaffHourRow[] {
 // Per-staff hours, distinct from the shop-wide hours in Settings — no rows
 // here means this staff member just follows the shop's default hours.
 function StaffHoursCard({ staffId }: { staffId: string }) {
-  const [loading, setLoading] = useState(true);
+  // Loading = the hours on screen are not for this staff member yet.
+  const [loadedFor, setLoadedFor] = useState<string | null>(null);
+  const loading = loadedFor !== staffId;
   const [customized, setCustomized] = useState(false);
   const [rows, setRows] = useState<StaffHourRow[]>([]);
   const [saving, setSaving] = useState(false);
@@ -223,12 +225,11 @@ function StaffHoursCard({ staffId }: { staffId: string }) {
 
   useEffect(() => {
     let cancelled = false;
-    setLoading(true);
     getStaffHours(staffId).then(existing => {
       if (cancelled) return;
       setCustomized(existing.length > 0);
       setRows(buildStaffHourRows(existing));
-      setLoading(false);
+      setLoadedFor(staffId);
     });
     return () => { cancelled = true; };
   }, [staffId]);

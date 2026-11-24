@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import AutoPilotChip from "@/components/AutoPilotChip";
 import ScrollReveal from "@/components/ScrollReveal";
@@ -364,7 +365,7 @@ export default function PricingSection({ finePrint = "text" }: { finePrint?: "te
           Every plan starts with a free 14-day trial of Pro+. Cancel any time before it ends. Card payments are Stripe&apos;s standard rates, paid by your shop to Stripe and the same on every plan: 2.7% + 20¢ tapped, 30¢ flat for Interac, 2.9% + 30¢ online. Flow never takes a commission on a new client.
         </p>
         </>)}
-        <a href="/signup" style={{
+        <Link href="/signup" style={{
           display: "inline-flex", alignItems: "center", gap: 8,
           background: BRAND_PURPLE,
           color: "#fff",
@@ -378,7 +379,7 @@ export default function PricingSection({ finePrint = "text" }: { finePrint?: "te
           onMouseLeave={e => (e.currentTarget.style.opacity = "1")}
         >
           Start your free trial
-        </a>
+        </Link>
       </div>
 
       <style>{`

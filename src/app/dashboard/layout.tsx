@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { cookies, headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
@@ -65,13 +66,13 @@ export default async function DashboardLayout({ children }: { children: React.Re
           <p style={{ color: "var(--dw45)", fontSize: 13.5, lineHeight: 1.6, margin: "0 0 24px" }}>
             If you were invited as a team member, ask your shop owner to send a fresh invite. Otherwise, set up your shop to get started.
           </p>
-          <a href="/signup/shop" style={{
+          <Link href="/signup/shop" style={{
             display: "inline-flex", alignItems: "center", justifyContent: "center",
             padding: "12px 24px", background: "#712AE2", color: "#fff",
             fontSize: 14, fontWeight: 700, borderRadius: 10, textDecoration: "none",
           }}>
             Set up your shop
-          </a>
+          </Link>
         </div>
       </div>
     );
@@ -87,13 +88,13 @@ export default async function DashboardLayout({ children }: { children: React.Re
           <p style={{ color: "var(--dw45)", fontSize: 13.5, lineHeight: 1.6, margin: "0 0 24px" }}>
             Your data is safe and nothing has been deleted. Add a card to pick up right where you left off.
           </p>
-          <a href="/dashboard/settings?tab=Billing" style={{
+          <Link href="/dashboard/settings?tab=Billing" style={{
             display: "inline-flex", alignItems: "center", justifyContent: "center",
             padding: "12px 24px", background: "#712AE2", color: "#fff",
             fontSize: 14, fontWeight: 700, borderRadius: 10, textDecoration: "none",
           }}>
             Add a card
-          </a>
+          </Link>
         </div>
       </div>
     );

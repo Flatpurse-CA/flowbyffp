@@ -43,6 +43,8 @@ function StatCard({
   );
 }
 
+const daysAgo = (n: number) => new Date(Date.now() - n * 24 * 60 * 60 * 1000);
+
 export default async function AdminOverviewPage() {
   const admin = createAdminClient();
 
@@ -56,7 +58,7 @@ export default async function AdminOverviewPage() {
   const shops    = (shopsRes.data   ?? []) as { owner_id: string; name: string; plan: string; created_at: string }[];
   const waitlist = (waitlistRes.data ?? []) as { email: string; shop_type: string | null; created_at: string }[];
 
-  const weekAgo  = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+  const weekAgo  = daysAgo(7);
   const newUsers = users.filter(u => new Date(u.created_at) > weekAgo).length;
   const newShops = shops.filter(s => new Date(s.created_at) > weekAgo).length;
   const newWait  = waitlist.filter(w => new Date(w.created_at) > weekAgo).length;

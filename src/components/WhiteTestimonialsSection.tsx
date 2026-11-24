@@ -113,7 +113,7 @@ export default function WhiteTestimonialsSection() {
           }}>
             {/* Quote mark */}
             <div>
-              <span style={{ fontSize: 36, lineHeight: 1, color: q.highlight ? BRAND_PURPLE : "rgba(0,0,0,0.12)", fontFamily: "Georgia, serif" }}>"</span>
+              <span style={{ fontSize: 36, lineHeight: 1, color: q.highlight ? BRAND_PURPLE : "rgba(0,0,0,0.12)", fontFamily: "Georgia, serif" }}>&quot;</span>
               <p style={{
                 fontSize: 15, color: q.highlight ? "#111" : "rgba(0,0,0,0.7)",
                 lineHeight: 1.7, margin: "8px 0 0", fontWeight: q.highlight ? 500 : 400,

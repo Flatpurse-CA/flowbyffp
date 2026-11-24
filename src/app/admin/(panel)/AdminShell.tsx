@@ -118,9 +118,12 @@ export function AdminShell({ children, user, initialDark = true }: { children: R
     return () => mq.removeEventListener("change", update);
   }, []);
 
-  useEffect(() => {
+  // Close the mobile menu when the route changes (state adjusted during render, per React docs).
+  const [menuPath, setMenuPath] = useState(pathname);
+  if (menuPath !== pathname) {
+    setMenuPath(pathname);
     setMobileOpen(false);
-  }, [pathname]);
+  }
 
   useEffect(() => {
     document.body.style.overflow = isMobile && mobileOpen ? "hidden" : "";

@@ -20,6 +20,7 @@ export function NotificationPrefsForm() {
   useEffect(() => {
     try {
       const raw = localStorage.getItem("admin-notification-prefs");
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage only exists after mount; reading it during render would not match the server HTML
       if (raw) setPrefs({ ...DEFAULT_PREFS, ...JSON.parse(raw) });
     } catch {
       // ignore malformed prefs, fall back to defaults

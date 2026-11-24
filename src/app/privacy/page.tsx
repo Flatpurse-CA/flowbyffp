@@ -229,7 +229,7 @@ export default function PrivacyPage() {
           FlatPurse Flow &nbsp;|&nbsp; Effective Date: June 2026 &nbsp;|&nbsp; Last Updated: August 2026
         </p>
         <p style={{ fontSize: 15, color: "rgba(255,255,255,0.5)", lineHeight: 1.8, margin: "28px 0 0", maxWidth: 720 }}>
-          This Privacy Policy describes how FlatPurse Inc. ("FlatPurse," "we," "us," or "our"), a company incorporated in Alberta, Canada, collects, uses, discloses, and protects personal information in connection with the FlatPurse Flow platform, including our website at flatpurse.com, our web application, mobile applications, APIs, and related services (collectively, the "Service").
+          This Privacy Policy describes how FlatPurse Inc. (&quot;FlatPurse,&quot; &quot;we,&quot; &quot;us,&quot; or &quot;our&quot;), a company incorporated in Alberta, Canada, collects, uses, discloses, and protects personal information in connection with the FlatPurse Flow platform, including our website at flatpurse.com, our web application, mobile applications, APIs, and related services (collectively, the &quot;Service&quot;).
         </p>
         <p style={{ fontSize: 15, color: "rgba(255,255,255,0.5)", lineHeight: 1.8, margin: "16px 0 0", maxWidth: 720 }}>
           By accessing or using the Service, you acknowledge that you have read and understood this Privacy Policy. If you do not agree, please do not use the Service.

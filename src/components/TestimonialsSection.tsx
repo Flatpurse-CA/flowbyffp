@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRef } from "react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import AutoPilotChip from "@/components/AutoPilotChip";
@@ -102,7 +103,7 @@ export default function TestimonialsSection() {
             </p>
 
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <a href="/signup" style={{
+              <Link href="/signup" style={{
                 display: "inline-flex",
                 alignItems: "center",
                 gap: 8,
@@ -116,7 +117,7 @@ export default function TestimonialsSection() {
                 letterSpacing: "-0.01em",
               }}>
                 Get started free <ArrowRight size={14} />
-              </a>
+              </Link>
 
               {/* Arrows */}
               <div style={{ display: "flex", gap: 8, marginLeft: "auto" }}>
@@ -243,7 +244,7 @@ export default function TestimonialsSection() {
                 fontStyle: "italic",
                 margin: "0 0 14px",
               }}>
-                "{t.quote}"
+                &quot;{t.quote}&quot;
               </p>
               <div className="t-meta" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
                 <div>

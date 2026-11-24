@@ -124,7 +124,7 @@ export default function RefundPolicyPage() {
           FlatPurse Flow &nbsp;|&nbsp; Effective Date: June 2026 &nbsp;|&nbsp; Last Updated: August 2026
         </p>
         <p style={{ fontSize: 15, color: "rgba(255,255,255,0.5)", lineHeight: 1.8, margin: "28px 0 0", maxWidth: 720 }}>
-          This Refund Policy explains when FlatPurse Inc. ("FlatPurse," "we," "us") issues refunds for subscription fees paid for the FlatPurse Flow platform. It is incorporated into and forms part of the FlatPurse Flow Terms of Service. By using the Service, you agree to this policy.
+          This Refund Policy explains when FlatPurse Inc. (&quot;FlatPurse,&quot; &quot;we,&quot; &quot;us&quot;) issues refunds for subscription fees paid for the FlatPurse Flow platform. It is incorporated into and forms part of the FlatPurse Flow Terms of Service. By using the Service, you agree to this policy.
         </p>
       </div>
 

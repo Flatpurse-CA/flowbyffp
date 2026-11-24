@@ -14,6 +14,7 @@ export default function CookieBanner() {
   useEffect(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage only exists after mount; reading it during render would not match the server HTML
       if (!saved) setVisible(true);
     } catch {
       setVisible(true);
