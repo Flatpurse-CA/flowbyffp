@@ -34,3 +34,18 @@ describe("scheduler local time", () => {
     expect(nextSendWindow(ED, day)).toBe(day);
   });
 });
+
+import { insideAttributionWindow } from "@/lib/dashboard/autopilotAttribution";
+
+describe("attribution windows (Spec 2)", () => {
+  const now = new Date("2026-11-25T12:00:00Z").getTime();
+  const daysAgo = (d: number) => new Date(now - d * 86400000).toISOString();
+  it("uses each flow's own window", () => {
+    expect(insideAttributionWindow("noshow", daysAgo(6), now)).toBe(true);
+    expect(insideAttributionWindow("noshow", daysAgo(8), now)).toBe(false);
+    expect(insideAttributionWindow("filler", daysAgo(3), now)).toBe(false);
+    expect(insideAttributionWindow("winback", daysAgo(13), now)).toBe(true);
+    expect(insideAttributionWindow("birthday", daysAgo(29), now)).toBe(true);
+    expect(insideAttributionWindow("birthday", daysAgo(31), now)).toBe(false);
+  });
+});

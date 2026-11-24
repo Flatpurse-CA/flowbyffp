@@ -102,3 +102,5 @@ FL-102/103 Flow Voice · FL-104-106 gift cards, packages, memberships · FL-107/
 - Now: FL-020/021, FL-022 (rename: Founders prices + server-side spot counter), FL-055, FL-027 card step + FL-031 checklist, E0-E3 + staff invite on mail.flatpurse.com, FL-078/079 (read-only, logged), FL-060, scheduler + message log, attribution ledger, seed data + E2E, commissions (% per service, per-staff override, pre-tax, no tips), Daily Brief email, recap emails in shop timezone Monday 7am.
 - Fix before launch: pricing page claims "direct billing to insurers", not built. Remove the claim or build it.
 - George: Twilio numbers (FlatPurse Inc.), Supabase region check, pen test firm, beta shops, revoke token, env/MFA/webhooks.
+
+- Attribution ledger (Spec 0/2, Nov 24): DONE. attributions table (migration 0072), per-flow windows (no-show 7d, filler 48h, win-back 14d, rebook 14d, birthday 30d, front desk 7d), revenue recovered counts only completed bookings (trigger sets autopilot_events.amount on completion, clears on cancel/no-show).
