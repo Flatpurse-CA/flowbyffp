@@ -161,7 +161,7 @@ export function BlastForm({ sequences, totalSubs }: { sequences: Sequence[]; tot
               style={{ width: 16, height: 16, accentColor: T.purple }}
             />
             <span style={{ fontSize: 13, color: T.muted }}>
-              I have reviewed the preview and I'm ready to send this email.
+              I have reviewed the preview and I&apos;m ready to send this email.
             </span>
           </label>
           <button

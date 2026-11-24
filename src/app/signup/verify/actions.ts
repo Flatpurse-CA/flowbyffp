@@ -1,9 +1,10 @@
 "use server";
 
+import { sendOwnerWelcome } from "@/lib/lifecycleEmails";
 import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient, isEmailAlreadyConfirmed } from "@/lib/supabase/admin";
-import { sendOtpEmail, sendWelcomeEmail } from "@/lib/resend";
+import { sendOtpEmail } from "@/lib/resend";
 import { checkRateLimit } from "@/lib/rateLimit";
 
 export async function verifyCode(email: string, token: string): Promise<{ error?: string }> {
@@ -21,8 +22,10 @@ export async function verifyCode(email: string, token: string): Promise<{ error?
   if (verifyData.user) {
     const admin = createAdminClient();
     const { data: profile } = await admin.from("profiles").select("first_name").eq("id", verifyData.user.id).maybeSingle();
+    const { data: shop } = await admin.from("shops").select("name").eq("owner_id", verifyData.user.id).maybeSingle();
     try {
-      await sendWelcomeEmail(email, { firstName: (profile?.first_name as string | undefined) ?? "there" });
+      // E1: welcome from George, instant after verification.
+      await sendOwnerWelcome(email, verifyData.user.id, (profile?.first_name as string | undefined) ?? "there", (shop?.name as string | undefined) ?? "your business");
     } catch {
       // Non-fatal — account is already verified, a failed welcome email shouldn't block anything.
     }

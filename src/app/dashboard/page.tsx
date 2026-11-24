@@ -3,6 +3,7 @@ import { listAppointments, hasAnyAppointments } from "./appointments/actions";
 import { getAutopilotState } from "./autopilot/actions";
 import { getDailyBriefData } from "./daily-brief/actions";
 import { HomeClient } from "./HomeClient";
+import { getSetupChecklist } from "@/lib/dashboard/setupChecklist";
 
 export const dynamic = "force-dynamic";
 export const fetchCache = "force-no-store";
@@ -31,6 +32,7 @@ export default async function HomePage() {
     getAutopilotState(),
     getDailyBriefData(),
   ]);
+  const setup = await getSetupChecklist(ctx.shopId, ctx.handle ?? null);
 
   const todaySchedule = rangeAppts
     .filter(a => {
@@ -60,6 +62,7 @@ export default async function HomePage() {
     <HomeClient
       role="owner"
       everBooked={everBooked}
+      setup={setup}
       todaySchedule={todaySchedule}
       autopilot={autopilot}
       todayAutopilotRevenue={todayAutopilotRevenue}

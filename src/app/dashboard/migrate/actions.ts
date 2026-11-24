@@ -5,6 +5,7 @@ import { getShopContext } from "@/lib/dashboard/shop";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { normalizePhoneForStorage } from "@/lib/phone";
 import { PLATFORMS } from "@/lib/migrate/platforms";
+import { UNDO_DAYS } from "@/lib/migrate/normalize";
 import type { ImportKind, NAppointment, NClient, NService, NStaff } from "@/lib/migrate/normalize";
 
 // Imports write with the service-role client (clients has no owner write
@@ -33,7 +34,7 @@ const iso = (v: unknown) => {
 // merge with the bookings they make in Flow later.
 const clientKey = (phone: string | null, email: string | null, name: string) => (phone || email || name).trim().toLowerCase();
 
-export type ImportSummary = { id: string; source: string; status: string; counts: Record<string, number>; created_at: string };
+export type ImportSummary = { id: string; source: string; status: string; counts: Record<string, number>; created_at: string; autopilot_enabled: boolean };
 
 export async function startImport(source: string): Promise<string> {
   const { admin, shopId } = await requireOwner();
@@ -44,9 +45,9 @@ export async function startImport(source: string): Promise<string> {
 }
 
 async function ownedImport(admin: ReturnType<typeof createAdminClient>, shopId: string, importId: string) {
-  const { data } = await admin.from("imports").select("id, status").eq("id", importId).eq("shop_id", shopId).maybeSingle();
+  const { data } = await admin.from("imports").select("id, status, created_at").eq("id", importId).eq("shop_id", shopId).maybeSingle();
   if (!data) throw new Error("Import not found");
-  return data as { id: string; status: string };
+  return data as { id: string; status: string; created_at: string };
 }
 
 /** Writes one chunk of normalized rows. Returns how many were new (duplicates are skipped). */
@@ -179,6 +180,7 @@ export async function undoImport(importId: string) {
   const { admin, shopId } = await requireOwner();
   const imp = await ownedImport(admin, shopId, importId);
   if (imp.status === "undone") return;
+  if (Date.now() - new Date(imp.created_at).getTime() > UNDO_DAYS * 86400000) throw new Error(`Imports can only be undone within ${UNDO_DAYS} days`);
   // Appointments first: they may point at imported staff.
   for (const table of ["appointments", "clients", "services", "staff"]) {
     const { error } = await admin.from(table).delete().eq("shop_id", shopId).eq("import_id", importId);
@@ -194,9 +196,17 @@ export async function listImports(): Promise<ImportSummary[]> {
   const admin = createAdminClient();
   const { data } = await admin
     .from("imports")
-    .select("id, source, status, counts, created_at")
+    .select("id, source, status, counts, created_at, autopilot_enabled")
     .eq("shop_id", ctx.shopId)
     .order("created_at", { ascending: false })
     .limit(10);
   return (data ?? []) as ImportSummary[];
+}
+
+/** Spec 7: the owner reviews an import, then lets AutoPilot message those clients. */
+export async function setImportAutopilot(importId: string, on: boolean) {
+  const { admin, shopId } = await requireOwner();
+  await ownedImport(admin, shopId, importId);
+  await admin.from("imports").update({ autopilot_enabled: on }).eq("id", importId).eq("shop_id", shopId);
+  revalidatePath("/dashboard/migrate");
 }

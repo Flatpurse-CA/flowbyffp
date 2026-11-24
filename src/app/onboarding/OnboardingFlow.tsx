@@ -616,6 +616,7 @@ function CompleteScreen({
   teamCount,
   flowCount,
   onDashboard,
+  needsCard,
 }: {
   displayName: string;
   handle: string;
@@ -623,6 +624,7 @@ function CompleteScreen({
   teamCount: number;
   flowCount: number;
   onDashboard: () => void;
+  needsCard: boolean;
 }) {
   const summary = [
     { label: "Booking link", value: `flow.app/${handle}`                                  },
@@ -702,7 +704,7 @@ function CompleteScreen({
           animation: `fp-fade-up 0.4s ${easing} 0.6s both`,
         }}
       >
-        Open your dashboard
+        {needsCard ? "Add card to start your trial" : "Open your dashboard"}
         <ArrowRight size={16} strokeWidth={2.5} />
       </button>
     </div>
@@ -711,7 +713,7 @@ function CompleteScreen({
 
 // ─── Root ─────────────────────────────────────────────────────────────────────
 
-export function OnboardingFlow({ displayName }: { displayName: string }) {
+export function OnboardingFlow({ displayName, needsCard = false }: { displayName: string; needsCard?: boolean }) {
   const router = useRouter();
 
   const [step, setStep]                       = useState(1);
@@ -881,7 +883,8 @@ export function OnboardingFlow({ displayName }: { displayName: string }) {
               serviceCount={services.length}
               teamCount={members.length}
               flowCount={activeFlows}
-              onDashboard={() => router.push("/dashboard")}
+              onDashboard={() => router.push(needsCard ? "/signup/card" : "/dashboard")}
+              needsCard={needsCard}
             />
           )}
         </div>

@@ -122,7 +122,7 @@ export const CITIES: City[] = [
 
 const priceFaq: Faq = {
   q: "How much does it cost?",
-  a: `Plans start at CAD ${PRICES.starter}/month. Founders Beta members save 40% in year 1 and 25% for life after that. Every plan starts with a free 14-day trial of Pro+, no card required.`,
+  a: `Plans start at CAD ${PRICES.starter}/month. Founders Beta members save 40% in year 1 and 25% for life after that. Every plan starts with a free 14-day trial of Pro+. Cancel any time before it ends.`,
 };
 const switchFaq: Faq = {
   q: "Can I move my clients from Fresha, Vagaro or Booksy?",

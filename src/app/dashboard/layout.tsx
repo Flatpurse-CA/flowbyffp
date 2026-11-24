@@ -1,9 +1,16 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
+import { createClient } from "@/lib/supabase/server";
 import { getAuthUser, getShopContext } from "@/lib/dashboard/shop";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getUnreadCount } from "./messages/actions";
 import { DashboardShell } from "./DashboardShell";
+import { needsCard } from "@/lib/billing/cardGate";
+import { getTrialNotice } from "@/lib/billing/trialNotice";
+import { TrialEndNotice } from "./TrialEndNotice";
+import { PlanStatusBanner } from "./PlanStatusBanner";
+import { TodayCache } from "./TodayCache";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const user = await getAuthUser();
@@ -17,6 +24,28 @@ export default async function DashboardLayout({ children }: { children: React.Re
   // them here instead of an empty, unconfigured dashboard means logging back
   // in actually finishes the job instead of leaving them stuck a second way.
   if (ctx && ctx.role === "owner" && !ctx.handle) redirect("/onboarding");
+
+  // Card up front: a new shop's trial only starts once Stripe has a card (FL-020/021).
+  if (ctx && ctx.role === "owner") {
+    const { data: billing } = await createAdminClient()
+      .from("shops")
+      .select("created_at, subscription_status, trial_override, plan")
+      .eq("id", ctx.shopId)
+      .maybeSingle();
+    if (billing && needsCard(billing)) redirect("/signup/card");
+  }
+
+  // Owner can require 2-step for the whole team (George Nov 21).
+  if (ctx && ctx.role === "staff") {
+    const [{ data: s }, path] = await Promise.all([
+      createAdminClient().from("shops").select("require_team_2fa").eq("id", ctx.shopId).maybeSingle(),
+      headers().then((h) => h.get("x-pathname") ?? ""),
+    ]);
+    if (s?.require_team_2fa && !path.startsWith("/dashboard/settings/security")) {
+      const { data: aal } = await (await createClient()).auth.mfa.getAuthenticatorAssuranceLevel();
+      if (aal?.currentLevel !== "aal2") redirect("/dashboard/settings/security?required=1");
+    }
+  }
 
   // Same idea one step earlier: an owner who signed up (has an owner profile)
   // but never created a shop goes straight to shop setup. This is where the
@@ -37,13 +66,13 @@ export default async function DashboardLayout({ children }: { children: React.Re
           <p style={{ color: "var(--dw45)", fontSize: 13.5, lineHeight: 1.6, margin: "0 0 24px" }}>
             If you were invited as a team member, ask your shop owner to send a fresh invite. Otherwise, set up your shop to get started.
           </p>
-          <a href="/signup/shop" style={{
+          <Link href="/signup/shop" style={{
             display: "inline-flex", alignItems: "center", justifyContent: "center",
             padding: "12px 24px", background: "#712AE2", color: "#fff",
             fontSize: 14, fontWeight: 700, borderRadius: 10, textDecoration: "none",
           }}>
             Set up your shop
-          </a>
+          </Link>
         </div>
       </div>
     );
@@ -59,22 +88,29 @@ export default async function DashboardLayout({ children }: { children: React.Re
           <p style={{ color: "var(--dw45)", fontSize: 13.5, lineHeight: 1.6, margin: "0 0 24px" }}>
             Your data is safe and nothing has been deleted. Add a card to pick up right where you left off.
           </p>
-          <a href="/dashboard/settings?tab=Billing" style={{
+          <Link href="/dashboard/settings?tab=Billing" style={{
             display: "inline-flex", alignItems: "center", justifyContent: "center",
             padding: "12px 24px", background: "#712AE2", color: "#fff",
             fontSize: 14, fontWeight: 700, borderRadius: 10, textDecoration: "none",
           }}>
             Add a card
-          </a>
+          </Link>
         </div>
       </div>
     );
   }
 
   const unreadCount = await getUnreadCount();
+  const trialNotice = ctx.role === "owner" ? await getTrialNotice(createAdminClient(), ctx.shopId) : null;
+  const { data: planState } = ctx.role === "owner"
+    ? await createAdminClient().from("shops").select("cancel_at, paused_until, deletion_scheduled_at").eq("id", ctx.shopId).maybeSingle()
+    : { data: null };
 
   return (
     <DashboardShell user={user} role={ctx.role} staffName={ctx.staffName} unreadCount={unreadCount} accessStatus={ctx.accessStatus} initialDark={(await cookies()).get("portal-theme")?.value !== "light"}>
+      {planState && (planState.cancel_at || planState.paused_until) && <PlanStatusBanner cancelAt={planState.cancel_at} pausedUntil={planState.paused_until} deletionAt={planState.deletion_scheduled_at} />}
+      {trialNotice && <TrialEndNotice notice={trialNotice} />}
+      <TodayCache />
       {children}
     </DashboardShell>
   );

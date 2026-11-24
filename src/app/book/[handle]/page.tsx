@@ -1,8 +1,10 @@
 import { notFound, permanentRedirect } from "next/navigation";
+import { isPausedNow } from "@/lib/billing/pause";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getCustomerContext } from "@/lib/dashboard/customer";
 import { fillBusinessHoursDefaults } from "@/lib/dashboard/businessHours";
 import { BookingClient } from "./BookingClient";
+import type { Policy } from "@/lib/booking/policy";
 
 export const dynamic = "force-dynamic";
 export const fetchCache = "force-no-store";
@@ -19,7 +21,7 @@ export default async function BookingPage({ params }: { params: Promise<{ handle
 
   const { data: shop } = await admin
     .from("shops")
-    .select("id, name, city, province, street_address, handle, stripe_connected, profile_image_url, cover_image_url, phone, owner_id, client_referrals_enabled, client_referral_reward")
+    .select("id, name, city, province, street_address, handle, stripe_connected, profile_image_url, cover_image_url, phone, owner_id, client_referrals_enabled, client_referral_reward, paused_until, deposit_mode, deposit_value, cancel_window_hours, late_cancel_fee_mode, late_cancel_fee_value, no_show_fee_mode, no_show_fee_value, mobile_enabled, travel_fee")
     .eq("handle", handle)
     .maybeSingle();
 
@@ -40,6 +42,17 @@ export default async function BookingPage({ params }: { params: Promise<{ handle
 
   // Canonicalize the URL casing so links always converge on one URL.
   if (rawHandle !== handle) permanentRedirect(`/book/${handle}`);
+
+  if (isPausedNow(shop.paused_until as string | null)) {
+    return (
+      <main style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 16, textAlign: "center", fontFamily: "sans-serif" }}>
+        <div>
+          <h1 style={{ fontSize: 22, margin: "0 0 8px" }}>{shop.name}</h1>
+          <p style={{ margin: 0, color: "#555" }}>Not taking online bookings right now.{shop.phone ? <> Call <a href={`tel:${shop.phone}`}>{shop.phone}</a> to book.</> : null}</p>
+        </div>
+      </main>
+    );
+  }
 
   const [{ data: services }, { data: staff }, { data: hours }, customer, { data: reviewsRaw }, { data: owner }] = await Promise.all([
     admin.from("services").select("id, name, price, duration_minutes, category").eq("shop_id", shop.id).eq("active", true).order("category", { ascending: true }).order("name", { ascending: true }),
@@ -86,6 +99,8 @@ export default async function BookingPage({ params }: { params: Promise<{ handle
         coverImageUrl: (shop.cover_image_url as string | null) ?? null,
         phone: (shop.phone as string | null) ?? null,
         email: owner.user?.email ?? null,
+        policy: shop as unknown as Policy,
+        mobile: { enabled: Boolean(shop.mobile_enabled), fee: Number(shop.travel_fee ?? 0) },
       }}
       services={(services ?? []) as { id: string; name: string; price: number; duration_minutes: number; category: string | null }[]}
       staff={(staff ?? []) as { id: string; full_name: string; role: string | null; color: string }[]}

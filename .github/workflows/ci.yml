@@ -1,0 +1,23 @@
+name: CI
+
+# FL-019: typecheck + unit tests on every push and PR. Lint runs too but does
+# not block yet (a few older files still have lint errors to clean up).
+on:
+  push:
+    branches: [main, billing-card-trial]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run lint
+        continue-on-error: true

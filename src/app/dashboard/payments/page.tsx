@@ -1,6 +1,10 @@
+import { canRefund } from "@/lib/auth/permissions";
 import { redirect } from "next/navigation";
 import { Wallet } from "lucide-react";
 import { listPayments } from "./actions";
+import { RefundButton } from "./RefundButton";
+
+const PAYOUT_HREF = "/api/payments/payout-report?days=30";
 import { getShopContext } from "@/lib/dashboard/shop";
 
 export const dynamic = "force-dynamic";
@@ -27,7 +31,10 @@ const STATUS_COLOR: Record<string, { fg: string; bg: string }> = {
 
 export default async function PaymentsPage() {
   const ctx = await getShopContext();
-  if (ctx && ctx.role !== "owner") redirect("/dashboard");
+  // Staff reach Payments only when the owner lets them issue refunds.
+  const refunder = await canRefund(ctx);
+  if (ctx && ctx.role !== "owner" && !refunder) redirect("/dashboard");
+  const isOwner = refunder;
 
   const now = new Date();
   const rangeStart = new Date(now);
@@ -35,6 +42,10 @@ export default async function PaymentsPage() {
 
   const payments = ctx ? await listPayments(rangeStart.toISOString(), now.toISOString()) : [];
 
+  const tipsByStaff = Object.entries(payments.reduce<Record<string, number>>((m, p) => {
+    if (p.tipAmount) m[p.staffName ?? "Unassigned"] = (m[p.staffName ?? "Unassigned"] ?? 0) + p.tipAmount;
+    return m;
+  }, {})).sort((x, y) => y[1] - x[1]);
   const totalCollected = payments.reduce((s, p) => s + (p.paidAmount ?? p.depositAmount ?? 0), 0);
   const totalTips = payments.reduce((s, p) => s + (p.tipAmount ?? 0), 0);
   const outstandingDeposits = payments.filter(p => p.status === "deposit").length;
@@ -46,9 +57,17 @@ export default async function PaymentsPage() {
     <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
       <div>
         <h1 style={{ color: "var(--dtext)", fontSize: 22, fontWeight: 800, margin: "0 0 3px", letterSpacing: "-0.03em" }}>Payments</h1>
-        <p style={{ color: "var(--dw35)", fontSize: 13, margin: 0 }}>Transaction history from your last 90 days of bookings.</p>
+        <p style={{ color: "var(--dw35)", fontSize: 13, margin: 0 }}>Transaction history from your last 90 days of bookings.{isOwner && <> <a href={PAYOUT_HREF} style={{ color: "rgb(109,40,217)", fontWeight: 600 }}>Download payout report (CSV)</a></>}</p>
       </div>
 
+      {tipsByStaff.length > 0 && (
+        <div style={{ ...card }}>
+          <p style={{ color: "var(--dw35)", fontSize: 10, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 8px" }}>Tips by staff (untaxed, paid to staff)</p>
+          {tipsByStaff.map(([name, amt]) => (
+            <div key={name} style={{ display: "flex", justifyContent: "space-between", color: "var(--dtext)", fontSize: 13.5, padding: "3px 0" }}><span>{name}</span><strong>{fmtPrice(amt)}</strong></div>
+          ))}
+        </div>
+      )}
       <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
         <div style={{ ...card, flex: "1 1 180px" }}>
           <p style={{ color: "var(--dw35)", fontSize: 10, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", margin: "0 0 8px" }}>Collected</p>
@@ -74,7 +93,7 @@ export default async function PaymentsPage() {
           <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 640 }}>
             <thead>
               <tr style={{ background: "var(--dsurface2)" }}>
-                {["Client", "Service", "Date", "Method", "Status", "Amount"].map(h => (
+                {["Client", "Service", "Date", "Method", "Status", "Amount", ...(isOwner ? [""] : [])].map(h => (
                   <th key={h} style={{ padding: "10px 16px", textAlign: "left", color: "var(--dw35)", fontSize: 10.5, fontWeight: 600, letterSpacing: "0.05em", textTransform: "uppercase", borderBottom: "1px solid var(--dw06)", whiteSpace: "nowrap" }}>
                     {h}
                   </th>
@@ -98,7 +117,9 @@ export default async function PaymentsPage() {
                     </td>
                     <td style={{ padding: "12px 16px", color: "var(--dtext)", fontSize: 13, fontWeight: 700, whiteSpace: "nowrap" }}>
                       {fmtPrice(amount)}{p.tipAmount ? <span style={{ color: "var(--dw35)", fontWeight: 500 }}> + {fmtPrice(p.tipAmount)} tip</span> : ""}
+                      {p.refundedAmount > 0 && <span style={{ display: "block", color: "rgb(220,38,38)", fontWeight: 600, fontSize: 11.5 }}>-{fmtPrice(p.refundedAmount)} refunded</span>}
                     </td>
+                    {isOwner && <td style={{ padding: "12px 16px" }}>{p.paidAmount ? <RefundButton appointmentId={p.id} max={Math.round((p.paidAmount - p.refundedAmount) * 100) / 100} /> : null}</td>}
                   </tr>
                 );
               })}

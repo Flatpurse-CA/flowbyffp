@@ -73,11 +73,13 @@ export async function getAutopilotState(): Promise<AutopilotState> {
     .from("autopilot_events")
     .select("flow_key, amount, client_name")
     .eq("shop_id", shopId)
+    .not("outcome", "in", "(pending,skipped,failed)")
     .gte("created_at", monthStart.toISOString());
 
   const { data: recentEvents } = await supabase
     .from("autopilot_events")
     .select("id, flow_key, event_text, amount, client_name, created_at")
+    .not("outcome", "in", "(pending,skipped)")
     .eq("shop_id", shopId)
     .order("created_at", { ascending: false })
     .limit(20);

@@ -31,6 +31,8 @@ function StatCard({
   );
 }
 
+const daysAgo = (n: number) => new Date(Date.now() - n * 86400000);
+
 export default async function AdminWaitlistPage() {
   const admin = createAdminClient();
 
@@ -48,7 +50,8 @@ export default async function AdminWaitlistPage() {
   }[];
 
   const total   = entries.length;
-  const thisWeek = entries.filter(e => new Date(e.created_at) > new Date(Date.now() - 7 * 86400000)).length;
+  const weekAgo = daysAgo(7);
+  const thisWeek = entries.filter(e => new Date(e.created_at) > weekAgo).length;
   const today   = entries.filter(e => {
     const d = new Date(e.created_at);
     const now = new Date();

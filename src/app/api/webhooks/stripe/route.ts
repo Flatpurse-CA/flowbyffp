@@ -1,9 +1,13 @@
+import { isFoundersPriceId } from "@/lib/plans";
+import { sendBillingEmail } from "@/lib/resend";
+import { ownerContact } from "@/lib/billing/notices";
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { stripe } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getStripePriceId, type BillablePlanKey, type BillingInterval } from "@/lib/plans";
 import { settleReferralRewards } from "@/lib/referrals";
+import { SHOP_BILLING_COLUMNS, sendDunningEmail, sendPausedEmail, sendRenewalReminder } from "@/lib/billing/notices";
 
 export async function POST(req: Request) {
   const signature = req.headers.get("stripe-signature");
@@ -52,40 +56,44 @@ export async function POST(req: Request) {
       const shopId = session.metadata.shop_id;
       const planKey = session.metadata.plan_key as BillablePlanKey;
       const interval = session.metadata.interval as BillingInterval;
-      const founderClaim = session.metadata.founder_claim === "true";
       const subscriptionId = typeof session.subscription === "string" ? session.subscription : session.subscription.id;
 
-      let finalSubscriptionId = subscriptionId;
+      // Card-up-front trials arrive here as "trialing"; the first charge is at trial_end.
+      const sub = await stripe().subscriptions.retrieve(subscriptionId);
+      let trialEnd = sub.status === "trialing" && sub.trial_end ? sub.trial_end : null;
 
-      if (founderClaim) {
-        const { data: claimed } = await admin.rpc("claim_founder_spot");
-        if (!claimed) {
-          // Spots ran out between checkout creation and completion — rare (40-spot beta).
-          // The 40%-off coupon was already shown and applied at checkout, so we honor it
-          // rather than silently repricing a subscription the customer already agreed to.
-          console.warn(`Founders spot claim missed for shop ${shopId} (checkout already showed the discount, honoring it)`);
+      // One free trial per card (FL-023): a card already used by another shop ends the trial now.
+      const pmId = typeof sub.default_payment_method === "string" ? sub.default_payment_method : sub.default_payment_method?.id;
+      if (pmId) {
+        const pm = await stripe().paymentMethods.retrieve(pmId);
+        const fingerprint = pm.card?.fingerprint ?? null;
+        if (fingerprint) {
+          await admin.from("shops").update({ card_fingerprint: fingerprint }).eq("id", shopId);
+          if (trialEnd) {
+            const { count } = await admin.from("shops").select("id", { count: "exact", head: true })
+              .eq("card_fingerprint", fingerprint).neq("id", shopId);
+            if ((count ?? 0) > 0) {
+              await stripe().subscriptions.update(subscriptionId, { trial_end: "now" });
+              trialEnd = null;
+            }
+          }
         }
-
-        const priceId = getStripePriceId(planKey, interval);
-        const schedule = await stripe().subscriptionSchedules.create({ from_subscription: subscriptionId });
-        await stripe().subscriptionSchedules.update(schedule.id, {
-          end_behavior: "release",
-          phases: [
-            { items: [{ price: priceId, quantity: 1 }], duration: { interval: "month", interval_count: 12 }, discounts: [{ coupon: "founders-40-off" }] },
-            { items: [{ price: priceId, quantity: 1 }], discounts: [{ coupon: "founders-25-off" }] },
-          ],
-        });
-        finalSubscriptionId = schedule.id;
       }
 
+      // FL-020: the plan only activates once Stripe confirms the card (trialing
+      // or active). An incomplete first payment leaves the shop where it was.
+      const confirmed = await stripe().subscriptions.retrieve(subscriptionId);
+      if (!["trialing", "active"].includes(confirmed.status)) {
+        await admin.from("shops").update({ subscription_id: subscriptionId, subscription_status: confirmed.status }).eq("id", shopId);
+        return NextResponse.json({ received: true });
+      }
       await admin
         .from("shops")
         .update({
           plan: planKey,
           billing_interval: interval,
-          subscription_id: finalSubscriptionId,
-          subscription_status: "active",
-          ...(founderClaim ? { is_founder: true, founder_discount_claimed_at: new Date().toISOString() } : {}),
+          subscription_id: subscriptionId,
+          subscription_status: confirmed.status,
         })
         .eq("id", shopId);
 
@@ -100,16 +108,68 @@ export async function POST(req: Request) {
     }
   }
 
+  if (event.type === "invoice.payment_failed" || event.type === "invoice.paid" || event.type === "invoice.upcoming") {
+    const inv = event.data.object as Stripe.Invoice;
+    const customerId = typeof inv.customer === "string" ? inv.customer : inv.customer?.id;
+    const { data: shop } = customerId
+      ? await admin.from("shops").select(SHOP_BILLING_COLUMNS).eq("stripe_customer_id", customerId).maybeSingle()
+      : { data: null };
+    if (shop && event.type === "invoice.payment_failed" && inv.billing_reason !== "manual") {
+      // Day 0 of dunning. Stripe Smart Retries handles the retries themselves.
+      if (!shop.payment_failed_at) {
+        await admin.from("shops").update({ payment_failed_at: new Date().toISOString(), dunning_step: 0, subscription_status: "past_due" }).eq("id", shop.id);
+        await sendDunningEmail(admin, shop as never, 0);
+      }
+    } else if (shop && event.type === "invoice.paid" && inv.amount_paid > 0) {
+      await admin.from("shops").update({ payment_failed_at: null, dunning_step: 0 }).eq("id", shop.id);
+      // FL-022: a Founders spot counts at the first paid charge.
+      const line = inv.lines?.data?.[0] as unknown as { price?: { id?: string }; pricing?: { price_details?: { price?: string } } } | undefined;
+      const linePrice = line?.price?.id ?? line?.pricing?.price_details?.price;
+      if (isFoundersPriceId(linePrice) && !(shop as { is_founder?: boolean }).is_founder) {
+        const { data: claimed } = await admin.rpc("claim_founder_spot", { p_shop: shop.id });
+        if (!claimed) {
+          // Sold out or past the deadline before this first charge: honor this
+          // invoice, move to the regular price from the next period.
+          const subId = typeof (inv as unknown as { subscription?: unknown }).subscription === "string"
+            ? (inv as unknown as { subscription: string }).subscription
+            : (inv as unknown as { parent?: { subscription_details?: { subscription?: string } } }).parent?.subscription_details?.subscription;
+          const plan = (shop as { plan?: string }).plan as BillablePlanKey;
+          const interval = ((shop as { billing_interval?: string }).billing_interval ?? "monthly") as BillingInterval;
+          if (subId && plan) {
+            const sub = await stripe().subscriptions.retrieve(subId);
+            await stripe().subscriptions.update(subId, { items: [{ id: sub.items.data[0].id, price: getStripePriceId(plan, interval) }], proration_behavior: "none" });
+          }
+        }
+      }
+    } else if (shop && event.type === "invoice.upcoming") {
+      await sendRenewalReminder(admin, shop as never, inv as never);
+    }
+  }
+
   if (event.type === "customer.subscription.updated" || event.type === "customer.subscription.deleted") {
     const sub = event.data.object as Stripe.Subscription;
     const customerId = typeof sub.customer === "string" ? sub.customer : sub.customer.id;
     const canceled = event.type === "customer.subscription.deleted";
+    const prev = (event.data as { previous_attributes?: { status?: string } }).previous_attributes?.status;
+
+    // Final retry failed: Stripe marks the subscription unpaid (set "If all retries fail" to
+    // "mark as unpaid" in Stripe settings). The account pauses; nothing is deleted.
+    if (!canceled && (sub.status === "unpaid" || sub.status === "paused") && prev && prev !== sub.status) {
+      const { data: owner } = await admin.from("shops").select("owner_id, name").eq("stripe_customer_id", customerId).maybeSingle();
+      if (owner) await sendPausedEmail(admin, owner);
+    }
 
     await admin
       .from("shops")
       .update({
         subscription_status: canceled ? "canceled" : sub.status,
-        ...(canceled ? { subscription_id: null, billing_interval: null } : {}),
+        cancel_at: !canceled && sub.cancel_at ? new Date(sub.cancel_at * 1000).toISOString() : null,
+        ...(sub.pause_collection ? {} : { paused_until: null }),
+        ...(canceled ? { subscription_id: null, billing_interval: null, plan_ended_at: new Date().toISOString() } : { plan_ended_at: null }),
+        // FL-020: a first payment that needed extra steps activates the plan
+        // only once Stripe confirms it.
+        ...(!canceled && prev && ["incomplete", "incomplete_expired"].includes(prev) && ["active", "trialing"].includes(sub.status) && sub.metadata?.plan_key
+          ? { plan: sub.metadata.plan_key, billing_interval: sub.metadata.interval ?? "monthly" } : {}),
       })
       .eq("stripe_customer_id", customerId);
 
@@ -149,10 +209,26 @@ export async function POST(req: Request) {
         reason: dispute.reason,
         status: dispute.status,
         is_platform: !connectedAccountId,
+        evidence_due_by: dispute.evidence_details?.due_by ? new Date(dispute.evidence_details.due_by * 1000).toISOString() : null,
         updated_at: new Date().toISOString(),
       },
       { onConflict: "stripe_dispute_id" },
     );
+    // FL-038: alert the owner once, with the deadline and what evidence helps.
+    if (event.type === "charge.dispute.created" && shopId) {
+      const { data: s } = await admin.from("shops").select("owner_id").eq("id", shopId).maybeSingle();
+      const owner = s?.owner_id ? await ownerContact(admin, s.owner_id as string) : null;
+      if (owner?.email) {
+        const due = dispute.evidence_details?.due_by ? new Date(dispute.evidence_details.due_by * 1000).toLocaleDateString("en-CA", { month: "long", day: "numeric", year: "numeric" }) : "soon";
+        await sendBillingEmail(owner.email, {
+          subject: `A client disputed a $${(dispute.amount / 100).toFixed(2)} payment`,
+          heading: "A payment was disputed",
+          body: `A client's bank has disputed a $${(dispute.amount / 100).toFixed(2)} charge (reason: ${dispute.reason.replaceAll("_", " ")}). Send evidence by ${due}. Helpful evidence: the booking confirmation, your cancellation policy the client agreed to, check-in or completion time, any messages with the client, and the receipt. Respond in your Stripe dashboard under Payments > Disputes.`,
+          ctaLabel: "Open Stripe", ctaUrl: "https://dashboard.stripe.com/disputes",
+        }).catch(() => {});
+        await admin.from("disputes").update({ alerted_at: new Date().toISOString() }).eq("stripe_dispute_id", dispute.id);
+      }
+    }
   }
 
   if (event.type === "payment_intent.succeeded") {
@@ -164,6 +240,7 @@ export async function POST(req: Request) {
         .update({
           paid_amount: pi.amount_received / 100,
           payment_method: "card",
+          stripe_payment_intent: pi.id,
           status: "confirmed",
           updated_at: new Date().toISOString(),
         })

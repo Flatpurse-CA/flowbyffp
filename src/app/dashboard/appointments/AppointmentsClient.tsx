@@ -10,7 +10,7 @@ import {
   Send, Pencil, Ban, CheckCircle2, StickyNote, SquarePen, UserX,
 } from "lucide-react";
 import type { AppointmentRow, AppointmentStatus } from "./actions";
-import { createAppointment, rescheduleAppointment, cancelAppointment, completeAppointment, confirmAppointment, markNoShow, updateAppointmentDetails, sendAppointmentPaymentLink, sendAppointmentReceipt } from "./actions";
+import { createAppointment, rescheduleAppointment, cancelAppointment, completeAppointment, confirmAppointment, markNoShow, chargeNoShowFee, updateAppointmentDetails, sendAppointmentPaymentLink, sendAppointmentReceipt } from "./actions";
 import { chargeInPerson } from "@/lib/terminal/nativeBridge";
 import type { StaffRow } from "../team/actions";
 import { tint } from "@/lib/color";
@@ -431,7 +431,7 @@ function CloseOutModal({ appt, onClose, onCompleted, stripeTerminalLocationId, t
   const sendReceiptIfRequested = async () => {
     if (!receiptSms) return;
     // Best-effort — a receipt failure shouldn't undo an already-recorded payment.
-    await sendAppointmentReceipt({ clientPhone: appt.phone || null, clientName: appt.name, serviceName: appt.service, amount: total }).catch(() => {});
+    await sendAppointmentReceipt({ clientPhone: appt.phone || null, clientName: appt.name, serviceName: appt.service, amount: total, appointmentId: appt.id }).catch(() => {});
   };
 
   const runCharge = async () => {
@@ -797,8 +797,12 @@ function AppointmentDetail({ appt, onClose, onCloseOut, onChanged }: { appt: App
     setError(null);
     setBusy(true);
     try {
-      await markNoShow(appt.id);
+      const { feeAvailable } = await markNoShow(appt.id);
       setStatus("no_show");
+      if (feeAvailable > 0 && window.confirm(`Charge the $${feeAvailable.toFixed(2)} no-show fee to the client's saved card?`)) {
+        const r = await chargeNoShowFee(appt.id);
+        if (r.error) setError(r.error);
+      }
       onChanged();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Couldn't mark as no-show, try again.");

@@ -141,7 +141,7 @@ export default function TestimonialsGrid() {
               letterSpacing: "-0.02em",
               margin: "0 0 32px",
             }}>
-              "{featured.quote}"
+              &quot;{featured.quote}&quot;
             </p>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -181,7 +181,7 @@ export default function TestimonialsGrid() {
                 lineHeight: 1.65,
                 margin: "0 0 24px",
               }}>
-                "{t.quote}"
+                &quot;{t.quote}&quot;
               </p>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: "auto" }}>
                 <img

@@ -1,5 +1,7 @@
 "use client";
 
+import { policyText, type Policy } from "@/lib/booking/policy";
+
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
@@ -32,7 +34,7 @@ async function confirmOnShopAccount(clientSecret: string, stripeAccount: string)
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type Shop = { id: string; name: string; city: string; province: string; streetAddress: string | null; stripeConnected: boolean; profileImageUrl: string | null; coverImageUrl: string | null; phone: string | null; email: string | null };
+type Shop = { id: string; name: string; city: string; province: string; streetAddress: string | null; stripeConnected: boolean; profileImageUrl: string | null; coverImageUrl: string | null; phone: string | null; email: string | null; policy: Policy; mobile: { enabled: boolean; fee: number } };
 type Service = { id: string; name: string; price: number; duration_minutes: number; category: string | null };
 type Staff = { id: string; full_name: string; role: string | null; color: string };
 type BusinessHour = { weekday: number; open: boolean; start_time: string; end_time: string };
@@ -117,11 +119,14 @@ export function BookingClient({ shop, services, staff, businessHours, initialCus
 }) {
   // ?ref=<code> from a client's referral link; read after mount (static-safe).
   const [refCode, setRefCode] = useState<string | null>(null);
+  const [offerToken, setOfferToken] = useState<string | null>(null);
   const [discount, setDiscount] = useState(0);
   useEffect(() => {
     const ref = new URLSearchParams(window.location.search).get("ref");
     // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time read of the URL after hydration
     if (ref && /^[A-Z0-9]{6,16}$/i.test(ref)) setRefCode(ref);
+    const offer = new URLSearchParams(window.location.search).get("offer");
+    if (offer && /^[A-Za-z0-9_-]{8,32}$/.test(offer)) setOfferToken(offer);
   }, []);
   const [showFlow, setShowFlow]     = useState(false);
   const [step, setStep]             = useState<"datetime" | "account" | "confirm" | "pay" | "done">("datetime");
@@ -142,6 +147,8 @@ export function BookingClient({ shop, services, staff, businessHours, initialCus
   const [date, setDate]             = useState<string | null>(null);
   const [time, setTime]             = useState<string | null>(null);
   const [notes, setNotes]           = useState("");
+  const [address, setAddress]       = useState("");
+  const [postal, setPostal]         = useState("");
   const [slots, setSlots]           = useState<string[]>([]);
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [customer, setCustomer]     = useState<Customer | null>(initialCustomer);
@@ -193,7 +200,10 @@ export function BookingClient({ shop, services, staff, businessHours, initialCus
       staffId: staffId === "any" ? null : staffId,
       startsAt: time,
       notes,
+      address: shop.mobile.enabled ? address : undefined,
+      postal: shop.mobile.enabled ? postal : undefined,
       refCode,
+      offerToken,
     });
     if (res.error) { setBookingError(res.error); setBooking(false); return; }
     setDiscount(res.discount ?? 0);
@@ -565,7 +575,12 @@ export function BookingClient({ shop, services, staff, businessHours, initialCus
                 onAuthed={(c) => { setCustomer(c); setStep("confirm"); }}
               />
             )}
-            {step === "confirm" && customer && refCode && referralReward !== null && (
+            {step === "confirm" && customer && offerToken && (
+              <div style={{ marginBottom: 14, padding: "11px 14px", borderRadius: 12, background: ACCENT, color: "white", fontSize: 13, fontWeight: 600 }}>
+                Your personal offer is applied automatically when you book (one use, for you only).
+              </div>
+            )}
+            {step === "confirm" && customer && !offerToken && refCode && referralReward !== null && (
               <div style={{ marginBottom: 14, padding: "11px 14px", borderRadius: 12, background: ACCENT, color: "white", fontSize: 13, fontWeight: 600 }}>
                 A friend referred you: new clients get up to C${referralReward} off their first visit.
               </div>
@@ -573,8 +588,8 @@ export function BookingClient({ shop, services, staff, businessHours, initialCus
             {step === "confirm" && customer && (
               <ConfirmStep
                 service={service} staffName={staffId === "any" ? "Anyone available" : staff.find(s => s.id === staffId)?.full_name ?? "Anyone available"}
-                time={time!} customer={customer} notes={notes} setNotes={setNotes}
-                error={bookingError} submitting={booking} stripeConnected={shop.stripeConnected}
+                time={time!} customer={customer} notes={notes} setNotes={setNotes} mobile={shop.mobile} address={address} setAddress={setAddress} postal={postal} setPostal={setPostal}
+                error={bookingError} submitting={booking} stripeConnected={shop.stripeConnected} policyLine={policyText(shop.policy, service?.price ?? 0)}
                 onBack={() => setStep(customer ? "datetime" : "account")}
                 onConfirm={handleConfirm}
               />
@@ -772,10 +787,11 @@ function AccountStep({ onBack, onAuthed }: { onBack: () => void; onAuthed: (c: C
 
 // ─── Step: confirm ──────────────────────────────────────────────────────────────
 
-function ConfirmStep({ service, staffName, time, customer, notes, setNotes, error, submitting, stripeConnected, onBack, onConfirm }: {
+function ConfirmStep({ service, staffName, time, customer, notes, setNotes, mobile, address, setAddress, postal, setPostal, error, submitting, stripeConnected, policyLine, onBack, onConfirm }: {
   service: Service; staffName: string; time: string; customer: Customer;
   notes: string; setNotes: (v: string) => void;
-  error: string | null; submitting: boolean; stripeConnected: boolean;
+  mobile: { enabled: boolean; fee: number }; address: string; setAddress: (v: string) => void; postal: string; setPostal: (v: string) => void;
+  error: string | null; submitting: boolean; stripeConnected: boolean; policyLine: string;
   onBack: () => void; onConfirm: () => void;
 }) {
   return (
@@ -802,6 +818,14 @@ function ConfirmStep({ service, staffName, time, customer, notes, setNotes, erro
         ))}
       </div>
 
+      {mobile.enabled && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <label style={{ color: "var(--cust-text-sub)", fontSize: 12, fontWeight: 600 }}>Your address (we come to you)</label>
+          <input value={address} onChange={e => setAddress(e.target.value)} placeholder="Street address" autoComplete="street-address" style={{ width: "100%", padding: "11px 13px", borderRadius: 10, border: "1.5px solid var(--cust-input-border)", background: "var(--cust-card-bg)", color: "var(--cust-text)", fontSize: 14, outline: "none", boxSizing: "border-box" as const, fontFamily: "inherit" }} />
+          <input value={postal} onChange={e => setPostal(e.target.value)} placeholder="Postal code" autoComplete="postal-code" style={{ width: "100%", padding: "11px 13px", borderRadius: 10, border: "1.5px solid var(--cust-input-border)", background: "var(--cust-card-bg)", color: "var(--cust-text)", fontSize: 14, outline: "none", boxSizing: "border-box" as const, fontFamily: "inherit" }} />
+          {mobile.fee > 0 && <p style={{ color: "var(--cust-text-sub)", fontSize: 12.5, margin: 0 }}>Travel fee: ${mobile.fee.toFixed(2)}, added to your total.</p>}
+        </div>
+      )}
       <div>
         <label style={{ color: "var(--cust-text-sub)", fontSize: 12, fontWeight: 600, display: "block", marginBottom: 6 }}>Notes for the shop (optional)</label>
         <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={3} style={{ width: "100%", padding: "11px 13px", borderRadius: 10, border: "1.5px solid var(--cust-input-border)", background: "var(--cust-card-bg)", color: "var(--cust-text)", fontSize: 14, outline: "none", boxSizing: "border-box", fontFamily: "inherit", resize: "vertical" }} />
@@ -813,6 +837,7 @@ function ConfirmStep({ service, staffName, time, customer, notes, setNotes, erro
         </span>
       </div>
 
+      <p style={{ color: "var(--cust-text-sub)", fontSize: 12.5, margin: 0, lineHeight: 1.5 }}>{policyLine}{stripeConnected ? " By booking you agree your saved card can be charged these fees." : ""}</p>
       {error && <div style={{ padding: "10px 13px", borderRadius: 10, background: "rgb(220,38,38)", border: "1px solid rgb(220,38,38)", color: "white", fontSize: 12.5 }}>{error}</div>}
 
       <button onClick={onConfirm} disabled={submitting} style={{

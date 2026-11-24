@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { OnboardingFlow } from "./OnboardingFlow";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { needsCard } from "@/lib/billing/cardGate";
 
 export default async function OnboardingPage({
   searchParams,
@@ -20,7 +22,9 @@ export default async function OnboardingPage({
       const raw = (data.user.email ?? "").split("@")[0];
       displayName = raw.charAt(0).toUpperCase() + raw.slice(1);
     }
-    return <OnboardingFlow displayName={displayName} />;
+    const { data: shop } = await createAdminClient().from("shops")
+      .select("created_at, subscription_status, trial_override, plan").eq("owner_id", data.user.id).maybeSingle();
+    return <OnboardingFlow displayName={displayName} needsCard={Boolean(shop && needsCard(shop))} />;
   }
 
   return <OnboardingFlow displayName="Nnamdi" />;

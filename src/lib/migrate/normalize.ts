@@ -208,20 +208,27 @@ export type NStaff = { name: string; email: string | null; role: string | null }
 export type NAppointment = { clientName: string; clientEmail: string | null; clientPhone: string | null; service: string; staff: string | null; startsAt: string; duration: number; price: number; status: string; notes: string | null };
 export type NormalizedRow = NClient | NService | NStaff | NAppointment;
 
-export function normalizeRows(kind: ImportKind, rows: string[][], map: ColumnMap): { ok: NormalizedRow[]; skipped: number } {
+/** Spec 7: the whole batch can be undone within 7 days. */
+export const UNDO_DAYS = 7;
+
+export type Rejected = { row: string[]; reason: string };
+
+export function normalizeRows(kind: ImportKind, rows: string[][], map: ColumnMap): { ok: NormalizedRow[]; skipped: number; rejected: Rejected[] } {
   const get = (r: string[], key: string) => (map[key] >= 0 ? clean(r[map[key]]) : "");
   const dateCol = kind === "appointments" ? (map.datetime >= 0 ? "datetime" : "date") : kind === "clients" ? "lastVisit" : "";
   const dayFirst = dateCol ? detectDayFirst(rows.slice(0, 200).map(r => get(r, dateCol))) : false;
   const now = new Date();
   const ok: NormalizedRow[] = [];
-  let skipped = 0;
+  const rejected: Rejected[] = [];
+  const skip = (r: string[], reason: string) => { rejected.push({ row: r, reason }); };
 
   for (const r of rows) {
     if (kind === "clients") {
       const name = joinName(get(r, "fullName"), get(r, "firstName"), get(r, "lastName"));
       const email = get(r, "email").toLowerCase() || null;
       const phone = get(r, "phone") || null;
-      if (!name && !email && !phone) { skipped++; continue; }
+      // Spec 7: flag rows with no phone and no email; they can't be messaged or matched.
+      if (!email && !phone) { skip(r, name ? "No phone or email" : "Empty row"); continue; }
       const lastVisit = parseDateTime(get(r, "lastVisit"), undefined, dayFirst);
       ok.push({
         name: name || email || phone!, email, phone,
@@ -236,17 +243,17 @@ export function normalizeRows(kind: ImportKind, rows: string[][], map: ColumnMap
       const variation = get(r, "variation");
       const name = variation && !/^regular$/i.test(variation) && variation !== base ? `${base} (${variation})` : base;
       const price = parseMoney(get(r, "price"));
-      if (!name || price === null) { skipped++; continue; }
+      if (!name || price === null) { skip(r, !name ? "No service name" : "No price"); continue; }
       ok.push({ name, price, duration: parseDuration(get(r, "duration")) ?? 30, category: get(r, "category") || null });
     } else if (kind === "staff") {
       const name = joinName(get(r, "fullName"), get(r, "firstName"), get(r, "lastName"));
-      if (!name) { skipped++; continue; }
+      if (!name) { skip(r, "No name"); continue; }
       ok.push({ name, email: get(r, "email").toLowerCase() || null, role: get(r, "role") || null });
     } else {
       const startsAt = parseDateTime(get(r, dateCol), get(r, "time"), dayFirst);
       const clientName = joinName(get(r, "clientName"), get(r, "clientFirst"), get(r, "clientLast"));
       const clientEmail = get(r, "clientEmail").toLowerCase() || null;
-      if (!startsAt || (!clientName && !clientEmail)) { skipped++; continue; }
+      if (!startsAt || (!clientName && !clientEmail)) { skip(r, !startsAt ? "Date or time not readable" : "No client name or email"); continue; }
       ok.push({
         clientName: clientName || clientEmail!, clientEmail,
         clientPhone: get(r, "clientPhone") || null,
@@ -260,5 +267,5 @@ export function normalizeRows(kind: ImportKind, rows: string[][], map: ColumnMap
       });
     }
   }
-  return { ok, skipped };
+  return { ok, skipped: rejected.length, rejected };
 }

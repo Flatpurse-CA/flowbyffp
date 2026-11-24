@@ -15,6 +15,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const saved = localStorage.getItem("ffp-theme") as Theme | null;
     const resolved = saved === "light" || saved === "dark" ? saved : "dark";
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- saved theme lives in localStorage, only readable after mount (avoids a server/client mismatch)
     setTheme(resolved);
     document.documentElement.setAttribute("data-theme", resolved);
   }, []);

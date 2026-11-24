@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getShopContext } from "@/lib/dashboard/shop";
 import { createClient } from "@/lib/supabase/server";
 import { stripe } from "@/lib/stripe";
+import { applicationFeeParam } from "@/lib/billing/platformFee";
 
 // Creates a card_present PaymentIntent directly on the shop's own connected
 // account (not a platform destination charge — the Tap to Pay reader is
@@ -45,6 +46,7 @@ export async function POST(req: Request) {
       // intent as done.
       payment_method_types: currency === "cad" ? ["card_present", "interac_present"] : ["card_present"],
       capture_method: "manual",
+      ...(await applicationFeeParam(ctx.shopId, Math.round(amount * 100), "in_person")),
       metadata: appointmentId ? { appointment_id: appointmentId } : undefined,
     },
     { stripeAccount: stripeAccountId },

@@ -1,5 +1,6 @@
 "use server";
 
+import { logShopAction } from "@/lib/audit";
 import { getEffectivePlan } from "@/lib/dashboard/plan";
 import { getPlan } from "@/lib/plans";
 import { revalidatePath } from "next/cache";
@@ -263,6 +264,7 @@ export async function updateStaff(id: string, input: { fullName?: string; role?:
 export async function archiveStaff(id: string) {
   const ctx = await getShopContext();
   if (!ctx || ctx.role !== "owner") throw new Error("Only the shop owner can remove team members");
+  await logShopAction("staff_archived", { staff_id: id });
   const { supabase, shopId } = await requireShop();
 
   const { error } = await supabase

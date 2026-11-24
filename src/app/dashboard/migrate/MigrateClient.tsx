@@ -8,7 +8,20 @@ import { parseCsv } from "@/lib/migrate/csv";
 import { parseXlsx } from "@/lib/migrate/xlsx";
 import { PLATFORMS, type PlatformId } from "@/lib/migrate/platforms";
 import { autoMap, detectKind, normalizeRows, FIELDS, KIND_LABELS, type ColumnMap, type ImportKind, type NAppointment } from "@/lib/migrate/normalize";
-import { startImport, importChunk, finishImport, undoImport, type ImportSummary } from "./actions";
+import { startImport, importChunk, finishImport, undoImport, setImportAutopilot, type ImportSummary } from "./actions";
+import { UNDO_DAYS, type Rejected } from "@/lib/migrate/normalize";
+
+const DAY_MS = 86400000;
+const undoOpen = (createdAt: string) => Date.now() - new Date(createdAt).getTime() < UNDO_DAYS * DAY_MS;
+const csvCell = (v: string) => /[",\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v;
+
+/** Spec 7 report: download the skipped rows with the reason each was skipped. */
+function downloadSkipped(rows: { file: string; r: Rejected }[]) {
+  const lines = ["File,Reason,Row", ...rows.map(({ file, r }) => [file, r.reason, r.row.join(" | ")].map(csvCell).join(","))];
+  const url = URL.createObjectURL(new Blob([lines.join("\n")], { type: "text/csv" }));
+  const a = document.createElement("a"); a.href = url; a.download = "flow-import-skipped-rows.csv"; a.click();
+  URL.revokeObjectURL(url);
+}
 
 type LoadedFile = { id: string; name: string; headers: string[]; rows: string[][]; kind: ImportKind; map: ColumnMap };
 
@@ -38,7 +51,7 @@ export function MigrateClient({ imports }: { imports: ImportSummary[] }) {
   const [expanded, setExpanded] = useState<string | null>(null);
   const [dragging, setDragging] = useState(false);
   const [progress, setProgress] = useState<{ done: number; total: number; label: string } | null>(null);
-  const [result, setResult] = useState<{ id: string; counts: Record<string, number>; duplicates: number } | null>(null);
+  const [result, setResult] = useState<{ id: string; counts: Record<string, number>; duplicates: number; skipped: { file: string; r: Rejected }[] } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [undoing, setUndoing] = useState<string | null>(null);
 
@@ -99,8 +112,9 @@ export function MigrateClient({ imports }: { imports: ImportSummary[] }) {
           done += slice.length;
         }
       }
-      await finishImport(importId, counts);
-      setResult({ id: importId, counts, duplicates });
+      const skipped = normalized.flatMap(n => n.rejected.map(r => ({ file: n.file.name, r })));
+      await finishImport(importId, { ...counts, merged: duplicates, skipped: skipped.length });
+      setResult({ id: importId, counts, duplicates, skipped });
       setFiles([]);
       startTransition(() => router.refresh());
     } catch (e) {
@@ -154,9 +168,15 @@ export function MigrateClient({ imports }: { imports: ImportSummary[] }) {
               </Link>
             ))}
           </div>
-          {result.duplicates > 0 && (
-            <p style={{ color: "var(--dw35)", fontSize: 12.5, margin: 0 }}>{result.duplicates} already in Flow, so they were skipped.</p>
-          )}
+          <p style={{ color: "var(--dw35)", fontSize: 12.5, margin: 0 }}>
+            {result.duplicates} already in Flow (kept their Flow details), {result.skipped.length} skipped.{" "}
+            {result.skipped.length > 0 && (
+              <button onClick={() => downloadSkipped(result.skipped)} style={{ background: "none", border: "none", padding: 0, color: "var(--dpurple-text)", fontSize: 12.5, fontWeight: 600, cursor: "pointer" }}>Download skipped rows</button>
+            )}
+          </p>
+          <p style={{ color: "var(--dw35)", fontSize: 12.5, margin: 0 }}>
+            AutoPilot won&apos;t message these clients until you turn it on for this import below. You can undo the whole import for {UNDO_DAYS} days.
+          </p>
           <button onClick={() => undo(result.id)} disabled={undoing === result.id} style={{ alignSelf: "flex-start", display: "flex", alignItems: "center", gap: 6, padding: "8px 14px", borderRadius: 10, background: "var(--dsurface3)", border: "1px solid var(--dw07)", color: "var(--dtext)", fontSize: 12.5, fontWeight: 600, cursor: "pointer" }}>
             <Undo2 size={14} /> {undoing === result.id ? "Undoing..." : "Undo this import"}
           </button>
@@ -272,7 +292,7 @@ export function MigrateClient({ imports }: { imports: ImportSummary[] }) {
           <div style={{ color: "var(--dtext)", fontSize: 14, fontWeight: 700, marginBottom: 10 }}>Past imports</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {imports.map(imp => {
-              const total = Object.values(imp.counts ?? {}).reduce((s, n) => s + Number(n), 0);
+              const total = Object.entries(imp.counts ?? {}).filter(([k]) => k !== "merged" && k !== "skipped").reduce((s, [, n]) => s + Number(n), 0);
               return (
                 <div key={imp.id} style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", fontSize: 12.5 }}>
                   <span style={{ color: "var(--dtext)", fontWeight: 600 }}>{platformName(imp.source)}</span>
@@ -280,7 +300,13 @@ export function MigrateClient({ imports }: { imports: ImportSummary[] }) {
                   <span style={{ padding: "2px 8px", borderRadius: 99, fontSize: 11, fontWeight: 700, color: "white", background: imp.status === "completed" ? "rgb(22,163,74)" : imp.status === "undone" ? "rgb(107,114,128)" : "rgb(217,119,6)" }}>
                     {imp.status === "completed" ? "Done" : imp.status === "undone" ? "Undone" : "Incomplete"}
                   </span>
-                  {imp.status !== "undone" && (
+                  {imp.status === "completed" && (
+                    <label style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "var(--dw35)", cursor: "pointer" }}>
+                      <input type="checkbox" defaultChecked={imp.autopilot_enabled} onChange={(e) => { void setImportAutopilot(imp.id, e.target.checked); }} />
+                      AutoPilot can message these clients
+                    </label>
+                  )}
+                  {imp.status !== "undone" && undoOpen(imp.created_at) && (
                     <button onClick={() => undo(imp.id)} disabled={undoing === imp.id} style={{ marginLeft: "auto", background: "none", border: "none", color: "var(--dpurple-text)", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
                       {undoing === imp.id ? "Undoing..." : "Undo"}
                     </button>

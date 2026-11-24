@@ -134,7 +134,7 @@ export default function FoundationsGrid() {
               lineHeight: 1.75,
               margin: 0,
             }}>
-              The core of smart booking, automated recovery, and real-time client intelligence, all powered by FlatPurse Flow's AutoPilot engine.
+              The core of smart booking, automated recovery, and real-time client intelligence, all powered by FlatPurse Flow&apos;s AutoPilot engine.
             </p>
           </div>
           <Link href="/autopilot" style={{

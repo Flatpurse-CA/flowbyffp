@@ -36,10 +36,13 @@ export default function LandingNav({ active = "home", variant = "v1" }: { active
 
   // Close on arrival, not on tap: unmounting the link inside its own click
   // handler can cancel the navigation on touch browsers.
-  useEffect(() => {
+  // (State adjusted during render when the path changes, per React docs.)
+  const [menuPath, setMenuPath] = useState(pathname);
+  if (menuPath !== pathname) {
+    setMenuPath(pathname);
     setMenuOpen(false);
     setResourcesOpen(false);
-  }, [pathname]);
+  }
 
   useEffect(() => {
     if (!resourcesOpen) return;

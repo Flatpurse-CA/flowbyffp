@@ -11,7 +11,7 @@ FlatPurse Flow is booking and client management software with an AI Front Desk, 
 - Pro+, C$189: unlimited team members at one location. Adds AutoPilot (No-Show Recovery about an hour after a missed appointment, Last-Minute Slot Filler, win-backs, birthday offers), Flow Coach, Business Health Score and revenue forecasting.
 - Enterprise: custom, 3+ locations.
 - Founders Beta: 40% off year 1, then 25% off for life.
-- Every plan starts with a free 14-day trial of Pro+, no card required.
+- Every plan starts with a free 14-day trial of Pro+. Cancel any time before it ends.
 
 ## Payments
 

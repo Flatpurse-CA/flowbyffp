@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, TrendingDown, TrendingUp, AlertTriangle, MoreHorizontal, X, Clock } from "lucide-react";
@@ -213,7 +215,9 @@ function buildStaffHourRows(initial: StaffHourRow[]): StaffHourRow[] {
 // Per-staff hours, distinct from the shop-wide hours in Settings — no rows
 // here means this staff member just follows the shop's default hours.
 function StaffHoursCard({ staffId }: { staffId: string }) {
-  const [loading, setLoading] = useState(true);
+  // Loading = the hours on screen are not for this staff member yet.
+  const [loadedFor, setLoadedFor] = useState<string | null>(null);
+  const loading = loadedFor !== staffId;
   const [customized, setCustomized] = useState(false);
   const [rows, setRows] = useState<StaffHourRow[]>([]);
   const [saving, setSaving] = useState(false);
@@ -221,12 +225,11 @@ function StaffHoursCard({ staffId }: { staffId: string }) {
 
   useEffect(() => {
     let cancelled = false;
-    setLoading(true);
     getStaffHours(staffId).then(existing => {
       if (cancelled) return;
       setCustomized(existing.length > 0);
       setRows(buildStaffHourRows(existing));
-      setLoading(false);
+      setLoadedFor(staffId);
     });
     return () => { cancelled = true; };
   }, [staffId]);
@@ -414,6 +417,9 @@ export function TeamClient({ staff, appointments }: { staff: StaffRow[]; appoint
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div>
             <h1 style={{ color: "var(--dtext)", fontSize: 22, fontWeight: 800, margin: "0 0 3px", letterSpacing: "-0.03em" }}>Team</h1>
+            <Link href="/dashboard/team/time-off" style={{ color: "rgb(109,40,217)", fontWeight: 600, fontSize: 13 }}>Time off</Link>
+            <Link href="/dashboard/team/performance" style={{ color: "rgb(109,40,217)", fontWeight: 600, fontSize: 13, marginLeft: 12 }}>Performance</Link>
+            <Link href="/dashboard/team/commissions" style={{ color: "rgb(109,40,217)", fontWeight: 600, fontSize: 13, marginLeft: 12 }}>Commissions</Link>
             <p style={{ color: "var(--dw35)", fontSize: 13, margin: 0 }}>{staff.length} active staff member{staff.length === 1 ? "" : "s"}</p>
           </div>
           <button onClick={() => setShowAdd(true)} style={{
