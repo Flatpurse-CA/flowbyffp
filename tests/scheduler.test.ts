@@ -13,24 +13,27 @@ describe("scheduler local time", () => {
   });
 
   it("next Monday 7am is in the shop's own timezone", () => {
-    const from = new Date("2026-11-25T18:00:00Z"); // Wednesday
+    const from = zonedTime(ED, 2026, 11, 25, 11, 0); // Wednesday
     const t = nextWeekdayAt(ED, 1, 7, from);
     expect(localParts(t, ED)).toMatchObject({ wd: 1, h: 7, mi: 0, d: 30, m: 11 });
     expect(nextWeekdayAt(TO, 1, 7, from).getTime()).toBeLessThan(t.getTime());
   });
 
+  // Times are built in local wall-clock time so the tests hold whatever offset
+  // the tz database gives a zone (Alberta's rules changed in newer tzdata).
   it("quiet hours are 9pm to 8am local", () => {
-    expect(inQuietHours(ED, new Date("2026-11-25T04:30:00Z"))).toBe(true);  // 9:30pm MST
-    expect(inQuietHours(ED, new Date("2026-11-25T18:00:00Z"))).toBe(false); // 11am MST
-    expect(inQuietHours(ED, new Date("2026-11-25T14:30:00Z"))).toBe(true);  // 7:30am MST
+    expect(inQuietHours(ED, zonedTime(ED, 2026, 11, 24, 21, 30))).toBe(true);
+    expect(inQuietHours(ED, zonedTime(ED, 2026, 11, 25, 11, 0))).toBe(false);
+    expect(inQuietHours(ED, zonedTime(ED, 2026, 11, 25, 7, 30))).toBe(true);
+    expect(inQuietHours(ED, zonedTime(ED, 2026, 11, 25, 8, 0))).toBe(false);
   });
 
   it("held texts go out at 8am local", () => {
-    const late = nextSendWindow(ED, new Date("2026-11-25T05:00:00Z")); // 10pm Nov 24 MST
+    const late = nextSendWindow(ED, zonedTime(ED, 2026, 11, 24, 22, 0));
     expect(localParts(late, ED)).toMatchObject({ d: 25, h: 8, mi: 0 });
-    const early = nextSendWindow(ED, new Date("2026-11-25T12:00:00Z")); // 5am Nov 25 MST
+    const early = nextSendWindow(ED, zonedTime(ED, 2026, 11, 25, 5, 0));
     expect(localParts(early, ED)).toMatchObject({ d: 25, h: 8 });
-    const day = new Date("2026-11-25T18:00:00Z");
+    const day = zonedTime(ED, 2026, 11, 25, 11, 0);
     expect(nextSendWindow(ED, day)).toBe(day);
   });
 });
