@@ -54,7 +54,7 @@ Legend: DONE = built, verify only · PARTIAL = something exists, needs finishing
 | FL-074 | Staff invites, roles, weekly hours | DONE (verify) |
 | FL-075 | SMS allowances per plan, 80% warning, email fallback | DONE (migration 0062; placeholder 200/1000/3000 via SMS_ALLOWANCE env; meter on Settings) |
 | FL-077 | Offline read-only today's schedule | DONE (service worker serves /offline.html with schedule saved every 5 min) |
-| FL-078/079 | Admin console v1 + "view as owner" | PARTIAL |
+| FL-078/079 | Admin console v1 + "view as owner" | PARTIAL (079 DONE: read-only view at /admin/view/[shop], support reason required, 1-hour session, logged to admin audit + owner activity log; Founders hold button on user page; left: admin 2-step required, stage S0-S4 + health, Stripe invoices/refunds, pause AutoPilot per account) |
 | FL-056/057 | AI Front Desk SMS + web chat, guardrails, take over | PARTIAL |
 | FL-058/059 | Mobile Mode core + Pro (ETA, running late, route) | DONE (migration 0063; area by postal prefix, flat travel fee, drive buffer; Today's route with ETA/late texts; no live GPS ETA) |
 | FL-060 | CSV migration w/ undo | PARTIAL |

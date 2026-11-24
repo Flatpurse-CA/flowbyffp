@@ -8,6 +8,7 @@ const LABELS: Record<string, string> = {
   refund: "Refund issued", policy_saved: "Booking policy changed", data_export: "Client data exported",
   no_show_fee: "No-show fee charged", plan_cancel: "Plan cancelled", plan_pause: "Plan paused",
   staff_archived: "Team member removed", resource_deleted: "Room/equipment deleted", account_deletion: "Account deletion scheduled",
+  support_view: "FlatPurse support viewed your account (read-only)",
 };
 
 /** FL-013: owner-only activity log of sensitive actions. */

@@ -7,6 +7,7 @@ import { computeAccessStatus } from "@/lib/dashboard/accessStatus";
 import { formatCAD, planLabel, ADMIN_PLAN_BADGE } from "@/lib/plans";
 import { banUser, unbanUser, deleteUser, sendSetupReminder } from "../actions";
 import { addAdmin, removeAdmin } from "../../settings/actions";
+import { startViewAsOwner, holdFounderSpot } from "../supportActions";
 import { pill, fmtDate } from "../AccountsTable";
 
 const KIND_LABEL = { owner: "Shop owner", client: "Client", team: "Team member" } as const;
@@ -33,14 +34,15 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 }
 const grid: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: "18px 24px" };
 
-export default async function AdminUserProfilePage({ params }: { params: Promise<{ id: string }> }) {
+export default async function AdminUserProfilePage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ viewas?: string; founders?: string }> }) {
   const { id } = await params;
+  const flags = await searchParams;
   const accounts = await loadAccounts();
   const a = accounts.find(x => x.user.id === id);
   if (!a) notFound();
 
   const admin = createAdminClient();
-  const [shopApptsRes, teamRes, clientApptsRes] = await Promise.all([
+  const [shopApptsRes, teamRes, clientApptsRes, founderRes] = await Promise.all([
     a.shop ? admin.from("appointments").select("status, price").eq("shop_id", a.shop.id) : Promise.resolve({ data: null }),
     a.shop ? admin.from("staff").select("id", { count: "exact", head: true }).eq("shop_id", a.shop.id).eq("active", true) : Promise.resolve({ count: null }),
     a.customer
@@ -48,7 +50,9 @@ export default async function AdminUserProfilePage({ params }: { params: Promise
       : a.staff
         ? admin.from("appointments").select("id, shop_id, service_name, starts_at, status, price").eq("staff_id", a.staff.id).order("starts_at", { ascending: false }).limit(25)
         : Promise.resolve({ data: null }),
+    a.shop ? admin.from("shops").select("founder_status").eq("id", a.shop.id).maybeSingle() : Promise.resolve({ data: null }),
   ]);
+  const founderStatus = (founderRes.data as { founder_status: string | null } | null)?.founder_status ?? null;
   const shopNames = new Map(accounts.filter(x => x.shop).map(x => [x.shop!.id, x.shop!.name]));
   const shopAppts = (shopApptsRes.data ?? []) as { status: string; price: number }[];
   const revenue = shopAppts.filter(ap => ap.status === "completed").reduce((t, ap) => t + (Number(ap.price) || 0), 0);
@@ -151,7 +155,35 @@ export default async function AdminUserProfilePage({ params }: { params: Promise
             <Field label="Shop created">{fmtDate(a.shop.created_at)}</Field>
           </div>
         </div>
-      ) : (
+      ) : null)}
+
+      {a.kind === "owner" && a.shop && (
+        <div style={card}>
+          <p style={cardTitle}>Support</p>
+          <form action={startViewAsOwner} style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+            <input type="hidden" name="shopId" value={a.shop.id} />
+            <input type="hidden" name="userId" value={a.user.id} />
+            <input name="reason" required minLength={8} placeholder="Support reason (required, the owner will see it)" style={{ flex: 1, minWidth: 220, height: 32, borderRadius: 9, border: "1px solid var(--aw08)", background: "var(--asurface1)", color: "var(--atext2)", padding: "0 10px", fontSize: 12.5, fontFamily: "inherit" }} />
+            <button type="submit" style={btn}>View as owner (read-only)</button>
+          </form>
+          {flags.viewas === "reason" && <p style={{ color: "#f87171", fontSize: 12.5, margin: "8px 0 0" }}>Enter a support reason of at least 8 characters.</p>}
+          {flags.viewas === "failed" && <p style={{ color: "#f87171", fontSize: 12.5, margin: "8px 0 0" }}>Couldn&apos;t start the session. Try again.</p>}
+          <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", marginTop: 14 }}>
+            <span style={{ color: "var(--atext2)", fontSize: 13 }}>Founders: {founderStatus === "claimed" ? "Claimed" : founderStatus === "held" ? "Spot held" : "No spot"}</span>
+            {!founderStatus && (
+              <form action={holdFounderSpot}>
+                <input type="hidden" name="shopId" value={a.shop.id} />
+                <input type="hidden" name="userId" value={a.user.id} />
+                <button type="submit" style={btn}>Hold a Founders spot</button>
+              </form>
+            )}
+            {flags.founders === "held" && <span style={{ color: "#34d399", fontSize: 12.5 }}>Spot held.</span>}
+            {flags.founders === "full" && <span style={{ color: "#f87171", fontSize: 12.5 }}>No spots left or the deadline has passed.</span>}
+          </div>
+        </div>
+      )}
+
+      {a.kind === "owner" && !a.shop && (
         <div style={{ ...card, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
           <div>
             <p style={{ ...cardTitle, margin: "0 0 6px" }}>Shop</p>
@@ -165,7 +197,7 @@ export default async function AdminUserProfilePage({ params }: { params: Promise
             </p>
           </div>
         </div>
-      ))}
+      )}
 
       {/* Team member: where they work */}
       {a.kind === "team" && (
