@@ -105,3 +105,4 @@ FL-102/103 Flow Voice · FL-104-106 gift cards, packages, memberships · FL-107/
 
 - Attribution ledger (Spec 0/2, Nov 24): DONE. attributions table (migration 0072), per-flow windows (no-show 7d, filler 48h, win-back 14d, rebook 14d, birthday 30d, front desk 7d), revenue recovered counts only completed bookings (trigger sets autopilot_events.amount on completion, clears on cancel/no-show).
 - Team permissions (George Nov 21, Nov 24): DONE. Refunds owner-only unless owner grants staff can_refund (Settings > Security); owner can require 2-step for the team (staff without aal2 sent to Security). Migration 0075.
+- Retention (George Nov 21, Nov 24): DONE. Owner deletion purges after 30 days (was 7). purge_shop() archives tax records 6y + signed intake 7y (answers stay encrypted) before deleting; pg_cron prunes expired archives daily. Migration 0076. Still gated by DATA_DELETION_ENABLED (off). Privacy page says tax 7 years: George/lawyer to align.

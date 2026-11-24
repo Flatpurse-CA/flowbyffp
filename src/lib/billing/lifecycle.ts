@@ -24,10 +24,15 @@ type Row = {
 };
 const COLS = "id, name, owner_id, plan, cancel_at, plan_ended_at, paused_until, deletion_scheduled_at, subscription_status, billing_notices";
 
+/** Archives tax records (6 years) and signed intake forms (7 years), logs, then deletes the shop. One transaction (migration 0076). */
 export async function purgeShop(admin: SupabaseClient, shopId: string, reason: "owner_request" | "post_cancel_90d") {
-  await admin.from("deletion_log").insert({ shop_id: shopId, reason });
-  await admin.from("shops").delete().eq("id", shopId);
+  const { error } = await admin.rpc("purge_shop", { p_shop: shopId, p_reason: reason });
+  if (error) throw new Error(`purge failed: ${error.message}`);
 }
+
+/** Owner-requested deletion runs 30 days after the request (George, Nov 21). */
+export const DELETION_GRACE_DAYS = 30;
+const RETENTION_NOTE = "As the law requires, we keep tax records for 6 years and signed intake forms for 7 years, then delete them too.";
 
 /** Daily: C2-C9 after a cancellation, P2 before a pause ends, D2/D3 for account deletion. */
 export async function runLifecycleJob(admin: SupabaseClient) {
@@ -58,7 +63,7 @@ export async function runLifecycleJob(admin: SupabaseClient) {
       } else if (at <= now && deletionEnabled()) {
         contact ??= await ownerContact(admin, shop.owner_id);
         await purgeShop(admin, shop.id, "owner_request");
-        if (contact.email) await sendBillingEmail(contact.email, { subject: "Your Flow account has been deleted", heading: "Your account has been deleted", body: `Hi ${contact.firstName},\n\nAs requested, we've deleted ${shop.name}'s Flow account and data. Thank you for trying Flow.\n\nGeorge` });
+        if (contact.email) await sendBillingEmail(contact.email, { subject: "Your Flow account has been deleted", heading: "Your account has been deleted", body: `Hi ${contact.firstName},\n\nAs requested, we've deleted ${shop.name}'s Flow account and data. ${RETENTION_NOTE} Thank you for trying Flow.\n\nGeorge` });
         out.purged++;
       }
       continue;
@@ -91,7 +96,7 @@ export async function runLifecycleJob(admin: SupabaseClient) {
         if (deletionEnabled()) {
           contact ??= await ownerContact(admin, shop.owner_id);
           await purgeShop(admin, shop.id, "post_cancel_90d");
-          if (contact.email) await sendBillingEmail(contact.email, { subject: "Your Flow data has been deleted", heading: "Your Flow data has been deleted", body: `Hi ${contact.firstName},\n\nAs promised, we've deleted ${shop.name}'s data from Flow. If you ever want to come back, you can start fresh anytime. Thank you for trying Flow.\n\nGeorge` });
+          if (contact.email) await sendBillingEmail(contact.email, { subject: "Your Flow data has been deleted", heading: "Your Flow data has been deleted", body: `Hi ${contact.firstName},\n\nAs promised, we've deleted ${shop.name}'s data from Flow. ${RETENTION_NOTE} If you ever want to come back, you can start fresh anytime. Thank you for trying Flow.\n\nGeorge` });
           out.purged++;
         }
       } else if (day >= 83) {

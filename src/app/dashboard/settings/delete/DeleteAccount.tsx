@@ -13,7 +13,7 @@ const btn: React.CSSProperties = { border: "none", borderRadius: 10, padding: "1
 const input: React.CSSProperties = { width: "100%", boxSizing: "border-box", background: "var(--dsurface1)", border: "1px solid var(--dsurface3)", borderRadius: 10, padding: "11px 12px", color: "var(--dtext)", fontSize: 14 };
 const fmt = (iso: string) => new Date(iso).toLocaleDateString("en-CA", { month: "long", day: "numeric", year: "numeric" });
 
-/** Account deletion (FL-069): never blocked by offers; type name + emailed code; 7-day grace. */
+/** Account deletion (FL-069): never blocked by offers; type name + emailed code; 30-day grace. */
 export function DeleteAccount({ businessName, scheduledAt }: { businessName: string; scheduledAt: string | null }) {
   const [name, setName] = useState("");
   const [code, setCode] = useState("");
@@ -37,7 +37,7 @@ export function DeleteAccount({ businessName, scheduledAt }: { businessName: str
   return (
     <div style={wrap}>
       <h1 style={{ color: "var(--dtext)", fontSize: 22, margin: 0 }}>Delete account</h1>
-      <p style={{ ...p, color: "var(--dtext)" }}>This permanently deletes {businessName}&apos;s clients, appointments, staff, messages, AutoPilot and AI logs, and settings. Your subscription is cancelled right away, so there are no more charges.</p>
+      <p style={{ ...p, color: "var(--dtext)" }}>This permanently deletes {businessName}&apos;s clients, appointments, staff, messages, AutoPilot and AI logs, and settings, 30 days from now. Your subscription is cancelled right away, so there are no more charges. Tax records are kept for 6 years and signed intake forms for 7 years, as the law requires, then deleted.</p>
       <p style={p}>We keep only what the law requires, such as financial and tax records. Stripe keeps its own payment records.</p>
       <p style={p}>Just need a break? <Link href="/dashboard/settings/cancel" style={{ color: "var(--dpurple-text)" }}>Pause instead.</Link></p>
       <a href={EXPORT_HREF} download style={{ color: "var(--dpurple-text)", fontSize: 14, fontWeight: 600 }}>Download my data first (ZIP of CSVs)</a>

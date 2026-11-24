@@ -1,5 +1,6 @@
 "use server";
 
+import { DELETION_GRACE_DAYS } from "@/lib/billing/lifecycle";
 import { logShopAction } from "@/lib/audit";
 import { createHash, randomInt } from "node:crypto";
 import { revalidatePath } from "next/cache";
@@ -39,7 +40,7 @@ export async function sendDeletionCode(): Promise<{ error?: string }> {
   return {};
 }
 
-/** Step 2: business name + code. Cancels billing now, deletes in 7 days. */
+/** Step 2: business name + code. Cancels billing now, deletes in 30 days. */
 export async function scheduleDeletion(input: { businessName: string; code: string }): Promise<{ date?: string; error?: string }> {
   const o = await owner();
   if (!o) return { error: "Only the owner can delete the account" };
@@ -59,7 +60,7 @@ export async function scheduleDeletion(input: { businessName: string; code: stri
     }
   }
 
-  const at = new Date(Date.now() + 7 * DAY);
+  const at = new Date(Date.now() + DELETION_GRACE_DAYS * DAY);
   // paused_until switches the booking page and AutoPilot off during the grace period.
   await admin.from("shops").update({
     deletion_scheduled_at: at.toISOString(), paused_until: at.toISOString(),
@@ -72,7 +73,7 @@ export async function scheduleDeletion(input: { businessName: string; code: stri
     await sendBillingEmail(email, {
       subject: `Your Flow account will be deleted on ${fmtDate(at)}`,
       heading: `Deletion scheduled for ${fmtDate(at)}`,
-      body: `Hi ${firstName},\n\nYour booking page and AutoPilot are now off, and your subscription is cancelled. On ${fmtDate(at)} we'll permanently delete ${shop.name}'s clients, appointments, staff, messages, AutoPilot and AI logs, and settings.\n\nDownload a copy first: ${SITE}/api/account/export\n\nChanged your mind? Cancel the deletion any time before then.\n\nGeorge`,
+      body: `Hi ${firstName},\n\nYour booking page and AutoPilot are now off, and your subscription is cancelled. On ${fmtDate(at)} we'll permanently delete ${shop.name}'s clients, appointments, staff, messages, AutoPilot and AI logs, and settings. We keep tax records for 6 years and signed intake forms for 7 years, as the law requires, then delete them too.\n\nDownload a copy first: ${SITE}/api/account/export\n\nChanged your mind? Cancel the deletion any time before then.\n\nGeorge`,
       ctaLabel: "Cancel deletion",
       ctaUrl: `${SITE}/dashboard/settings/delete`,
     });
