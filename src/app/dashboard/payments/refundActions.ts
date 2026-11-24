@@ -5,11 +5,12 @@ import { revalidatePath } from "next/cache";
 import { getShopContext, getAuthUser } from "@/lib/dashboard/shop";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { stripe } from "@/lib/stripe";
+import { canRefund } from "@/lib/auth/permissions";
 
-/** FL-038: owner refunds a card payment with a required reason; tax reversed in proportion. */
+/** FL-038: owner (or staff granted can_refund) refunds a card payment with a required reason; tax reversed in proportion. */
 export async function refundPayment(input: { appointmentId: string; amount: number; reason: string }): Promise<{ error?: string }> {
   const ctx = await getShopContext();
-  if (!ctx || ctx.role !== "owner") return { error: "Only the owner can issue refunds" };
+  if (!(await canRefund(ctx)) || !ctx) return { error: "Only the owner, or a team member they allow, can issue refunds" };
   const reason = input.reason.trim().slice(0, 300);
   if (reason.length < 3) return { error: "A reason is required" };
   const admin = createAdminClient();

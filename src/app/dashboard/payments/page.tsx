@@ -1,3 +1,4 @@
+import { canRefund } from "@/lib/auth/permissions";
 import { redirect } from "next/navigation";
 import { Wallet } from "lucide-react";
 import { listPayments } from "./actions";
@@ -30,8 +31,10 @@ const STATUS_COLOR: Record<string, { fg: string; bg: string }> = {
 
 export default async function PaymentsPage() {
   const ctx = await getShopContext();
-  if (ctx && ctx.role !== "owner") redirect("/dashboard");
-  const isOwner = ctx?.role === "owner";
+  // Staff reach Payments only when the owner lets them issue refunds.
+  const refunder = await canRefund(ctx);
+  if (ctx && ctx.role !== "owner" && !refunder) redirect("/dashboard");
+  const isOwner = refunder;
 
   const now = new Date();
   const rangeStart = new Date(now);

@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
+import { createClient } from "@/lib/supabase/server";
 import { getAuthUser, getShopContext } from "@/lib/dashboard/shop";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getUnreadCount } from "./messages/actions";
@@ -31,6 +32,18 @@ export default async function DashboardLayout({ children }: { children: React.Re
       .eq("id", ctx.shopId)
       .maybeSingle();
     if (billing && needsCard(billing)) redirect("/signup/card");
+  }
+
+  // Owner can require 2-step for the whole team (George Nov 21).
+  if (ctx && ctx.role === "staff") {
+    const [{ data: s }, path] = await Promise.all([
+      createAdminClient().from("shops").select("require_team_2fa").eq("id", ctx.shopId).maybeSingle(),
+      headers().then((h) => h.get("x-pathname") ?? ""),
+    ]);
+    if (s?.require_team_2fa && !path.startsWith("/dashboard/settings/security")) {
+      const { data: aal } = await (await createClient()).auth.mfa.getAuthenticatorAssuranceLevel();
+      if (aal?.currentLevel !== "aal2") redirect("/dashboard/settings/security?required=1");
+    }
   }
 
   // Same idea one step earlier: an owner who signed up (has an owner profile)
