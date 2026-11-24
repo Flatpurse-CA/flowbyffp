@@ -32,7 +32,7 @@ const FILLER_OFFERS_PER_SLOT = 3;  // per run (runs every 15 min)
 const FILLER_MAX_PER_SLOT = 10;    // per opening, in total
 
 type Appt = ClientAppointment & {
-  id: string; service_name: string; staff_id: string | null; updated_at: string | null;
+  id: string; service_name: string; staff_id: string | null; updated_at: string | null; import_id?: string | null;
 };
 
 type Shop = {
@@ -107,7 +107,7 @@ async function runShop(admin: ReturnType<typeof createAdminClient>, shop: Shop, 
   const since = new Date(now.getTime() - 400 * DAY).toISOString();
   const { data: rows } = await admin
     .from("appointments")
-    .select("id, client_name, client_phone, client_email, customer_id, starts_at, price, status, service_name, staff_id, updated_at")
+    .select("id, client_name, client_phone, client_email, customer_id, starts_at, price, status, service_name, staff_id, updated_at, import_id")
     .eq("shop_id", shop.id)
     .gte("starts_at", since)
     .order("starts_at", { ascending: true })
@@ -131,7 +131,7 @@ async function runShop(admin: ReturnType<typeof createAdminClient>, shop: Shop, 
 
   // Consent + exclusions (FL-006/029/061).
   const { data: clientRows } = await admin
-    .from("clients").select("id, full_name, email, phone, date_of_birth, marketing_consent, do_not_automate")
+    .from("clients").select("id, full_name, email, phone, date_of_birth, marketing_consent, do_not_automate, import_id")
     .eq("shop_id", shop.id).limit(10000);
   const excluded = new Set<string>();
   const express = new Set<string>();
@@ -139,6 +139,18 @@ async function runShop(admin: ReturnType<typeof createAdminClient>, shop: Shop, 
     const k = keyOf((c.email as string | null) ?? null, (c.phone as string | null) ?? null, (c.full_name as string) ?? "");
     if (c.do_not_automate) excluded.add(k);
     if (c.marketing_consent === "express") express.add(k);
+  }
+  // Spec 7: imported clients stay off-limits until the owner turns AutoPilot on for that import.
+  // A client who has also booked in Flow itself is a live client and is not held back.
+  const { data: held } = await admin.from("imports").select("id").eq("shop_id", shop.id).eq("autopilot_enabled", false).neq("status", "undone");
+  const heldIds = new Set((held ?? []).map(i => i.id as string));
+  if (heldIds.size) {
+    const live = new Set(appts.filter(a => !a.import_id).map(a => keyOf(a.client_email, a.client_phone, a.client_name)));
+    const imported = [
+      ...appts.filter(a => a.import_id && heldIds.has(a.import_id)).map(a => keyOf(a.client_email, a.client_phone, a.client_name)),
+      ...(clientRows ?? []).filter(c => c.import_id && heldIds.has(c.import_id as string)).map(c => keyOf((c.email as string | null) ?? null, (c.phone as string | null) ?? null, (c.full_name as string) ?? "")),
+    ];
+    for (const k of imported) if (!live.has(k)) excluded.add(k);
   }
   const phones = [...new Set(appts.map(a => toE164(a.client_phone)).concat((clientRows ?? []).map(c => toE164(c.phone as string | null))).filter((p): p is string => Boolean(p)))];
   const optedOut = new Set<string>();

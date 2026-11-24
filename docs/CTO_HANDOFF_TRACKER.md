@@ -57,7 +57,7 @@ Legend: DONE = built, verify only · PARTIAL = something exists, needs finishing
 | FL-078/079 | Admin console v1 + "view as owner" | PARTIAL (079 DONE: read-only view at /admin/view/[shop], support reason required, 1-hour session, logged to admin audit + owner activity log; Founders hold button on user page; left: admin 2-step required, stage S0-S4 + health, Stripe invoices/refunds, pause AutoPilot per account) |
 | FL-056/057 | AI Front Desk SMS + web chat, guardrails, take over | PARTIAL |
 | FL-058/059 | Mobile Mode core + Pro (ETA, running late, route) | DONE (migration 0063; area by postal prefix, flat travel fee, drive buffer; Today's route with ETA/late texts; no live GPS ETA) |
-| FL-060 | CSV migration w/ undo | PARTIAL |
+| FL-060 | CSV migration w/ undo | DONE (undo limited to 7 days; rows with no phone/email skipped with reasons + CSV download; report shows merged/skipped; AutoPilot holds imported clients until owner turns it on per import, migration 0070) |
 | FL-083/085 | Quebec French waitlist; Google booking link tip | PARTIAL |
 | FL-084 | Help centre + in-app ? + status page | PARTIAL |
 
