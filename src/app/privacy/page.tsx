@@ -100,10 +100,11 @@ Where we act as a processor, the Business User is responsible for ensuring it ha
     intro: "We retain personal information for as long as necessary to provide the Service, comply with our legal obligations, resolve disputes, and enforce our agreements. Specific retention practices include:",
     items: [
       "Account data: retained for the life of the account and for a reasonable period after termination.",
-      "Billing and tax records: retained as required by Canadian tax and accounting law (typically seven years).",
+      "Billing and tax records: retained for six (6) years from the end of the last tax year to which they relate, as required by the Income Tax Act (Canada) and Alberta tax law, or longer where the Canada Revenue Agency requires.",
+      "Client intake forms: retained for seven (7) years from the date of the client's last appointment, after which they are securely destroyed.",
       "End-customer data: retained as instructed by the Business User and deleted or returned upon termination of the Business User's account, subject to legal holds.",
       "Logs and security data: typically retained for up to 24 months.",
-      "Deletion of personal data: Upon account closure or a valid deletion request, we will erase your personal data within thirty (30) days, except where longer retention is required to comply with legal, tax, or regulatory obligations (including the billing, tax, and security retention periods described above).",
+      "Deletion of personal data: Upon account closure or a valid deletion request, we will erase your personal data within thirty (30) days, except where longer retention is required to comply with legal, tax, or regulatory obligations (including the billing, tax, client intake form, and security retention periods described above).",
     ],
   },
   {
