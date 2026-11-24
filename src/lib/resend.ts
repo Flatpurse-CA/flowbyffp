@@ -1,5 +1,6 @@
 import { Resend } from "resend";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { logMessage, type MessageLogEntry } from "@/lib/messageLog";
 
 const FROM = process.env.RESEND_FROM_EMAIL ?? "FlatPurse Flow <onboarding@resend.dev>";
 // Founder emails (Spec 4B): "George from Flow" on mail.flatpurse.com, replies go to George.
@@ -14,7 +15,7 @@ function client(): Resend | null {
 
 // Never throws — callers destructure `{ error }` the same way the Resend SDK
 // itself responds, whether the failure is a missing API key or a real send error.
-async function send(payload: { to: string; subject: string; html: string; attachments?: { filename: string; content: string; contentType?: string }[]; from?: string; replyTo?: string }) {
+async function send(payload: { to: string; subject: string; html: string; attachments?: { filename: string; content: string; contentType?: string }[]; from?: string; replyTo?: string; log?: { shopId?: string | null; kind?: string; audience?: MessageLogEntry["audience"] } }) {
   const c = client();
   if (!c) {
     return {
@@ -22,7 +23,14 @@ async function send(payload: { to: string; subject: string; html: string; attach
       error: { name: "config_error", message: "RESEND_API_KEY is not set, add it to .env.local (or the deployment's env vars) before sending email." },
     };
   }
-  return c.emails.send({ ...payload, from: payload.from ?? FROM });
+  const { log, ...msg } = payload;
+  const res = await c.emails.send({ ...msg, from: msg.from ?? FROM });
+  await logMessage({
+    shopId: log?.shopId, channel: "email", audience: log?.audience ?? "system", kind: log?.kind,
+    recipient: msg.to, subject: msg.subject, status: res.error ? "failed" : "sent",
+    providerId: res.data?.id ?? null, error: res.error?.message ?? null,
+  });
+  return res;
 }
 
 function icsEscape(text: string) {
@@ -634,5 +642,5 @@ export async function sendShopSetupReminderEmail(to: string, input: { firstName:
 export async function sendLifecycleEmail(to: string, key: EmailTemplateKey, vars: Record<string, string>, ctaUrl?: string) {
   const { subject, html } = await renderTemplate(key, vars, { ctaUrl });
   const founder = FOUNDER_KEYS.includes(key);
-  return send({ to, subject, html, ...(founder ? { from: FOUNDER_FROM, replyTo: FOUNDER_REPLY_TO } : {}) });
+  return send({ to, subject, html, ...(founder ? { from: FOUNDER_FROM, replyTo: FOUNDER_REPLY_TO } : {}), log: { kind: key, audience: "owner" } });
 }

@@ -15,6 +15,10 @@
     {
       "path": "/api/cron/lifecycle",
       "schedule": "0 15 * * *"
+    },
+    {
+      "path": "/api/cron/jobs",
+      "schedule": "5 15 * * *"
     }
   ],
   "regions": [

@@ -2,6 +2,8 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { sendSms } from "@/lib/twilio";
 import { sendBillingEmail } from "@/lib/resend";
 import { ownerContact } from "@/lib/billing/notices";
+import { logMessage } from "@/lib/messageLog";
+import { enqueueJob, inQuietHours, nextSendWindow, shopTimezone } from "@/lib/scheduler";
 
 /**
  * FL-075: monthly SMS allowance per plan. Numbers are placeholders until cost
@@ -27,10 +29,23 @@ export async function smsUsage(shopId: string): Promise<{ sent: number; allowanc
 }
 
 /** Send a shop's SMS, counting it against the allowance. */
-export async function sendShopSms(shopId: string, to: string, body: string, opts: { marketing: boolean }): Promise<{ error?: string; overAllowance?: boolean }> {
+export async function sendShopSms(shopId: string, to: string, body: string, opts: { marketing: boolean; automated?: boolean; kind?: string }): Promise<{ error?: string; overAllowance?: boolean; queued?: boolean }> {
+  // Spec: no automated texts 9pm-8am local time; queue them for 8am instead (FL-004).
+  if (opts.automated) {
+    const tz = await shopTimezone(shopId);
+    if (inQuietHours(tz)) {
+      const { error } = await enqueueJob("sms.send", nextSendWindow(tz), { shopId, to, body, marketing: opts.marketing, kind: opts.kind ?? null }, { shopId });
+      await logMessage({ shopId, channel: "sms", kind: opts.kind, recipient: to, subject: body.slice(0, 120), status: error ? "failed" : "queued", error });
+      return error ? { error } : { queued: true };
+    }
+  }
   const { sent, allowance } = await smsUsage(shopId);
-  if (opts.marketing && sent >= allowance) return { error: "SMS allowance used up", overAllowance: true };
+  if (opts.marketing && sent >= allowance) {
+    await logMessage({ shopId, channel: "sms", kind: opts.kind, recipient: to, subject: body.slice(0, 120), status: "skipped", error: "SMS allowance used up" });
+    return { error: "SMS allowance used up", overAllowance: true };
+  }
   const r = await sendSms(to, body);
+  await logMessage({ shopId, channel: "sms", kind: opts.kind ?? (opts.marketing ? "marketing" : "transactional"), recipient: to, subject: body.slice(0, 120), status: r.error ? "failed" : "sent", error: r.error });
   if (r.error) return r;
   const admin = createAdminClient();
   const { data: now } = await admin.rpc("bump_sms_usage", { p_shop: shopId, p_month: monthKey() });

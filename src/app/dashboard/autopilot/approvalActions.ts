@@ -59,7 +59,7 @@ export async function decideMessage(id: string, approve: boolean): Promise<{ err
   let ok = false;
   if (ev.client_phone && twilioConfigured()) {
     const { data: out } = await admin.from("sms_opt_outs").select("phone").eq("phone", ev.client_phone).maybeSingle();
-    if (!out) ok = !(await sendShopSms(ctx.shopId, ev.client_phone as string, smsText(shop?.name ?? "", text, bookingUrl, COMMERCIAL.has(ev.flow_key as string)), { marketing: COMMERCIAL.has(ev.flow_key as string) })).error;
+    if (!out) ok = !(await sendShopSms(ctx.shopId, ev.client_phone as string, smsText(shop?.name ?? "", text, bookingUrl, COMMERCIAL.has(ev.flow_key as string)), { marketing: COMMERCIAL.has(ev.flow_key as string), automated: true, kind: `autopilot.${ev.flow_key as string}` })).error;
   }
   if (ev.client_email) {
     const r = await sendAutopilotEmail(ev.client_email as string, { shopName: shop?.name ?? "", subject, text, ctaLabel: "Book now", ctaUrl: bookingUrl });

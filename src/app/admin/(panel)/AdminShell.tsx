@@ -37,6 +37,7 @@ const NAV = [
   { icon: BarChart3,       href: "/admin/analytics",          label: "Analytics"         },
   { icon: GitFork,         href: "/admin/cohorts",            label: "Cohort Analysis"   },
   { icon: Zap,             href: "/admin/autopilot-activity", label: "AutoPilot Activity"},
+  { icon: Mail,            href: "/admin/messages",           label: "Message Log"       },
   { icon: ShieldAlert,     href: "/admin/payments-risk",      label: "Payments Risk"     },
   { icon: Flag,            href: "/admin/feature-flags",      label: "Feature Flags"     },
   { icon: FlaskConical,    href: "/admin/experiments",        label: "Experiments"       },

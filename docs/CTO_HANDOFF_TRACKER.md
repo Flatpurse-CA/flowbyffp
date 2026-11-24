@@ -65,7 +65,7 @@ Legend: DONE = built, verify only · PARTIAL = something exists, needs finishing
 | ID | Task | Status |
 |---|---|---|
 | FL-002 | Organisation -> Location data model | TODO |
-| FL-003/004/005 | Event bus, local-time scheduler, unified messaging log | PARTIAL |
+| FL-003/004/005 | Event bus, local-time scheduler, unified messaging log | PARTIAL (004 DONE: shops.timezone from province, scheduled_jobs + claim_due_jobs, nextWeekdayAt/quiet-hours helpers, /api/cron/jobs; automated SMS in 9pm-8am shop time queued for 8am. 005 DONE: message_log for every email + shop SMS, admin Message Log page. 003 event bus not built) |
 | FL-008 | AI gateway (templates, logging, cost, PII redaction) | PARTIAL |
 | FL-009/010 | Attribution ledger, nightly metrics engine | PARTIAL |
 | FL-011 | Optional 2-step; required for payouts/export | DONE (Supabase TOTP on Settings > Security; gates export + payout changes; needs MFA enabled in Supabase Auth) |
