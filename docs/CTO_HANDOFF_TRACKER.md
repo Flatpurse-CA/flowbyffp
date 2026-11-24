@@ -76,7 +76,7 @@ Legend: DONE = built, verify only · PARTIAL = something exists, needs finishing
 | FL-019 | Test suite + CI + seed data | PARTIAL (vitest money/policy/tax/area tests + GitHub CI; no seed data or E2E yet) |
 
 ### P2 (month 1 after launch)
-FL-087 schedules/time off (DONE: migration 0066, Team > Time off, blocks booking) · FL-088 commissions (PARTIAL) · FL-089 staff performance (DONE: Team > Performance) · FL-090 Daily Brief push/email (PARTIAL) · FL-091 weekly/monthly emails (DONE: Monday + 1st-of-month recap via billing cron) · FL-092 nudges · FL-093 reviews (PARTIAL) · FL-094 Operations Score (PARTIAL) · FL-095 annual plan (PARTIAL) · FL-096 referral (DONE, verify) · FL-097-099 wow screens · FL-100 Flow Coach (PARTIAL) · FL-101 AI help assistant
+FL-087 schedules/time off (DONE: migration 0066, Team > Time off, blocks booking) · FL-088 commissions (DONE: migration 0073, Team > Commissions; % per service, per-staff override, flat/none/booth renter, pre-tax after discounts, refunds reversed, tips 100% staff, fee split toggle, pay-period report + CSV) · FL-089 staff performance (DONE: Team > Performance) · FL-090 Daily Brief push/email (PARTIAL) · FL-091 weekly/monthly emails (DONE: Monday + 1st-of-month recap via billing cron) · FL-092 nudges · FL-093 reviews (PARTIAL) · FL-094 Operations Score (PARTIAL) · FL-095 annual plan (PARTIAL) · FL-096 referral (DONE, verify) · FL-097-099 wow screens · FL-100 Flow Coach (PARTIAL) · FL-101 AI help assistant
 
 ### P3 (later)
 FL-102/103 Flow Voice · FL-104-106 gift cards, packages, memberships · FL-107/108 API + Zapier · FL-109 Reserve with Google · FL-110 native apps · FL-111 multi-location · FL-112 Founder Hour · FL-113 leaderboard · FL-114 insurer billing · FL-115 French translation
