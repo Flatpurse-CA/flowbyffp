@@ -32,7 +32,7 @@ const PLAN_PRODUCTS = [
 ];
 
 // Founders prices, locked for life (must match FOUNDERS_PRICES in src/lib/plans.ts).
-const FOUNDERS_PRICES = { starter: [29, 290], pro: [65, 650], pro_plus: [139, 1390] };
+const FOUNDERS_PRICES = { starter: [29, 290], pro: [66, 660], pro_plus: [139, 1390] };
 const FOUNDERS_COUPONS = [];
 
 async function findProductByPlanKey(planKey) {

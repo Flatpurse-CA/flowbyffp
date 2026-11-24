@@ -229,7 +229,7 @@ export function getStripePriceId(key: BillablePlanKey, interval: BillingInterval
  */
 export const FOUNDERS_PRICES: Record<BillablePlanKey, Record<BillingInterval, number>> = {
   starter:  { monthly: 29,  annual: 290 },
-  pro:      { monthly: 65,  annual: 650 },
+  pro:      { monthly: 66,  annual: 660 },
   pro_plus: { monthly: 139, annual: 1390 },
 };
 
