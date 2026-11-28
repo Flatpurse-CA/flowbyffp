@@ -90,7 +90,7 @@ export function BetaBanner({ spotsLeft }: { spotsLeft: number | null }) {
   return (
     <Link href="/signup" className="h6-beta">
       <span className="h6-beta-dot" aria-hidden="true" />
-      <span><strong>Founders Beta is open.</strong> {spotsLeft !== null && spotsLeft > 0 ? `${spotsLeft} of 40 spots left, ` : ""}40% off your first year</span>
+      <span><strong>Founders Beta is open.</strong> {spotsLeft !== null && spotsLeft > 0 && spotsLeft < 40 ? `${spotsLeft} of 40 spots left, ` : "40 spots, "}at least 25% off, locked in</span>
       <ArrowUpRight size={15} strokeWidth={2.2} aria-hidden="true" />
     </Link>
   );
@@ -183,7 +183,7 @@ export function HeroCopy() {
           {isClients ? <>Explore the benefits <ArrowDown size={16} strokeWidth={2.2} /></> : <>Watch the walkthrough <ArrowUpRight size={16} strokeWidth={2.2} /></>}
         </a>
       </div>
-      <p className="h5-hero-micro">{isClients ? "Your favourite shop. A simpler way to book." : "14-day free trial. Cancel any time before it ends."}</p>
+      <p className="h5-hero-micro">{isClients ? "Your favourite shop. A simpler way to book." : "14-day free trial. Card required. Cancel before day 14 and you pay nothing."}</p>
     </div>
   );
 }

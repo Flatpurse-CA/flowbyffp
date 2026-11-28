@@ -8,7 +8,7 @@ const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600", "700"] }
 export const metadata = {
   title: "Pricing | FlatPurse Flow",
   description:
-    "Simple, transparent pricing with zero commission. The first 40 businesses get 40% off Pro or Pro+ for 12 months, then 25% off forever.",
+    "Simple, transparent pricing with zero commission. The first 40 businesses get Founders pricing: at least 25% off every plan, locked in while they stay subscribed.",
 };
 
 export default function PricingPage() {

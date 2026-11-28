@@ -14,12 +14,12 @@ const navFont = Inter({ subsets: ["latin"], weight: ["400", "500", "600", "700"]
 
 export const metadata: Metadata = {
   title: "AutoPilot | Salon Booking Automation | FlatPurse Flow",
-  description: "AutoPilot helps Canadian salon and barbershop owners keep the calendar moving with online booking, reminders, waitlist recovery, follow-ups and payments.",
+  description: "AutoPilot helps Canadian salon and barbershop owners keep the calendar moving with online booking, reminders, slot filling, follow-ups and payments.",
 };
 
 const FEATURES = [
   { n: "01 / SMART BOOKING", t: "Online salon booking, around the clock", b: "Give clients one link to choose a service, pick a barber or stylist, and select an available appointment. They can book when it suits them without a phone call during your busiest hour.", u: "For the booking request that arrives after closing." },
-  { n: "02 / NO-SHOW RECOVERY", t: "Put your waitlist to work", b: "When a cancellation leaves a gap, AutoPilot helps reach clients waiting for a slot. Appointment reminders also help clients remember their visit before an empty chair becomes lost revenue.", u: "For the opening you would otherwise have to fill manually." },
+  { n: "02 / NO-SHOW RECOVERY", t: "Fill the gap and rebook the no-show", b: "When a cancellation leaves a gap, AutoPilot offers it by text and email to clients who are due for a visit. After a no-show, it texts the client an hour later to rebook. Appointment reminders also help clients remember their visit before an empty chair becomes lost revenue.", u: "For the opening you would otherwise have to fill manually." },
   { n: "03 / AI FRONT DESK", t: "Booking questions, with less back-and-forth", b: "AutoPilot helps answer client questions and handle booking conversations through supported messaging channels. Questions that need your judgement can be passed back to you.", u: "For the “Do you have anything Friday?” message." },
   { n: "04 / CLIENT WIN-BACK", t: "Reconnect with clients you haven’t seen", b: "A missed routine can turn into a forgotten regular. Win-back messages help you reconnect with clients who haven’t visited recently, without working through your client list by hand.", u: "For the regular whose next appointment never got booked." },
   { n: "05 / REBOOKING REMINDERS", t: "Help the next appointment happen", b: "Rebooking nudges encourage clients to return for their next service. Keep cuts, colour appointments, and other repeat visits on their radar while leaving them free to choose a time.", u: "For the “I’ve been meaning to book” moment." },
@@ -27,8 +27,8 @@ const FEATURES = [
 ];
 
 const FAQ: { q: string; a: React.ReactNode }[] = [
-  { q: "What is AutoPilot?", a: "AutoPilot is FlatPurse Flow’s booking automation system for independent salons and barbershops. It connects online booking, appointment reminders, waitlist recovery, booking conversations, client follow-ups, and payments." },
-  { q: "Can AutoPilot prevent every no-show?", a: "No. Reminders can help clients remember appointments, and waitlist outreach can help fill a cancelled slot. Results depend on your clients, their availability, your policies, and the way your shop uses the tools." },
+  { q: "What is AutoPilot?", a: "AutoPilot is FlatPurse Flow’s booking automation system for independent salons and barbershops. It connects online booking, appointment reminders, slot filling, booking conversations, client follow-ups, and payments." },
+  { q: "Can AutoPilot prevent every no-show?", a: "No. Reminders can help clients remember appointments, and offering the slot to clients who are due can help fill a cancelled slot. Results depend on your clients, their availability, your policies, and the way your shop uses the tools." },
   { q: "Is AutoPilot a replacement for my receptionist?", a: "AutoPilot supports routine booking and follow-up tasks. Your team still handles personal service, exceptions, and decisions that need a human." },
   { q: "How do win-back and rebooking reminders differ?", a: "Rebooking reminders prompt a client to arrange their next regular visit. Win-back messages reconnect with clients who have stopped returning or have not visited recently." },
   { q: "Does AutoPilot work for Canadian salons?", a: "FlatPurse Flow is built in Edmonton for Canadian salons and barbershops, with pricing in Canadian dollars. Check your plan for the payment methods and messaging channels available to your shop." },
@@ -62,7 +62,7 @@ export default function AutoPilotPage() {
             <h2>A change of plans.<br />A chance to fill the chair.</h2>
             <ol className="ap-timeline">
               <li><span className="ap-time">09:00</span><div><strong>An appointment opens up</strong><p>A client cancels their afternoon visit.</p></div></li>
-              <li><span className="ap-time">NEXT</span><div><strong>Your waitlist gets a nudge</strong><p>AutoPilot reaches out about the available slot.</p></div></li>
+              <li><span className="ap-time">NEXT</span><div><strong>Clients who are due get a nudge</strong><p>AutoPilot reaches out about the available slot.</p></div></li>
               <li><span className="ap-time">THEN</span><div><strong>A client takes the opening</strong><p>They book and follow the payment steps.</p></div></li>
             </ol>
             <div className="ap-story-note">Example workflow. A replacement booking depends on client availability and response.</div>

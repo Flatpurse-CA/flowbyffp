@@ -14,7 +14,7 @@ export const PRICES = {
   proPlus: plan("pro_plus").monthlyPrice!,
 };
 
-/** Founders Beta: 40% off year 1, then 25% off for life. */
+/** Founders Beta: separate locked prices, at least 25% off (see FOUNDERS_PRICES in plans.ts). Legacy helpers below are unused. */
 export const foundersYear1 = (price: number) => (price * 0.6).toFixed(2);
 export const foundersAfter = (price: number) => (price * 0.75).toFixed(2);
 

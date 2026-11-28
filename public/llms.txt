@@ -2,16 +2,16 @@
 
 > Booking, payments and AI recovery for salons, barbershops, spas, massage clinics and studios in Canada. Built in Edmonton, Alberta by FlatPurse Inc.
 
-FlatPurse Flow is booking and client management software with an AI Front Desk, no-show recovery and Tap to Pay on iPhone (credit and Interac). It handles online booking, payments, client CRM, staff scheduling and sales tax for all 13 Canadian provinces and territories. Prices are in CAD and client data is stored in Canada.
+FlatPurse Flow is booking and client management software with an AI Front Desk, no-show recovery and Tap to Pay on iPhone or Android (credit and Interac). It handles online booking, payments, client CRM, staff scheduling and sales tax for all 13 Canadian provinces and territories. Prices are in CAD. Client data is stored in Canada; payment and messaging providers may process some data elsewhere.
 
 ## Plans (CAD per month, per location, before tax)
 
 - Starter, C$39: up to 2 team members. Bookings, online booking page, clients, payments and Tap to Pay, reminders, reviews.
-- Pro, C$89: up to 6 team members. Adds AI Front Desk, Daily Brief and client segments.
-- Pro+, C$189: unlimited team members at one location. Adds AutoPilot (No-Show Recovery about an hour after a missed appointment, Last-Minute Slot Filler, win-backs, birthday offers), Flow Coach, Business Health Score and revenue forecasting.
+- Pro, C$89: up to 6 team members. Adds AutoPilot (No-Show Recovery about an hour after a missed appointment, Last-Minute Slot Filler, win-backs, birthday offers), AI Front Desk, Daily Brief and client segments.
+- Pro+, C$189: unlimited team members at one location. Adds Flow Coach, Business Health Score and revenue forecasting.
 - Enterprise: custom, 3+ locations.
-- Founders Beta: 40% off year 1, then 25% off for life.
-- Every plan starts with a free 14-day trial of Pro+. Cancel any time before it ends.
+- Founders Beta (first 40 locations, until January 31, 2027): Starter C$29, Pro C$66, Pro+ C$139 a month, at least 25% off, locked in while subscribed.
+- Every plan starts with a free 14-day trial of Pro+. A card is required up front; nothing is charged before day 14.
 
 ## Payments
 

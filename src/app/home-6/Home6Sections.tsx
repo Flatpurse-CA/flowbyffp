@@ -24,7 +24,7 @@ function Head({ eyebrow, title, body, align = "center" }: { eyebrow: string; tit
 
 const FLOWS = [
   { icon: UserX, t: "No-Show Recovery", d: "When a client misses an appointment, Flow messages them an hour later with a link to rebook." },
-  { icon: CalendarClock, t: "Last-Minute Slot Filler", d: "A cancellation opens a slot. Flow offers it to your waitlist and sends the next client a payment link." },
+  { icon: CalendarClock, t: "Last-Minute Slot Filler", d: "A cancellation opens a slot. Flow offers it to clients who are due for a visit, by text and email." },
   { icon: RotateCcw, t: "30-Day Win-Back", d: "Clients who have not visited in 30 days get a message inviting them back." },
   { icon: MessageCircle, t: "AI Front Desk", d: "Answers Instagram and WhatsApp messages, books the appointment and hands off to you only when it needs to." },
   { icon: Repeat, t: "Rebooking Reminders", d: "Nudges each client to rebook based on how often they usually come in." },
@@ -129,7 +129,7 @@ const CANADA = [
   { icon: Percent, t: "0% commission", d: "You pay a flat monthly plan plus standard card processing. Flow takes no cut of your bookings or of new clients." },
   { icon: ReceiptText, t: "Tax handled in 13 provinces and territories", d: "GST, HST and PST are applied for you, with CRA-compliant receipts on every sale." },
   { icon: Smartphone, t: "Tap to Pay, Interac included", d: "Take cards and Interac debit on your iPhone or Android phone. No card reader to buy." },
-  { icon: ShieldCheck, t: "Your data stays in Canada", d: "Client data is stored in Canada, encrypted in transit and at rest, and never sold." },
+  { icon: ShieldCheck, t: "Your data stays in Canada", d: "Client data is stored in Canada, encrypted and never sold. Payment and messaging providers may process some data outside Canada." },
 ];
 
 /** Canadian payments, tax and data residency. */

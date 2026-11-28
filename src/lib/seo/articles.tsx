@@ -50,7 +50,7 @@ export const QUESTIONS: Article[] = [
       <h2>A worked example</h2>
       <p>A 4-chair salon taking 20,000 dollars a month in tapped credit cards across 300 sales pays about 600 dollars in processing (2.7% is 540, plus 300 × 20¢). Interac sales cost less.</p>
       <h2>Flow&apos;s plans</h2>
-      <p>Starter CAD {PRICES.starter}, Pro CAD {PRICES.pro}, Pro+ CAD {PRICES.proPlus} a month, per location, before tax. Founders Beta saves 40% in year 1 and 25% for life. <Link href="/pricing">See all plans</Link>.</p>
+      <p>Starter CAD {PRICES.starter}, Pro CAD {PRICES.pro}, Pro+ CAD {PRICES.proPlus} a month, per location, before tax. Founders Beta gets at least 25% off every plan, locked in while you stay subscribed. <Link href="/pricing">See all plans</Link>.</p>
       <p className="seo-sources">Sources: {src(SOURCES.fresha)}, {src(SOURCES.booksy)}, {src(SOURCES.vagaro)}, {src(SOURCES.stripe)}.</p>
     </>,
     related: salonLinks,

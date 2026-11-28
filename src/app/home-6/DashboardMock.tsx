@@ -33,7 +33,7 @@ const SCHEDULE = [
   { t: "10:30 AM", n: "Jordan Lee", s: "Skin fade and beard", who: "Dre", st: "done", p: 55 },
   { t: "11:15 AM", n: "Priya Shah", s: "Balayage", who: "Maya", st: "done", p: 210 },
   { t: "1:00 PM", n: "Chloe Martin", s: "Colour and cut", who: "Dre", st: "next", p: 140 },
-  { t: "2:30 PM", n: "Tunde Bello", s: "Classic cut", who: "Sam", st: "confirmed", p: 40 },
+  { t: "2:30 PM", n: "Tunde Bello", s: "Classic cut", who: "Dre", st: "confirmed", p: 40 },
   { t: "3:15 PM", n: "Emily Tremblay", s: "Gel manicure", who: "Ivy", st: "deposit", p: 60 },
 ];
 
@@ -127,7 +127,7 @@ export default function DashboardMock() {
                 <p style={{ color: "#fff", fontSize: 46, fontWeight: 800, margin: "0 0 20px", letterSpacing: "-0.04em", lineHeight: 1 }}>C$4,860</p>
                 <div style={{ display: "flex", gap: 30 }}>
                   {[
-                    { v: "C$385", l: "Today" }, { v: "23", l: "Slots filled" }, { v: "14", l: "No-shows saved" },
+                    { v: "C$385", l: "Today" }, { v: "23", l: "Filled this month" }, { v: "14", l: "No-shows saved" },
                     { v: "11", l: "Win-backs" }, { v: "96%", l: "Show-up rate" },
                   ].map(s => (
                     <div key={s.l}>
@@ -159,7 +159,7 @@ export default function DashboardMock() {
             <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14 }}>
               {[
                 { icon: CalendarDays, iconC: VIOLET, iconBg: "rgb(237,233,254)", label: "TODAY'S BOOKINGS", value: "14", sub: "Next at 1:00 PM", subC: LABEL },
-                { icon: AlertTriangle, iconC: RED, iconBg: "rgb(254,226,226)", label: "NEEDS YOUR EYES", value: "2", valueC: RED, sub: "Deposit due for Emily T.", subC: LABEL, badge: 2 },
+                { icon: AlertTriangle, iconC: RED, iconBg: "rgb(254,226,226)", label: "NEEDS YOUR EYES", value: "1", valueC: RED, sub: "Deposit due for Emily T.", subC: LABEL, badge: 2 },
                 { icon: BarChart2, iconC: BLUE, iconBg: "rgb(219,234,254)", label: "THIS MONTH", value: "C$18,420", sub: "+23% vs last month", subC: GREEN },
                 { icon: Star, iconC: "rgb(180,83,9)", iconBg: "rgb(254,236,200)", label: "GOOGLE RATING", value: "4.9", sub: "38 new reviews", subC: LABEL },
               ].map(c => (

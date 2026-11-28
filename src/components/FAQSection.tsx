@@ -14,7 +14,7 @@ const FAQS = [
   {
     n: "02",
     q: "How does AutoPilot work?",
-    a: "AutoPilot is a set of six always-on AI flows that run in the background of your shop. It sends reminders, fills cancellations from your waitlist, messages clients who haven't visited in 30+ days, and answers booking DMs, without you lifting a finger.",
+    a: "AutoPilot is a set of six always-on AI flows that run in the background of your shop. It sends reminders, offers open slots to clients who are due for a visit, messages clients who haven't visited in 30+ days, and answers booking DMs, without you lifting a finger.",
   },
   {
     n: "03",
@@ -24,7 +24,7 @@ const FAQS = [
   {
     n: "04",
     q: "How long does setup take?",
-    a: "Most shops are fully set up in under 15 minutes. You create your booking page, add your services and staff, connect payments, and AutoPilot handles the rest. No complicated onboarding or technical knowledge required.",
+    a: "Most shops are fully set up in under a day. You create your booking page, add your services and staff, connect payments, and AutoPilot handles the rest. No complicated onboarding or technical knowledge required.",
   },
   {
     n: "05",
@@ -34,7 +34,7 @@ const FAQS = [
   {
     n: "06",
     q: "What happens when a client no-shows or cancels?",
-    a: "AutoPilot immediately pulls the next client from your waitlist, fills the slot, and sends them a payment link. You recover revenue that would otherwise be lost, with zero effort on your part.",
+    a: "For a cancellation, AutoPilot offers the open slot to clients who are due for a visit, by text and email. The first to tap books it. For a no-show, it texts the client an hour after the missed appointment to rebook. You recover revenue that would otherwise be lost, with zero effort on your part.",
   },
   {
     n: "07",

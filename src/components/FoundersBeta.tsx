@@ -4,8 +4,8 @@ import "./founders-beta.css";
 
 const CARDS = [
   { t: "A direct line to the founder", d: "Founders Beta support comes from George, in Edmonton. What you ask for goes straight into the product." },
-  { t: "Founders pricing, locked in", d: "40% off your first year, then 25% off for as long as you stay subscribed." },
-  { t: "Try all of it first", d: "14 days of Pro+ free. No contracts. Cancel any time." },
+  { t: "Founders pricing, locked in", d: "At least 25% off every plan, for as long as you stay subscribed." },
+  { t: "Try all of it first", d: "14 days of Pro+ free, card required. Cancel before day 14 and you pay nothing." },
 ];
 
 /** Honest social proof for a new product: replaces the testimonial sections. */
@@ -35,7 +35,8 @@ export default function FoundersBeta({ spotsLeft }: { spotsLeft: number | null }
           ))}
         </div>
         <div className="fb-note">
-          <blockquote>&ldquo;Flow is brand new, and the first businesses to join get to help shape it. Try it free for 14 days. If you stay, Founders get 40% off their first year, 25% off for life after that, and a direct line to me.&rdquo;</blockquote>
+          <p className="fb-note-label" style={{ margin: "0 0 10px", fontSize: 12, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", opacity: 0.7 }}>A note from the founder</p>
+          <blockquote>&ldquo;Flow is brand new, and the first businesses to join get to help shape it. Try it free for 14 days. If you stay, Founders lock in at least 25% off for as long as they stay subscribed, and get a direct line to me.&rdquo;</blockquote>
           <div className="fb-note-foot">
             <p><strong>George Ogunbande</strong><span>Founder, FlatPurse Flow</span></p>
             <Link href="/signup" className="fb-btn">Claim a Founders spot</Link>

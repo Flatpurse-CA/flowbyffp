@@ -24,7 +24,7 @@ const V2_INK = "#1c1b22";
 const V2_MUTED = "#4b4a55";
 const V2_ACCENT = "#5233db";
 // Intercepted by the homepage's AudienceProvider to switch to the Clients view.
-const FOR_CLIENTS_HREF = "#for-clients";
+const FOR_CLIENTS_HREF = "#for-clients"; // other pages link to /#for-clients
 
 export default function LandingNav({ active = "home", variant = "v1" }: { active?: string; variant?: "v1" | "v2" }) {
   const v2 = variant === "v2";
@@ -242,7 +242,7 @@ export default function LandingNav({ active = "home", variant = "v1" }: { active
             )}
           </div>
           {v2 && (
-            <a href={FOR_CLIENTS_HREF} className="nav-v2-link" style={{ fontSize: 17, fontWeight: 500, color: muted, textDecoration: "none" }}>
+            <a href={pathname === "/" ? FOR_CLIENTS_HREF : `/${FOR_CLIENTS_HREF}`} className="nav-v2-link" style={{ fontSize: 17, fontWeight: 500, color: muted, textDecoration: "none" }}>
               For clients
             </a>
           )}
@@ -329,7 +329,7 @@ export default function LandingNav({ active = "home", variant = "v1" }: { active
           })}
           {v2 && (
             <>
-              <a href={FOR_CLIENTS_HREF} onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "14px 4px", fontSize: 16, fontWeight: 500, color: NAV_MUTED, textDecoration: "none", borderBottom: `1px solid ${BORDER}` }}>
+              <a href={pathname === "/" ? FOR_CLIENTS_HREF : `/${FOR_CLIENTS_HREF}`} onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "14px 4px", fontSize: 16, fontWeight: 500, color: NAV_MUTED, textDecoration: "none", borderBottom: `1px solid ${BORDER}` }}>
                 For clients
               </a>
               <Link href="/login" style={{ display: "block", padding: "14px 4px", fontSize: 16, fontWeight: 500, color: NAV_MUTED, textDecoration: "none", borderBottom: `1px solid ${BORDER}` }}>

@@ -218,7 +218,7 @@ export default async function Home5Page() {
 
       <Footer childrenAt="bottom" cta={{
         heading: <>Stop losing chairs<br />to no-shows.</>,
-        body: "Start your free trial today. Founders Beta shops get 40% off Pro or Pro+ for the first year.",
+        body: "Start your free trial today. Founders Beta shops get at least 25% off every plan, locked in while they stay subscribed.",
         href: "/signup",
         label: "Start your free trial",
         secondary: { href: "/demo", label: "Watch the walkthrough" },

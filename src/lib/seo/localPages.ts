@@ -122,7 +122,7 @@ export const CITIES: City[] = [
 
 const priceFaq: Faq = {
   q: "How much does it cost?",
-  a: `Plans start at CAD ${PRICES.starter}/month. Founders Beta members save 40% in year 1 and 25% for life after that. Every plan starts with a free 14-day trial of Pro+. Cancel any time before it ends.`,
+  a: `Plans start at CAD ${PRICES.starter}/month. Founders Beta members get at least 25% off every plan, locked in while they stay subscribed. Every plan starts with a free 14-day trial of Pro+. Card required to start. Cancel before day 14 and you pay nothing.`,
 };
 const switchFaq: Faq = {
   q: "Can I move my clients from Fresha, Vagaro or Booksy?",
@@ -130,7 +130,7 @@ const switchFaq: Faq = {
 };
 const readerFaq: Faq = {
   q: "Do I need a card terminal?",
-  a: `No. Tap to Pay works on a compatible iPhone: ${RATES.tappedCredit} per tapped credit card and ${RATES.interac} for Interac.`,
+  a: `No. Tap to Pay works on a compatible iPhone or Android phone: ${RATES.tappedCredit} per tapped credit card and ${RATES.interac} for Interac.`,
 };
 const canadaFaq = (c: City): Faq => ({
   q: "Is Flow made in Canada?",

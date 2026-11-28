@@ -88,7 +88,7 @@ function SignupStep1() {
               animation: fadeUp(60),
             }}
           >
-            Set up your shop in a few minutes.
+            Most shops are live in under a day.
           </p>
           <p style={{ margin: "-20px 0 28px", fontSize: 13, lineHeight: 1.5, color: "rgb(196,181,253)", animation: fadeUp(70) }}>
             14 days of Pro+ free. Founders pricing is applied automatically.

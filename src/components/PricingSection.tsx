@@ -12,12 +12,12 @@ const PLANS = [
     id: "starter",
     label: "Starter",
     badge: null,
-    originalPrice: null,
-    price: "C$39",
+    originalPrice: "C$39/mo",
+    price: "C$29",
     priceSuffix: "/mo",
-    subtitle: "Flat monthly price",
+    subtitle: "Founders price, locked in",
     description: "Solo businesses getting started",
-    features: ["Bookings, calendar & online booking page", "Payments & Tap to Pay on iPhone", "Client CRM, reminders & reviews", "Up to 2 team members"],
+    features: ["Bookings, calendar & online booking page", "Payments & Tap to Pay on iPhone or Android", "Client CRM, reminders & reviews", "Up to 2 team members"],
     cta: "Start with Starter",
     href: "/signup",
     gradient: "radial-gradient(140% 60% at 50% 100%, rgb(109,40,217) 0%, rgb(76,29,149) 28%, rgb(30,10,60) 58%, rgba(9,9,11,0) 85%)",
@@ -26,13 +26,13 @@ const PLANS = [
   {
     id: "pro",
     label: "Pro",
-    badge: null,
+    badge: "Recommended",
     originalPrice: "C$89/mo",
-    price: "C$53.40",
+    price: "C$66",
     priceSuffix: "/mo",
-    subtitle: "Year 1 · then C$66.75/mo forever",
+    subtitle: "Founders price, locked in",
     description: "Run your business",
-    features: ["AI Front Desk: answers clients and books appointments", "Daily Brief: morning business summary", "Client segmentation & churn-risk alerts", "Up to 6 team members"],
+    features: ["AutoPilot: no-show recovery, slot filler, win-backs, birthday offers", "AI Front Desk: answers clients and books appointments", "Daily Brief: morning business summary", "Up to 6 team members"],
     cta: "Start with Pro",
     href: "/signup",
     gradient: "radial-gradient(140% 60% at 50% 100%, rgb(109,40,217) 0%, rgb(76,29,149) 28%, rgb(30,10,60) 58%, rgba(9,9,11,0) 85%)",
@@ -41,13 +41,13 @@ const PLANS = [
   {
     id: "pro-plus",
     label: "Pro+",
-    badge: "Most Popular",
+    badge: null,
     originalPrice: "C$189/mo",
-    price: "C$113.40",
+    price: "C$139",
     priceSuffix: "/mo",
-    subtitle: "Year 1 · then C$141.75/mo forever",
+    subtitle: "Founders price, locked in",
     description: "Grow your business",
-    features: ["AutoPilot: no-show recovery, slot filler, win-backs, birthday offers", "Flow Coach™: your AI business consultant", "Business Health Score & revenue forecasting", "Unlimited team members at one location"],
+    features: ["Everything in Pro", "Flow Coach™: your AI business consultant", "Business Health Score & revenue forecasting", "Unlimited team members at one location"],
     cta: "Start with Pro+",
     href: "/signup",
     gradient: "radial-gradient(140% 60% at 50% 100%, rgb(109,40,217) 0%, rgb(76,29,149) 28%, rgb(30,10,60) 58%, rgba(9,9,11,0) 85%)",
@@ -82,7 +82,7 @@ function CheckIcon({ active, founders }: { active: boolean; founders: boolean })
 // finePrint "cards" (home-6): the trial / founders / fee notes as cards and a
 // fee table instead of two grey paragraphs. Default keeps every other page as-is.
 const FINE_CARDS = [
-  { t: "14-day free trial", d: "Every plan starts with Pro+ free for 14 days. Cancel any time before it ends." },
+  { t: "14-day free trial", d: "Every plan starts with Pro+ free for 14 days. Card required to start. Cancel before day 14 and you pay nothing." },
   { t: "Founders pricing, locked in", d: "Beta members are pre-qualified. Your price holds as long as your subscription stays active. Cancel and it is gone for good." },
   { t: "0% commission", d: "Flow never takes a commission on a new client." },
 ];
@@ -138,7 +138,7 @@ export default function PricingSection({ finePrint = "text" }: { finePrint?: "te
           color: "#fff",
           margin: "0 0 16px",
         }}>
-          Beta members are<br /><span style={{ color: BRAND_PURPLE }}>auto-enrolled.</span>
+          Flat pricing.<br /><span style={{ color: BRAND_PURPLE }}>Zero commission.</span>
         </h2>
         <p style={{
           fontSize: 16,
@@ -147,7 +147,7 @@ export default function PricingSection({ finePrint = "text" }: { finePrint?: "te
           margin: 0,
           maxWidth: 520,
         }}>
-          The first 40 businesses to join get 40% off Pro or Pro+ for 12 months, then 25% off forever. No code required. Here&apos;s what that looks like:
+          The first 40 businesses get Founders pricing: at least 25% off every plan, locked in for as long as they stay subscribed. No code required.
         </p>
       </ScrollReveal>
 
@@ -362,7 +362,7 @@ export default function PricingSection({ finePrint = "text" }: { finePrint?: "te
           Beta members are pre-qualified. Founders pricing is locked in for as long as your subscription stays active; cancel and you lose it for good.
         </p>
         <p style={{ fontSize: 13.5, color: "rgba(255,255,255,0.5)", lineHeight: 1.7, margin: "-12px auto 28px", maxWidth: 560 }}>
-          Every plan starts with a free 14-day trial of Pro+. Cancel any time before it ends. Card payments are Stripe&apos;s standard rates, paid by your shop to Stripe and the same on every plan: 2.7% + 20¢ tapped, 30¢ flat for Interac, 2.9% + 30¢ online. Flow never takes a commission on a new client.
+          Every plan starts with a free 14-day trial of Pro+. Card required to start. Cancel before day 14 and you pay nothing. Card payments are Stripe&apos;s standard rates, paid by your shop to Stripe and the same on every plan: 2.7% + 20¢ tapped, 30¢ flat for Interac, 2.9% + 30¢ online. Flow never takes a commission on a new client.
         </p>
         </>)}
         <Link href="/signup" style={{

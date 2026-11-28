@@ -49,7 +49,7 @@ export default function Footer({ cta, children, childrenAt = "top", hideCta = fa
             margin: "0 auto 40px",
             maxWidth: 480,
           }}>
-            {cta ? cta.body : <>Start your free trial today. Founders Beta shops get 40% off Pro or Pro+ for the first year.</>}
+            {cta ? cta.body : <>Start your free trial today. Founders Beta shops get at least 25% off every plan, locked in while they stay subscribed.</>}
           </p>
           <Link href={cta?.href ?? "/signup"} style={{
             display: "inline-flex", alignItems: "center", justifyContent: "center",

@@ -18,7 +18,7 @@ const FEATURES = [
     id: "noshows",
     title: "02: No-Show Recovery",
     description:
-      "When a client cancels or ghosts, AutoPilot immediately fills that slot from your waitlist and sends a payment link, recovering revenue you would have lost.",
+      "When a client cancels, AutoPilot offers the open slot to clients who are due for a visit, by text and email. The first to tap books it. When a client no-shows, it texts them an hour later to rebook.",
     image: "/Features2.jpg",
   },
   {
